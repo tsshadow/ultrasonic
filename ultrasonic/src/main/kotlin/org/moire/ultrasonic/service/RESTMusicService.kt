@@ -696,6 +696,16 @@ open class RESTMusicService(
         return response.body()!!.genresList.toDomainEntityList()
     }
 
+
+    @Throws(Exception::class)
+    override fun getCustom1(
+        refresh: Boolean
+    ): List<Custom1> {
+        val response = responseChecker.callWithResponseCheck { api -> api.getCustom1().execute() }
+
+        return response.body()!!.custom1List.toDomainEntityList()
+    }
+
     @Throws(Exception::class)
     override fun getSongsByGenre(
         genre: String,
@@ -704,6 +714,21 @@ open class RESTMusicService(
     ): MusicDirectory {
         val response = responseChecker.callWithResponseCheck { api ->
             api.getSongsByGenre(genre, count, offset, null).execute()
+        }
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+    @Throws(Exception::class)
+    override fun getSongsByCustom1(
+        custom1: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = responseChecker.callWithResponseCheck { api ->
+            api.getSongsByCustom1(custom1, count, offset, null).execute()
         }
 
         val result = MusicDirectory()

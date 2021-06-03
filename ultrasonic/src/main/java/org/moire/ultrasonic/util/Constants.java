@@ -55,6 +55,7 @@ public final class Constants
 	public static final String INTENT_EXTRA_NAME_STARRED = "subsonic.starred";
 	public static final String INTENT_EXTRA_NAME_RANDOM = "subsonic.random";
 	public static final String INTENT_EXTRA_NAME_GENRE_NAME = "subsonic.genre";
+	public static final String INTENT_EXTRA_NAME_CUSTOM1_NAME = "subsonic.custom1";
 	public static final String INTENT_EXTRA_NAME_IS_ALBUM = "subsonic.isalbum";
 	public static final String INTENT_EXTRA_NAME_VIDEOS = "subsonic.videos";
 	public static final String INTENT_EXTRA_NAME_SHOW_PLAYER = "subsonic.showplayer";

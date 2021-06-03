@@ -199,14 +199,17 @@
         <item>10</item>
         <item>15</item>
         <item>20</item>
-        <item>25</item>
         <item>30</item>
         <item>40</item>
+        <item>25</item>
         <item>50</item>
         <item>75</item>
         <item>100</item>
         <item>250</item>
         <item>500</item>
+        <item>1000</item>
+        <item>10000</item>
+        <item>100000</item>
     </string-array>
     <string-array name="searchNames" translatable="false">
         <item>@string/settings.search_1</item>
@@ -223,6 +226,9 @@
         <item>@string/settings.search_100</item>
         <item>@string/settings.search_250</item>
         <item>@string/settings.search_500</item>
+        <item>@string/settings.search_1000</item>
+        <item>@string/settings.search_10000</item>
+        <item>@string/settings.search_100000</item>
     </string-array>
     <string-array name="videoPlayerValues" translatable="false">
         <item>mx</item>

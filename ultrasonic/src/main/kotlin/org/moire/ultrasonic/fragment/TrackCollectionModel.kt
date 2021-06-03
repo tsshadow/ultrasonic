@@ -29,6 +29,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
     val currentDirectory: MutableLiveData<MusicDirectory> = MutableLiveData()
     val songsForGenre: MutableLiveData<MusicDirectory> = MutableLiveData()
+    val songsForCustom1: MutableLiveData<MusicDirectory> = MutableLiveData()
 
     suspend fun getMusicFolders(refresh: Boolean) {
         withContext(Dispatchers.IO) {
@@ -197,6 +198,13 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getSongsByGenre(genre, count, offset)
             songsForGenre.postValue(musicDirectory)
+        }
+    }
+    suspend fun getSongsForCustom1(genre: String, count: Int, offset: Int) {
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getSongsByCustom1(genre, count, offset)
+            songsForCustom1.postValue(musicDirectory)
         }
     }
 

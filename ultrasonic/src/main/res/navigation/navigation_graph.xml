@@ -20,6 +20,9 @@
             android:id="@+id/mainToSelectGenre"
             app:destination="@id/selectGenreFragment" />
         <action
+            android:id="@+id/mainToSelectCustom1"
+            app:destination="@id/selectCustom1Fragment" />
+        <action
             android:id="@+id/mainToServerSelector"
             app:destination="@id/serverSelectorFragment" />
     </fragment>
@@ -93,6 +96,9 @@
     <fragment
         android:id="@+id/selectGenreFragment"
         android:name="org.moire.ultrasonic.fragment.SelectGenreFragment" />
+    <fragment
+        android:id="@+id/selectCustom1Fragment"
+        android:name="org.moire.ultrasonic.fragment.SelectCustom1Fragment" />
     <fragment
         android:id="@+id/playerFragment"
         android:name="org.moire.ultrasonic.fragment.PlayerFragment" >

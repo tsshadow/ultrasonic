@@ -334,12 +334,12 @@
             a:title="@string/settings.default_songs"
             app:iconSpaceReserved="false"/>
         <ListPreference
-            a:defaultValue="25"
+            a:defaultValue="100000"
             a:entries="@array/searchNames"
             a:entryValues="@array/searchValues"
             a:key="maxSongs"
             a:title="@string/settings.max_songs"
-            app:iconSpaceReserved="false"/>
+            app:iconSpaceReserved="false" />
         <Preference
             a:key="clearSearchHistory"
             a:persistent="false"
