@@ -7,21 +7,8 @@
 package org.moire.ultrasonic.service
 
 import android.graphics.Bitmap
+import org.moire.ultrasonic.domain.*
 import java.io.InputStream
-import org.moire.ultrasonic.domain.Bookmark
-import org.moire.ultrasonic.domain.ChatMessage
-import org.moire.ultrasonic.domain.Genre
-import org.moire.ultrasonic.domain.Indexes
-import org.moire.ultrasonic.domain.JukeboxStatus
-import org.moire.ultrasonic.domain.Lyrics
-import org.moire.ultrasonic.domain.MusicDirectory
-import org.moire.ultrasonic.domain.MusicFolder
-import org.moire.ultrasonic.domain.Playlist
-import org.moire.ultrasonic.domain.PodcastsChannel
-import org.moire.ultrasonic.domain.SearchCriteria
-import org.moire.ultrasonic.domain.SearchResult
-import org.moire.ultrasonic.domain.Share
-import org.moire.ultrasonic.domain.UserInfo
 
 @Suppress("TooManyFunctions")
 interface MusicService {
@@ -33,6 +20,10 @@ interface MusicService {
 
     @Throws(Exception::class)
     fun getGenres(refresh: Boolean): List<Genre>?
+
+
+    @Throws(Exception::class)
+    fun getCustom1(refresh: Boolean): List<Custom1>?
 
     @Throws(Exception::class)
     fun star(id: String?, albumId: String?, artistId: String?)
@@ -104,6 +95,9 @@ interface MusicService {
 
     @Throws(Exception::class)
     fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory
+
+    @Throws(Exception::class)
+    fun getSongsByCustom1(genre: String, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
     fun getStarred(): SearchResult

@@ -519,5 +519,6 @@
     <string name="feature_flags_five_star_rating_description">Use five star rating system for songs
         instead of simply starring/unstarring items.
     </string>
+    <string name="server_editor.disabled_feature">One or more features were disabled because the server doesn\'t support them.\nYou can run this test again anytime.</string>
 
 </resources>

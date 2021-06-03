@@ -14,6 +14,7 @@ import org.koin.core.component.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Bookmark
 import org.moire.ultrasonic.domain.ChatMessage
+import org.moire.ultrasonic.domain.Custom1
 import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.Indexes
 import org.moire.ultrasonic.domain.JukeboxStatus
@@ -47,6 +48,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     private val cachedMusicFolders =
         TimeLimitedCache<List<MusicFolder>?>(10, TimeUnit.HOURS)
     private val cachedGenres = TimeLimitedCache<List<Genre>?>(10, TimeUnit.HOURS)
+    private val cachedCustom1 = TimeLimitedCache<List<Custom1>?>(10, TimeUnit.HOURS)
     private var restUrl: String? = null
     private var cachedMusicFolderId: String? = null
 
@@ -363,8 +365,36 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
+    override fun getCustom1(refresh: Boolean): List<Custom1>? {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedCustom1.clear()
+        }
+        var result = cachedCustom1.get()
+        if (result == null) {
+            result = musicService.getCustom1(refresh)
+            cachedCustom1.set(result)
+        }
+
+        val sorted = result?.toMutableList()
+        sorted?.sortWith { custom1, custom1_2 ->
+            custom1.name.compareTo(
+                custom1_2.name,
+                ignoreCase = true
+            )
+        }
+        return sorted
+    }
+
+    @Throws(Exception::class)
     override fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory {
         return musicService.getSongsByGenre(genre, count, offset)
+    }
+
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom1(custom1: String, count: Int, offset: Int): MusicDirectory {
+        return musicService.getSongsByCustom1(custom1, count, offset)
     }
 
     @Throws(Exception::class)

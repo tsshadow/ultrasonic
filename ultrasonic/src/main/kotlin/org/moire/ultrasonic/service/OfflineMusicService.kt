@@ -25,21 +25,7 @@ import java.util.regex.Pattern
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.domain.Artist
-import org.moire.ultrasonic.domain.Bookmark
-import org.moire.ultrasonic.domain.ChatMessage
-import org.moire.ultrasonic.domain.Genre
-import org.moire.ultrasonic.domain.Indexes
-import org.moire.ultrasonic.domain.JukeboxStatus
-import org.moire.ultrasonic.domain.Lyrics
-import org.moire.ultrasonic.domain.MusicDirectory
-import org.moire.ultrasonic.domain.MusicFolder
-import org.moire.ultrasonic.domain.Playlist
-import org.moire.ultrasonic.domain.PodcastsChannel
-import org.moire.ultrasonic.domain.SearchCriteria
-import org.moire.ultrasonic.domain.SearchResult
-import org.moire.ultrasonic.domain.Share
-import org.moire.ultrasonic.domain.UserInfo
+import org.moire.ultrasonic.domain.*
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.Util
@@ -365,9 +351,20 @@ class OfflineMusicService : MusicService, KoinComponent {
         throw OfflineException("Getting Songs By Genre not available in offline mode")
     }
 
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom1(custom1: String, count: Int, offset: Int): MusicDirectory {
+        throw OfflineException("Getting Songs By Custom1 tag not available in offline mode")
+    }
+
     @Throws(Exception::class)
     override fun getGenres(refresh: Boolean): List<Genre>? {
         throw OfflineException("Getting Genres not available in offline mode")
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom1(refresh: Boolean): List<Custom1>? {
+        throw OfflineException("Getting Custom1 tags not available in offline mode")
     }
 
     @Throws(Exception::class)
