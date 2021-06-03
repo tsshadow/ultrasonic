@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="background_task.loading">Loading&#8230;</string>
     <string name="background_task.network_error">A network error occurred. Please check the server address or try again later.</string>
@@ -103,7 +103,7 @@
     <string name="main.albums_title">Albums</string>
     <string name="main.artists_title">Artists</string>
     <string name="main.genres_title">Genres</string>
-    <string name="main.custom1_title">Subgenre</string>
+    <string name="main.custom1_title">Custom 1</string>
     <string name="main.music">Music</string>
     <string name="main.offline">Offline</string>
     <string name="main.select_server">Select Server</string>
@@ -354,7 +354,7 @@
     <string name="util.bytes_format.gigabyte">0.00 GB</string>
     <string name="util.bytes_format.kilobyte">0 KB</string>
     <string name="util.bytes_format.megabyte">0.00 MB</string>
-    <string name="util.no_time">-:--</string>
+    <string name="util.no_time" tools:ignore="TypographyDashes">-:--</string>
     <string name="util.zero_time">0:00</string>
     <string name="video.get_mx_player_text">MX Player is not installed. Get it for free on Play Store, or change video settings.</string>
     <string name="video.get_mx_player_button">Get MX Player</string>
