@@ -234,7 +234,7 @@ interface SubsonicAPIDefinition {
     @GET("getGenres.view")
     fun getGenres(): Call<GenresResponse>
 
-    @GET("getGenres.view")
+    @GET("getCustom1.view")
     fun getCustom1(): Call<Custom1Response>
 
     @GET("getSongsByGenre.view")
