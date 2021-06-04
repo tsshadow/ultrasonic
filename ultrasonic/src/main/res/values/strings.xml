@@ -13,7 +13,7 @@
     <string name="button_bar.bookmarks">Bookmarks</string>
     <string name="button_bar.browse">Media Library</string>
     <string name="button_bar.chat">Chat</string>
-    <string name="button_bar.home">Ultrasonic Main</string>
+    <string name="button_bar.home">Ultrasonic+ Main</string>
     <string name="button_bar.now_playing">Now Playing</string>
     <string name="buttons.play">Play</string>
     <string name="buttons.pause">Pause</string>
@@ -28,7 +28,7 @@
     <string name="button_bar.playlists">Playlists</string>
     <string name="button_bar.search">Search</string>
     <string name="chat.send_a_message">Send a message</string>
-    <string name="common.appname">Ultrasonic</string>
+    <string name="common.appname">Ultrasonic+</string>
     <string name="common.cancel">Cancel</string>
     <string name="common.comment">Comment</string>
     <string name="common.confirm">Confirm</string>
@@ -102,8 +102,12 @@
     <string name="main.albums_starred">Starred</string>
     <string name="main.albums_title">Albums</string>
     <string name="main.artists_title">Artists</string>
-    <string name="main.genres_title">Genres</string>
     <string name="main.custom1_title">Custom 1</string>
+    <string name="main.custom2_title">Custom 2</string>
+    <string name="main.custom3_title">Custom 3</string>
+    <string name="main.custom4_title">Custom 4</string>
+    <string name="main.custom5_title">Custom 5</string>
+    <string name="main.genres_title">Genres</string>
     <string name="main.music">Music</string>
     <string name="main.offline">Offline</string>
     <string name="main.select_server">Select Server</string>
@@ -112,7 +116,7 @@
     <string name="main.songs_starred">Starred</string>
     <string name="main.songs_title">Songs</string>
     <string name="main.videos">Videos</string>
-    <string name="main.welcome_text">Welcome to Ultrasonic! The app is currently not configured. After you\'ve set up your personal server (available from <b>subsonic.org</b>), please click <i>Manage Servers</i> in <b>Settings</b> to connect to it.</string>
+    <string name="main.welcome_text">Welcome to Ultrasonic+! The app is currently not configured. After you\'ve set up your personal server (available from <b>subsonic.org</b>), please click <i>Manage Servers</i> in <b>Settings</b> to connect to it.</string>
     <string name="main.welcome_title">Welcome!</string>
     <string name="menu.about">About</string>
     <string name="menu.common">Common</string>
@@ -154,8 +158,12 @@
     <string name="select_album.play_all">Play All</string>
     <string name="select_artist.all_folders">All Folders</string>
     <string name="select_artist.folder">Select Folder</string>
+    <string name="select_custom1.empty">No custom 1 tags found</string>
+    <string name="select_custom2.empty">No custom 2 tags found</string>
+    <string name="select_custom3.empty">No custom 3 tags found</string>
+    <string name="select_custom4.empty">No custom 4 tags found</string>
+    <string name="select_custom5.empty">No custom 5 tags found</string>
     <string name="select_genre.empty">No genres found</string>
-    <string name="select_custom1.empty">No subgenres found</string>
     <string name="select_playlist.empty">No saved playlists on server</string>
     <string name="service.connecting">Contacting server, please wait.</string>
     <string name="settings.allow_self_signed_certificate" translatable="false">allowSelfSignedCertificate</string>
@@ -386,7 +394,7 @@
     <string name="time_span_disable">Disable</string>
     <string name="time_span_disabled">Disabled</string>
     <string name="save_as_defaults">Save as default</string>
-    <string name="share_comment">Comment</string>
+    <string name="share_comment">Comment</string>q
     <string name="settings.share_expiration">Time To Expiration</string>
     <string name="download_song_removed">\"%s\" was removed from playlist</string>
     <string name="download.share_playlist">Share Playlist</string>
@@ -432,15 +440,15 @@
     <string name="settings.debug.log_delete">Delete files</string>
     <string name="settings.debug.log_deleted">Deleted log files.</string>
 
-    <string name="permissions.access_error">Ultrasonic can\'t access the music file cache. Cache location was reset to the default path.</string>
+    <string name="permissions.access_error">Ultrasonic+ can\'t access the music file cache. Cache location was reset to the default path.</string>
     <string name="permissions.message_box_title">Warning</string>
-    <string name="permissions.permission_missing">Ultrasonic needs read/write permission to the music cache directory. Cache directory was reset to its default value.</string>
+    <string name="permissions.permission_missing">Ultrasonic+ needs read/write permission to the music cache directory. Cache directory was reset to its default value.</string>
     <string name="permissions.rationale_title">Permission request</string>
-    <string name="permissions.rationale_description_failed">Ultrasonic needs read/write permission to the music cache directory.\nPlease allow Ultrasonic to access the filesystem.</string>
+    <string name="permissions.rationale_description_failed">Ultrasonic+ needs read/write permission to the music cache directory.\nPlease allow Ultrasonic+ to access the filesystem.</string>
     <string name="permissions.permanent_denial_title">Permissions permanently denied</string>
-    <string name="permissions.permanent_denial_description">Ultrasonic needs Read/Write access to the cache location. You can grant them in app settings. If you reject this request, the default folder will be used as the cache location.</string>
+    <string name="permissions.permanent_denial_description">Ultrasonic+ needs Read/Write access to the cache location. You can grant them in app settings. If you reject this request, the default folder will be used as the cache location.</string>
     <string name="permissions.open_settings">Open settings</string>
-    <string name="permissions.rationale_description_initial">To be able to change the cache location, Ultrasonic needs read/write permission to the filesystem.</string>
+    <string name="permissions.rationale_description_initial">To be able to change the cache location, Ultrasonic+ needs read/write permission to the filesystem.</string>
 
     <string name="filepicker.select_folder">Select a folder</string>
     <string name="filepicker.create_folder">Create new folder</string>
@@ -506,7 +514,7 @@
     <string name="api.subsonic.param_missing">Required param is missing.</string>
     <string name="api.subsonic.requested_data_was_not_found">Requested data was not found.</string>
     <string name="api.subsonic.trial_period_is_over">Trial period is over.</string>
-    <string name="api.subsonic.upgrade_client">Incompatible versions. Please upgrade Ultrasonic Android app.</string>
+    <string name="api.subsonic.upgrade_client">Incompatible versions. Please upgrade Ultrasonic+ Android app.</string>
     <string name="api.subsonic.upgrade_server">Incompatible versions. Please upgrade Subsonic server.</string>
 
     <!-- Subsonic feature flags -->

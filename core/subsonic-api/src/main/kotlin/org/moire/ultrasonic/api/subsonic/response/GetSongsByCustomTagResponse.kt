@@ -5,16 +5,16 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions
 import org.moire.ultrasonic.api.subsonic.SubsonicError
 import org.moire.ultrasonic.api.subsonic.models.MusicDirectoryChild
 
-class GetSongsByCustom1Response(
+class GetSongsByCustomTagResponse(
     status: Status,
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("songsBycustom1") private val songsByCustom1List = SongsByCustom1Wrapper()
+    @JsonProperty("songsByCustom") private val songsByCustomTagList = SongsByCustomTagWrapper()
 
-    val songsList get() = songsByCustom1List.songsList
+    val songsList get() = songsByCustomTagList.songsList
 }
 
-internal class SongsByCustom1Wrapper(
+internal class SongsByCustomTagWrapper(
     @JsonProperty("song") val songsList: List<MusicDirectoryChild> = emptyList()
 )

@@ -13,7 +13,7 @@
     <string name="button_bar.bookmarks">Bladwijzers</string>
     <string name="button_bar.browse">Mediabibliotheek</string>
     <string name="button_bar.chat">Chat</string>
-    <string name="button_bar.home">Ultrasonic Main</string>
+    <string name="button_bar.home">Ultrasonic+ Main</string>
     <string name="button_bar.now_playing">Nu aan het afspelen</string>
     <string name="buttons.play">Afspelen</string>
     <string name="buttons.pause">Pauzeren</string>
@@ -28,7 +28,7 @@
     <string name="button_bar.playlists">Afspeellijsten</string>
     <string name="button_bar.search">Zoeken</string>
     <string name="chat.send_a_message">Bericht versturen</string>
-    <string name="common.appname">Ultrasonic</string>
+    <string name="common.appname">Ultrasonic+</string>
     <string name="common.cancel">Annuleren</string>
     <string name="common.comment">Reageren</string>
     <string name="common.confirm">Bevestigen</string>
@@ -421,15 +421,15 @@
     <string name="settings.debug.log_delete">Verwijderen</string>
     <string name="settings.debug.log_deleted">De logboeken zijn verwijderd.</string>
 
-    <string name="permissions.access_error">Ultrasonic heeft geen toegang tot de muziekcache. De cachelocatie is teruggezet op de standaardlocatie.</string>
+    <string name="permissions.access_error">Ultrasonic+ heeft geen toegang tot de muziekcache. De cachelocatie is teruggezet op de standaardlocatie.</string>
     <string name="permissions.message_box_title">Waarschuwing</string>
-    <string name="permissions.permission_missing">Ultrasonic heeft lees- en schrijfrechten nodig op de muziekcachemap. De cachemap is teruggezet op de standaardmap.</string>
+    <string name="permissions.permission_missing">Ultrasonic+ heeft lees- en schrijfrechten nodig op de muziekcachemap. De cachemap is teruggezet op de standaardmap.</string>
     <string name="permissions.rationale_title">Rechtenverzoek</string>
-    <string name="permissions.rationale_description_failed">Ultrasonic heeft lees- en schrijfrechten nodig op de muziekcachemap.\nGeef Ultrasonic toegang tot het bestandssysteem.</string>
+    <string name="permissions.rationale_description_failed">Ultrasonic+ heeft lees- en schrijfrechten nodig op de muziekcachemap.\nGeef Ultrasonic+ toegang tot het bestandssysteem.</string>
     <string name="permissions.permanent_denial_title">De rechten zijn afgewezen</string>
-    <string name="permissions.permanent_denial_description">Ultrasonic heeft lees- en schrijfrechten nodig op de cachemap. Je kunt deze rechten verlenen in de appinstellingen. Als je dit verzoek afwijst, wordt de standaardmap gebruikt.</string>
+    <string name="permissions.permanent_denial_description">Ultrasonic+ heeft lees- en schrijfrechten nodig op de cachemap. Je kunt deze rechten verlenen in de appinstellingen. Als je dit verzoek afwijst, wordt de standaardmap gebruikt.</string>
     <string name="permissions.open_settings">Instellingen openen</string>
-    <string name="permissions.rationale_description_initial">Ultrasonic heeft lees- en schrijfrechten nodig op het bestandssysteem om de cachemap te kunnen wijzigen.</string>
+    <string name="permissions.rationale_description_initial">Ultrasonic+ heeft lees- en schrijfrechten nodig op het bestandssysteem om de cachemap te kunnen wijzigen.</string>
 
     <string name="filepicker.select_folder">Kies een map</string>
     <string name="filepicker.create_folder">Nieuwe map maken</string>
@@ -495,7 +495,7 @@
     <string name="api.subsonic.param_missing">Vereiste parameter ontbreekt.</string>
     <string name="api.subsonic.requested_data_was_not_found">De opgevraagde gegevens kunnen niet worden gevonden.</string>
     <string name="api.subsonic.trial_period_is_over">Proefperiode is afgelopen.</string>
-    <string name="api.subsonic.upgrade_client">Incompatibele versies. Werk de Ultrasonic Android-app bij.</string>
+    <string name="api.subsonic.upgrade_client">Incompatibele versies. Werk de Ultrasonic+ Android-app bij.</string>
     <string name="api.subsonic.upgrade_server">Incompatibele versies. Werk je Subsonic-server bij.</string>
 
     <!-- Subsonic feature flags -->

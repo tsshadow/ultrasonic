@@ -245,13 +245,13 @@ interface SubsonicAPIDefinition {
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByGenreResponse>
 
-    @GET("getSongsByGenre.view")
+    @GET("getSongsByCustom1.view")
     fun getSongsByCustom1(
         @Query("custom1") genre: String,
         @Query("count") count: Int = 10,
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
-    ): Call<GetSongsByCustom1Response>
+    ): Call<GetSongsByCustomTagResponse>
 
     @GET("getUser.view")
     fun getUser(@Query("username") username: String): Call<GetUserResponse>

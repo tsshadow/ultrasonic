@@ -121,7 +121,6 @@ public class MainFragment extends Fragment {
         if (!ActiveServerProvider.Companion.isOffline())
         {
             adapter.addView(musicTitle, false);
-            adapter.addViews(asList(artistsButton, albumsButton, genresButton), true);
             adapter.addViews(asList(artistsButton, albumsButton, genresButton, custom1Button), true);
             adapter.addView(songsTitle, false);
             adapter.addViews(asList(randomSongsButton, songsStarredButton), true);
