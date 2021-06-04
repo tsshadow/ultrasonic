@@ -97,7 +97,7 @@ interface MusicService {
     fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
-    fun getSongsByCustom1(genre: String, count: Int, offset: Int): MusicDirectory
+    fun getSongsByCustom1(custom1: String, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
     fun getStarred(): SearchResult

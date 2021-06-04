@@ -247,11 +247,11 @@ interface SubsonicAPIDefinition {
 
     @GET("getSongsByCustom1.view")
     fun getSongsByCustom1(
-        @Query("custom1") genre: String,
+        @Query("custom1") custom1: String,
         @Query("count") count: Int = 10,
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
-    ): Call<GetSongsByCustomTagResponse>
+    ): Call<GetSongsByCustom1Response>
 
     @GET("getUser.view")
     fun getUser(@Query("username") username: String): Call<GetUserResponse>

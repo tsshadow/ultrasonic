@@ -200,10 +200,10 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
             songsForGenre.postValue(musicDirectory)
         }
     }
-    suspend fun getSongsForCustom1(genre: String, count: Int, offset: Int) {
+    suspend fun getSongsForCustom1(custom1: String, count: Int, offset: Int) {
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByCustom1(genre, count, offset)
+            val musicDirectory = service.getSongsByCustom1(custom1, count, offset)
             songsForCustom1.postValue(musicDirectory)
         }
     }
