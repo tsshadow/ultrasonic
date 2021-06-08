@@ -237,6 +237,21 @@ interface SubsonicAPIDefinition {
     @GET("getCustom1.view")
     fun getCustom1(): Call<Custom1Response>
 
+    @GET("getCustom2.view")
+    fun getCustom2(): Call<Custom2Response>
+
+    @GET("getCustom3.view")
+    fun getCustom3(): Call<Custom3Response>
+
+    @GET("getCustom4.view")
+    fun getCustom4(): Call<Custom4Response>
+
+    @GET("getCustom5.view")
+    fun getCustom5(): Call<Custom5Response>
+
+    @GET("getMoods.view")
+    fun getMoods(): Call<MoodResponse>
+
     @GET("getSongsByGenre.view")
     fun getSongsByGenre(
         @Query("genre") genre: String,
@@ -252,6 +267,51 @@ interface SubsonicAPIDefinition {
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByCustom1Response>
+
+
+    @GET("getSongsByCustom2.view")
+    fun getSongsByCustom2(
+        @Query("custom2") custom2: String,
+        @Query("count") count: Int = 20,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByCustom2Response>
+
+
+    @GET("getSongsByCustom3.view")
+    fun getSongsByCustom3(
+        @Query("custom3") custom3: String,
+        @Query("count") count: Int = 30,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByCustom3Response>
+
+
+    @GET("getSongsByCustom4.view")
+    fun getSongsByCustom4(
+        @Query("custom4") custom4: String,
+        @Query("count") count: Int = 40,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByCustom4Response>
+
+
+    @GET("getSongsByCustom5.view")
+    fun getSongsByCustom5(
+        @Query("custom5") custom5: String,
+        @Query("count") count: Int = 50,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByCustom5Response>
+
+
+    @GET("getSongsByMood.view")
+    fun getSongsByMood(
+        @Query("mood") custom5: String,
+        @Query("count") count: Int = 50,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByMoodResponse>
 
     @GET("getUser.view")
     fun getUser(@Query("username") username: String): Call<GetUserResponse>

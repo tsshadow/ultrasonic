@@ -358,6 +358,31 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(Exception::class)
+    override fun getSongsByCustom2(custom2: String, count: Int, offset: Int): MusicDirectory {
+        throw OfflineException("Getting Songs By Custom2 tag not available in offline mode")
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom3(custom3: String, count: Int, offset: Int): MusicDirectory {
+        throw OfflineException("Getting Songs By Custom3 tag not available in offline mode")
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom4(custom4: String, count: Int, offset: Int): MusicDirectory {
+        throw OfflineException("Getting Songs By Custom4 tag not available in offline mode")
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom5(custom5: String, count: Int, offset: Int): MusicDirectory {
+        throw OfflineException("Getting Songs By Custom5 tag not available in offline mode")
+    }
+    
+    @Throws(Exception::class)
+    override fun getSongsByMood(mood: String, count: Int, offset: Int): MusicDirectory {
+        throw OfflineException("Getting Songs By Mood tag not available in offline mode")
+    }
+
+    @Throws(Exception::class)
     override fun getGenres(refresh: Boolean): List<Genre>? {
         throw OfflineException("Getting Genres not available in offline mode")
     }
@@ -365,6 +390,31 @@ class OfflineMusicService : MusicService, KoinComponent {
     @Throws(Exception::class)
     override fun getCustom1(refresh: Boolean): List<Custom1>? {
         throw OfflineException("Getting Custom1 tags not available in offline mode")
+    }
+    
+    @Throws(Exception::class)
+    override fun getCustom2(refresh: Boolean): List<Custom2>? {
+        throw OfflineException("Getting Custom2 tags not available in offline mode")
+    }
+    
+    @Throws(Exception::class)
+    override fun getCustom3(refresh: Boolean): List<Custom3>? {
+        throw OfflineException("Getting Custom3 tags not available in offline mode")
+    }
+    
+    @Throws(Exception::class)
+    override fun getCustom4(refresh: Boolean): List<Custom4>? {
+        throw OfflineException("Getting Custom4 tags not available in offline mode")
+    }
+    
+    @Throws(Exception::class)
+    override fun getCustom5(refresh: Boolean): List<Custom5>? {
+        throw OfflineException("Getting Custom5 tags not available in offline mode")
+    }
+
+    @Throws(Exception::class)
+    override fun getMoods(refresh: Boolean): List<Mood>? {
+        throw OfflineException("Getting Mood tags not available in offline mode")
     }
 
     @Throws(Exception::class)

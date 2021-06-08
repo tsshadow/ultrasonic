@@ -60,6 +60,11 @@
 		a:textAppearance="?android:attr/textAppearanceMedium" a:gravity="center_vertical"
 		a:paddingLeft="6dip" a:paddingRight="6dip" a:minHeight="40dip" />
 
+	<TextView a:id="@+id/main_mood_button" a:text="@string/main.mood_title"
+		a:layout_width="fill_parent" a:layout_height="wrap_content"
+		a:textAppearance="?android:attr/textAppearanceMedium" a:gravity="center_vertical"
+		a:paddingLeft="6dip" a:paddingRight="6dip" a:minHeight="40dip" />
+
 
 	<TextView a:id="@+id/main_songs" a:text="@string/main.songs_title"
 		a:layout_width="fill_parent" a:layout_height="wrap_content"

@@ -683,10 +683,55 @@ open class RESTMusicService(
     @Throws(Exception::class)
     override fun getCustom1(
         refresh: Boolean
-    ): List<Custom1> {
+    ): List<Custom1>? {
         val response = responseChecker.callWithResponseCheck { api -> api.getCustom1().execute() }
 
         return response.body()!!.custom1List.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom2(
+        refresh: Boolean
+    ): List<Custom2>? {
+        val response = responseChecker.callWithResponseCheck { api -> api.getCustom2().execute() }
+
+        return response.body()!!.custom2List.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom3(
+        refresh: Boolean
+    ): List<Custom3>? {
+        val response = responseChecker.callWithResponseCheck { api -> api.getCustom3().execute() }
+
+        return response.body()!!.custom3List.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom4(
+        refresh: Boolean
+    ): List<Custom4>? {
+        val response = responseChecker.callWithResponseCheck { api -> api.getCustom4().execute() }
+
+        return response.body()!!.custom4List.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom5(
+        refresh: Boolean
+    ): List<Custom5>? {
+        val response = responseChecker.callWithResponseCheck { api -> api.getCustom5().execute() }
+
+        return response.body()!!.custom5List.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getMoods(
+            refresh: Boolean
+    ): List<Mood>? {
+        val response = responseChecker.callWithResponseCheck { api -> api.getMoods().execute() }
+
+        return response.body()!!.moodList.toDomainEntityList()
     }
 
     @Throws(Exception::class)
@@ -713,6 +758,86 @@ open class RESTMusicService(
     ): MusicDirectory {
         val response = responseChecker.callWithResponseCheck { api ->
             api.getSongsByCustom1(custom1, count, offset, null).execute()
+        }
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom2(
+        custom2: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = responseChecker.callWithResponseCheck { api ->
+            api.getSongsByCustom2(custom2, count, offset, null).execute()
+        }
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom3(
+        custom3: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = responseChecker.callWithResponseCheck { api ->
+            api.getSongsByCustom3(custom3, count, offset, null).execute()
+        }
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom4(
+        custom4: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = responseChecker.callWithResponseCheck { api ->
+            api.getSongsByCustom4(custom4, count, offset, null).execute()
+        }
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom5(
+        custom5: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = responseChecker.callWithResponseCheck { api ->
+            api.getSongsByCustom5(custom5, count, offset, null).execute()
+        }
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByMood(
+        mood: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = responseChecker.callWithResponseCheck { api ->
+            api.getSongsByMood(mood, count, offset, null).execute()
         }
 
         val result = MusicDirectory()

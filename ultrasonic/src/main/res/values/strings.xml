@@ -107,6 +107,7 @@
     <string name="main.custom3_title">Custom 3</string>
     <string name="main.custom4_title">Custom 4</string>
     <string name="main.custom5_title">Custom 5</string>
+    <string name="main.mood_title">Mood</string>
     <string name="main.genres_title">Genres</string>
     <string name="main.music">Music</string>
     <string name="main.offline">Offline</string>
@@ -163,6 +164,7 @@
     <string name="select_custom3.empty">No custom 3 tags found</string>
     <string name="select_custom4.empty">No custom 4 tags found</string>
     <string name="select_custom5.empty">No custom 5 tags found</string>
+    <string name="select_mood.empty">No mood tags found</string>
     <string name="select_genre.empty">No genres found</string>
     <string name="select_playlist.empty">No saved playlists on server</string>
     <string name="service.connecting">Contacting server, please wait.</string>

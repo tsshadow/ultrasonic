@@ -12,21 +12,7 @@ import java.util.concurrent.TimeUnit
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.domain.Bookmark
-import org.moire.ultrasonic.domain.ChatMessage
-import org.moire.ultrasonic.domain.Custom1
-import org.moire.ultrasonic.domain.Genre
-import org.moire.ultrasonic.domain.Indexes
-import org.moire.ultrasonic.domain.JukeboxStatus
-import org.moire.ultrasonic.domain.Lyrics
-import org.moire.ultrasonic.domain.MusicDirectory
-import org.moire.ultrasonic.domain.MusicFolder
-import org.moire.ultrasonic.domain.Playlist
-import org.moire.ultrasonic.domain.PodcastsChannel
-import org.moire.ultrasonic.domain.SearchCriteria
-import org.moire.ultrasonic.domain.SearchResult
-import org.moire.ultrasonic.domain.Share
-import org.moire.ultrasonic.domain.UserInfo
+import org.moire.ultrasonic.domain.*
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.LRUCache
 import org.moire.ultrasonic.util.TimeLimitedCache
@@ -49,6 +35,11 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         TimeLimitedCache<List<MusicFolder>?>(10, TimeUnit.HOURS)
     private val cachedGenres = TimeLimitedCache<List<Genre>?>(10, TimeUnit.HOURS)
     private val cachedCustom1 = TimeLimitedCache<List<Custom1>?>(10, TimeUnit.HOURS)
+    private val cachedCustom2 = TimeLimitedCache<List<Custom2>?>(10, TimeUnit.HOURS)
+    private val cachedCustom3 = TimeLimitedCache<List<Custom3>?>(10, TimeUnit.HOURS)
+    private val cachedCustom4 = TimeLimitedCache<List<Custom4>?>(10, TimeUnit.HOURS)
+    private val cachedCustom5 = TimeLimitedCache<List<Custom5>?>(10, TimeUnit.HOURS)
+    private val cachedMood = TimeLimitedCache<List<Mood>?>(10, TimeUnit.HOURS)
     private var restUrl: String? = null
     private var cachedMusicFolderId: String? = null
 
@@ -386,15 +377,150 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         return sorted
     }
 
+
+    @Throws(Exception::class)
+    override fun getCustom2(refresh: Boolean): List<Custom2>? {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedCustom2.clear()
+        }
+        var result = cachedCustom2.get()
+        if (result == null) {
+            result = musicService.getCustom2(refresh)
+            cachedCustom2.set(result)
+        }
+
+        val sorted = result?.toMutableList()
+        sorted?.sortWith { custom1, custom1_2 ->
+            custom1.name.compareTo(
+                custom1_2.name,
+                ignoreCase = true
+            )
+        }
+        return sorted
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom3(refresh: Boolean): List<Custom3>? {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedCustom3.clear()
+        }
+        var result = cachedCustom3.get()
+        if (result == null) {
+            result = musicService.getCustom3(refresh)
+            cachedCustom3.set(result)
+        }
+
+        val sorted = result?.toMutableList()
+        sorted?.sortWith { custom1, custom1_2 ->
+            custom1.name.compareTo(
+                custom1_2.name,
+                ignoreCase = true
+            )
+        }
+        return sorted
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom4(refresh: Boolean): List<Custom4>? {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedCustom4.clear()
+        }
+        var result = cachedCustom4.get()
+        if (result == null) {
+            result = musicService.getCustom4(refresh)
+            cachedCustom4.set(result)
+        }
+
+        val sorted = result?.toMutableList()
+        sorted?.sortWith { custom1, custom1_2 ->
+            custom1.name.compareTo(
+                custom1_2.name,
+                ignoreCase = true
+            )
+        }
+        return sorted
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom5(refresh: Boolean): List<Custom5>? {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedCustom5.clear()
+        }
+        var result = cachedCustom5.get()
+        if (result == null) {
+            result = musicService.getCustom5(refresh)
+            cachedCustom5.set(result)
+        }
+
+        val sorted = result?.toMutableList()
+        sorted?.sortWith { custom1, custom1_2 ->
+            custom1.name.compareTo(
+                custom1_2.name,
+                ignoreCase = true
+            )
+        }
+        return sorted
+    }
+
+    @Throws(Exception::class)
+    override fun getMoods(refresh: Boolean): List<Mood>? {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedMood.clear()
+        }
+        var result = cachedMood.get()
+        if (result == null) {
+            result = musicService.getMoods(refresh)
+            cachedMood.set(result)
+        }
+
+        val sorted = result?.toMutableList()
+        sorted?.sortWith { mood, mood_2 ->
+            mood.name.compareTo(
+                    mood_2.name,
+                ignoreCase = true
+            )
+        }
+        return sorted
+    }
+
     @Throws(Exception::class)
     override fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory {
         return musicService.getSongsByGenre(genre, count, offset)
     }
-
-
+    
     @Throws(Exception::class)
     override fun getSongsByCustom1(custom1: String, count: Int, offset: Int): MusicDirectory {
         return musicService.getSongsByCustom1(custom1, count, offset)
+    }
+    
+    @Throws(Exception::class)
+    override fun getSongsByCustom2(custom2: String, count: Int, offset: Int): MusicDirectory {
+        return musicService.getSongsByCustom2(custom2, count, offset)
+    }
+    
+    @Throws(Exception::class)
+    override fun getSongsByCustom3(custom3: String, count: Int, offset: Int): MusicDirectory {
+        return musicService.getSongsByCustom3(custom3, count, offset)
+    }
+    
+    @Throws(Exception::class)
+    override fun getSongsByCustom4(custom4: String, count: Int, offset: Int): MusicDirectory {
+        return musicService.getSongsByCustom4(custom4, count, offset)
+    }
+    
+    @Throws(Exception::class)
+    override fun getSongsByCustom5(custom5: String, count: Int, offset: Int): MusicDirectory {
+        return musicService.getSongsByCustom5(custom5, count, offset)
+    }
+    
+    @Throws(Exception::class)
+    override fun getSongsByMood(mood: String, count: Int, offset: Int): MusicDirectory {
+        return musicService.getSongsByMood(mood, count, offset)
     }
 
     @Throws(Exception::class)

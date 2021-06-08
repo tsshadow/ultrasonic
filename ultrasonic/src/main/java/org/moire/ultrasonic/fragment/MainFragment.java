@@ -100,6 +100,7 @@ public class MainFragment extends Fragment {
         final View albumsButton = buttons.findViewById(R.id.main_albums_button);
         final View genresButton = buttons.findViewById(R.id.main_genres_button);
         final View custom1Button = buttons.findViewById(R.id.main_custom1_button);
+        final View moodButton = buttons.findViewById(R.id.main_mood_button);
         final View videosTitle = buttons.findViewById(R.id.main_videos_title);
         final View songsTitle = buttons.findViewById(R.id.main_songs);
         final View randomSongsButton = buttons.findViewById(R.id.main_songs_button);
@@ -121,7 +122,7 @@ public class MainFragment extends Fragment {
         if (!ActiveServerProvider.Companion.isOffline())
         {
             adapter.addView(musicTitle, false);
-            adapter.addViews(asList(artistsButton, albumsButton, genresButton, custom1Button), true);
+            adapter.addViews(asList(artistsButton, albumsButton, genresButton, custom1Button, moodButton), true);
             adapter.addView(songsTitle, false);
             adapter.addViews(asList(randomSongsButton, songsStarredButton), true);
             adapter.addView(albumsTitle, false);
@@ -203,6 +204,10 @@ public class MainFragment extends Fragment {
             {
                 showCustom1();
             }
+            else if (view == moodButton)
+            {
+                showMoods();
+            }
             else if (view == videosButton)
             {
                 showVideos();
@@ -258,6 +263,10 @@ public class MainFragment extends Fragment {
     private void showCustom1()
     {
         Navigation.findNavController(getView()).navigate(R.id.mainToSelectCustom1);
+    }
+    private void showMoods()
+    {
+        Navigation.findNavController(getView()).navigate(R.id.mainToSelectMood);
     }
 
     private void showVideos()

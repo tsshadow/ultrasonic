@@ -21,9 +21,23 @@ interface MusicService {
     @Throws(Exception::class)
     fun getGenres(refresh: Boolean): List<Genre>?
 
-
     @Throws(Exception::class)
     fun getCustom1(refresh: Boolean): List<Custom1>?
+
+    @Throws(Exception::class)
+    fun getCustom2(refresh: Boolean): List<Custom2>?
+
+    @Throws(Exception::class)
+    fun getCustom3(refresh: Boolean): List<Custom3>?
+
+    @Throws(Exception::class)
+    fun getCustom4(refresh: Boolean): List<Custom4>?
+
+    @Throws(Exception::class)
+    fun getCustom5(refresh: Boolean): List<Custom5>?
+
+    @Throws(Exception::class)
+    fun getMoods(refresh: Boolean): List<Mood>?
 
     @Throws(Exception::class)
     fun star(id: String?, albumId: String?, artistId: String?)
@@ -98,6 +112,21 @@ interface MusicService {
 
     @Throws(Exception::class)
     fun getSongsByCustom1(custom1: String, count: Int, offset: Int): MusicDirectory
+
+    @Throws(Exception::class)
+    fun getSongsByCustom2(custom2: String, count: Int, offset: Int): MusicDirectory
+
+    @Throws(Exception::class)
+    fun getSongsByCustom3(custom3: String, count: Int, offset: Int): MusicDirectory
+
+    @Throws(Exception::class)
+    fun getSongsByCustom4(custom4: String, count: Int, offset: Int): MusicDirectory
+
+    @Throws(Exception::class)
+    fun getSongsByCustom5(custom5: String, count: Int, offset: Int): MusicDirectory
+
+    @Throws(Exception::class)
+    fun getSongsByMood(mood: String, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
     fun getStarred(): SearchResult
