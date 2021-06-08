@@ -307,7 +307,7 @@ interface SubsonicAPIDefinition {
 
     @GET("getSongsByMood.view")
     fun getSongsByMood(
-        @Query("mood") custom5: String,
+        @Query("mood") mood: String,
         @Query("count") count: Int = 50,
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null

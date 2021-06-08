@@ -125,6 +125,7 @@ class TrackCollectionFragment : Fragment() {
         model.currentDirectory.observe(viewLifecycleOwner, defaultObserver)
         model.songsForGenre.observe(viewLifecycleOwner, songsForGenreObserver)
         model.songsForCustom1.observe(viewLifecycleOwner, songsForCustom1Observer)
+        model.songsForMood.observe(viewLifecycleOwner, songsForMoodObserver)
 
         albumListView!!.choiceMode = ListView.CHOICE_MODE_MULTIPLE
         albumListView!!.setOnItemClickListener { parent, theView, position, _ ->
@@ -232,6 +233,7 @@ class TrackCollectionFragment : Fragment() {
         val shareName = args.getString(Constants.INTENT_EXTRA_NAME_SHARE_NAME)
         val genreName = args.getString(Constants.INTENT_EXTRA_NAME_GENRE_NAME)
         val custom1Name = args.getString(Constants.INTENT_EXTRA_NAME_CUSTOM1_NAME)
+        val moodName = args.getString(Constants.INTENT_EXTRA_NAME_MOOD_NAME)
 
         val getStarredTracks = args.getInt(Constants.INTENT_EXTRA_NAME_STARRED, 0)
         val getVideos = args.getInt(Constants.INTENT_EXTRA_NAME_VIDEOS, 0)
@@ -271,7 +273,9 @@ class TrackCollectionFragment : Fragment() {
             } else if (custom1Name != null) {
                 setTitle(custom1Name)
                 model.getSongsForCustom1(custom1Name, albumListSize, albumListOffset)
-
+            } else if (moodName != null) {
+                setTitle(moodName)
+                model.getSongsForMood(moodName, albumListSize, albumListOffset)
 
             } else if (getStarredTracks != 0) {
                 setTitle(getString(R.string.main_songs_starred))
@@ -656,6 +660,37 @@ class TrackCollectionFragment : Fragment() {
             ) + size
             val bundle = Bundle()
             bundle.putString(Constants.INTENT_EXTRA_NAME_CUSTOM1_NAME, custom1)
+            bundle.putInt(Constants.INTENT_EXTRA_NAME_ALBUM_LIST_SIZE, size)
+            bundle.putInt(Constants.INTENT_EXTRA_NAME_ALBUM_LIST_OFFSET, theOffset)
+
+
+            Navigation.findNavController(requireView())
+                .navigate(R.id.trackCollectionFragment, bundle)
+        }
+
+        updateInterfaceWithEntries(musicDirectory)
+    }
+
+    private val songsForMoodObserver = Observer<MusicDirectory> { musicDirectory ->
+
+        // Hide more button when results are less than album list size
+        if (musicDirectory.getChildren().size < requireArguments().getInt(
+            Constants.INTENT_EXTRA_NAME_ALBUM_LIST_SIZE, 0
+        )
+        ) {
+            moreButton!!.visibility = View.GONE
+        } else {
+            moreButton!!.visibility = View.VISIBLE
+        }
+
+        moreButton!!.setOnClickListener {
+            val mood = requireArguments().getString(Constants.INTENT_EXTRA_NAME_MOOD_NAME)
+            val size = requireArguments().getInt(Constants.INTENT_EXTRA_NAME_ALBUM_LIST_SIZE, 0)
+            val theOffset = requireArguments().getInt(
+                Constants.INTENT_EXTRA_NAME_ALBUM_LIST_OFFSET, 0
+            ) + size
+            val bundle = Bundle()
+            bundle.putString(Constants.INTENT_EXTRA_NAME_MOOD_NAME, mood)
             bundle.putInt(Constants.INTENT_EXTRA_NAME_ALBUM_LIST_SIZE, size)
             bundle.putInt(Constants.INTENT_EXTRA_NAME_ALBUM_LIST_OFFSET, theOffset)
 

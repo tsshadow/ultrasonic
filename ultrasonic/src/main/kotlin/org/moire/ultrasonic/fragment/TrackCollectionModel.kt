@@ -30,6 +30,11 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     val currentDirectory: MutableLiveData<MusicDirectory> = MutableLiveData()
     val songsForGenre: MutableLiveData<MusicDirectory> = MutableLiveData()
     val songsForCustom1: MutableLiveData<MusicDirectory> = MutableLiveData()
+    val songsForCustom2: MutableLiveData<MusicDirectory> = MutableLiveData()
+    val songsForCustom3: MutableLiveData<MusicDirectory> = MutableLiveData()
+    val songsForCustom4: MutableLiveData<MusicDirectory> = MutableLiveData()
+    val songsForCustom5: MutableLiveData<MusicDirectory> = MutableLiveData()
+    val songsForMood: MutableLiveData<MusicDirectory> = MutableLiveData()
 
     suspend fun getMusicFolders(refresh: Boolean) {
         withContext(Dispatchers.IO) {
@@ -205,6 +210,41 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getSongsByCustom1(custom1, count, offset)
             songsForCustom1.postValue(musicDirectory)
+        }
+    }
+    suspend fun getSongsForCustom2(custom2: String, count: Int, offset: Int) {
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getSongsByCustom2(custom2, count, offset)
+            songsForCustom2.postValue(musicDirectory)
+        }
+    }
+    suspend fun getSongsForCustom3(custom3: String, count: Int, offset: Int) {
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getSongsByCustom3(custom3, count, offset)
+            songsForCustom3.postValue(musicDirectory)
+        }
+    }
+    suspend fun getSongsForCustom4(custom4: String, count: Int, offset: Int) {
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getSongsByCustom4(custom4, count, offset)
+            songsForCustom4.postValue(musicDirectory)
+        }
+    }
+    suspend fun getSongsForCustom5(custom5: String, count: Int, offset: Int) {
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getSongsByCustom5(custom5, count, offset)
+            songsForCustom5.postValue(musicDirectory)
+        }
+    }
+    suspend fun getSongsForMood(mood: String, count: Int, offset: Int) {
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getSongsByMood(mood, count, offset)
+            songsForMood.postValue(musicDirectory)
         }
     }
 

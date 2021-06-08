@@ -34,7 +34,7 @@ import timber.log.Timber;
  */
 public class SelectMoodFragment extends Fragment {
 
-    private SwipeRefreshLayout refreshmoodListView;
+    private SwipeRefreshLayout refreshMoodListView;
     private ListView moodListView;
     private View emptyView;
     private CancellationToken cancellationToken;
@@ -54,10 +54,10 @@ public class SelectMoodFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         cancellationToken = new CancellationToken();
-        refreshmoodListView = view.findViewById(R.id.select_mood_refresh);
+        refreshMoodListView = view.findViewById(R.id.select_mood_refresh);
         moodListView = view.findViewById(R.id.select_mood_list);
 
-        refreshmoodListView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
+        refreshMoodListView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
         {
             @Override
             public void onRefresh()
@@ -97,7 +97,7 @@ public class SelectMoodFragment extends Fragment {
 
     private void load(final boolean refresh)
     {
-        BackgroundTask<List<Mood>> task = new FragmentBackgroundTask<List<Mood>>(getActivity(), true, refreshmoodListView, cancellationToken)
+        BackgroundTask<List<Mood>> task = new FragmentBackgroundTask<List<Mood>>(getActivity(), true, refreshMoodListView, cancellationToken)
         {
             @Override
             protected List<Mood> doInBackground()
