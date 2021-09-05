@@ -1,10 +1,10 @@
 package org.moire.ultrasonic.api.subsonic
 
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.never
-import com.nhaarman.mockito_kotlin.verify
 import org.amshove.kluent.`should throw`
 import org.junit.Test
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
+import org.mockito.kotlin.mock
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_1_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_2_0
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType.BY_GENRE
@@ -14,7 +14,7 @@ import org.moire.ultrasonic.api.subsonic.models.AlbumListType.BY_GENRE
  */
 class ApiVersionCheckWrapperTest {
     private val apiMock = mock<SubsonicAPIDefinition>()
-    private val wrapper = ApiVersionCheckWrapper(apiMock, V1_1_0)
+    private val wrapper = ApiVersionCheckWrapper(apiMock, V1_1_0, isRealProtocolVersion = true)
 
     @Test
     fun `Should just call real api for ping`() {

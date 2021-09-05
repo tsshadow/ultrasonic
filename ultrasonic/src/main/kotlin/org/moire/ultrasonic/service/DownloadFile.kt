@@ -24,6 +24,7 @@ import org.koin.core.component.inject
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.CacheCleaner
 import org.moire.ultrasonic.util.CancellableTask
 import org.moire.ultrasonic.util.FileUtil
@@ -39,7 +40,7 @@ import timber.log.Timber
 class DownloadFile(
     val song: MusicDirectory.Entry,
     private val save: Boolean
-) : KoinComponent {
+) : KoinComponent, Comparable<DownloadFile> {
     val partialFile: File
     val completeFile: File
     private val saveFile: File = FileUtil.getSongFile(song)
@@ -48,6 +49,8 @@ class DownloadFile(
     private var retryCount = MAX_RETRIES
 
     private val desiredBitRate: Int = Util.getMaxBitRate()
+
+    var priority = 100
 
     @Volatile
     private var isPlaying = false
@@ -59,6 +62,7 @@ class DownloadFile(
     private var completeWhenDone = false
 
     private val downloader: Downloader by inject()
+    private val imageLoaderProvider: ImageLoaderProvider by inject()
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
 
@@ -200,7 +204,6 @@ class DownloadFile(
         return String.format("DownloadFile (%s)", song)
     }
 
-    @Suppress("TooGenericExceptionCaught")
     private inner class DownloadTask : CancellableTask() {
         override fun execute() {
             var inputStream: InputStream? = null
@@ -248,8 +251,9 @@ class DownloadFile(
 
                 if (needsDownloading) {
                     // Attempt partial HTTP GET, appending to the file if it exists.
-                    val (inStream, partial) = musicService
-                        .getDownloadInputStream(song, partialFile.length(), desiredBitRate)
+                    val (inStream, partial) = musicService.getDownloadInputStream(
+                        song, partialFile.length(), desiredBitRate, save
+                    )
 
                     inputStream = inStream
 
@@ -275,7 +279,7 @@ class DownloadFile(
                     if (isCancelled) {
                         throw Exception(String.format("Download of '%s' was cancelled", song))
                     }
-                    downloadAndSaveCoverArt(musicService)
+                    downloadAndSaveCoverArt()
                 }
 
                 if (isPlaying) {
@@ -288,7 +292,7 @@ class DownloadFile(
                         Util.renameFile(partialFile, completeFile)
                     }
                 }
-            } catch (e: Exception) {
+            } catch (all: Exception) {
                 Util.close(outputStream)
                 Util.delete(completeFile)
                 Util.delete(saveFile)
@@ -297,7 +301,7 @@ class DownloadFile(
                     if (retryCount > 0) {
                         --retryCount
                     }
-                    Timber.w(e, "Failed to download '%s'.", song)
+                    Timber.w(all, "Failed to download '%s'.", song)
                 }
             } finally {
                 Util.close(inputStream)
@@ -329,14 +333,14 @@ class DownloadFile(
             return String.format("DownloadTask (%s)", song)
         }
 
-        private fun downloadAndSaveCoverArt(musicService: MusicService) {
+        private fun downloadAndSaveCoverArt() {
             try {
                 if (!TextUtils.isEmpty(song.coverArt)) {
-                    val size = Util.getMinDisplayMetric()
-                    musicService.getCoverArt(song, size, true, true)
+                    // Download the largest size that we can display in the UI
+                    imageLoaderProvider.getImageLoader().cacheCoverArt(song)
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to get cover art.")
+            } catch (all: Exception) {
+                Timber.e(all, "Failed to get cover art.")
             }
         }
 
@@ -383,6 +387,10 @@ class DownloadFile(
                 }
             }
         }
+    }
+
+    override fun compareTo(other: DownloadFile): Int {
+        return priority.compareTo(other.priority)
     }
 
     companion object {

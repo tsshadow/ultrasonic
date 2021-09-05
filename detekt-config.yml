@@ -30,9 +30,14 @@ performance:
 
 exceptions:
   active: true
+  TooGenericExceptionCaught:
+    allowedExceptionNameRegex: '_|(all|ignore|expected).*'
 
 empty-blocks:
   active: true
+  EmptyFunctionBlock:
+    active: true
+    ignoreOverridden: true
 
 complexity:
   active: true
@@ -40,6 +45,7 @@ complexity:
     thresholdInFiles: 20
     thresholdInClasses: 20
     thresholdInInterfaces: 20
+    thresholdInObjects: 30
   LabeledExpression:
     active: false
 

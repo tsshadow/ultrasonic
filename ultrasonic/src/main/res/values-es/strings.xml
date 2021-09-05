@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="background_task.loading">Cargando&#8230;</string>
     <string name="background_task.network_error">Se ha producido un error de red. Por favor comprueba la dirección del servidor o reinténtalo mas tarde.</string>
@@ -111,8 +111,9 @@
     <string name="main.songs_starred">Me gusta</string>
     <string name="main.songs_title">Canciones</string>
     <string name="main.videos">Vídeos</string>
-    <string name="main.welcome_text">Te damos la bienvenida a Ultrasonic! La aplicación no está configurada actualmente. Después de que hayas configurado tu servidor personal (disponible desde <b>subsonic.org</b>), por favor haz click en <i>Administrar servidores</i> en <b>Configuración</b> para conectarte con él.</string>
-    <string name="main.welcome_title">¡Saludos!</string>
+    <string name="main.welcome_text_demo">Para utilizar Ultrasonic con tu música necesitas un <b>servidor propio</b>. \n\n➤ En caso de que quieras probar la aplicación primero, se puede añadir ahora un servidor de demostración. \n\n➤ En caso contrario, puedes configurar tu servidor personal en la <b>configuración</b>.</string>
+    <string name="main.welcome_title">¡Bienvenido a Ultrasonic!</string>
+    <string name="main.welcome_cancel">Llévame a la configuración</string>
     <string name="menu.about">Acerca de</string>
     <string name="menu.common">Común</string>
     <string name="menu.deleted_playlist">Eliminada lista de reproducción %s</string>
@@ -140,16 +141,11 @@
     <string name="search.search">Haz click para buscar</string>
     <string name="search.songs">Canciones</string>
     <string name="search.title">Buscar</string>
-    <string name="select_album.donate_dialog_0_trial_days_left">El periodo de prueba ha finalizado</string>
-    <string name="select_album.donate_dialog_later">Mas tarde</string>
-    <string name="select_album.donate_dialog_message">Consigue descargas ilimitadas donando a Subsonic.</string>
-    <string name="select_album.donate_dialog_now">Ahora</string>
     <string name="select_album.empty">No se han encontrado medios</string>
     <string name="select_album.n_selected">%d pista(s) seleccionada(s).</string>
     <string name="select_album.n_unselected">%d pista(s) deseleccionada(s).</string>
     <string name="select_album.no_network">Atención: No hay red disponible.</string>
     <string name="select_album.no_sdcard">Error: No hay tarjeta SD disponible.</string>
-    <string name="select_album.not_licensed">Servidor sin licencia. Quedan %d dia(s) de prueba.</string>
     <string name="select_album.play_all">Reproducir todo</string>
     <string name="select_artist.all_folders">Todas las carpetas</string>
     <string name="select_artist.folder">Seleccionar la carpeta</string>
@@ -325,8 +321,7 @@
     <string name="settings.use_id3_summary">Usar el método de etiquetas ID3 en lugar del método basado en el sistema de ficheros</string>
     <string name="settings.show_artist_picture">Mostrar la imagen del artista en la lista de artistas</string>
     <string name="settings.show_artist_picture_summary">Muestra la imagen del artista en la lista de artistas si está disponible</string>
-    <string name="settings.video_title">Vídeo</string>
-    <string name="settings.video_player">Reproductor de vídeo</string>
+    <string name="main.video" tools:ignore="UnusedResources">Vídeo</string>
     <string name="settings.view_refresh">Refresco de la vista</string>
     <string name="settings.view_refresh_500">.5 segundos</string>
     <string name="settings.view_refresh_1000">1 segundo</string>
@@ -346,10 +341,8 @@
     <string name="util.bytes_format.gigabyte">0.00 GB</string>
     <string name="util.bytes_format.kilobyte">0 KB</string>
     <string name="util.bytes_format.megabyte">0.00 MB</string>
-    <string name="util.no_time">-:--</string>
+    <string name="util.no_time" tools:ignore="TypographyDashes">-:--</string>
     <string name="util.zero_time">0:00</string>
-    <string name="video.get_mx_player_text">El MX Player no esta instalado. Descárgalo grátis de la Play Store, o cambia la configuración de vídeo.</string>
-    <string name="video.get_mx_player_button">Obtener MX Player</string>
     <string name="widget.initial_text">Toca para seleccionar música</string>
     <string name="widget.sdcard_busy">Tarjeta SD no disponible</string>
     <string name="widget.sdcard_missing">No hay tarjeta SD</string>
@@ -385,27 +378,11 @@
     <string name="settings.share_greeting_default">Saludo predeterminado para los compartidos</string>
     <string name="share_default_greeting">Echa un vistazo a esta música que te comparto desde %s</string>
     <string name="share_via">Compartir canciones vía</string>
-    <string name="settings.video_mx_player">MX Player</string>
-    <string name="settings.video_default">Por defecto</string>
-    <string name="settings.video_flash">Flash</string>
     <string name="menu.share">Compartir</string>
     <string name="select_album_all_songs">Todas las canciones por %s</string>
     <string name="settings.show_all_songs_by_artist">Mostrar todas las canciones por artista</string>
     <string name="settings.show_all_songs_by_artist_summary">Añadir nueva entrada en la vista de artista para acceder a todas las canciones de un artista</string>
     <string name="download.menu_show_artist">Mostrar artista</string>
-    <string name="settings.image_loader_concurrency">Concurrencia del cargador de imágenes</string>
-    <string name="settings.image_loader_concurrency_1">1</string>
-    <string name="settings.image_loader_concurrency_2">2</string>
-    <string name="settings.image_loader_concurrency_3">3</string>
-    <string name="settings.image_loader_concurrency_4">4</string>
-    <string name="settings.image_loader_concurrency_5">5</string>
-    <string name="settings.image_loader_concurrency_6">6</string>
-    <string name="settings.image_loader_concurrency_7">7</string>
-    <string name="settings.image_loader_concurrency_8">8</string>
-    <string name="settings.image_loader_concurrency_9">9</string>
-    <string name="settings.image_loader_concurrency_10">10</string>
-    <string name="settings.image_loader_concurrency_11">11</string>
-    <string name="settings.image_loader_concurrency_12">12</string>
     <string name="albumArt">Caratula del Álbum</string>
     <string name="common_multiple_years">Múltiples años</string>
     <string name="settings.playback.resume_on_bluetooth_device">Reanudar al conectar un dispositivo Bluetooth</string>
@@ -459,33 +436,34 @@
     <string name="server_editor.authentication">Autenticación</string>
     <string name="server_editor.advanced">Configuración avanzada</string>
     <string name="server_editor.disabled_feature">Una o más funciones se han deshabilitado porque el servidor no las admite.\nPuedes ejecutar esta prueba nuevamente en cualquier momento.</string>
+    <string name="server_menu.demo">Servidor de demostración</string>
 
     <plurals name="select_album_n_songs">
-        <item quantity="one">1 canción</item>
+        <item quantity="one">%d canción</item>
         <item quantity="other">%d canciones</item>
     </plurals>
     <plurals name="select_album_n_songs_pinned">
-        <item quantity="one">1 canción seleccionada para ser anclada.</item>
+        <item quantity="one">%d canción seleccionada para ser anclada.</item>
         <item quantity="other">%d canciones seleccionadas para ser ancladas.</item>
     </plurals>
     <plurals name="select_album_n_songs_downloaded">
-        <item quantity="one">1 canción seleccionada para ser descargada.</item>
+        <item quantity="one">%d canción seleccionada para ser descargada.</item>
         <item quantity="other">%d canciones seleccionadas para ser descargadas.</item>
     </plurals>
     <plurals name="select_album_n_songs_unpinned">
-        <item quantity="one">1 canción seleccionada para ser desanclada.</item>
+        <item quantity="one">%d canción seleccionada para ser desanclada.</item>
         <item quantity="other">%d canciones seleccionadas para ser desancladas.</item>
     </plurals>
     <plurals name="select_album_n_songs_added">
-        <item quantity="one">1 canción añadida al final de la cola de reproducción.</item>
+        <item quantity="one">%d canción añadida al final de la cola de reproducción.</item>
         <item quantity="other">%d canciones añadidas al final de la cola de reproducción.</item>
     </plurals>
     <plurals name="select_album_n_songs_play_next">
-        <item quantity="one">1 canción insertada después de la canción actual.</item>
+        <item quantity="one">%d canción insertada después de la canción actual.</item>
         <item quantity="other">%d canciones insertadas después de la canción actual.</item>
     </plurals>
     <plurals name="select_album_donate_dialog_n_trial_days_left">
-        <item quantity="one">Queda un día de periodo de prueba</item>
+        <item quantity="one">Queda %d día de periodo de prueba</item>
         <item quantity="other">Quedan %d días de periodo de prueba</item>
     </plurals>
 
@@ -503,10 +481,6 @@
 
     <!-- Subsonic feature flags -->
     <string name="feature_flags_category_title">Funciones experimentales</string>
-    <string name="feature_flags_image_loader_title">Habilitar nuevo cargador de imágenes</string>
-    <string name="feature_flags_image_loader_description">Permite la implementación de un nuevo cargador de imágenes.
-        Actualmente no guarda la imagen en el almacenamiento del dispositivo y sólo utiliza caché en la memoria.
-    </string>
     <string name="feature_flags_five_star_rating_title">Use cinco estrellas para las canciones</string>
     <string name="feature_flags_five_star_rating_description">Utilice el sistema de calificación de cinco estrellas para canciones
          en lugar de simplemente destacar / desestimar elementos.

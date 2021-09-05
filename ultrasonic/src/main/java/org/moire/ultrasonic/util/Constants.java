@@ -123,7 +123,6 @@ public final class Constants
 	public static final String PREFERENCES_KEY_CLEAR_PLAYLIST = "clearPlaylist";
 	public static final String PREFERENCES_KEY_CLEAR_BOOKMARK = "clearBookmark";
 	public static final String PREFERENCES_KEY_DISC_SORT = "discAndTrackSort";
-	public static final String PREFERENCES_KEY_VIDEO_PLAYER = "videoPlayer";
 	public static final String PREFERENCES_KEY_SEND_BLUETOOTH_NOTIFICATIONS = "sendBluetoothNotifications";
 	public static final String PREFERENCES_KEY_SEND_BLUETOOTH_ALBUM_ART = "sendBluetoothAlbumArt";
 	public static final String PREFERENCES_KEY_VIEW_REFRESH = "viewRefresh";
@@ -132,8 +131,6 @@ public final class Constants
 	public static final String PREFERENCES_KEY_DEFAULT_SHARE_GREETING = "sharingDefaultGreeting";
 	public static final String PREFERENCES_KEY_DEFAULT_SHARE_EXPIRATION = "sharingDefaultExpiration";
 	public static final String PREFERENCES_KEY_SHOW_ALL_SONGS_BY_ARTIST = "showAllSongsByArtist";
-	public static final String PREFERENCES_KEY_IMAGE_LOADER_CONCURRENCY = "imageLoaderConcurrency";
-	public static final String PREFERENCES_KEY_FF_IMAGE_LOADER = "ff_new_image_loader";
 	public static final String PREFERENCES_KEY_USE_FIVE_STAR_RATING = "use_five_star_rating";
 	public static final String PREFERENCES_KEY_CATEGORY_NOTIFICATIONS = "notificationsCategory";
 	public static final String PREFERENCES_KEY_FIRST_RUN_EXECUTED = "firstRunExecuted";

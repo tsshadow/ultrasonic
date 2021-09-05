@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="background_task.loading">Carregando&#8230;</string>
     <string name="background_task.network_error">Ocorreu um erro de rede. Verifique o endereço do servidor ou tente mais tarde.</string>
@@ -15,9 +15,16 @@
     <string name="button_bar.chat">Chat</string>
     <string name="button_bar.home">Menu Principal</string>
     <string name="button_bar.now_playing">Tocando Agora</string>
+    <string name="buttons.play">Tocar</string>
+    <string name="buttons.pause">Pausar</string>
+    <string name="buttons.repeat">Repetir</string>
+    <string name="buttons.shuffle">Misturar</string>
+    <string name="buttons.stop">Parar</string>
+    <string name="buttons.next">Próxima</string>
+    <string name="buttons.previous">Anterior</string>
     <string name="podcasts.label">Podcasts</string>
     <string name="podcasts_channels.empty">Nenhum canal de podcasts registrado</string>
-    <string name="button_bar.podcasts">Podcast</string>
+    <string name="button_bar.podcasts">Podcasts</string>
     <string name="button_bar.playlists">Playlists</string>
     <string name="button_bar.search">Pesquisa</string>
     <string name="chat.send_a_message">Enviar uma mensagem</string>
@@ -32,8 +39,11 @@
     <string name="common.name">Nome</string>
     <string name="common.ok">OK</string>
     <string name="common.pin">Fixar</string>
+    <string name="common.pause">Pausar</string>
+    <string name="common.play">Tocar</string>
     <string name="common.play_last">Tocar por Último</string>
     <string name="common.play_next">Tocar na Próxima</string>
+    <string name="common.play_previous">Tocar a Anterior</string>
     <string name="common.play_now">Tocar Agora</string>
     <string name="common.play_shuffled">Tocar Aleatoriamente</string>
     <string name="common.public">Público</string>
@@ -101,8 +111,9 @@
     <string name="main.songs_starred">Favoritas</string>
     <string name="main.songs_title">Músicas</string>
     <string name="main.videos">Vídeos</string>
-    <string name="main.welcome_text">Bem-vindo ao Ultrasonic! O aplicativo ainda não está configurado. Após configurar seu servidor pessoal (disponível em <b>subsonic.org</b>), clique em <i>Adicionar Servidor</i> em <b>Configurações</b> para a conexão.</string>
-    <string name="main.welcome_title">Bem-vindo!</string>
+    <string name="main.welcome_text_demo">Para usar o Ultrasonic com sua própria música, você precisará de um <b>servidor próprio</b>.\n\n➤ Caso queira experimentar o aplicativo primeiro, você pode adicionar um servidor de demonstração agora.\n\n➤ Caso contrário, configure seu servidor nas <b>configurações</b>.</string>
+    <string name="main.welcome_title">Bem-vindo ao Ultrasonic!</string>
+    <string name="main.welcome_cancel">Vá para as configurações</string>
     <string name="menu.about">Sobre</string>
     <string name="menu.common">Comum</string>
     <string name="menu.deleted_playlist">Playlist excluída %s</string>
@@ -130,16 +141,11 @@
     <string name="search.search">Clique para pesquisar</string>
     <string name="search.songs">Músicas</string>
     <string name="search.title">Pesquisar</string>
-    <string name="select_album.donate_dialog_0_trial_days_left">O período de teste acabou</string>
-    <string name="select_album.donate_dialog_later">Mais tarde</string>
-    <string name="select_album.donate_dialog_message">Obtenha downloads ilimitados fazendo uma doação ao Subsonic.</string>
-    <string name="select_album.donate_dialog_now">Agora</string>
     <string name="select_album.empty">Nenhuma mídia encontrada</string>
     <string name="select_album.n_selected">%d faixas selecionadas.</string>
     <string name="select_album.n_unselected">%d faixas desselecionadas.</string>
     <string name="select_album.no_network">Aviso: Nenhuma rede disponível.</string>
     <string name="select_album.no_sdcard">Erro: Nenhum cartão SD disponível.</string>
-    <string name="select_album.not_licensed">Servidor não licenciado. Restam %d dias de teste.</string>
     <string name="select_album.play_all">Tocar Tudo</string>
     <string name="select_artist.all_folders">Todas as Pastas</string>
     <string name="select_artist.folder">Selecionar Pasta</string>
@@ -256,6 +262,8 @@
     <string name="settings.playback.resume_play_on_headphones_plug.summary">O aplicativo retomará a reprodução em pausa na inserção dos fones de ouvido no dispositivo.</string>
     <string name="settings.screen_lit_summary">Manter a tela ligada enquanto baixando aumenta a velocidade de download.</string>
     <string name="settings.screen_lit_title">Manter a Tela Ligada</string>
+    <string name="settings.scrobble_summary">Lembre-se de configurar usuário e senha nos serviços Scrobble do servidor</string>
+    <string name="settings.scrobble_title">Registre Minhas Músicas</string>
     <string name="settings.search_1">1</string>
     <string name="settings.search_10">10</string>
     <string name="settings.search_100">100</string>
@@ -313,8 +321,7 @@
     <string name="settings.use_id3_summary">Usar as etiquetas ID3 ao invés do sistema de arquivos</string>
     <string name="settings.show_artist_picture">Mostrar Foto do Artista na Lista</string>
     <string name="settings.show_artist_picture_summary">Mostrar a imagem do artista na lista de artistas, se disponível</string>
-    <string name="settings.video_title">Vídeo</string>
-    <string name="settings.video_player">Player de Vídeo</string>
+    <string name="main.video" tools:ignore="UnusedResources">Vídeo</string>
     <string name="settings.view_refresh">Atualização da Tela</string>
     <string name="settings.view_refresh_500">.5 segundos</string>
     <string name="settings.view_refresh_1000">1 segundo</string>
@@ -334,10 +341,8 @@
     <string name="util.bytes_format.gigabyte">0.00 GB</string>
     <string name="util.bytes_format.kilobyte">0 KB</string>
     <string name="util.bytes_format.megabyte">0.00 MB</string>
-    <string name="util.no_time">-:--</string>
+    <string name="util.no_time" tools:ignore="TypographyDashes">-:--</string>
     <string name="util.zero_time">0:00</string>
-    <string name="video.get_mx_player_text">O MX Player não está instalado. Baixe da graça pela Play Store ou modifique as configurações de vídeo.</string>
-    <string name="video.get_mx_player_button">Baixar MX Player</string>
     <string name="widget.initial_text">Toque para selecionar a música</string>
     <string name="widget.sdcard_busy">Cartão SD indisponível</string>
     <string name="widget.sdcard_missing">Sem cartão SD</string>
@@ -373,27 +378,11 @@
     <string name="settings.share_greeting_default">Saudação Padrão do Compartilhamento</string>
     <string name="share_default_greeting">Confira esta música que compartilhei do %s</string>
     <string name="share_via">Compartilhar músicas via</string>
-    <string name="settings.video_mx_player">MX Player</string>
-    <string name="settings.video_default">Padrão</string>
-    <string name="settings.video_flash">Flash</string>
     <string name="menu.share">Compartilhar</string>
     <string name="select_album_all_songs">Todas as Músicas de %s</string>
     <string name="settings.show_all_songs_by_artist">Mostrar Todas as Músicas por Artista</string>
     <string name="settings.show_all_songs_by_artist_summary">Adicionar nova entrada em artista para acessar todas as músicas do artista</string>
     <string name="download.menu_show_artist">Mostrar Artista</string>
-    <string name="settings.image_loader_concurrency">Concorrência ao Carregar Imagens</string>
-    <string name="settings.image_loader_concurrency_1">1</string>
-    <string name="settings.image_loader_concurrency_2">2</string>
-    <string name="settings.image_loader_concurrency_3">3</string>
-    <string name="settings.image_loader_concurrency_4">4</string>
-    <string name="settings.image_loader_concurrency_5">5</string>
-    <string name="settings.image_loader_concurrency_6">6</string>
-    <string name="settings.image_loader_concurrency_7">7</string>
-    <string name="settings.image_loader_concurrency_8">8</string>
-    <string name="settings.image_loader_concurrency_9">9</string>
-    <string name="settings.image_loader_concurrency_10">10</string>
-    <string name="settings.image_loader_concurrency_11">11</string>
-    <string name="settings.image_loader_concurrency_12">12</string>
     <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Anos Múltiplos</string>
     <string name="settings.playback.resume_on_bluetooth_device">Retomar ao Conectar Dispositivo Bluetooth</string>
@@ -446,6 +435,9 @@
     <string name="server_menu.move_down">Para baixo</string>
     <string name="server_editor.authentication">Autenticação</string>
     <string name="server_editor.advanced">Configurações avançadas</string>
+    <string name="server_editor.disabled_feature">Um ou mais recursos foram desativados porque o servidor não os suporta.\nVocê pode rodar este teste novamente a qualquer momento.</string>
+    <string name="server_menu.demo">Servidor Demonstração</string>
+
     <plurals name="select_album_n_songs">
         <item quantity="one">%d música</item>
         <item quantity="other">%d músicas</item>
@@ -488,12 +480,8 @@
     <string name="api.subsonic.upgrade_server">Versões incompativeis. Atualize o servidor Ultrasonic.</string>
 
     <!-- Subsonic feature flags -->
-    <string name="feature_flags_category_title">Bandeiras de Recursos</string>
-    <string name="feature_flags_image_loader_title">Ativar Novo Carregador de Imagens</string>
-    <string name="feature_flags_image_loader_description">Permite nova implementação do carregador de imagens.
-        Atualmente, ele não salva a imagem no armazenamento do dispositivo e usa apenas o cache na memória.
-    </string>
-    <string name="feature_flags_five_star_rating_title">Usar Classif. de 5 estrelas Para Músicas</string>
+    <string name="feature_flags_category_title">Sinalização de Recursos</string>
+    <string name="feature_flags_five_star_rating_title">Usar Classif. 5 Estrelas para Músicas</string>
     <string name="feature_flags_five_star_rating_description">Use o sistema de classificação de 5 estrelas para músicas
          em vez de simplesmente estrelar/não estrelar itens.
     </string>

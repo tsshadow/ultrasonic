@@ -1,5 +1,6 @@
 package org.moire.ultrasonic.data
 
+import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -7,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
+import org.moire.ultrasonic.di.DB_FILENAME
 import org.moire.ultrasonic.service.MusicServiceFactory.resetMusicService
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Util
@@ -20,6 +22,8 @@ class ActiveServerProvider(
     private val repository: ServerSettingDao
 ) {
     private var cachedServer: ServerSetting? = null
+    private var cachedDatabase: MetaDatabase? = null
+    private var cachedServerId: Int? = null
 
     /**
      * Get the settings of the current Active Server
@@ -37,12 +41,15 @@ class ActiveServerProvider(
                     cachedServer = repository.findById(serverId)
                 }
                 Timber.d(
-                    "getActiveServer retrieved from DataBase, id: $serverId; " +
-                        "cachedServer: $cachedServer"
+                    "getActiveServer retrieved from DataBase, id: %s cachedServer: %s",
+                    serverId, cachedServer
                 )
             }
 
-            if (cachedServer != null) return cachedServer!!
+            if (cachedServer != null) {
+                return cachedServer!!
+            }
+
             setActiveServerId(0)
         }
 
@@ -79,6 +86,33 @@ class ActiveServerProvider(
         }
     }
 
+    @Synchronized
+    fun getActiveMetaDatabase(): MetaDatabase {
+        val activeServer = getActiveServerId()
+
+        if (activeServer == cachedServerId && cachedDatabase != null) {
+            return cachedDatabase!!
+        }
+
+        Timber.i("Switching to new database, id:$activeServer")
+        cachedServerId = activeServer
+        val db = Room.databaseBuilder(
+            UApp.applicationContext(),
+            MetaDatabase::class.java,
+            METADATA_DB + cachedServerId
+        )
+            .fallbackToDestructiveMigrationOnDowngrade()
+            .build()
+        return db
+    }
+
+    @Synchronized
+    fun deleteMetaDatabase(id: Int) {
+        cachedDatabase?.close()
+        UApp.applicationContext().deleteDatabase(METADATA_DB + id)
+        Timber.i("Deleted metadataBase, id:$id")
+    }
+
     /**
      * Sets the minimum Subsonic API version of the current server.
      */
@@ -105,7 +139,7 @@ class ActiveServerProvider(
      * @param method: The Rest resource to use
      * @return The Rest Url of the method on the server
      */
-    fun getRestUrl(method: String?): String? {
+    fun getRestUrl(method: String?): String {
         val builder = StringBuilder(8192)
         val activeServer = getActiveServer()
         val serverUrl: String = activeServer.url
@@ -127,6 +161,9 @@ class ActiveServerProvider(
     }
 
     companion object {
+
+        const val METADATA_DB = "$DB_FILENAME-meta-"
+
         /**
          * Queries if the Active Server is the "Offline" mode of Ultrasonic
          * @return True, if the "Offline" mode is selected

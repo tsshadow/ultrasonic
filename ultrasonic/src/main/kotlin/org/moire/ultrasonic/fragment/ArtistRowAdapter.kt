@@ -13,24 +13,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView.SectionedAdapter
 import java.text.Collator
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.domain.Artist
+import org.moire.ultrasonic.domain.ArtistOrIndex
 import org.moire.ultrasonic.domain.MusicDirectory
-import org.moire.ultrasonic.util.ImageLoader
+import org.moire.ultrasonic.imageloader.ImageLoader
 import org.moire.ultrasonic.util.Util
 
 /**
  * Creates a Row in a RecyclerView which contains the details of an Artist
  */
 class ArtistRowAdapter(
-    artistList: List<Artist>,
-    onItemClick: (Artist) -> Unit,
-    onContextMenuClick: (MenuItem, Artist) -> Boolean,
+    artistList: List<ArtistOrIndex>,
+    onItemClick: (ArtistOrIndex) -> Unit,
+    onContextMenuClick: (MenuItem, ArtistOrIndex) -> Boolean,
     private val imageLoader: ImageLoader,
     onMusicFolderUpdate: (String?) -> Unit
-) : GenericRowAdapter<Artist>(
+) : GenericRowAdapter<ArtistOrIndex>(
     onItemClick,
     onContextMenuClick,
-    imageLoader,
     onMusicFolderUpdate
 ),
     SectionedAdapter {
@@ -44,7 +43,7 @@ class ArtistRowAdapter(
     /**
      * Sets the data to be displayed in the RecyclerView
      */
-    override fun setData(data: List<Artist>) {
+    override fun setData(data: List<ArtistOrIndex>) {
         itemList = data.sortedWith(compareBy(Collator.getInstance()) { t -> t.name })
         super.notifyDataSetChanged()
     }
@@ -62,8 +61,11 @@ class ArtistRowAdapter(
                 holder.coverArt.visibility = View.VISIBLE
                 imageLoader.loadImage(
                     holder.coverArt,
-                    MusicDirectory.Entry("-1").apply { coverArt = holder.coverArtId },
-                    false, 0, false, true, R.drawable.ic_contact_picture
+                    MusicDirectory.Entry("-1").apply {
+                        coverArt = holder.coverArtId
+                        artist = itemList[listPosition].name
+                    },
+                    false, 0, R.drawable.ic_contact_picture
                 )
             } else {
                 holder.coverArt.visibility = View.GONE

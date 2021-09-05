@@ -101,7 +101,6 @@
     <string name="main.songs_starred">Označené hvězdičkou</string>
     <string name="main.songs_title">Skladby</string>
     <string name="main.videos">Videa</string>
-    <string name="main.welcome_text">Vítejte v aplikaci Ultrasonic! Aplikace není ještě nakonfigurována. Poté co nastavíte svůj osobní server (dostupný na <b>subsonic.org</b>), vyberte <i>Správa serverů</i> v <b>Nastavení</b> a připojte aplikaci.</string>
     <string name="main.welcome_title">Vítejte!</string>
     <string name="menu.about">O aplikaci</string>
     <string name="menu.common">Další</string>
@@ -130,16 +129,11 @@
     <string name="search.search">Kliknout pro vyhledání</string>
     <string name="search.songs">Skladby</string>
     <string name="search.title">Hledat</string>
-    <string name="select_album.donate_dialog_0_trial_days_left">Zkušební doba vypršela</string>
-    <string name="select_album.donate_dialog_later">Pozdějí</string>
-    <string name="select_album.donate_dialog_message">Získejte neomezená stahování přispěním na Subsonic.</string>
-    <string name="select_album.donate_dialog_now">Hned</string>
     <string name="select_album.empty">Média nenalezena</string>
     <string name="select_album.n_selected">%d skladeb označeno.</string>
     <string name="select_album.n_unselected">%d skladeb odznačeno.</string>
     <string name="select_album.no_network">Varování: Připojení nedostupné.</string>
     <string name="select_album.no_sdcard">Chyba: SD karta nedostupná.</string>
-    <string name="select_album.not_licensed">Server bez licence. Zbývá %d dní zkušební doby.</string>
     <string name="select_album.play_all">Přehrát vše</string>
     <string name="select_artist.all_folders">Všechny adresáře</string>
     <string name="select_artist.folder">Vybrat adresář</string>
@@ -311,8 +305,7 @@
     <string name="settings.use_folder_for_album_artist_summary">Očekává jména hlavních adresářů obsahující jména umělců</string>
     <string name="settings.use_id3">Procházet za použití ID3 tagů</string>
     <string name="settings.use_id3_summary">Používat metodu ID3 tagů místo jmen na základě adresářové struktury</string>
-    <string name="settings.video_title">Video</string>
-    <string name="settings.video_player">Videopřehrávač</string>
+    <string name="main.video">Video</string>
     <string name="settings.view_refresh">Obnovení náhledu</string>
     <string name="settings.view_refresh_500">.5 sekundy</string>
     <string name="settings.view_refresh_1000">1 sekunda</string>
@@ -334,8 +327,6 @@
     <string name="util.bytes_format.megabyte">0.00 MB</string>
     <string name="util.no_time">-:--</string>
     <string name="util.zero_time">0:00</string>
-    <string name="video.get_mx_player_text">MX Player není nainstalován. Nainstalujte z Obchodu Play nebo změňte nastavení videí.</string>
-    <string name="video.get_mx_player_button">Stáhnout MX Player</string>
     <string name="widget.initial_text">Ťuknutím vybrat hudbu</string>
     <string name="widget.sdcard_busy">SD karta nedostupná</string>
     <string name="widget.sdcard_missing">Chybí SD karta</string>
@@ -371,27 +362,11 @@
     <string name="settings.share_greeting_default">Výchozí pozdrav sdílení</string>
     <string name="share_default_greeting">Mrkni na hudbu sdílenou z %s</string>
     <string name="share_via">Sdílet skladby přes</string>
-    <string name="settings.video_mx_player">MX Player</string>
-    <string name="settings.video_default">Výchozí</string>
-    <string name="settings.video_flash">Flash</string>
     <string name="menu.share">Sdílení</string>
     <string name="select_album_all_songs">Všechny skladby od %s</string>
     <string name="settings.show_all_songs_by_artist">Zobrazit všechny skladby umělce</string>
     <string name="settings.show_all_songs_by_artist_summary">Přidat nový zápis v náhledu umělců pro přístup ke všem skladbám umělce</string>
     <string name="download.menu_show_artist">Zobrazit umělce</string>
-    <string name="settings.image_loader_concurrency">Počet vláken stahování obrázků</string>
-    <string name="settings.image_loader_concurrency_1">1</string>
-    <string name="settings.image_loader_concurrency_2">2</string>
-    <string name="settings.image_loader_concurrency_3">3</string>
-    <string name="settings.image_loader_concurrency_4">4</string>
-    <string name="settings.image_loader_concurrency_5">5</string>
-    <string name="settings.image_loader_concurrency_6">6</string>
-    <string name="settings.image_loader_concurrency_7">7</string>
-    <string name="settings.image_loader_concurrency_8">8</string>
-    <string name="settings.image_loader_concurrency_9">9</string>
-    <string name="settings.image_loader_concurrency_10">10</string>
-    <string name="settings.image_loader_concurrency_11">11</string>
-    <string name="settings.image_loader_concurrency_12">12</string>
     <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Vícenásobné roky</string>
     <string name="settings.playback.resume_on_bluetooth_device">Pokračovat v přehrávání po připojení bluetooth přístroje</string>
@@ -445,45 +420,38 @@
     <string name="server_editor.authentication">Ověření</string>
     <string name="server_editor.advanced">Rozšířené možnosti</string>
     <plurals name="select_album_n_songs">
-        <item quantity="one">1 skladba</item>
+        <item quantity="one">%d skladba</item>
         <item quantity="few">%d skladby</item>
-        <item quantity="many">%d  skladeb</item>
         <item quantity="other">%d skladeb</item>
     </plurals>
     <plurals name="select_album_n_songs_pinned">
-        <item quantity="one">1 skladba vybrána pro připnutí.</item>
+        <item quantity="one">%d skladba vybrána pro připnutí.</item>
         <item quantity="few">%d skladby vybrány pro připnutí.</item>
-        <item quantity="many">%d skladeb vybráno pro připnutí.</item>
         <item quantity="other">%d skladeb vybráno pro připnutí.</item>
     </plurals>
     <plurals name="select_album_n_songs_downloaded">
-        <item quantity="one">1 skladba vybrána pro stažení.</item>
+        <item quantity="one">%d skladba vybrána pro stažení.</item>
         <item quantity="few">%d skladby vybrány pro stažení.</item>
-        <item quantity="many">%d skladeb vybráno pro stažení.</item>
         <item quantity="other">%d skladeb vybráno pro stažení.</item>
     </plurals>
     <plurals name="select_album_n_songs_unpinned">
-        <item quantity="one">1 skladba vybrána pro odepnutí.</item>
+        <item quantity="one">%d skladba vybrána pro odepnutí.</item>
         <item quantity="few">%d skladby vybrány pro odepnutí.</item>
-        <item quantity="many">%d skladeb vybráno pro odepnutí.</item>
         <item quantity="other">%d skladeb vybráno pro odepnutí.</item>
     </plurals>
     <plurals name="select_album_n_songs_added">
-        <item quantity="one">1 skladba přidána na konec fronty přehrávání.</item>
+        <item quantity="one">%d skladba přidána na konec fronty přehrávání.</item>
         <item quantity="few">%d skladyb přidány na konec fronty přehrávání.</item>
-        <item quantity="many">%d skladeb přidáno na konec fronty přehrávání.</item>
         <item quantity="other">%d skladeb přidáno na konec fronty přehrávání.</item>
     </plurals>
     <plurals name="select_album_n_songs_play_next">
-        <item quantity="one">1 skladba přidána za aktuální skladbu.</item>
+        <item quantity="one">%d skladba přidána za aktuální skladbu.</item>
         <item quantity="few">%d skladby přidány za aktuální skladbu.</item>
-        <item quantity="many">%d skladeb přidáno za aktuální skladbu.</item>
         <item quantity="other">%d skladeb přidáno za aktuální skladbu.</item>
     </plurals>
     <plurals name="select_album_donate_dialog_n_trial_days_left">
-        <item quantity="one">Zbývá 1 den zkušební doby</item>
+        <item quantity="one">Zbývá %d den zkušební doby</item>
         <item quantity="few">Zbývají %d dny zkušební doby</item>
-        <item quantity="many">Zbývá %d dní zkušební doby</item>
         <item quantity="other">Zbývá %d dní zkušební doby</item>
     </plurals>
 
@@ -501,10 +469,6 @@
 
     <!-- Subsonic feature flags -->
     <string name="feature_flags_category_title">Příznaky funkcí</string>
-    <string name="feature_flags_image_loader_title">Povolit nové načítání obrázků</string>
-    <string name="feature_flags_image_loader_description">Zapne novou implementaci načítání obrázků.
-        Toto aktuálně neukládá obrázky dlouhodobě, ale používá pouze odkládání do paměti.
-    </string>
     <string name="feature_flags_five_star_rating_title">Používat pět hvězdiček pro hodnocení skladeb</string>
     <string name="feature_flags_five_star_rating_description">Používat pět hvězdiček pro hodnocení skladeb
         namísto jednoduchého jednohvězdičkového hodnocení.

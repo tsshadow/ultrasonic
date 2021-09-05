@@ -10,19 +10,17 @@ import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions
 import org.moire.ultrasonic.api.subsonic.SubsonicClientConfiguration
-import org.moire.ultrasonic.cache.PermanentFileStorage
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.imageloader.ImageLoader
 import org.moire.ultrasonic.log.TimberOkHttpLogger
-import org.moire.ultrasonic.service.ApiCallResponseChecker
 import org.moire.ultrasonic.service.CachedMusicService
 import org.moire.ultrasonic.service.MusicService
 import org.moire.ultrasonic.service.OfflineMusicService
 import org.moire.ultrasonic.service.RESTMusicService
 import org.moire.ultrasonic.subsonic.DownloadHandler
+import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
 import org.moire.ultrasonic.subsonic.ShareHandler
-import org.moire.ultrasonic.subsonic.VideoPlayer
-import org.moire.ultrasonic.subsonic.loader.image.SubsonicImageLoader
 import org.moire.ultrasonic.util.Constants
 
 /**
@@ -44,43 +42,38 @@ val musicServiceModule = module {
     }
 
     single {
-        val serverId = get<String>(named("ServerID"))
-        return@single PermanentFileStorage(get(), serverId, BuildConfig.DEBUG)
-    }
+        val server = get<ActiveServerProvider>().getActiveServer()
 
-    single {
         return@single SubsonicClientConfiguration(
-            baseUrl = get<ActiveServerProvider>().getActiveServer().url,
-            username = get<ActiveServerProvider>().getActiveServer().userName,
-            password = get<ActiveServerProvider>().getActiveServer().password,
+            baseUrl = server.url,
+            username = server.userName,
+            password = server.password,
             minimalProtocolVersion = SubsonicAPIVersions.getClosestKnownClientApiVersion(
-                get<ActiveServerProvider>().getActiveServer().minimumApiVersion
+                server.minimumApiVersion
                     ?: Constants.REST_PROTOCOL_VERSION
             ),
             clientID = Constants.REST_CLIENT_ID,
-            allowSelfSignedCertificate = get<ActiveServerProvider>()
-                .getActiveServer().allowSelfSignedCertificate,
-            enableLdapUserSupport = get<ActiveServerProvider>().getActiveServer().ldapSupport,
-            debug = BuildConfig.DEBUG
+            allowSelfSignedCertificate = server.allowSelfSignedCertificate,
+            enableLdapUserSupport = server.ldapSupport,
+            debug = BuildConfig.DEBUG,
+            isRealProtocolVersion = server.minimumApiVersion != null
         )
     }
 
     single<HttpLoggingInterceptor.Logger> { TimberOkHttpLogger() }
     single { SubsonicAPIClient(get(), get()) }
-    single { ApiCallResponseChecker(get(), get()) }
 
     single<MusicService>(named(ONLINE_MUSIC_SERVICE)) {
-        CachedMusicService(RESTMusicService(get(), get(), get(), get()))
+        CachedMusicService(RESTMusicService(get(), get()))
     }
 
     single<MusicService>(named(OFFLINE_MUSIC_SERVICE)) {
         OfflineMusicService()
     }
 
-    single { SubsonicImageLoader(androidContext(), get()) }
+    single { ImageLoader(androidContext(), get(), ImageLoaderProvider.config) }
 
     single { DownloadHandler(get(), get()) }
     single { NetworkAndStorageChecker(androidContext()) }
-    single { VideoPlayer() }
     single { ShareHandler(androidContext()) }
 }

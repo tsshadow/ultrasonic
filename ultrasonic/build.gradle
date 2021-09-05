@@ -9,8 +9,8 @@ android {
 
     defaultConfig {
         applicationId "org.moire.ultrasonic"
-        versionCode 93
-        versionName "2.21.0"
+        versionCode 95
+        versionName "2.23.0"
 
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
@@ -61,6 +61,13 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$buildDir/schemas".toString())
+        }
+    }
+
 }
 
 tasks.withType(Test) {
@@ -70,8 +77,10 @@ tasks.withType(Test) {
 dependencies {
     implementation project(':core:domain')
     implementation project(':core:subsonic-api')
-    implementation project(':core:subsonic-api-image-loader')
-    implementation project(':core:cache')
+
+    api(other.picasso) {
+        exclude group: "com.android.support"
+    }
 
     implementation androidSupport.core
     implementation androidSupport.support
@@ -103,8 +112,12 @@ dependencies {
     testImplementation testing.junit
     testRuntimeOnly testing.junitVintage
     testImplementation testing.kotlinJunit
-    testImplementation testing.mockitoKotlin
     testImplementation testing.kluent
+    testImplementation testing.mockito
+    testImplementation testing.mockitoInline
+    testImplementation testing.mockitoKotlin
+    testImplementation testing.robolectric
+
     implementation other.dexter
     implementation other.timber
 }

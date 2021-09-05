@@ -81,7 +81,6 @@ class TrackCollectionFragment : Fragment() {
     private var shareButton: MenuItem? = null
 
     private val mediaPlayerController: MediaPlayerController by inject()
-    private val videoPlayer: VideoPlayer by inject()
     private val downloadHandler: DownloadHandler by inject()
     private val networkAndStorageChecker: NetworkAndStorageChecker by inject()
     private val imageLoaderProvider: ImageLoaderProvider by inject()
@@ -142,7 +141,7 @@ class TrackCollectionFragment : Fragment() {
                         bundle
                     )
                 } else if (entry != null && entry.isVideo) {
-                    videoPlayer.playVideo(requireContext(), entry)
+                    VideoPlayer.playVideo(requireContext(), entry)
                 } else {
                     enableButtons()
                 }
@@ -529,6 +528,7 @@ class TrackCollectionFragment : Fragment() {
         var pinnedCount = 0
 
         for (song in selection) {
+            if (song == null) continue
             val downloadFile = mediaPlayerController.getDownloadFileForSong(song)
             if (downloadFile.isWorkDone) {
                 deleteEnabled = true
@@ -835,7 +835,7 @@ class TrackCollectionFragment : Fragment() {
         val artworkSelection = random.nextInt(entries.size)
         imageLoaderProvider.getImageLoader().loadImage(
             coverArtView, entries[artworkSelection], false,
-            Util.getAlbumImageSize(context), false, true
+            Util.getAlbumImageSize(context)
         )
 
         val albumHeader = AlbumHeader.processEntries(context, entries)

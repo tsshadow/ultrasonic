@@ -20,18 +20,21 @@ import android.os.Looper
 import android.os.PowerManager
 import android.os.PowerManager.PARTIAL_WAKE_LOCK
 import android.os.PowerManager.WakeLock
+import androidx.lifecycle.MutableLiveData
 import java.io.File
 import java.net.URLEncoder
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.max
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.audiofx.VisualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.PlayerState
-import org.moire.ultrasonic.fragment.PlayerFragment
 import org.moire.ultrasonic.util.CancellableTask
 import org.moire.ultrasonic.util.Constants
+import org.moire.ultrasonic.util.MediaSessionHandler
 import org.moire.ultrasonic.util.StreamProxy
 import org.moire.ultrasonic.util.Util
 import timber.log.Timber
@@ -39,10 +42,12 @@ import timber.log.Timber
 /**
  * Represents a Media Player which uses the mobile's resources for playback
  */
-class LocalMediaPlayer(
-    private val audioFocusHandler: AudioFocusHandler,
-    private val context: Context
-) {
+@Suppress("TooManyFunctions")
+class LocalMediaPlayer : KoinComponent {
+
+    private val audioFocusHandler by inject<AudioFocusHandler>()
+    private val context by inject<Context>()
+    private val mediaSessionHandler by inject<MediaSessionHandler>()
 
     @JvmField
     var onCurrentPlayingChanged: ((DownloadFile?) -> Unit?)? = null
@@ -79,9 +84,11 @@ class LocalMediaPlayer(
     private var proxy: StreamProxy? = null
     private var bufferTask: CancellableTask? = null
     private var positionCache: PositionCache? = null
-    private var secondaryProgress = -1
+
     private val pm = context.getSystemService(POWER_SERVICE) as PowerManager
     private val wakeLock: WakeLock = pm.newWakeLock(PARTIAL_WAKE_LOCK, this.javaClass.name)
+
+    val secondaryProgress: MutableLiveData<Int> = MutableLiveData(0)
 
     fun init() {
         Thread {
@@ -123,6 +130,10 @@ class LocalMediaPlayer(
     }
 
     fun release() {
+        // Calling reset() will result in changing this player's state. If we allow
+        // the onPlayerStateChanged callback, then the state change will cause this
+        // to resurrect the media session which has just been destroyed.
+        onPlayerStateChanged = null
         reset()
         try {
             val i = Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
@@ -165,7 +176,7 @@ class LocalMediaPlayer(
             val mainHandler = Handler(context.mainLooper)
 
             val myRunnable = Runnable {
-                onPlayerStateChanged!!(playerState, currentPlaying)
+                onPlayerStateChanged?.invoke(playerState, currentPlaying)
             }
             mainHandler.post(myRunnable)
         }
@@ -357,7 +368,6 @@ class LocalMediaPlayer(
 
             downloadFile.updateModificationDate()
             mediaPlayer.setOnCompletionListener(null)
-            secondaryProgress = -1 // Ensure seeking in non StreamProxy playback works
 
             setPlayerState(PlayerState.IDLE)
             setAudioAttributes(mediaPlayer)
@@ -388,28 +398,28 @@ class LocalMediaPlayer(
             setPlayerState(PlayerState.PREPARING)
 
             mediaPlayer.setOnBufferingUpdateListener { mp, percent ->
-                val progressBar = PlayerFragment.getProgressBar()
                 val song = downloadFile.song
 
                 if (percent == 100) {
                     mp.setOnBufferingUpdateListener(null)
                 }
 
-                secondaryProgress = (percent.toDouble() / 100.toDouble() * progressBar.max).toInt()
-
+                // The secondary progress is an indicator of how far the song is cached.
                 if (song.transcodedContentType == null && Util.getMaxBitRate() == 0) {
-                    progressBar?.secondaryProgress = secondaryProgress
+                    val progress = (percent.toDouble() / 100.toDouble() * playerDuration).toInt()
+                    secondaryProgress.postValue(progress)
                 }
             }
 
             mediaPlayer.setOnPreparedListener {
                 Timber.i("Media player prepared")
                 setPlayerState(PlayerState.PREPARED)
-                val progressBar = PlayerFragment.getProgressBar()
-                if (progressBar != null && downloadFile.isWorkDone) {
-                    // Populate seek bar secondary progress if we have a complete file for consistency
-                    PlayerFragment.getProgressBar().secondaryProgress = 100 * progressBar.max
+
+                // Populate seek bar secondary progress if we have a complete file for consistency
+                if (downloadFile.isWorkDone) {
+                    secondaryProgress.postValue(playerDuration)
                 }
+
                 synchronized(this@LocalMediaPlayer) {
                     if (position != 0) {
                         Timber.i("Restarting player from position %d", position)
@@ -700,8 +710,11 @@ class LocalMediaPlayer(
                 try {
                     if (playerState === PlayerState.STARTED) {
                         cachedPosition = mediaPlayer.currentPosition
+                        mediaSessionHandler.updateMediaSessionPlaybackPosition(
+                            cachedPosition.toLong()
+                        )
                     }
-                    Util.sleepQuietly(50L)
+                    Util.sleepQuietly(100L)
                 } catch (e: Exception) {
                     Timber.w(e, "Crashed getting current position")
                     isRunning = false

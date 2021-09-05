@@ -100,7 +100,6 @@
     <string name="main.songs_starred">Mit Stern</string>
     <string name="main.songs_title">Titel</string>
     <string name="main.videos">Filme</string>
-    <string name="main.welcome_text">Willkommen bei Ultrasonic! Die App ist zurzeit unkonfiguriert. Nachdem du deinen Server konfiguriert hast (siehe <b>subsonic.org</b>), bitte <i>Server hinzufügen</i> in den <b>Einstellungen</b> klicken um die Verbindun herzustellen.</string>
     <string name="main.welcome_title">Willkommen</string>
     <string name="menu.about">Über</string>
     <string name="menu.common">Allgemein</string>
@@ -129,16 +128,11 @@
     <string name="search.search">Neue Suche</string>
     <string name="search.songs">Titel</string>
     <string name="search.title">Suche</string>
-    <string name="select_album.donate_dialog_0_trial_days_left">Testperiode zu Ende</string>
-    <string name="select_album.donate_dialog_later">Später</string>
-    <string name="select_album.donate_dialog_message">Unbegresnze Downloads bei Spende an Sunsonic</string>
-    <string name="select_album.donate_dialog_now">Jetzt</string>
     <string name="select_album.empty">Keine Medien gefunden</string>
     <string name="select_album.n_selected">%d Titel ausgewählt.</string>
     <string name="select_album.n_unselected">%d Titel abgewählt.</string>
     <string name="select_album.no_network">Warnung: kein Netz.</string>
     <string name="select_album.no_sdcard">Fehler: Keine SD Karte verfügbar.</string>
-    <string name="select_album.not_licensed">Server nicht lizenziert. Noch %d Testtage</string>
     <string name="select_album.play_all">Alles wiedergeben</string>
     <string name="select_artist.all_folders">Alle Ordner</string>
     <string name="select_artist.folder">Ordner wählen</string>
@@ -308,8 +302,7 @@
     <string name="settings.use_folder_for_album_artist_summary">Annehmen, dass der Ordner der obersten Ebene der Name des Albumkünstlers ist</string>
     <string name="settings.use_id3">Durchsuchen von ID3-Tags</string>
     <string name="settings.use_id3_summary">Nutze ID3 Tag Methode anstatt Dateisystem-Methode</string>
-    <string name="settings.video_title">Film</string>
-    <string name="settings.video_player">Filmwiedergabe</string>
+    <string name="main.video">Film</string>
     <string name="settings.view_refresh">Aktualisierungsinterval</string>
     <string name="settings.view_refresh_500">.5 Sekunden</string>
     <string name="settings.view_refresh_1000">1 Sekunde</string>
@@ -331,8 +324,6 @@
     <string name="util.bytes_format.megabyte">0.00 MB</string>
     <string name="util.no_time">-:--</string>
     <string name="util.zero_time">0:00</string>
-    <string name="video.get_mx_player_text">MX Player ist nicht installiert. Holen Sie ihn sich kostenlos im Play Store, oder ändern Sie die Filmeinstellungen.</string>
-    <string name="video.get_mx_player_button">MX Player holen</string>
     <string name="widget.initial_text">Berühren, um Musik auszuwählen</string>
     <string name="widget.sdcard_busy">SD Karte nicht verfügbar</string>
     <string name="widget.sdcard_missing">Keine SD Karte</string>
@@ -368,55 +359,39 @@
     <string name="settings.share_greeting_default">Standard Begrüßung beim Teilen</string>
     <string name="share_default_greeting">Hör dir mal die Musik an, die ich mit dir über %s geteilt habe.</string>
     <string name="share_via">Titel teilen über</string>
-    <string name="settings.video_mx_player">MX Player</string>
-    <string name="settings.video_default">Standard</string>
-    <string name="settings.video_flash">Flash</string>
     <string name="menu.share">Freigabe</string>
     <string name="select_album_all_songs">Alle Titel von %s</string>
     <string name="settings.show_all_songs_by_artist">Alle Titel nach Künstler sortieren</string>
     <string name="settings.show_all_songs_by_artist_summary">Einen neuen Eintrag in der Künstleransicht hinzufügen, um auf alle Lieder eines Künstlers zuzugreifen</string>
     <string name="download.menu_show_artist">Künstler zeigen</string>
-    <string name="settings.image_loader_concurrency">Paralleles laden von Bildern</string>
-    <string name="settings.image_loader_concurrency_1">1</string>
-    <string name="settings.image_loader_concurrency_2">2</string>
-    <string name="settings.image_loader_concurrency_3">3</string>
-    <string name="settings.image_loader_concurrency_4">4</string>
-    <string name="settings.image_loader_concurrency_5">5</string>
-    <string name="settings.image_loader_concurrency_6">6</string>
-    <string name="settings.image_loader_concurrency_7">7</string>
-    <string name="settings.image_loader_concurrency_8">8</string>
-    <string name="settings.image_loader_concurrency_9">9</string>
-    <string name="settings.image_loader_concurrency_10">10</string>
-    <string name="settings.image_loader_concurrency_11">11</string>
-    <string name="settings.image_loader_concurrency_12">12</string>
     <string name="common_multiple_years">Mehrere Jahre</string>
     <string name="server_editor.new_label">Server hinzufügen</string>
     <plurals name="select_album_n_songs">
-        <item quantity="one">1 Titel</item>
+        <item quantity="one">%d Titel</item>
         <item quantity="other">%d Titel</item>
     </plurals>
     <plurals name="select_album_n_songs_pinned">
-        <item quantity="one">1 Titel</item>
+        <item quantity="one">%d Titel</item>
         <item quantity="other">%d Titel</item>
     </plurals>
     <plurals name="select_album_n_songs_downloaded">
-        <item quantity="one">1 Titel</item>
+        <item quantity="one">%d Titel</item>
         <item quantity="other">%d Titel</item>
     </plurals>
     <plurals name="select_album_n_songs_unpinned">
-        <item quantity="one">1 Titel</item>
+        <item quantity="one">%d Titel</item>
         <item quantity="other">%d Titel</item>
     </plurals>
     <plurals name="select_album_n_songs_added">
-        <item quantity="one">1 Titel</item>
+        <item quantity="one">%d Titel</item>
         <item quantity="other">%d Titel</item>
     </plurals>
     <plurals name="select_album_n_songs_play_next">
-        <item quantity="one">1 Titel</item>
+        <item quantity="one">%d Titel</item>
         <item quantity="other">%d Titel</item>
     </plurals>
     <plurals name="select_album_donate_dialog_n_trial_days_left">
-        <item quantity="one">1 Titel</item>
+        <item quantity="one">%d Titel</item>
         <item quantity="other">%d Titel</item>
     </plurals>
 
@@ -434,8 +409,6 @@
 
     <!-- Subsonic feature flags -->
     <string name="feature_flags_category_title">Funktionseinstellungem</string>
-    <string name="feature_flags_image_loader_title">Neuen Bild-Lader aktivieren</string>
-    <string name="feature_flags_image_loader_description">Neuen Bild-Lader aktivieren. Bilder werden derzeit nur im Chache gespeichert.</string>
     <string name="feature_flags_five_star_rating_title">Verwenden Sie Fünf-Sterne-Bewertung für Songs</string>
     <string name="feature_flags_five_star_rating_description">Verwenden Sie Fünf-Sterne-Bewertungssystem für Songs
          anstatt einfach Elemente zu markieren / zu entfernen.
