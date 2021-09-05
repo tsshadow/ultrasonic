@@ -10,7 +10,6 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
-import java.util.Locale
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
@@ -22,6 +21,7 @@ import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.Util.getMaxAlbums
 import org.moire.ultrasonic.util.Util.getMaxSongs
 import org.moire.ultrasonic.util.Util.getShouldUseId3Tags
+import java.util.*
 
 /**
  * Displays the Main screen of Ultrasonic, where the music library can be browsed
@@ -35,6 +35,8 @@ class MainFragment : Fragment(), KoinComponent {
     private lateinit var artistsButton: View
     private lateinit var albumsButton: View
     private lateinit var genresButton: View
+    private lateinit var custom1Button: View
+    private lateinit var moodButton: View
     private lateinit var videosTitle: View
     private lateinit var songsTitle: View
     private lateinit var randomSongsButton: View
@@ -108,6 +110,8 @@ class MainFragment : Fragment(), KoinComponent {
         artistsButton = buttons.findViewById(R.id.main_artists_button)
         albumsButton = buttons.findViewById(R.id.main_albums_button)
         genresButton = buttons.findViewById(R.id.main_genres_button)
+        moodButton = buttons.findViewById(R.id.main_mood_button)
+        custom1Button = buttons.findViewById(R.id.main_custom1_button)
         videosTitle = buttons.findViewById(R.id.main_videos_title)
         songsTitle = buttons.findViewById(R.id.main_songs)
         randomSongsButton = buttons.findViewById(R.id.main_songs_button)
@@ -138,7 +142,7 @@ class MainFragment : Fragment(), KoinComponent {
 
         if (!isOffline()) {
             adapter.addView(musicTitle, false)
-            adapter.addViews(listOf(artistsButton, albumsButton, genresButton), true)
+            adapter.addViews(listOf(artistsButton, albumsButton, genresButton /*, custom1Button*/, moodButton), true)
             adapter.addView(songsTitle, false)
             adapter.addViews(listOf(randomSongsButton, songsStarredButton), true)
             adapter.addView(albumsTitle, false)
@@ -221,6 +225,12 @@ class MainFragment : Fragment(), KoinComponent {
                 view === genresButton -> {
                     showGenres()
                 }
+                view === custom1Button -> {
+                    showCustom1()
+                }
+                view === moodButton -> {
+                    showMoods()
+                }
                 view === videosButton -> {
                     showVideos()
                 }
@@ -275,6 +285,14 @@ class MainFragment : Fragment(), KoinComponent {
 
     private fun showGenres() {
         Navigation.findNavController(requireView()).navigate(R.id.mainToSelectGenre)
+    }
+
+    private fun showCustom1() {
+        Navigation.findNavController(requireView()).navigate(R.id.mainToSelectCustom1)
+    }
+
+    private fun showMoods() {
+        Navigation.findNavController(requireView()).navigate(R.id.mainToSelectMood)
     }
 
     private fun showVideos() {

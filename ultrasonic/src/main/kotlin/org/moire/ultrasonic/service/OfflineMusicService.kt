@@ -6,7 +6,6 @@
  */
 package org.moire.ultrasonic.service
 
-import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -15,17 +14,37 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.io.InputStream
 import java.io.Reader
+import java.lang.Math.min
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.LinkedList
 import java.util.Locale
-import java.util.Random
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.domain.*
+import org.moire.ultrasonic.domain.Artist
+import org.moire.ultrasonic.domain.Bookmark
+import org.moire.ultrasonic.domain.ChatMessage
+import org.moire.ultrasonic.domain.Genre
+import org.moire.ultrasonic.domain.Custom1
+import org.moire.ultrasonic.domain.Custom2
+import org.moire.ultrasonic.domain.Custom3
+import org.moire.ultrasonic.domain.Custom4
+import org.moire.ultrasonic.domain.Custom5
+import org.moire.ultrasonic.domain.Mood
+import org.moire.ultrasonic.domain.Index
+import org.moire.ultrasonic.domain.JukeboxStatus
+import org.moire.ultrasonic.domain.Lyrics
+import org.moire.ultrasonic.domain.MusicDirectory
+import org.moire.ultrasonic.domain.MusicFolder
+import org.moire.ultrasonic.domain.Playlist
+import org.moire.ultrasonic.domain.PodcastsChannel
+import org.moire.ultrasonic.domain.SearchCriteria
+import org.moire.ultrasonic.domain.SearchResult
+import org.moire.ultrasonic.domain.Share
+import org.moire.ultrasonic.domain.UserInfo
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.Util
@@ -37,21 +56,21 @@ import timber.log.Timber
 class OfflineMusicService : MusicService, KoinComponent {
     private val activeServerProvider: ActiveServerProvider by inject()
 
-    override fun getIndexes(musicFolderId: String?, refresh: Boolean): Indexes {
-        val artists: MutableList<Artist> = ArrayList()
+    override fun getIndexes(musicFolderId: String?, refresh: Boolean): List<Index> {
+        val indexes: MutableList<Index> = ArrayList()
         val root = FileUtil.getMusicDirectory()
         for (file in FileUtil.listFiles(root)) {
             if (file.isDirectory) {
-                val artist = Artist()
-                artist.id = file.path
-                artist.index = file.name.substring(0, 1)
-                artist.name = file.name
-                artists.add(artist)
+                val index = Index(file.path)
+                index.id = file.path
+                index.index = file.name.substring(0, 1)
+                index.name = file.name
+                indexes.add(index)
             }
         }
         val ignoredArticlesString = "The El La Los Las Le Les"
         val ignoredArticles = COMPILE.split(ignoredArticlesString)
-        artists.sortWith { lhsArtist, rhsArtist ->
+        indexes.sortWith { lhsArtist, rhsArtist ->
             var lhs = lhsArtist.name!!.lowercase(Locale.ROOT)
             var rhs = rhsArtist.name!!.lowercase(Locale.ROOT)
             val lhs1 = lhs[0]
@@ -79,7 +98,7 @@ class OfflineMusicService : MusicService, KoinComponent {
             lhs.compareTo(rhs)
         }
 
-        return Indexes(0L, ignoredArticlesString, artists = artists)
+        return indexes
     }
 
     override fun getMusicDirectory(
@@ -104,34 +123,6 @@ class OfflineMusicService : MusicService, KoinComponent {
         return result
     }
 
-    override fun getAvatar(
-        username: String?,
-        size: Int,
-        saveToFile: Boolean,
-        highQuality: Boolean
-    ): Bitmap? {
-        return try {
-            val bitmap = FileUtil.getAvatarBitmap(username, size, highQuality)
-            Util.scaleBitmap(bitmap, size)
-        } catch (ignored: Exception) {
-            null
-        }
-    }
-
-    override fun getCoverArt(
-        entry: MusicDirectory.Entry?,
-        size: Int,
-        saveToFile: Boolean,
-        highQuality: Boolean
-    ): Bitmap? {
-        return try {
-            val bitmap = FileUtil.getAlbumArtBitmap(entry, size, highQuality)
-            Util.scaleBitmap(bitmap, size)
-        } catch (ignored: Exception) {
-            null
-        }
-    }
-
     override fun search(criteria: SearchCriteria): SearchResult {
         val artists: MutableList<Artist> = ArrayList()
         val albums: MutableList<MusicDirectory.Entry> = ArrayList()
@@ -142,8 +133,7 @@ class OfflineMusicService : MusicService, KoinComponent {
             val artistName = artistFile.name
             if (artistFile.isDirectory) {
                 if (matchCriteria(criteria, artistName).also { closeness = it } > 0) {
-                    val artist = Artist()
-                    artist.id = artistFile.path
+                    val artist = Artist(artistFile.path)
                     artist.index = artistFile.name.substring(0, 1)
                     artist.name = artistName
                     artist.closeness = closeness
@@ -236,7 +226,7 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Suppress("TooGenericExceptionCaught")
     @Throws(Exception::class)
-    override fun createPlaylist(id: String, name: String, entries: List<MusicDirectory.Entry>) {
+    override fun createPlaylist(id: String?, name: String?, entries: List<MusicDirectory.Entry>) {
         val playlistFile =
             FileUtil.getPlaylistFile(activeServerProvider.getActiveServer().name, name)
         val fw = FileWriter(playlistFile)
@@ -273,9 +263,10 @@ class OfflineMusicService : MusicService, KoinComponent {
         if (children.isEmpty()) {
             return result
         }
-        val random = Random()
-        for (i in 0 until size) {
-            val file = children[random.nextInt(children.size)]
+        children.shuffle()
+        val finalSize: Int = min(children.size, size)
+        for (i in 0 until finalSize) {
+            val file = children[i % children.size]
             result.addChild(createEntry(file, getName(file)))
         }
         return result
@@ -350,7 +341,6 @@ class OfflineMusicService : MusicService, KoinComponent {
     override fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory {
         throw OfflineException("Getting Songs By Genre not available in offline mode")
     }
-
 
     @Throws(Exception::class)
     override fun getSongsByCustom1(custom1: String, count: Int, offset: Int): MusicDirectory {
@@ -472,7 +462,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(OfflineException::class)
-    override fun getVideoUrl(id: String, useFlash: Boolean): String? {
+    override fun getVideoUrl(id: String): String? {
         throw OfflineException("getVideoUrl isn't available in offline mode")
     }
 
@@ -518,7 +508,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     override fun isLicenseValid(): Boolean = true
 
     @Throws(OfflineException::class)
-    override fun getArtists(refresh: Boolean): Indexes {
+    override fun getArtists(refresh: Boolean): List<Artist> {
         throw OfflineException("getArtists isn't available in offline mode")
     }
 
@@ -541,7 +531,8 @@ class OfflineMusicService : MusicService, KoinComponent {
     override fun getDownloadInputStream(
         song: MusicDirectory.Entry,
         offset: Long,
-        maxBitrate: Int
+        maxBitrate: Int,
+        save: Boolean
     ): Pair<InputStream, Boolean> {
         throw OfflineException("getDownloadInputStream isn't available in offline mode")
     }

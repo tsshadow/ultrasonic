@@ -117,8 +117,9 @@
     <string name="main.songs_starred">Starred</string>
     <string name="main.songs_title">Songs</string>
     <string name="main.videos">Videos</string>
-    <string name="main.welcome_text">Welcome to Ultrasonic+! The app is currently not configured. After you\'ve set up your personal server (available from <b>subsonic.org</b>), please click <i>Manage Servers</i> in <b>Settings</b> to connect to it.</string>
-    <string name="main.welcome_title">Welcome!</string>
+    <string name="main.welcome_text_demo">To use Ultrasonic+ with your own music you will need your <b>own server</b>. \n\n➤ In case you want to try out the app first, it can add a demo server now. \n\n➤ Otherwise you can configure your server in the <b>settings</b>.</string>
+    <string name="main.welcome_title">Welcome to Ultrasonic+!</string>
+    <string name="main.welcome_cancel">Take me to the settings</string>
     <string name="menu.about">About</string>
     <string name="menu.common">Common</string>
     <string name="menu.deleted_playlist">Deleted playlist %s</string>
@@ -146,16 +147,11 @@
     <string name="search.search">Click to search</string>
     <string name="search.songs">Songs</string>
     <string name="search.title">Search</string>
-    <string name="select_album.donate_dialog_0_trial_days_left">Trial period is over</string>
-    <string name="select_album.donate_dialog_later">Later</string>
-    <string name="select_album.donate_dialog_message">Get unlimited downloads by donating to Subsonic.</string>
-    <string name="select_album.donate_dialog_now">Now</string>
     <string name="select_album.empty">No media found</string>
     <string name="select_album.n_selected">%d tracks selected.</string>
     <string name="select_album.n_unselected">%d tracks unselected.</string>
     <string name="select_album.no_network">Warning: No network available.</string>
     <string name="select_album.no_sdcard">Error: No SD card available.</string>
-    <string name="select_album.not_licensed">Server not licensed. %d trial days left.</string>
     <string name="select_album.play_all">Play All</string>
     <string name="select_artist.all_folders">All Folders</string>
     <string name="select_artist.folder">Select Folder</string>
@@ -326,7 +322,6 @@
     <string name="settings.show_track_number">Show Track Number</string>
     <string name="settings.show_track_number_summary">Include track number when displaying a song</string>
     <string name="settings.test_connection_title">Test Connection</string>
-    <string name="settings.testing_connection">Testing connection&#8230;</string>
     <string name="settings.testing_ok">Connection is OK</string>
     <string name="settings.testing_unlicensed">Connection is OK. Server unlicensed.</string>
     <string name="settings.theme_light">Light</string>
@@ -343,8 +338,7 @@
     <string name="settings.use_id3_summary">Use ID3 tag methods instead of file system based methods</string>
     <string name="settings.show_artist_picture">Show artist picture in artist list</string>
     <string name="settings.show_artist_picture_summary">Displays the artist picture in the artist list if available</string>
-    <string name="settings.video_title">Video</string>
-    <string name="settings.video_player">Video player</string>
+    <string name="main.video" tools:ignore="UnusedResources">Video</string>
     <string name="settings.view_refresh">View Refresh</string>
     <string name="settings.view_refresh_500">.5 seconds</string>
     <string name="settings.view_refresh_1000">1 second</string>
@@ -366,8 +360,6 @@
     <string name="util.bytes_format.megabyte">0.00 MB</string>
     <string name="util.no_time" tools:ignore="TypographyDashes">-:--</string>
     <string name="util.zero_time">0:00</string>
-    <string name="video.get_mx_player_text">MX Player is not installed. Get it for free on Play Store, or change video settings.</string>
-    <string name="video.get_mx_player_button">Get MX Player</string>
     <string name="widget.initial_text">Touch to select music</string>
     <string name="widget.sdcard_busy">SD card unavailable</string>
     <string name="widget.sdcard_missing">No SD card</string>
@@ -396,34 +388,18 @@
     <string name="time_span_disable">Disable</string>
     <string name="time_span_disabled">Disabled</string>
     <string name="save_as_defaults">Save as default</string>
-    <string name="share_comment">Comment</string>q
+    <string name="share_comment">Comment</string>
     <string name="settings.share_expiration">Time To Expiration</string>
     <string name="download_song_removed">\"%s\" was removed from playlist</string>
     <string name="download.share_playlist">Share Playlist</string>
     <string name="settings.share_greeting_default">Default Share Greeting</string>
     <string name="share_default_greeting">Check out this music I shared from %s</string>
     <string name="share_via">Share songs via</string>
-    <string name="settings.video_mx_player">MX Player</string>
-    <string name="settings.video_default">Default</string>
-    <string name="settings.video_flash">Flash</string>
     <string name="menu.share">Share</string>
     <string name="select_album_all_songs">All Songs by %s</string>
     <string name="settings.show_all_songs_by_artist">Show All Songs By Artist</string>
     <string name="settings.show_all_songs_by_artist_summary">Add new entry in artist view to access all songs for an artist</string>
     <string name="download.menu_show_artist">Show Artist</string>
-    <string name="settings.image_loader_concurrency">Image Loader Concurrency</string>
-    <string name="settings.image_loader_concurrency_1">1</string>
-    <string name="settings.image_loader_concurrency_2">2</string>
-    <string name="settings.image_loader_concurrency_3">3</string>
-    <string name="settings.image_loader_concurrency_4">4</string>
-    <string name="settings.image_loader_concurrency_5">5</string>
-    <string name="settings.image_loader_concurrency_6">6</string>
-    <string name="settings.image_loader_concurrency_7">7</string>
-    <string name="settings.image_loader_concurrency_8">8</string>
-    <string name="settings.image_loader_concurrency_9">9</string>
-    <string name="settings.image_loader_concurrency_10">10</string>
-    <string name="settings.image_loader_concurrency_11">11</string>
-    <string name="settings.image_loader_concurrency_12">12</string>
     <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Multiple Years</string>
     <string name="settings.server_address_unset" translatable="false">http://example.com</string>
@@ -477,33 +453,35 @@
     <string name="server_menu.move_down">Move down</string>
     <string name="server_editor.authentication">Authentication</string>
     <string name="server_editor.advanced">Advanced settings</string>
+    <string name="server_editor.disabled_feature">One or more features were disabled because the server doesn\'t support them.\nYou can run this test again anytime.</string>
+    <string name="server_menu.demo">Demo Server</string>
 
     <plurals name="select_album_n_songs">
-        <item quantity="one">1 song</item>
+        <item quantity="one">%d song</item>
         <item quantity="other">%d songs</item>
     </plurals>
     <plurals name="select_album_n_songs_pinned">
-        <item quantity="one">1 song selected to be pinned.</item>
+        <item quantity="one">%d song selected to be pinned.</item>
         <item quantity="other">%d songs selected to be pinned.</item>
     </plurals>
     <plurals name="select_album_n_songs_downloaded">
-        <item quantity="one">1 song selected to be downloaded.</item>
+        <item quantity="one">%d song selected to be downloaded.</item>
         <item quantity="other">%d songs selected to be downloaded.</item>
     </plurals>
     <plurals name="select_album_n_songs_unpinned">
-        <item quantity="one">1 song selected to be unpinned.</item>
+        <item quantity="one">%d song selected to be unpinned.</item>
         <item quantity="other">%d songs selected to be unpinned.</item>
     </plurals>
     <plurals name="select_album_n_songs_added">
-        <item quantity="one">1 song added to the end of play queue.</item>
+        <item quantity="one">%d song added to the end of play queue.</item>
         <item quantity="other">%d songs added to the end of play queue.</item>
     </plurals>
     <plurals name="select_album_n_songs_play_next">
-        <item quantity="one">1 song inserted after current song.</item>
+        <item quantity="one">%d song inserted after current song.</item>
         <item quantity="other">%d songs inserted after current song.</item>
     </plurals>
     <plurals name="select_album_donate_dialog_n_trial_days_left">
-        <item quantity="one">1 day left of trial period</item>
+        <item quantity="one">%d day left of trial period</item>
         <item quantity="other">%d days left of trial period</item>
     </plurals>
 
@@ -516,19 +494,14 @@
     <string name="api.subsonic.param_missing">Required param is missing.</string>
     <string name="api.subsonic.requested_data_was_not_found">Requested data was not found.</string>
     <string name="api.subsonic.trial_period_is_over">Trial period is over.</string>
-    <string name="api.subsonic.upgrade_client">Incompatible versions. Please upgrade Ultrasonic+ Android app.</string>
+    <string name="api.subsonic.upgrade_client">Incompatible versions. Please upgrade Ultrasonic Android app.</string>
     <string name="api.subsonic.upgrade_server">Incompatible versions. Please upgrade Subsonic server.</string>
 
     <!-- Subsonic feature flags -->
     <string name="feature_flags_category_title">Feature Flags</string>
-    <string name="feature_flags_image_loader_title">Enable new image loader</string>
-    <string name="feature_flags_image_loader_description">Enables new image loader implementation.
-        Currently it doesn\'t save image in device storage and uses only cache in memory.
-    </string>
     <string name="feature_flags_five_star_rating_title">Use five star rating for songs</string>
     <string name="feature_flags_five_star_rating_description">Use five star rating system for songs
         instead of simply starring/unstarring items.
     </string>
-    <string name="server_editor.disabled_feature">One or more features were disabled because the server doesn\'t support them.\nYou can run this test again anytime.</string>
 
 </resources>

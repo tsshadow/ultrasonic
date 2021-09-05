@@ -6,9 +6,28 @@
  */
 package org.moire.ultrasonic.service
 
-import android.graphics.Bitmap
-import org.moire.ultrasonic.domain.*
 import java.io.InputStream
+import org.moire.ultrasonic.domain.Artist
+import org.moire.ultrasonic.domain.Bookmark
+import org.moire.ultrasonic.domain.ChatMessage
+import org.moire.ultrasonic.domain.Genre
+import org.moire.ultrasonic.domain.Custom1
+import org.moire.ultrasonic.domain.Custom2
+import org.moire.ultrasonic.domain.Custom3
+import org.moire.ultrasonic.domain.Custom4
+import org.moire.ultrasonic.domain.Custom5
+import org.moire.ultrasonic.domain.Mood
+import org.moire.ultrasonic.domain.Index
+import org.moire.ultrasonic.domain.JukeboxStatus
+import org.moire.ultrasonic.domain.Lyrics
+import org.moire.ultrasonic.domain.MusicDirectory
+import org.moire.ultrasonic.domain.MusicFolder
+import org.moire.ultrasonic.domain.Playlist
+import org.moire.ultrasonic.domain.PodcastsChannel
+import org.moire.ultrasonic.domain.SearchCriteria
+import org.moire.ultrasonic.domain.SearchResult
+import org.moire.ultrasonic.domain.Share
+import org.moire.ultrasonic.domain.UserInfo
 
 @Suppress("TooManyFunctions")
 interface MusicService {
@@ -52,10 +71,10 @@ interface MusicService {
     fun getMusicFolders(refresh: Boolean): List<MusicFolder>
 
     @Throws(Exception::class)
-    fun getIndexes(musicFolderId: String?, refresh: Boolean): Indexes
+    fun getIndexes(musicFolderId: String?, refresh: Boolean): List<Index>
 
     @Throws(Exception::class)
-    fun getArtists(refresh: Boolean): Indexes
+    fun getArtists(refresh: Boolean): List<Artist>
 
     @Throws(Exception::class)
     fun getMusicDirectory(id: String, name: String?, refresh: Boolean): MusicDirectory
@@ -79,7 +98,7 @@ interface MusicService {
     fun getPlaylists(refresh: Boolean): List<Playlist>
 
     @Throws(Exception::class)
-    fun createPlaylist(id: String, name: String, entries: List<MusicDirectory.Entry>)
+    fun createPlaylist(id: String?, name: String?, entries: List<MusicDirectory.Entry>)
 
     @Throws(Exception::class)
     fun deletePlaylist(id: String)
@@ -134,17 +153,6 @@ interface MusicService {
     @Throws(Exception::class)
     fun getStarred2(): SearchResult
 
-    @Throws(Exception::class)
-    fun getCoverArt(
-        entry: MusicDirectory.Entry?,
-        size: Int,
-        saveToFile: Boolean,
-        highQuality: Boolean
-    ): Bitmap?
-
-    @Throws(Exception::class)
-    fun getAvatar(username: String?, size: Int, saveToFile: Boolean, highQuality: Boolean): Bitmap?
-
     /**
      * Return response [InputStream] and a [Boolean] that indicates if this response is
      * partial.
@@ -153,12 +161,12 @@ interface MusicService {
     fun getDownloadInputStream(
         song: MusicDirectory.Entry,
         offset: Long,
-        maxBitrate: Int
+        maxBitrate: Int,
+        save: Boolean
     ): Pair<InputStream, Boolean>
 
-    // TODO: Refactor and remove this call (see RestMusicService implementation)
     @Throws(Exception::class)
-    fun getVideoUrl(id: String, useFlash: Boolean): String?
+    fun getVideoUrl(id: String): String?
 
     @Throws(Exception::class)
     fun updateJukeboxPlaylist(ids: List<String>?): JukeboxStatus

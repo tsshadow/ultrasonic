@@ -327,7 +327,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     // Returns true if the directory contains only folders
     private fun hasOnlyFolders(musicDirectory: MusicDirectory) =
         musicDirectory.getChildren(includeDirs = true, includeFiles = false).size ==
-            musicDirectory.getChildren(includeDirs = true, includeFiles = true).size
+                musicDirectory.getChildren(includeDirs = true, includeFiles = true).size
 
     override fun load(
         isOffline: Boolean,

@@ -473,7 +473,7 @@
     <string name="api.subsonic.param_missing">Vereiste parameter ontbreekt.</string>
     <string name="api.subsonic.requested_data_was_not_found">De opgevraagde gegevens kunnen niet worden gevonden.</string>
     <string name="api.subsonic.trial_period_is_over">Proefperiode is afgelopen.</string>
-    <string name="api.subsonic.upgrade_client">Incompatibele versies. Werk de Ultrasonic+ Android-app bij.</string>
+    <string name="api.subsonic.upgrade_client">Incompatibele versies. Werk de Ultrasonic Android-app bij.</string>
     <string name="api.subsonic.upgrade_server">Incompatibele versies. Werk je Subsonic-server bij.</string>
 
     <!-- Subsonic feature flags -->
