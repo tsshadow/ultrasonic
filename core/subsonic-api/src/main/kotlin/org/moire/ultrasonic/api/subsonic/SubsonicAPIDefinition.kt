@@ -3,34 +3,7 @@ package org.moire.ultrasonic.api.subsonic
 import okhttp3.ResponseBody
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
-import org.moire.ultrasonic.api.subsonic.response.BookmarksResponse
-import org.moire.ultrasonic.api.subsonic.response.ChatMessagesResponse
-import org.moire.ultrasonic.api.subsonic.response.GenresResponse
-import org.moire.ultrasonic.api.subsonic.response.GetAlbumList2Response
-import org.moire.ultrasonic.api.subsonic.response.GetAlbumListResponse
-import org.moire.ultrasonic.api.subsonic.response.GetAlbumResponse
-import org.moire.ultrasonic.api.subsonic.response.GetArtistResponse
-import org.moire.ultrasonic.api.subsonic.response.GetArtistsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetIndexesResponse
-import org.moire.ultrasonic.api.subsonic.response.GetLyricsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetMusicDirectoryResponse
-import org.moire.ultrasonic.api.subsonic.response.GetPlaylistResponse
-import org.moire.ultrasonic.api.subsonic.response.GetPlaylistsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetPodcastsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetRandomSongsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetSongsByGenreResponse
-import org.moire.ultrasonic.api.subsonic.response.GetStarredResponse
-import org.moire.ultrasonic.api.subsonic.response.GetStarredTwoResponse
-import org.moire.ultrasonic.api.subsonic.response.GetUserResponse
-import org.moire.ultrasonic.api.subsonic.response.JukeboxResponse
-import org.moire.ultrasonic.api.subsonic.response.LicenseResponse
-import org.moire.ultrasonic.api.subsonic.response.MusicFoldersResponse
-import org.moire.ultrasonic.api.subsonic.response.SearchResponse
-import org.moire.ultrasonic.api.subsonic.response.SearchThreeResponse
-import org.moire.ultrasonic.api.subsonic.response.SearchTwoResponse
-import org.moire.ultrasonic.api.subsonic.response.SharesResponse
-import org.moire.ultrasonic.api.subsonic.response.SubsonicResponse
-import org.moire.ultrasonic.api.subsonic.response.VideosResponse
+import org.moire.ultrasonic.api.subsonic.response.*
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -274,6 +247,24 @@ interface SubsonicAPIDefinition {
     @GET("getGenres.view")
     fun getGenres(): Call<GenresResponse>
 
+    @GET("getCustom1.view")
+    fun getCustom1(): Call<Custom1Response>
+
+    @GET("getCustom2.view")
+    fun getCustom2(): Call<Custom2Response>
+
+    @GET("getCustom3.view")
+    fun getCustom3(): Call<Custom3Response>
+
+    @GET("getCustom4.view")
+    fun getCustom4(): Call<Custom4Response>
+
+    @GET("getCustom5.view")
+    fun getCustom5(): Call<Custom5Response>
+
+    @GET("getMoods.view")
+    fun getMoods(): Call<MoodResponse>
+
     @GET("getSongsByGenre.view")
     fun getSongsByGenre(
         @Query("genre") genre: String,
@@ -281,6 +272,59 @@ interface SubsonicAPIDefinition {
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByGenreResponse>
+
+    @GET("getSongsByCustom1.view")
+    fun getSongsByCustom1(
+        @Query("custom1") custom1: String,
+        @Query("count") count: Int = 10,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByCustom1Response>
+
+
+    @GET("getSongsByCustom2.view")
+    fun getSongsByCustom2(
+        @Query("custom2") custom2: String,
+        @Query("count") count: Int = 20,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByCustom2Response>
+
+
+    @GET("getSongsByCustom3.view")
+    fun getSongsByCustom3(
+        @Query("custom3") custom3: String,
+        @Query("count") count: Int = 30,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByCustom3Response>
+
+
+    @GET("getSongsByCustom4.view")
+    fun getSongsByCustom4(
+        @Query("custom4") custom4: String,
+        @Query("count") count: Int = 40,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByCustom4Response>
+
+
+    @GET("getSongsByCustom5.view")
+    fun getSongsByCustom5(
+        @Query("custom5") custom5: String,
+        @Query("count") count: Int = 50,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByCustom5Response>
+
+
+    @GET("getSongsByMood.view")
+    fun getSongsByMood(
+        @Query("mood") mood: String,
+        @Query("count") count: Int = 50,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByMoodResponse>
 
     @GET("getUser.view")
     fun getUser(@Query("username") username: String): Call<GetUserResponse>

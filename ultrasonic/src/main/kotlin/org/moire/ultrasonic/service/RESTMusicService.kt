@@ -24,6 +24,12 @@ import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.Bookmark
 import org.moire.ultrasonic.domain.ChatMessage
 import org.moire.ultrasonic.domain.Genre
+import org.moire.ultrasonic.domain.Custom1
+import org.moire.ultrasonic.domain.Custom2
+import org.moire.ultrasonic.domain.Custom3
+import org.moire.ultrasonic.domain.Custom4
+import org.moire.ultrasonic.domain.Custom5
+import org.moire.ultrasonic.domain.Mood
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lyrics
@@ -558,6 +564,61 @@ open class RESTMusicService(
         return response.body()!!.genresList.toDomainEntityList()
     }
 
+
+    @Throws(Exception::class)
+    override fun getCustom1(
+        refresh: Boolean
+    ): List<Custom1>? {
+        val response = API.getCustom1().execute().throwOnFailure()
+
+        return response.body()!!.custom1List.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom2(
+        refresh: Boolean
+    ): List<Custom2>? {
+        val response = API.getCustom2().execute().throwOnFailure()
+
+        return response.body()!!.custom2List.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom3(
+        refresh: Boolean
+    ): List<Custom3>? {
+        val response = API.getCustom3().execute().throwOnFailure()
+
+        return response.body()!!.custom3List.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom4(
+        refresh: Boolean
+    ): List<Custom4>? {
+        val response = API.getCustom4().execute().throwOnFailure()
+
+        return response.body()!!.custom4List.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getCustom5(
+        refresh: Boolean
+    ): List<Custom5>? {
+        val response = API.getCustom5().execute().throwOnFailure()
+
+        return response.body()!!.custom5List.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getMoods(
+            refresh: Boolean
+    ): List<Mood>? {
+        val response = API.getMoods().execute().throwOnFailure()
+
+        return response.body()!!.moodList.toDomainEntityList()
+    }
+
     @Throws(Exception::class)
     override fun getSongsByGenre(
         genre: String,
@@ -565,6 +626,90 @@ open class RESTMusicService(
         offset: Int
     ): MusicDirectory {
         val response = API.getSongsByGenre(genre, count, offset, null).execute().throwOnFailure()
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom1(
+        custom1: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByCustom1(custom1, count, offset, null).execute().throwOnFailure()
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom2(
+        custom2: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByCustom2(custom2, count, offset, null).execute().throwOnFailure()
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom3(
+        custom3: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByCustom3(custom3, count, offset, null).execute().throwOnFailure()
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom4(
+        custom4: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByCustom4(custom4, count, offset, null).execute().throwOnFailure()
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByCustom5(
+        custom5: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByCustom5(custom5, count, offset, null).execute().throwOnFailure()
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByMood(
+        mood: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByMood(mood, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList())

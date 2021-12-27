@@ -107,6 +107,12 @@
     <string name="main.albums_starred">Starred</string>
     <string name="main.albums_title">Albums</string>
     <string name="main.artists_title">Artists</string>
+    <string name="main.custom1_title">Custom 1</string>
+    <string name="main.custom2_title">Custom 2</string>
+    <string name="main.custom3_title">Custom 3</string>
+    <string name="main.custom4_title">Custom 4</string>
+    <string name="main.custom5_title">Custom 5</string>
+    <string name="main.mood_title">Mood</string>
     <string name="main.genres_title">Genres</string>
     <string name="main.music">Music</string>
     <string name="main.offline">Offline</string>
@@ -154,6 +160,12 @@
     <string name="select_album.play_all">Play All</string>
     <string name="select_artist.all_folders">All Folders</string>
     <string name="select_artist.folder">Select Folder</string>
+    <string name="select_custom1.empty">No custom 1 tags found</string>
+    <string name="select_custom2.empty">No custom 2 tags found</string>
+    <string name="select_custom3.empty">No custom 3 tags found</string>
+    <string name="select_custom4.empty">No custom 4 tags found</string>
+    <string name="select_custom5.empty">No custom 5 tags found</string>
+    <string name="select_mood.empty">No mood tags found</string>
     <string name="select_genre.empty">No genres found</string>
     <string name="select_playlist.empty">No saved playlists on server</string>
     <string name="service.connecting">Contacting server, please wait.</string>
@@ -283,6 +295,9 @@
     <string name="settings.search_5">5</string>
     <string name="settings.search_50">50</string>
     <string name="settings.search_500">500</string>
+    <string name="settings.search_1000">1000</string>
+    <string name="settings.search_10000">10000</string>
+    <string name="settings.search_100000">100000</string>
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">Search history cleared</string>
     <string name="settings.search_title">Search Settings</string>
