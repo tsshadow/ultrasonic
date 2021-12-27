@@ -265,6 +265,9 @@ interface SubsonicAPIDefinition {
     @GET("getMoods.view")
     fun getMoods(): Call<MoodResponse>
 
+    @GET("getYears.view")
+    fun getYears(): Call<YearResponse>
+
     @GET("getSongsByGenre.view")
     fun getSongsByGenre(
         @Query("genre") genre: String,
@@ -317,7 +320,6 @@ interface SubsonicAPIDefinition {
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByCustom5Response>
 
-
     @GET("getSongsByMood.view")
     fun getSongsByMood(
         @Query("mood") mood: String,
@@ -325,6 +327,14 @@ interface SubsonicAPIDefinition {
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByMoodResponse>
+
+    @GET("getSongsByYear.view")
+    fun getSongsByYear(
+        @Query("year") year: String,
+        @Query("count") count: Int = 50,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByYearResponse>
 
     @GET("getUser.view")
     fun getUser(@Query("username") username: String): Call<GetUserResponse>

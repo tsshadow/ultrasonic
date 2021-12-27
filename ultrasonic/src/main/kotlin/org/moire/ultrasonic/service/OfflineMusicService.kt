@@ -34,6 +34,7 @@ import org.moire.ultrasonic.domain.Custom3
 import org.moire.ultrasonic.domain.Custom4
 import org.moire.ultrasonic.domain.Custom5
 import org.moire.ultrasonic.domain.Mood
+import org.moire.ultrasonic.domain.Year
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lyrics
@@ -388,6 +389,11 @@ class OfflineMusicService : MusicService, KoinComponent {
     override fun getSongsByMood(mood: String, count: Int, offset: Int): MusicDirectory {
         throw OfflineException("Getting Songs By Mood tag not available in offline mode")
     }
+    
+    @Throws(Exception::class)
+    override fun getSongsByYear(year: String, count: Int, offset: Int): MusicDirectory {
+        throw OfflineException("Getting Songs By Year tag not available in offline mode")
+    }
 
     @Throws(Exception::class)
     override fun getGenres(refresh: Boolean): List<Genre>? {
@@ -422,6 +428,11 @@ class OfflineMusicService : MusicService, KoinComponent {
     @Throws(Exception::class)
     override fun getMoods(refresh: Boolean): List<Mood>? {
         throw OfflineException("Getting Mood tags not available in offline mode")
+    }
+
+    @Throws(Exception::class)
+    override fun getYears(refresh: Boolean): List<Year>? {
+        throw OfflineException("Getting Year tags not available in offline mode")
     }
 
     @Throws(Exception::class)

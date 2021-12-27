@@ -30,6 +30,7 @@ import org.moire.ultrasonic.domain.Custom3
 import org.moire.ultrasonic.domain.Custom4
 import org.moire.ultrasonic.domain.Custom5
 import org.moire.ultrasonic.domain.Mood
+import org.moire.ultrasonic.domain.Year
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lyrics
@@ -618,6 +619,15 @@ open class RESTMusicService(
 
         return response.body()!!.moodList.toDomainEntityList()
     }
+    
+    @Throws(Exception::class)
+    override fun getYears(
+        refresh: Boolean
+    ): List<Year>? {
+        val response = API.getYears().execute().throwOnFailure()
+
+        return response.body()!!.yearList.toDomainEntityList()
+    }
 
     @Throws(Exception::class)
     override fun getSongsByGenre(
@@ -710,6 +720,19 @@ open class RESTMusicService(
         offset: Int
     ): MusicDirectory {
         val response = API.getSongsByMood(mood, count, offset, null).execute().throwOnFailure()
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
+    @Throws(Exception::class)
+    override fun getSongsByYear(
+        year: String,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByYear(year, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList())

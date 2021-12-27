@@ -17,6 +17,7 @@ import org.moire.ultrasonic.domain.Custom3
 import org.moire.ultrasonic.domain.Custom4
 import org.moire.ultrasonic.domain.Custom5
 import org.moire.ultrasonic.domain.Mood
+import org.moire.ultrasonic.domain.Year
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lyrics
@@ -58,6 +59,9 @@ interface MusicService {
 
     @Throws(Exception::class)
     fun getMoods(refresh: Boolean): List<Mood>?
+    
+    @Throws(Exception::class)
+    fun getYears(refresh: Boolean): List<Year>?
 
     @Throws(Exception::class)
     fun star(id: String?, albumId: String?, artistId: String?)
@@ -152,6 +156,9 @@ interface MusicService {
 
     @Throws(Exception::class)
     fun getSongsByMood(mood: String, count: Int, offset: Int): MusicDirectory
+
+    @Throws(Exception::class)
+    fun getSongsByYear(year: String, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
     fun getStarred(): SearchResult

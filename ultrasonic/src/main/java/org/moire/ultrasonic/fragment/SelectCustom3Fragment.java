@@ -75,7 +75,7 @@ public class SelectCustom3Fragment extends Fragment {
                 if (custom3 != null)
                 {
                     Bundle bundle = new Bundle();
-                    bundle.putString(Constants.INTENT_NAME_CUSTOM3_NAME, custom3.getName());
+                    bundle.putString(Constants.INTENT_CUSTOM3_NAME, custom3.getName());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.getMaxSongs());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0);
                     Navigation.findNavController(view).navigate(R.id.trackCollectionFragment, bundle);

@@ -23,6 +23,7 @@ import org.moire.ultrasonic.domain.Custom3
 import org.moire.ultrasonic.domain.Custom4
 import org.moire.ultrasonic.domain.Custom5
 import org.moire.ultrasonic.domain.Mood
+import org.moire.ultrasonic.domain.Year
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lyrics
@@ -61,6 +62,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     private val cachedCustom4 = TimeLimitedCache<List<Custom4>?>(10 * 3600, TimeUnit.SECONDS)
     private val cachedCustom5 = TimeLimitedCache<List<Custom5>?>(10 * 3600, TimeUnit.SECONDS)
     private val cachedMood = TimeLimitedCache<List<Mood>?>(10 * 3600, TimeUnit.SECONDS)
+    private val cachedYear = TimeLimitedCache<List<Year>?>(10 * 3600, TimeUnit.SECONDS)
 
     // New Room Database
     private var cachedArtists = metaDatabase.artistsDao()
@@ -523,6 +525,28 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         }
         return sorted
     }
+    
+ @Throws(Exception::class)
+    override fun getYears(refresh: Boolean): List<Year>? {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedYear.clear()
+        }
+        var result = cachedYear.get()
+        if (result == null) {
+            result = musicService.getYears(refresh)
+            cachedYear.set(result)
+        }
+
+        val sorted = result?.toMutableList()
+        sorted?.sortWith { year, year_2 ->
+            year.name.compareTo(
+                    year_2.name,
+                ignoreCase = true
+            )
+        }
+        return sorted
+    }
 
     @Throws(Exception::class)
     override fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory {
@@ -557,6 +581,11 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     @Throws(Exception::class)
     override fun getSongsByMood(mood: String, count: Int, offset: Int): MusicDirectory {
         return musicService.getSongsByMood(mood, count, offset)
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByYear(year: String, count: Int, offset: Int): MusicDirectory {
+        return musicService.getSongsByYear(year, count, offset)
     }
 
     @Throws(Exception::class)

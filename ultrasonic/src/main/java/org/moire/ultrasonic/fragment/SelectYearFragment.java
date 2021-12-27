@@ -14,7 +14,7 @@ import androidx.navigation.Navigation;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.moire.ultrasonic.R;
-import org.moire.ultrasonic.domain.Custom5;
+import org.moire.ultrasonic.domain.Year;
 import org.moire.ultrasonic.service.MusicService;
 import org.moire.ultrasonic.service.MusicServiceFactory;
 import org.moire.ultrasonic.util.BackgroundTask;
@@ -23,7 +23,7 @@ import org.moire.ultrasonic.util.Constants;
 import org.moire.ultrasonic.util.FragmentBackgroundTask;
 import org.moire.ultrasonic.util.Settings;
 import org.moire.ultrasonic.util.Util;
-import org.moire.ultrasonic.view.Custom5Adapter;
+import org.moire.ultrasonic.view.YearAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +31,12 @@ import java.util.List;
 import timber.log.Timber;
 
 /**
- * Displays the available custom5 in the media library
+ * Displays the available year in the media library
  */
-public class SelectCustom5Fragment extends Fragment {
+public class SelectYearFragment extends Fragment {
 
-    private SwipeRefreshLayout refreshcustom5ListView;
-    private ListView custom5ListView;
+    private SwipeRefreshLayout refreshYearListView;
+    private ListView yearListView;
     private View emptyView;
     private CancellationToken cancellationToken;
 
@@ -49,16 +49,16 @@ public class SelectCustom5Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.select_custom5, container, false);
+        return inflater.inflate(R.layout.select_year, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         cancellationToken = new CancellationToken();
-        refreshcustom5ListView = view.findViewById(R.id.select_custom5_refresh);
-        custom5ListView = view.findViewById(R.id.select_custom5_list);
+        refreshYearListView = view.findViewById(R.id.select_year_refresh);
+        yearListView = view.findViewById(R.id.select_year_list);
 
-        refreshcustom5ListView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
+        refreshYearListView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
         {
             @Override
             public void onRefresh()
@@ -67,15 +67,15 @@ public class SelectCustom5Fragment extends Fragment {
             }
         });
 
-        custom5ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        yearListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Custom5 custom5 = (Custom5) parent.getItemAtPosition(position);
+                Year year = (Year) parent.getItemAtPosition(position);
 
-                if (custom5 != null)
+                if (year != null)
                 {
                     Bundle bundle = new Bundle();
-                    bundle.putString(Constants.INTENT_CUSTOM5_NAME, custom5.getName());
+                    bundle.putString(Constants.INTENT_YEAR_NAME, year.getName());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.getMaxSongs());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0);
                     Navigation.findNavController(view).navigate(R.id.trackCollectionFragment, bundle);
@@ -83,10 +83,10 @@ public class SelectCustom5Fragment extends Fragment {
             }
         });
 
-        emptyView = view.findViewById(R.id.select_custom5_empty);
-        registerForContextMenu(custom5ListView);
+        emptyView = view.findViewById(R.id.select_year_empty);
+        registerForContextMenu(yearListView);
 
-        FragmentTitle.Companion.setTitle(this, R.string.main_custom5_title);
+        FragmentTitle.Companion.setTitle(this, R.string.main_year_title);
         load(false);
     }
 
@@ -98,35 +98,35 @@ public class SelectCustom5Fragment extends Fragment {
 
     private void load(final boolean refresh)
     {
-        BackgroundTask<List<Custom5>> task = new FragmentBackgroundTask<List<Custom5>>(getActivity(), true, refreshcustom5ListView, cancellationToken)
+        BackgroundTask<List<Year>> task = new FragmentBackgroundTask<List<Year>>(getActivity(), true, refreshYearListView, cancellationToken)
         {
             @Override
-            protected List<Custom5> doInBackground()
+            protected List<Year> doInBackground()
             {
                 MusicService musicService = MusicServiceFactory.getMusicService();
 
-                List<Custom5> custom5 = new ArrayList<>();
+                List<Year> year = new ArrayList<>();
 
                 try
                 {
-                    custom5 = musicService.getCustom5(refresh);
+                    year = musicService.getYears(refresh);
                 }
                 catch (Exception x)
                 {
-                    Timber.e(x, "Failed to load custom5");
+                    Timber.e(x, "Failed to load year");
                 }
 
-                return custom5;
+                return year;
             }
 
             @Override
-            protected void done(List<Custom5> result)
+            protected void done(List<Year> result)
             {
                 emptyView.setVisibility(result == null || result.isEmpty() ? View.VISIBLE : View.GONE);
 
                 if (result != null)
                 {
-                    custom5ListView.setAdapter(new Custom5Adapter(getContext(), result));
+                    yearListView.setAdapter(new YearAdapter(getContext(), result));
                 }
             }
         };
