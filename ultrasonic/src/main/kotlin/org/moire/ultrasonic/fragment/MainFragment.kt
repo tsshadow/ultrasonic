@@ -25,6 +25,13 @@ class MainFragment : Fragment(), KoinComponent {
     private lateinit var artistsButton: TextView
     private lateinit var albumsButton: TextView
     private lateinit var genresButton: TextView
+    private lateinit var custom1Button: TextView
+    private lateinit var custom2Button: TextView
+    private lateinit var custom3Button: TextView
+    private lateinit var custom4Button: TextView
+    private lateinit var custom5Button: TextView
+    private lateinit var moodsButton: TextView
+    private lateinit var yearsButton: TextView
     private lateinit var videosTitle: TextView
     private lateinit var songsTitle: TextView
     private lateinit var randomSongsButton: TextView
@@ -91,6 +98,13 @@ class MainFragment : Fragment(), KoinComponent {
         artistsButton = binding!!.mainArtistsButton
         albumsButton = binding!!.mainAlbumsButton
         genresButton = binding!!.mainGenresButton
+        custom1Button = binding!!.mainCustom1Button
+        custom2Button = binding!!.mainCustom2Button
+        custom3Button = binding!!.mainCustom3Button
+        custom4Button = binding!!.mainCustom4Button
+        custom5Button = binding!!.mainCustom5Button
+        moodsButton = binding!!.mainMoodsButton
+        yearsButton = binding!!.mainYearButton
         videosTitle = binding!!.mainVideosTitle
         songsTitle = binding!!.mainSongs
         randomSongsButton = binding!!.mainSongsButton
@@ -117,6 +131,13 @@ class MainFragment : Fragment(), KoinComponent {
         artistsButton.isVisible = true
         albumsButton.isVisible = isOnline
         genresButton.isVisible = true
+        custom1Button.isVisible = false
+        custom2Button.isVisible = false
+        custom3Button.isVisible = false
+        custom4Button.isVisible = false
+        custom5Button.isVisible = false
+        moodsButton.isVisible = true
+        yearsButton.isVisible = true
 
         // Songs
         songsTitle.isVisible = isOnline
@@ -192,6 +213,34 @@ class MainFragment : Fragment(), KoinComponent {
             showGenres()
         }
 
+        custom1Button.setOnClickListener {
+            showCustom1()
+        }
+
+        custom2Button.setOnClickListener {
+            showCustom2()
+        }
+
+        custom3Button.setOnClickListener {
+            showCustom3()
+        }
+
+        custom4Button.setOnClickListener {
+            showCustom4()
+        }
+
+        custom5Button.setOnClickListener {
+            showCustom5()
+        }
+
+        moodsButton.setOnClickListener {
+            showMoods()
+        }
+
+        yearsButton.setOnClickListener {
+            showYears()
+        }
+
         videosButton.setOnClickListener {
             showVideos()
         }
@@ -231,6 +280,34 @@ class MainFragment : Fragment(), KoinComponent {
 
     private fun showGenres() {
         Navigation.findNavController(requireView()).navigate(R.id.mainToSelectGenre)
+    }
+
+    private fun showCustom1() {
+        Navigation.findNavController(requireView()).navigate(R.id.mainToSelectCustom1)
+    }
+
+    private fun showCustom2() {
+        Navigation.findNavController(requireView()).navigate(R.id.mainToSelectCustom2)
+    }
+
+    private fun showCustom3() {
+        Navigation.findNavController(requireView()).navigate(R.id.mainToSelectCustom3)
+    }
+
+    private fun showCustom4() {
+        Navigation.findNavController(requireView()).navigate(R.id.mainToSelectCustom4)
+    }
+
+    private fun showCustom5() {
+        Navigation.findNavController(requireView()).navigate(R.id.mainToSelectCustom5)
+    }
+
+    private fun showMoods() {
+        Navigation.findNavController(requireView()).navigate(R.id.mainToSelectMood)
+    }
+
+    private fun showYears() {
+        Navigation.findNavController(requireView()).navigate(R.id.mainToSelectYear)
     }
 
     private fun showVideos() {

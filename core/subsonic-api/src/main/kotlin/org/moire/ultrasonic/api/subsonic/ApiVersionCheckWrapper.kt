@@ -14,28 +14,7 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_8_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_9_0
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
-import org.moire.ultrasonic.api.subsonic.response.BookmarksResponse
-import org.moire.ultrasonic.api.subsonic.response.ChatMessagesResponse
-import org.moire.ultrasonic.api.subsonic.response.GenresResponse
-import org.moire.ultrasonic.api.subsonic.response.GetAlbumList2Response
-import org.moire.ultrasonic.api.subsonic.response.GetAlbumListResponse
-import org.moire.ultrasonic.api.subsonic.response.GetAlbumResponse
-import org.moire.ultrasonic.api.subsonic.response.GetArtistResponse
-import org.moire.ultrasonic.api.subsonic.response.GetArtistsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetLyricsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetPlaylistsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetPodcastsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetRandomSongsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetSongsByGenreResponse
-import org.moire.ultrasonic.api.subsonic.response.GetStarredResponse
-import org.moire.ultrasonic.api.subsonic.response.GetStarredTwoResponse
-import org.moire.ultrasonic.api.subsonic.response.GetUserResponse
-import org.moire.ultrasonic.api.subsonic.response.JukeboxResponse
-import org.moire.ultrasonic.api.subsonic.response.SearchThreeResponse
-import org.moire.ultrasonic.api.subsonic.response.SearchTwoResponse
-import org.moire.ultrasonic.api.subsonic.response.SharesResponse
-import org.moire.ultrasonic.api.subsonic.response.SubsonicResponse
-import org.moire.ultrasonic.api.subsonic.response.VideosResponse
+import org.moire.ultrasonic.api.subsonic.response.*
 import retrofit2.Call
 
 /**
@@ -270,6 +249,15 @@ internal class ApiVersionCheckWrapper(
         return api.getGenres()
     }
 
+    override fun getMoods(): Call<MoodResponse> {
+        checkVersion(V1_9_0)
+        return api.getMoods()
+    }
+    override fun getYears(): Call<YearResponse> {
+        checkVersion(V1_9_0)
+        return api.getYears()
+    }
+
     override fun getSongsByGenre(
         genre: String,
         count: Int,
@@ -279,6 +267,28 @@ internal class ApiVersionCheckWrapper(
         checkVersion(V1_9_0)
         checkParamVersion(musicFolderId, V1_12_0)
         return api.getSongsByGenre(genre, count, offset, musicFolderId)
+    }
+
+    override fun getSongsByMood(
+        mood: String,
+        count: Int,
+        offset: Int,
+        musicFolderId: String?
+    ): Call<GetSongsByMoodResponse> {
+        checkVersion(V1_9_0)
+        checkParamVersion(musicFolderId, V1_12_0)
+        return api.getSongsByMood(mood, count, offset, musicFolderId)
+    }
+
+    override fun getSongsByYear(
+        year: String,
+        count: Int,
+        offset: Int,
+        musicFolderId: String?
+    ): Call<GetSongsByYearResponse> {
+        checkVersion(V1_9_0)
+        checkParamVersion(musicFolderId, V1_12_0)
+        return api.getSongsByYear(year, count, offset, musicFolderId)
     }
 
     override fun getUser(username: String): Call<GetUserResponse> {

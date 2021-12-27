@@ -19,6 +19,27 @@
         <action
             android:id="@+id/mainToSelectGenre"
             app:destination="@id/selectGenreFragment" />
+        <action
+            android:id="@+id/mainToSelectCustom1"
+            app:destination="@id/selectCustom1Fragment" />
+        <action
+            android:id="@+id/mainToSelectCustom2"
+            app:destination="@id/selectCustom2Fragment" />
+        <action
+            android:id="@+id/mainToSelectCustom3"
+            app:destination="@id/selectCustom3Fragment" />
+        <action
+            android:id="@+id/mainToSelectCustom4"
+            app:destination="@id/selectCustom4Fragment" />
+        <action
+            android:id="@+id/mainToSelectCustom5"
+            app:destination="@id/selectCustom5Fragment" />
+        <action
+            android:id="@+id/mainToSelectMood"
+            app:destination="@id/selectMoodFragment" />
+        <action
+            android:id="@+id/mainToSelectYear"
+            app:destination="@id/selectYearFragment" />
     </fragment>
     <fragment
         android:id="@+id/mediaLibraryFragment"
@@ -106,6 +127,27 @@
     <fragment
         android:id="@+id/selectGenreFragment"
         android:name="org.moire.ultrasonic.fragment.SelectGenreFragment" />
+    <fragment
+        android:id="@+id/selectCustom1Fragment"
+        android:name="org.moire.ultrasonic.fragment.SelectCustom1Fragment" />
+    <fragment
+        android:id="@+id/selectCustom2Fragment"
+        android:name="org.moire.ultrasonic.fragment.SelectCustom2Fragment" />
+    <fragment
+        android:id="@+id/selectCustom3Fragment"
+        android:name="org.moire.ultrasonic.fragment.SelectCustom3Fragment" />
+    <fragment
+        android:id="@+id/selectCustom4Fragment"
+        android:name="org.moire.ultrasonic.fragment.SelectCustom4Fragment" />
+    <fragment
+        android:id="@+id/selectCustom5Fragment"
+        android:name="org.moire.ultrasonic.fragment.SelectCustom5Fragment" />
+    <fragment
+        android:id="@+id/selectMoodFragment"
+        android:name="org.moire.ultrasonic.fragment.SelectMoodFragment" />
+    <fragment
+        android:id="@+id/selectYearFragment"
+        android:name="org.moire.ultrasonic.fragment.SelectYearFragment" />
     <fragment
         android:id="@+id/playerFragment"
         android:name="org.moire.ultrasonic.fragment.PlayerFragment" >

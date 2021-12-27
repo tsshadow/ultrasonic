@@ -564,6 +564,8 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         val shareId = args.getString(Constants.INTENT_SHARE_ID)
         val shareName = args.getString(Constants.INTENT_SHARE_NAME)
         val genreName = args.getString(Constants.INTENT_GENRE_NAME)
+        val moodName = args.getString(Constants.INTENT_MOOD_NAME)
+        val yearName = args.getString(Constants.INTENT_YEAR_NAME)
 
         val getStarredTracks = args.getInt(Constants.INTENT_STARRED, 0)
         val getVideos = args.getInt(Constants.INTENT_VIDEOS, 0)
@@ -587,6 +589,12 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
             } else if (genreName != null) {
                 setTitle(genreName)
                 listModel.getSongsForGenre(genreName, albumListSize, albumListOffset)
+            } else if (moodName != null) {
+                setTitle(moodName)
+                listModel.getSongsByMood(moodName, albumListSize, albumListOffset)
+            } else if (yearName != null) {
+                setTitle(yearName)
+                listModel.getSongsByYear(yearName, albumListSize, albumListOffset)
             } else if (getStarredTracks != 0) {
                 setTitle(getString(R.string.main_songs_starred))
                 listModel.getStarred()

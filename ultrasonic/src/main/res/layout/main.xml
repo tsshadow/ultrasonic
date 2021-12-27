@@ -55,6 +55,83 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
+            android:id="@+id/main_custom1_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="40dip"
+            android:paddingStart="6dip"
+            android:paddingEnd="6dip"
+            android:text="@string/main.custom1_title"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/main_custom2_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="40dip"
+            android:paddingStart="6dip"
+            android:paddingEnd="6dip"
+            android:text="@string/main.custom2_title"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/main_custom3_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="40dip"
+            android:paddingStart="6dip"
+            android:paddingEnd="6dip"
+            android:text="@string/main.custom3_title"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/main_custom4_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="40dip"
+            android:paddingStart="6dip"
+            android:paddingEnd="6dip"
+            android:text="@string/main.custom4_title"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/main_custom5_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="40dip"
+            android:paddingStart="6dip"
+            android:paddingEnd="6dip"
+            android:text="@string/main.custom5_title"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/main_moods_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="40dip"
+            android:paddingStart="6dip"
+            android:paddingEnd="6dip"
+            android:text="@string/main.mood_title"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/main_year_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="40dip"
+            android:paddingStart="6dip"
+            android:paddingEnd="6dip"
+            android:text="@string/main.year_title"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
             android:id="@+id/main_songs"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
