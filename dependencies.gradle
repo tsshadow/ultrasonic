@@ -27,7 +27,7 @@ ext.versions = [
 
         retrofit             : "2.6.4",
         jackson              : "2.9.5",
-        okhttp               : "3.12.13",
+        okhttp               : "4.9.3",
         koin                 : "3.0.2",
         picasso              : "2.71828",
 
