@@ -552,6 +552,11 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     override fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory {
         return musicService.getSongsByGenre(genre, count, offset)
     }
+    
+    @Throws(Exception::class)
+    override fun getSongsByGenreAndYear(genre: String, year: Int, count: Int, offset: Int): MusicDirectory {
+        return musicService.getSongsByGenreAndYear(genre, year, count, offset)
+    }
 
     @Throws(Exception::class)
     override fun getSongsByCustom1(custom1: String, count: Int, offset: Int): MusicDirectory {

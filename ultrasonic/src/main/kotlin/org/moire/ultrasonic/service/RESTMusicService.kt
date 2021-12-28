@@ -642,6 +642,21 @@ open class RESTMusicService(
 
         return result
     }
+    
+    @Throws(Exception::class)
+    override fun getSongsByGenreAndYear(
+        genre: String,
+        year: Int,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByGenreAndYear(genre, year, count, offset, null).execute().throwOnFailure()
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList())
+
+        return result
+    }
 
     @Throws(Exception::class)
     override fun getSongsByCustom1(
@@ -741,6 +756,7 @@ open class RESTMusicService(
 
         return result
     }
+    
     @Throws(Exception::class)
     override fun getSongsByYear(
         year: String,

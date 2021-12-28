@@ -269,6 +269,17 @@ internal class ApiVersionCheckWrapper(
         return api.getSongsByGenre(genre, count, offset, musicFolderId)
     }
 
+    override fun getSongsByGenreAndYear(
+        genre: String,
+        year: Int,
+        count: Int,
+        offset: Int,
+        musicFolderId: String?
+    ): Call<GetSongsByGenreResponse> {
+        checkVersion(V1_9_0)
+        checkParamVersion(musicFolderId, V1_12_0)
+        return api.getSongsByGenreAndYear(genre, year, count, offset, musicFolderId)
+    }
     override fun getSongsByMood(
         mood: String,
         count: Int,

@@ -140,6 +140,9 @@ interface MusicService {
     fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
+    fun getSongsByGenreAndYear(genre: String, year: Int, count: Int, offset: Int): MusicDirectory
+
+    @Throws(Exception::class)
     fun getSongsByCustom1(custom1: String, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
