@@ -591,7 +591,16 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 listModel.getSongsForGenre(genreName, albumListSize, albumListOffset)
             } else if (moodName != null) {
                 setTitle(moodName)
-                listModel.getSongsByMood(moodName, albumListSize, albumListOffset)
+                if (yearName != null && yearName != "")
+                {
+                    listModel.getSongsByMoodAndYear(
+                        moodName,
+                        yearName.toInt(), albumListSize, albumListOffset)
+                }
+                else
+                {
+                    listModel.getSongsByMood(moodName, albumListSize, albumListOffset)
+                }
             } else if (yearName != null) {
                 setTitle(yearName)
                 listModel.getSongsByYear(yearName, albumListSize, albumListOffset)

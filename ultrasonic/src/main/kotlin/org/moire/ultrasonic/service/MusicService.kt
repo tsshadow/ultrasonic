@@ -158,6 +158,9 @@ interface MusicService {
     fun getSongsByMood(mood: String, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
+    fun getSongsByMoodAndYear(mood: String, year: Int, count: Int, offset: Int): MusicDirectory
+
+    @Throws(Exception::class)
     fun getSongsByYear(year: String, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)

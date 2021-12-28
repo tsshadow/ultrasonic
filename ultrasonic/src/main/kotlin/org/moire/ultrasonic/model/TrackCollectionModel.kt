@@ -67,6 +67,14 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
+    suspend fun getSongsByMoodAndYear(mood: String, year: Int, count: Int, offset: Int) {
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getSongsByMoodAndYear(mood, year, count, offset)
+            updateList(musicDirectory)
+        }
+    }
+
     suspend fun getSongsByYear(year: String, count: Int, offset: Int) {
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()

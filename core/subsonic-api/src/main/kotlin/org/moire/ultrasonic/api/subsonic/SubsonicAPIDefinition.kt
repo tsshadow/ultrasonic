@@ -328,6 +328,15 @@ interface SubsonicAPIDefinition {
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByMoodResponse>
 
+    @GET("getSongsByMoodAndYear.view")
+    fun getSongsByMoodAndYear(
+        @Query("mood") mood: String,
+        @Query("year") year: Int,
+        @Query("count") count: Int = 50,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByMoodResponse>
+
     @GET("getSongsByYear.view")
     fun getSongsByYear(
         @Query("year") year: String,

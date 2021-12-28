@@ -12,6 +12,12 @@
         a:text="@string/select_mood.empty"
         a:visibility="gone" />
 
+    <EditText
+        a:id="@+id/selectYear"
+        a:layout_height="wrap_content"
+        a:layout_width="match_parent"
+        a:inputType="text" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/select_mood_refresh"
