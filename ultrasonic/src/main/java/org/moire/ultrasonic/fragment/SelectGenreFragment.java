@@ -39,6 +39,8 @@ public class SelectGenreFragment extends Fragment {
     private SwipeRefreshLayout refreshGenreListView;
     private ListView genreListView;
     private EditText yearEditBox;
+    private EditText ratingMin;
+    private EditText ratingMax;
     private View emptyView;
     private CancellationToken cancellationToken;
 
@@ -79,6 +81,8 @@ public class SelectGenreFragment extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putString(Constants.INTENT_GENRE_NAME, genre.getName());
                     bundle.putString(Constants.INTENT_YEAR_NAME, yearEditBox.getText().toString());
+                    bundle.putString(Constants.INTENT_RATING_MIN, ratingMin.getText().toString());
+                    bundle.putString(Constants.INTENT_RATING_MAX, ratingMax.getText().toString());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.getMaxSongs());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0);
                     Navigation.findNavController(view).navigate(R.id.trackCollectionFragment, bundle);
@@ -89,6 +93,8 @@ public class SelectGenreFragment extends Fragment {
         emptyView = view.findViewById(R.id.select_genre_empty);
         registerForContextMenu(genreListView);
         yearEditBox = (EditText)view.findViewById(R.id.selectYear);
+        ratingMin = (EditText)view.findViewById(R.id.ratingMin);
+        ratingMax = (EditText)view.findViewById(R.id.ratingMax);
 
         FragmentTitle.Companion.setTitle(this, R.string.main_genres_title);
         load(false);
