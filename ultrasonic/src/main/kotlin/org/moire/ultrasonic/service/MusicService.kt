@@ -137,10 +137,7 @@ interface MusicService {
     fun getRandomSongs(size: Int): MusicDirectory
 
     @Throws(Exception::class)
-    fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory
-
-    @Throws(Exception::class)
-    fun getSongsByGenreAndYear(genre: String, year: Int, count: Int, offset: Int): MusicDirectory
+    fun getSongsByGenre(genre: String, year: Int, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
     fun getSongsByCustom1(custom1: String, count: Int, offset: Int): MusicDirectory
@@ -158,10 +155,7 @@ interface MusicService {
     fun getSongsByCustom5(custom5: String, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
-    fun getSongsByMood(mood: String, count: Int, offset: Int): MusicDirectory
-
-    @Throws(Exception::class)
-    fun getSongsByMoodAndYear(mood: String, year: Int, count: Int, offset: Int): MusicDirectory
+    fun getSongsByMood(mood: String, year: Int, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
     fun getSongsByYear(year: String, count: Int, offset: Int): MusicDirectory

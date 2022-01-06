@@ -588,28 +588,18 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 listModel.getShare(shareId)
             } else if (genreName != null) {
                 setTitle(genreName)
-                if (yearName != null && yearName != "")
-                {
-                    listModel.getSongsByGenreAndYear(
-                        genreName,
-                        yearName.toInt(), albumListSize, albumListOffset)
-                }
-                else
-                {
-                    listModel.getSongsForGenre(genreName, albumListSize, albumListOffset)
-                }
+                listModel.getSongsForGenre(
+                    genreName,
+                    if (yearName != null && yearName != "")  yearName.toInt() else -1,
+                    albumListSize,
+                    albumListOffset)
             } else if (moodName != null) {
                 setTitle(moodName)
-                if (yearName != null && yearName != "")
-                {
-                    listModel.getSongsByMoodAndYear(
-                        moodName,
-                        yearName.toInt(), albumListSize, albumListOffset)
-                }
-                else
-                {
-                    listModel.getSongsByMood(moodName, albumListSize, albumListOffset)
-                }
+                listModel.getSongsByMood(
+                    moodName,
+                    if (yearName != null && yearName != "")  yearName.toInt() else -1,
+                    albumListSize,
+                    albumListOffset)
             } else if (yearName != null) {
                 setTitle(yearName)
                 listModel.getSongsByYear(yearName, albumListSize, albumListOffset)

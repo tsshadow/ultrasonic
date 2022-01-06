@@ -51,34 +51,21 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
-    suspend fun getSongsForGenre(genre: String, count: Int, offset: Int) {
+    suspend fun getSongsForGenre(genre: String, year: Int, count: Int, offset: Int) {
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByGenre(genre, count, offset)
+            val musicDirectory = service.getSongsByGenre(genre, year, count, offset)
             updateList(musicDirectory)
         }
     }
 
-    suspend fun getSongsByGenreAndYear(genre: String, year: Int, count: Int, offset: Int) {
+    suspend fun getSongsByMood(mood: String,
+                               year: Int,
+                               count: Int,
+                               offset: Int) {
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByGenreAndYear(genre, year, count, offset)
-            updateList(musicDirectory)
-        }
-    }
-
-    suspend fun getSongsByMood(mood: String, count: Int, offset: Int) {
-        withContext(Dispatchers.IO) {
-            val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByMood(mood, count, offset)
-            updateList(musicDirectory)
-        }
-    }
-
-    suspend fun getSongsByMoodAndYear(mood: String, year: Int, count: Int, offset: Int) {
-        withContext(Dispatchers.IO) {
-            val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByMoodAndYear(mood, year, count, offset)
+            val musicDirectory = service.getSongsByMood(mood, year, count, offset)
             updateList(musicDirectory)
         }
     }

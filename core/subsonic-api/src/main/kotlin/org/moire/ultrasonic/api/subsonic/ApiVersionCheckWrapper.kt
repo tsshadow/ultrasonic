@@ -260,17 +260,6 @@ internal class ApiVersionCheckWrapper(
 
     override fun getSongsByGenre(
         genre: String,
-        count: Int,
-        offset: Int,
-        musicFolderId: String?
-    ): Call<GetSongsByGenreResponse> {
-        checkVersion(V1_9_0)
-        checkParamVersion(musicFolderId, V1_12_0)
-        return api.getSongsByGenre(genre, count, offset, musicFolderId)
-    }
-
-    override fun getSongsByGenreAndYear(
-        genre: String,
         year: Int,
         count: Int,
         offset: Int,
@@ -278,21 +267,11 @@ internal class ApiVersionCheckWrapper(
     ): Call<GetSongsByGenreResponse> {
         checkVersion(V1_9_0)
         checkParamVersion(musicFolderId, V1_12_0)
-        return api.getSongsByGenreAndYear(genre, year, count, offset, musicFolderId)
+        return api.getSongsByGenre(genre, year, count, offset, musicFolderId)
     }
+
     override fun getSongsByMood(
         mood: String,
-        count: Int,
-        offset: Int,
-        musicFolderId: String?
-    ): Call<GetSongsByMoodResponse> {
-        checkVersion(V1_9_0)
-        checkParamVersion(musicFolderId, V1_12_0)
-        return api.getSongsByMood(mood, count, offset, musicFolderId)
-    }
-
-    override fun getSongsByMoodAndYear(
-        mood: String,
         year: Int,
         count: Int,
         offset: Int,
@@ -300,8 +279,9 @@ internal class ApiVersionCheckWrapper(
     ): Call<GetSongsByMoodResponse> {
         checkVersion(V1_9_0)
         checkParamVersion(musicFolderId, V1_12_0)
-        return api.getSongsByMoodAndYear(mood, year, count, offset, musicFolderId)
+        return api.getSongsByMood(mood, year, count, offset, musicFolderId)
     }
+
 
     override fun getSongsByYear(
         year: String,

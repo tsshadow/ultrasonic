@@ -356,15 +356,9 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(Exception::class)
-    override fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory {
+    override fun getSongsByGenre(genre: String, year: Int, count: Int, offset: Int): MusicDirectory {
         throw OfflineException("Getting Songs By Genre not available in offline mode")
     }
-
-    @Throws(Exception::class)
-    override fun getSongsByGenreAndYear(genre: String, year: Int, count: Int, offset: Int): MusicDirectory {
-        throw OfflineException("Getting Songs By Genre and year tag not available in offline mode")
-    }
-
     @Throws(Exception::class)
     override fun getSongsByCustom1(custom1: String, count: Int, offset: Int): MusicDirectory {
         throw OfflineException("Getting Songs By Custom1 tag not available in offline mode")
@@ -391,13 +385,8 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(Exception::class)
-    override fun getSongsByMood(mood: String, count: Int, offset: Int): MusicDirectory {
+    override fun getSongsByMood(mood: String, year: Int, count: Int, offset: Int): MusicDirectory {
         throw OfflineException("Getting Songs By Mood tag not available in offline mode")
-    }
-
-    @Throws(Exception::class)
-    override fun getSongsByMoodAndYear(mood: String, year: Int, count: Int, offset: Int): MusicDirectory {
-        throw OfflineException("Getting Songs By Mood and year tag not available in offline mode")
     }
 
     @Throws(Exception::class)
