@@ -594,7 +594,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                     genreName,
                     if (yearName != null && yearName != "")  yearName.toInt() else -1,
                     if (ratingMin != null && ratingMin != "") ratingMin.toInt() else 0,
-                    if (ratingMax != null && ratingMax != "") ratingMax.toInt() else 255,
+                    if (ratingMax != null && ratingMax != "") ratingMax.toInt() else 10,
                     albumListSize,
                     albumListOffset)
             } else if (moodName != null) {
@@ -603,7 +603,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                     moodName,
                     if (yearName != null && yearName != "")  yearName.toInt() else -1,
                     if (ratingMin != null && ratingMin != "") ratingMin.toInt() else 0,
-                    if (ratingMax != null && ratingMax != "") ratingMax.toInt() else 255,
+                    if (ratingMax != null && ratingMax != "") ratingMax.toInt() else 10,
                     albumListSize,
                     albumListOffset)
             } else if (yearName != null) {

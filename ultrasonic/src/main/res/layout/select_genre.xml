@@ -2,7 +2,7 @@
 <LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
     a:layout_width="fill_parent"
     a:layout_height="fill_parent"
-    a:orientation="vertical" >
+    a:orientation="vertical">
 
     <TextView
         a:id="@+id/select_genre_empty"
@@ -12,26 +12,64 @@
         a:text="@string/select_genre.empty"
         a:visibility="gone" />
 
-    <EditText
-        a:id="@+id/selectYear"
-        a:layout_height="wrap_content"
+    <LinearLayout
         a:layout_width="match_parent"
-        a:inputType="text" />
-
-    <EditText
-        a:id="@+id/ratingMin"
         a:layout_height="wrap_content"
-        a:layout_width="match_parent"
-        a:inputType="text" />
+        a:orientation="horizontal">
+        <TextView
+            a:id="@+id/textView"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_weight=".20"
+            a:text="Year" />
 
-    <EditText
-        a:id="@+id/ratingMax"
+        <EditText
+            a:id="@+id/selectYear"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_weight=".80"
+            a:inputType="text" />
+    </LinearLayout>
+
+    <LinearLayout
+        a:layout_width="match_parent"
         a:layout_height="wrap_content"
-        a:layout_width="match_parent"
-        a:inputType="text" />
+        a:orientation="horizontal">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+        <TextView
+            a:id="@+id/textView"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_weight=".20"
+            a:text="Rating" />
+        <TextView
+            a:id="@+id/textView"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_weight=".10"
+            a:text="From" />
+        <EditText
+            a:id="@+id/ratingMin"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_weight=".30"
+            a:inputType="text" />
+
+        <TextView
+            a:id="@+id/textView"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_weight=".10"
+            a:text="To" />
+        <EditText
+            a:id="@+id/ratingMax"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_weight=".30"
+            a:inputType="text" />
+    </LinearLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/select_genre_refresh"
         android:layout_width="fill_parent"
         android:layout_height="0dip"

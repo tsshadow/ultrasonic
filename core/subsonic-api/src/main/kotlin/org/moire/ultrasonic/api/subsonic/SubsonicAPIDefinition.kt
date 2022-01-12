@@ -273,7 +273,7 @@ interface SubsonicAPIDefinition {
         @Query("genre") genre: String,
         @Query("year") year: Int = -1,
         @Query("ratingMin") ratingMin: Int = 0,
-        @Query("ratingMax") ratingMax: Int = 255,
+        @Query("ratingMax") ratingMax: Int = 10,
         @Query("count") count: Int = 10,
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
@@ -328,7 +328,7 @@ interface SubsonicAPIDefinition {
         @Query("mood") mood: String,
         @Query("year") year: Int = -1,
         @Query("ratingMin") ratingMin: Int = 0,
-        @Query("ratingMax") ratingMax: Int = 255,
+        @Query("ratingMax") ratingMax: Int = 10,
         @Query("count") count: Int = 50,
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
