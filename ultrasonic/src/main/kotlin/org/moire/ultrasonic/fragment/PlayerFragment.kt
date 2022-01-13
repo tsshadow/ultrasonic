@@ -1160,27 +1160,36 @@ class PlayerFragment :
         return false
     }
 
+    private fun setStar(aImage: ImageView, rating: Int)
+    {
+        when {
+            rating > 1 -> {
+                aImage.setImageDrawable(fullStar)
+                aImage.scaleX = 1f
+            }
+            rating == 1 -> {
+                aImage.setImageDrawable(halfStar)
+                aImage.scaleX = -1f //Mirror half star hotfix
+            }
+            else -> {
+                aImage.setImageDrawable(hollowStar)
+                aImage.scaleX = 1f
+            }
+        }
+    }
+
     private fun displaySongRating() {
         var rating = 0
 
         if (currentSong?.userRating != null) {
             rating = currentSong!!.userRating!!
         }
-        fiveStar1ImageView.setImageDrawable(
-            if (rating > 1) fullStar else if (rating == 1) halfStar else hollowStar
-        )
-        fiveStar2ImageView.setImageDrawable(
-            if (rating > 3) fullStar else if (rating == 3) halfStar else hollowStar
-        )
-        fiveStar3ImageView.setImageDrawable(
-            if (rating > 5) fullStar else if (rating == 5) halfStar else hollowStar
-        )
-        fiveStar4ImageView.setImageDrawable(
-            if (rating > 7) fullStar else if (rating == 7) halfStar else hollowStar
-        )
-        fiveStar5ImageView.setImageDrawable(
-            if (rating > 9) fullStar else if (rating == 9) halfStar else hollowStar
-        )
+
+        setStar(fiveStar1ImageView, rating)
+        setStar(fiveStar2ImageView, rating - 2)
+        setStar(fiveStar3ImageView, rating - 4)
+        setStar(fiveStar4ImageView, rating - 6)
+        setStar(fiveStar5ImageView, rating - 8)
     }
 
     private fun setSongRating(rating: Int) {
