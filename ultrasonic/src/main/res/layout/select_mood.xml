@@ -12,12 +12,6 @@
         a:text="@string/select_mood.empty"
         a:visibility="gone" />
 
-    <EditText
-        a:id="@+id/selectYear"
-        a:layout_height="wrap_content"
-        a:layout_width="match_parent"
-        a:inputType="text" />
-
     <LinearLayout
         a:layout_width="match_parent"
         a:layout_height="wrap_content"

@@ -172,19 +172,19 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     @Suppress("MagicNumber")
     private fun setFiveStars(rating: Int) {
         fiveStar1.setImageDrawable(
-            if (rating > 0) imageHelper.starDrawable else imageHelper.starHollowDrawable
+            if (rating > 1) imageHelper.starDrawable else if (rating == 1) imageHelper.starHalfDrawable else imageHelper.starHollowDrawable
         )
         fiveStar2.setImageDrawable(
-            if (rating > 1) imageHelper.starDrawable else imageHelper.starHollowDrawable
+            if (rating > 3) imageHelper.starDrawable else if (rating == 3) imageHelper.starHalfDrawable else imageHelper.starHollowDrawable
         )
         fiveStar3.setImageDrawable(
-            if (rating > 2) imageHelper.starDrawable else imageHelper.starHollowDrawable
+            if (rating > 5) imageHelper.starDrawable else if (rating == 5) imageHelper.starHalfDrawable else imageHelper.starHollowDrawable
         )
         fiveStar4.setImageDrawable(
-            if (rating > 3) imageHelper.starDrawable else imageHelper.starHollowDrawable
+            if (rating > 7) imageHelper.starDrawable else if (rating == 7) imageHelper.starHalfDrawable else imageHelper.starHollowDrawable
         )
         fiveStar5.setImageDrawable(
-            if (rating > 4) imageHelper.starDrawable else imageHelper.starHollowDrawable
+            if (rating > 9) imageHelper.starDrawable else if (rating == 9) imageHelper.starHalfDrawable else imageHelper.starHollowDrawable
         )
     }
 
