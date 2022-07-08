@@ -1,0 +1,116 @@
+default:
+  image: cimg/android:2022.06.1
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .gradle/
+
+variables:
+  CACHE_FALLBACK_KEY: develop
+  MEMORY_CONFIG: "-Xmx3200m -Xms256m -XX:MaxMetaspaceSize=1g"
+  MEMORY_CONFIG_DEBUG: "-Xmx3200m -Xms256m -XX:MaxMetaspaceSize=1g -verbose:gc -Xlog:gc*"
+  JVM_OPTS: ${MEMORY_CONFIG}
+  JAVA_TOOL_OPTIONS: ${MEMORY_CONFIG}
+  GRADLE_OPTS: ${MEMORY_CONFIG}
+  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ultrasonic/${CI_COMMIT_TAG}"
+  PACKAGE_APK: "ultrasonic-${CI_COMMIT_TAG}.apk"
+  PACKAGE_APK_IDSIG: "ultrasonic-${CI_COMMIT_TAG}.apk.idsig"
+
+stages:
+  - Check
+  - Assemble
+  - Translations
+  - APK
+  - Publish
+  - Release
+
+Check Style:
+  stage: Check
+  script: ./gradlew -Pqc ktlintCheck
+
+Static Analysis:
+  stage: Check
+  script: ./gradlew -Pqc detekt
+
+Lint:
+  stage: Check
+  script: ./gradlew :ultrasonic:lintRelease
+
+Unit Tests:
+  stage: Check
+  script: ./gradlew ciTest testDebugUnitTest
+
+Assemble Debug:
+  stage: Assemble
+  script: ./gradlew assembleDebug
+
+Assemble Release:
+  stage: Assemble
+  script: ./gradlew assembleRelease
+  artifacts:
+    name: ultrasonic-release-unsigned-${CI_COMMIT_SHA}
+    paths:
+      - ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk
+
+Push Translations:
+  stage: Translations
+  image: cimg/python:3.6
+  script:
+    - python -m venv ~/venv
+    - . ~/venv/bin/activate
+    - pip install transifex-client
+    - echo $'[https://www.transifex.com]\nhostname = https://www.transifex.com\nusername = api\npassword = '"${TRANSIFEX_PASSWORD}"$'\n' > ~/.transifexrc
+    - tx push -s
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop"
+
+Generate Signed Develop APK:
+  stage: APK
+  script:
+    - openssl aes-256-cbc -K ${ULTRASONIC_KEYSTORE_KEY} -iv ${ULTRASONIC_KEYSTORE_IV} -in ultrasonic-keystore.enc -out ultrasonic-keystore -d
+    - mkdir -p ${CI_PROJECT_DIR}/ultrasonic-release
+    - ${ANDROID_HOME}/build-tools/*/zipalign -v 4 ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk ${CI_PROJECT_DIR}/ultrasonic-release/ultrasonic-${CI_COMMIT_SHA}.apk
+    - ${ANDROID_HOME}/build-tools/*/apksigner sign --verbose --ks ${CI_PROJECT_DIR}/ultrasonic-keystore --ks-pass pass:${ULTRASONIC_KEYSTORE_STOREPASS} --key-pass pass:${ULTRASONIC_KEYSTORE_KEYPASS} ${CI_PROJECT_DIR}/ultrasonic-release/ultrasonic-${CI_COMMIT_SHA}.apk
+    - ${ANDROID_HOME}/build-tools/*/apksigner verify --verbose ${CI_PROJECT_DIR}/ultrasonic-release/ultrasonic-${CI_COMMIT_SHA}.apk
+  artifacts:
+    name: ultrasonic-${CI_COMMIT_SHA}
+    paths:
+      - ultrasonic-release/
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop"
+
+Generate Signed APK:
+  stage: APK
+  script:
+    - openssl aes-256-cbc -K ${ULTRASONIC_KEYSTORE_KEY} -iv ${ULTRASONIC_KEYSTORE_IV} -in ultrasonic-keystore.enc -out ultrasonic-keystore -d
+    - mkdir -p ${CI_PROJECT_DIR}/ultrasonic-release
+    - ${ANDROID_HOME}/build-tools/*/zipalign -v 4 ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
+    - ${ANDROID_HOME}/build-tools/*/apksigner sign --verbose --ks ${CI_PROJECT_DIR}/ultrasonic-keystore --ks-pass pass:${ULTRASONIC_KEYSTORE_STOREPASS} --key-pass pass:${ULTRASONIC_KEYSTORE_KEYPASS} ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
+    - ${ANDROID_HOME}/build-tools/*/apksigner verify --verbose ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
+  artifacts:
+    name: ultrasonic-${CI_COMMIT_TAG}
+    paths:
+      - ultrasonic-release/
+  rules:
+    - if: $CI_COMMIT_TAG
+
+Publish Signed APK:
+  stage: Publish
+  image: curlimages/curl:latest
+  script:
+    - |
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ultrasonic-release/${PACKAGE_APK} "${PACKAGE_REGISTRY_URL}/${PACKAGE_APK}"
+    - |
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ultrasonic-release/${PACKAGE_APK_IDSIG} "${PACKAGE_REGISTRY_URL}/${PACKAGE_APK_IDSIG}"
+  rules:
+    - if: $CI_COMMIT_TAG
+
+Release:
+  stage: Release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script: |
+    release-cli create --name "Release ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
+      --assets-link "{\"name\":\"${PACKAGE_APK}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${PACKAGE_APK}\"}" \
+      --assets-link "{\"name\":\"${PACKAGE_APK_IDSIG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${PACKAGE_APK_IDSIG}\"}"
+  rules:
+    - if: $CI_COMMIT_TAG
