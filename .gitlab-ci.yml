@@ -12,7 +12,7 @@ variables:
   JVM_OPTS: ${MEMORY_CONFIG}
   JAVA_TOOL_OPTIONS: ${MEMORY_CONFIG}
   GRADLE_OPTS: ${MEMORY_CONFIG}
-  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ultrasonic/${CI_COMMIT_TAG}"
+  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/Ultrasonic/${CI_COMMIT_TAG}"
   PACKAGE_APK: "ultrasonic-${CI_COMMIT_TAG}.apk"
   PACKAGE_APK_IDSIG: "ultrasonic-${CI_COMMIT_TAG}.apk.idsig"
 
