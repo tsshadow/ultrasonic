@@ -13,6 +13,6 @@ Main features:
 * Server chat
 * And much more!!!
 
-The source code is available with GPL license in Github: https://github.com/ultrasonic/ultrasonic
-If you have any issue, please post in: https://github.com/ultrasonic/ultrasonic/issues
+The source code is available with GPL license in GitLab: https://gitlab.com/ultrasonic/ultrasonic
+If you have any issue, please post in: https://gitlab.com/ultrasonic/ultrasonic/issues
 Play store icon designed by: http://www.flaticon.com/authors/sebastien-gabriel
