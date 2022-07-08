@@ -6,7 +6,7 @@ default:
       - .gradle/
 
 variables:
-  CACHE_FALLBACK_KEY: develop
+  CACHE_FALLBACK_KEY: develop-protected
   MEMORY_CONFIG: "-Xmx3200m -Xms256m -XX:MaxMetaspaceSize=1g"
   MEMORY_CONFIG_DEBUG: "-Xmx3200m -Xms256m -XX:MaxMetaspaceSize=1g -verbose:gc -Xlog:gc*"
   JVM_OPTS: ${MEMORY_CONFIG}
