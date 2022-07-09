@@ -27,22 +27,32 @@ stages:
 Check Style:
   stage: Check
   script: ./gradlew -Pqc ktlintCheck
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG
 
 Static Analysis:
   stage: Check
   script: ./gradlew -Pqc detekt
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG
 
 Lint:
   stage: Check
   script: ./gradlew :ultrasonic:lintRelease
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG
 
 Unit Tests:
   stage: Check
   script: ./gradlew ciTest testDebugUnitTest
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG
 
 Assemble Debug:
   stage: Assemble
   script: ./gradlew assembleDebug
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG
 
 Assemble Release:
   stage: Assemble
@@ -51,6 +61,8 @@ Assemble Release:
     name: ultrasonic-release-unsigned-${CI_COMMIT_SHA}
     paths:
       - ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG
 
 Push Translations:
   stage: Translations

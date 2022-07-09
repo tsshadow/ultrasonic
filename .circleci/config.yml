@@ -1,0 +1,224 @@
+version: 2.1
+
+parameters:
+  memory-config:
+    type: string
+    default: "-Xmx3200m -Xms256m -XX:MaxMetaspaceSize=1g"
+  memory-config-debug:
+    type: string
+    default: "-Xmx3200m -Xms256m -XX:MaxMetaspaceSize=1g -verbose:gc -Xlog:gc*"
+
+jobs:
+  Done in GitLab CI:
+    docker:
+      - image: busybox:stable
+    steps:
+      - run:
+          name: Done in GitLab CI
+          command: echo This build will be done in GitLab CI
+  Check Style:
+    docker:
+      - image: cimg/android:2022.06.1
+    working_directory: ~/ultrasonic
+    environment:
+      JVM_OPTS: << pipeline.parameters.memory-config >>
+      JAVA_TOOL_OPTIONS: << pipeline.parameters.memory-config >>
+      GRADLE_OPTS: << pipeline.parameters.memory-config >>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+            - ultrasonic-{{ .Branch }}
+            - ultrasonic
+      - run:
+          name: Check Style
+          command: ./gradlew -Pqc ktlintCheck
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+  Static Analysis:
+    docker:
+      - image: cimg/android:2022.06.1
+    working_directory: ~/ultrasonic
+    environment:
+      JVM_OPTS: << pipeline.parameters.memory-config >>
+      JAVA_TOOL_OPTIONS: << pipeline.parameters.memory-config >>
+      GRADLE_OPTS: << pipeline.parameters.memory-config >>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+            - ultrasonic-{{ .Branch }}
+            - ultrasonic
+      - run:
+          name: Check Style
+          command: ./gradlew -Pqc detekt
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+  Lint:
+    docker:
+      - image: cimg/android:2022.06.1
+    working_directory: ~/ultrasonic
+    environment:
+      JVM_OPTS: << pipeline.parameters.memory-config >>
+      JAVA_TOOL_OPTIONS: << pipeline.parameters.memory-config >>
+      GRADLE_OPTS: << pipeline.parameters.memory-config >>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+            - ultrasonic-{{ .Branch }}
+            - ultrasonic
+      - run:
+          name: Lint
+          command: ./gradlew :ultrasonic:lintRelease
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+  Unit Tests:
+    docker:
+      - image: cimg/android:2022.06.1
+    working_directory: ~/ultrasonic
+    environment:
+      JVM_OPTS: << pipeline.parameters.memory-config >>
+      JAVA_TOOL_OPTIONS: << pipeline.parameters.memory-config >>
+      GRADLE_OPTS: << pipeline.parameters.memory-config >>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+            - ultrasonic-{{ .Branch }}
+            - ultrasonic
+      - run:
+          name: Check Style
+          command: ./gradlew ciTest testDebugUnitTest
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+  Assemble Debug:
+    docker:
+      - image: cimg/android:2022.06.1
+    working_directory: ~/ultrasonic
+    environment:
+      JVM_OPTS: << pipeline.parameters.memory-config >>
+      JAVA_TOOL_OPTIONS: << pipeline.parameters.memory-config >>
+      GRADLE_OPTS: << pipeline.parameters.memory-config >>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+            - ultrasonic-{{ .Branch }}
+            - ultrasonic
+      - run:
+          name: Assemble Debug
+          command: ./gradlew assembleDebug
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+  Assemble Release:
+    docker:
+      - image: cimg/android:2022.06.1
+    working_directory: ~/ultrasonic
+    environment:
+      JVM_OPTS: << pipeline.parameters.memory-config >>
+      JAVA_TOOL_OPTIONS: << pipeline.parameters.memory-config >>
+      GRADLE_OPTS: << pipeline.parameters.memory-config >>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+            - ultrasonic-{{ .Branch }}
+            - ultrasonic
+      - run:
+          name: Assemble Release
+          command: ./gradlew assembleRelease
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
+      - store_artifacts:
+          path: ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk
+          destination: ultrasonic-release-unsigned
+
+workflows:
+  version: 2
+  Check and Build:
+    jobs:
+      - Done in GitLab CI:
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+            tags:
+              only: /.*/
+      - Check Style:
+          filters:
+            branches:
+              ignore:
+                - develop
+                - master
+            tags:
+              ignore: /.*/
+      - Static Analysis:
+          filters:
+            branches:
+              ignore:
+                - develop
+                - master
+            tags:
+              ignore: /.*/
+      - Lint:
+          filters:
+            branches:
+              ignore:
+                - develop
+                - master
+            tags:
+              ignore: /.*/
+      - Unit Tests:
+          filters:
+            branches:
+              ignore:
+                - develop
+                - master
+            tags:
+              ignore: /.*/
+      - Assemble Debug:
+          requires:
+            - Check Style
+            - Static Analysis
+            - Lint
+            - Unit Tests
+          filters:
+            branches:
+              ignore:
+                - develop
+                - master
+            tags:
+              ignore: /.*/
+      - Assemble Release:
+          requires:
+            - Check Style
+            - Static Analysis
+            - Lint
+            - Unit Tests
+          filters:
+            branches:
+              ignore:
+                - develop
+                - master
+            tags:
+              ignore: /.*/
