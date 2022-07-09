@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -669,6 +670,9 @@ class MediaPlayerController(
     }
 }
 
+/*
+ * TODO: Merge with the Builder functions in AutoMediaBrowserCallback
+ */
 fun Track.toMediaItem(): MediaItem {
 
     val filePath = FileUtil.getSongFile(this)
@@ -679,13 +683,18 @@ fun Track.toMediaItem(): MediaItem {
         .setMediaUri(uri.toUri())
         .build()
 
+    val artworkFile = File(FileUtil.getAlbumArtFile(this))
+
     val metadata = MediaMetadata.Builder()
     metadata.setTitle(title)
         .setArtist(artist)
         .setAlbumTitle(album)
         .setAlbumArtist(artist)
         .setUserRating(HeartRating(starred))
-        .build()
+
+    if (artworkFile.exists()) {
+        metadata.setArtworkUri(artworkFile.toUri())
+    }
 
     val mediaItem = MediaItem.Builder()
         .setUri(uri)
