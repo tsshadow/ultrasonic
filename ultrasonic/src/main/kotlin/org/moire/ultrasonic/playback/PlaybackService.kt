@@ -69,7 +69,7 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
 
     private fun releasePlayerAndSession() {
         // Broadcast that the service is being shutdown
-        RxBus.stopCommandPublisher.onNext(Unit)
+        RxBus.stopServiceCommandPublisher.onNext(Unit)
 
         player.release()
         mediaLibrarySession.release()
@@ -77,6 +77,9 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
         isStarted = false
         stopForeground(true)
         stopSelf()
+
+        // Clear Koin
+        UApp.instance!!.shutdownKoin()
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)

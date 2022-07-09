@@ -58,6 +58,7 @@ class UApp : MultiDexApplication() {
     }
 
     internal fun startKoin() {
+        initiated = true
         startKoin {
             // TODO Currently there is a bug in Koin which makes necessary to set the log level to ERROR
             logger(TimberKoinLogger(Level.ERROR))

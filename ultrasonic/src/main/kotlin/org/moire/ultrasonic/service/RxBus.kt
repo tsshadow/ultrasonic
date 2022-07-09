@@ -59,15 +59,20 @@ class RxBus {
         val dismissNowPlayingCommandObservable: Observable<Unit> =
             dismissNowPlayingCommandPublisher.observeOn(mainThread())
 
+        val createServiceCommandPublisher: PublishSubject<Unit> =
+            PublishSubject.create()
+        val createServiceCommandObservable: Observable<Unit> =
+            createServiceCommandPublisher.observeOn(mainThread())
+
+        val stopServiceCommandPublisher: PublishSubject<Unit> =
+            PublishSubject.create()
+        val stopServiceCommandObservable: Observable<Unit> =
+            stopServiceCommandPublisher.observeOn(mainThread())
+
         val shutdownCommandPublisher: PublishSubject<Unit> =
             PublishSubject.create()
         val shutdownCommandObservable: Observable<Unit> =
             shutdownCommandPublisher.observeOn(mainThread())
-
-        val stopCommandPublisher: PublishSubject<Unit> =
-            PublishSubject.create()
-        val stopCommandObservable: Observable<Unit> =
-            stopCommandPublisher.observeOn(mainThread())
     }
 
     data class StateWithTrack(

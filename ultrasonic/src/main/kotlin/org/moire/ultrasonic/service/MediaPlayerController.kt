@@ -173,9 +173,21 @@ class MediaPlayerController(
             }
         }
 
-        rxBusSubscription += RxBus.stopCommandObservable.subscribe {
+        rxBusSubscription += RxBus.stopServiceCommandObservable.subscribe {
             // Clear the widget when we stop the service
             updateWidget(null)
+        }
+
+        rxBusSubscription += RxBus.shutdownCommandObservable.subscribe {
+            playbackStateSerializer.serializeNow(
+                playList,
+                currentMediaItemIndex,
+                playerPosition,
+                isShufflePlayEnabled,
+                repeatMode
+            )
+            clear(false)
+            onDestroy()
         }
 
         created = true

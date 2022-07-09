@@ -55,7 +55,6 @@ import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MediaPlayerLifecycleSupport
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
-import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.InfoDialog
 import org.moire.ultrasonic.util.LocaleHelper
@@ -67,7 +66,9 @@ import org.moire.ultrasonic.util.Util
 import timber.log.Timber
 
 /**
- * The main (and only) Activity of Ultrasonic which loads all other screens as Fragments
+ * The main (and only) Activity of Ultrasonic which loads all other screens as Fragments.
+ * Because this is the only Activity we have to manage the apps lifecycle through tis activitys
+ * onCreate/onResume/onDestroy methods...
  */
 @Suppress("TooManyFunctions")
 class NavigationActivity : AppCompatActivity() {
@@ -90,7 +91,6 @@ class NavigationActivity : AppCompatActivity() {
     private val serverSettingsModel: ServerSettingsModel by viewModel()
     private val lifecycleSupport: MediaPlayerLifecycleSupport by inject()
     private val mediaPlayerController: MediaPlayerController by inject()
-    private val imageLoaderProvider: ImageLoaderProvider by inject()
     private val activeServerProvider: ActiveServerProvider by inject()
     private val serverRepository: ServerSettingDao by inject()
 
@@ -213,6 +213,30 @@ class NavigationActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        Timber.d("onResume called")
+        super.onResume()
+
+        Storage.reset()
+        setMenuForServerCapabilities()
+
+        // Lifecycle support's constructor registers some event receivers so it should be created early
+        lifecycleSupport.onCreate()
+
+        if (!nowPlayingHidden) showNowPlaying()
+        else hideNowPlaying()
+    }
+
+    /*
+     * Attention: onDestroy does not mean that the app is necessarily being killed.
+     * Also rotating the screen will call onDestroy() and then onCreate()
+     */
+    override fun onDestroy() {
+        Timber.d("onDestroy called")
+        rxBusSubscription.dispose()
+        super.onDestroy()
+    }
+
     private fun updateNavigationHeaderForServer() {
         val activeServer = activeServerProvider.getActiveServer()
 
@@ -233,28 +257,6 @@ class NavigationActivity : AppCompatActivity() {
         selectServerButton?.iconTint = ColorStateList.valueOf(foregroundColor)
         selectServerButton?.setTextColor(foregroundColor)
         headerBackgroundImage?.setBackgroundColor(backgroundColor)
-    }
-
-    override fun onResume() {
-        Timber.d("onResume called")
-        super.onResume()
-
-        Storage.reset()
-        setMenuForServerCapabilities()
-
-        // Lifecycle support's constructor registers some event receivers so it should be created early
-        lifecycleSupport.onCreate()
-
-        if (!nowPlayingHidden) showNowPlaying()
-        else hideNowPlaying()
-    }
-
-    override fun onDestroy() {
-        Timber.d("onDestroy called")
-        rxBusSubscription.dispose()
-        imageLoaderProvider.clearImageLoader()
-        UApp.instance!!.shutdownKoin()
-        super.onDestroy()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -381,10 +383,12 @@ class NavigationActivity : AppCompatActivity() {
     private fun exit() {
         Timber.d("User choose to exit the app")
 
-        // Broadcast that the service is being shutdown
-        RxBus.stopCommandPublisher.onNext(Unit)
+        // Broadcast that the service is being stopped
+        RxBus.stopServiceCommandPublisher.onNext(Unit)
 
-        lifecycleSupport.onDestroy()
+        // Broadcast that the app is being shutdown
+        RxBus.shutdownCommandPublisher.onNext(Unit)
+
         finishAndRemoveTask()
     }
 
