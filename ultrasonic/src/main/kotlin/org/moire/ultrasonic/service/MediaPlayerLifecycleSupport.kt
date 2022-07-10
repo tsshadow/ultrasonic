@@ -13,9 +13,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.view.KeyEvent
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.app.UApp.Companion.applicationContext
+import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.CacheCleaner
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
@@ -24,13 +28,29 @@ import timber.log.Timber
 
 /**
  * This class is responsible for handling received events for the Media Player implementation
+ *
+ * TODO: Remove this class. Each component should listen to the lifecycleEvents and act on them
+ * independently
  */
 class MediaPlayerLifecycleSupport : KoinComponent {
     private val playbackStateSerializer by inject<PlaybackStateSerializer>()
     private val mediaPlayerController by inject<MediaPlayerController>()
+    private val imageLoaderProvider: ImageLoaderProvider by inject()
 
     private var created = false
     private var headsetEventReceiver: BroadcastReceiver? = null
+
+    private var rxBusSubscription = CompositeDisposable()
+
+    // Listen to lifecycle events
+    init {
+        rxBusSubscription += RxBus.createServiceCommandObservable.subscribe {
+            onCreate()
+        }
+        rxBusSubscription += RxBus.shutdownCommandObservable.subscribe {
+            onDestroy()
+        }
+    }
 
     fun onCreate() {
         onCreate(false, null)
@@ -69,23 +89,14 @@ class MediaPlayerLifecycleSupport : KoinComponent {
         }
     }
 
-    fun onDestroy() {
+    private fun onDestroy() {
 
         if (!created) return
 
-        playbackStateSerializer.serializeNow(
-            mediaPlayerController.playList,
-            mediaPlayerController.currentMediaItemIndex,
-            mediaPlayerController.playerPosition,
-            mediaPlayerController.isShufflePlayEnabled,
-            mediaPlayerController.repeatMode
-        )
-
-        mediaPlayerController.clear(false)
-        RxBus.shutdownCommandPublisher.onNext(Unit)
-
         applicationContext().unregisterReceiver(headsetEventReceiver)
-        mediaPlayerController.onDestroy()
+
+        imageLoaderProvider.clearImageLoader()
+        UApp.instance!!.shutdownKoin()
 
         created = false
         Timber.i("LifecycleSupport destroyed")
