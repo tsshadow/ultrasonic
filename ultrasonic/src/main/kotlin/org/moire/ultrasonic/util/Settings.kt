@@ -22,8 +22,8 @@ object Settings {
 
     @JvmStatic
     var theme by StringSetting(
-        Constants.PREFERENCES_KEY_THEME,
-        Constants.PREFERENCES_KEY_THEME_DARK
+        getKey(R.string.setting_key_theme),
+        getKey(R.string.setting_key_theme_dark)
     )
 
     @JvmStatic
@@ -40,26 +40,30 @@ object Settings {
             }
         }
 
-    private var maxWifiBitRate by StringIntSetting(Constants.PREFERENCES_KEY_MAX_BITRATE_WIFI)
+    private var maxWifiBitRate
+        by StringIntSetting(getKey(R.string.setting_key_max_bitrate_wifi))
 
-    private var maxMobileBitRate by StringIntSetting(Constants.PREFERENCES_KEY_MAX_BITRATE_MOBILE)
+    private var maxMobileBitRate
+        by StringIntSetting(getKey(R.string.setting_key_max_bitrate_mobile))
 
     @JvmStatic
     val preloadCount: Int
         get() {
             val preferences = preferences
             val preloadCount =
-                preferences.getString(Constants.PREFERENCES_KEY_PRELOAD_COUNT, "-1")!!
+                preferences.getString(getKey(R.string.setting_key_preload_count), "-1")!!
                     .toInt()
             return if (preloadCount == -1) Int.MAX_VALUE else preloadCount
         }
+
+    val parallelDownloads by IntSetting(getKey(R.string.setting_key_parallel_downloads), 3)
 
     @JvmStatic
     val cacheSizeMB: Int
         get() {
             val preferences = preferences
             val cacheSize = preferences.getString(
-                Constants.PREFERENCES_KEY_CACHE_SIZE,
+                getKey(R.string.setting_key_cache_size),
                 "-1"
             )!!.toInt()
             return if (cacheSize == -1) Int.MAX_VALUE else cacheSize
@@ -67,139 +71,141 @@ object Settings {
 
     @JvmStatic
     var customCacheLocation by BooleanSetting(
-        Constants.PREFERENCES_KEY_CUSTOM_CACHE_LOCATION,
+        getKey(R.string.setting_key_custom_cache_location),
         false
     )
 
     @JvmStatic
     var cacheLocationUri by StringSetting(
-        Constants.PREFERENCES_KEY_CACHE_LOCATION, ""
+        getKey(R.string.setting_key_cache_location), ""
     )
 
     @JvmStatic
     var isWifiRequiredForDownload by BooleanSetting(
-        Constants.PREFERENCES_KEY_WIFI_REQUIRED_FOR_DOWNLOAD,
+        getKey(R.string.setting_key_wifi_required_for_download),
         false
     )
 
     @JvmStatic
-    var shareOnServer by BooleanSetting(Constants.PREFERENCES_KEY_SHARE_ON_SERVER, true)
+    var shareOnServer by BooleanSetting(getKey(R.string.setting_key_share_on_server), true)
 
     @JvmStatic
     var shouldDisplayBitrateWithArtist by BooleanSetting(
-        Constants.PREFERENCES_KEY_DISPLAY_BITRATE_WITH_ARTIST,
+        getKey(R.string.setting_key_display_bitrate_with_artist),
         true
     )
 
     @JvmStatic
     var shouldUseFolderForArtistName
-        by BooleanSetting(Constants.PREFERENCES_KEY_USE_FOLDER_FOR_ALBUM_ARTIST, false)
+        by BooleanSetting(getKey(R.string.setting_key_use_folder_for_album_artist), false)
 
     @JvmStatic
     var shouldShowTrackNumber
-        by BooleanSetting(Constants.PREFERENCES_KEY_SHOW_TRACK_NUMBER, false)
+        by BooleanSetting(getKey(R.string.setting_key_show_track_number), false)
 
     @JvmStatic
     var defaultAlbums
-        by StringIntSetting(Constants.PREFERENCES_KEY_DEFAULT_ALBUMS, "5")
+        by StringIntSetting(getKey(R.string.setting_key_default_albums), "5")
 
     @JvmStatic
     var maxAlbums
-        by StringIntSetting(Constants.PREFERENCES_KEY_MAX_ALBUMS, "20")
+        by StringIntSetting(getKey(R.string.setting_key_max_albums), "20")
 
     @JvmStatic
     var defaultSongs
-        by StringIntSetting(Constants.PREFERENCES_KEY_DEFAULT_SONGS, "10")
+        by StringIntSetting(getKey(R.string.setting_key_default_songs), "10")
 
     @JvmStatic
     var maxSongs
-        by StringIntSetting(Constants.PREFERENCES_KEY_MAX_SONGS, "25")
+        by StringIntSetting(getKey(R.string.setting_key_max_songs), "25")
 
     @JvmStatic
     var maxArtists
-        by StringIntSetting(Constants.PREFERENCES_KEY_MAX_ARTISTS, "10")
+        by StringIntSetting(getKey(R.string.setting_key_max_artists), "10")
 
     @JvmStatic
     var defaultArtists
-        by StringIntSetting(Constants.PREFERENCES_KEY_DEFAULT_ARTISTS, "3")
+        by StringIntSetting(getKey(R.string.setting_key_default_artists), "3")
 
     @JvmStatic
     var incrementTime
-        by StringIntSetting(Constants.PREFERENCES_KEY_INCREMENT_TIME, "5")
+        by StringIntSetting(getKey(R.string.setting_key_increment_time), "5")
 
     @JvmStatic
     var mediaButtonsEnabled
-        by BooleanSetting(Constants.PREFERENCES_KEY_MEDIA_BUTTONS, true)
+        by BooleanSetting(getKey(R.string.setting_key_media_buttons), true)
 
     var resumePlayOnHeadphonePlug
-        by BooleanSetting(R.string.setting_keys_resume_play_on_headphones_plug, true)
+        by BooleanSetting(R.string.setting_key_resume_play_on_headphones_plug, true)
 
     @JvmStatic
     var resumeOnBluetoothDevice by IntSetting(
-        Constants.PREFERENCES_KEY_RESUME_ON_BLUETOOTH_DEVICE,
+        getKey(R.string.setting_key_resume_on_bluetooth_device),
         Constants.PREFERENCE_VALUE_DISABLED
     )
 
     @JvmStatic
     var pauseOnBluetoothDevice by IntSetting(
-        Constants.PREFERENCES_KEY_PAUSE_ON_BLUETOOTH_DEVICE,
+        getKey(R.string.setting_key_pause_on_bluetooth_device),
         Constants.PREFERENCE_VALUE_A2DP
     )
 
     @JvmStatic
     var showNowPlaying
-        by BooleanSetting(Constants.PREFERENCES_KEY_SHOW_NOW_PLAYING, true)
+        by BooleanSetting(getKey(R.string.setting_key_show_now_playing), true)
 
     @JvmStatic
     var shouldTransitionOnPlayback by BooleanSetting(
-        Constants.PREFERENCES_KEY_DOWNLOAD_TRANSITION,
+        getKey(R.string.setting_key_download_transition),
         true
     )
 
     @JvmStatic
     var showNowPlayingDetails
-        by BooleanSetting(Constants.PREFERENCES_KEY_SHOW_NOW_PLAYING_DETAILS, false)
+        by BooleanSetting(getKey(R.string.setting_key_show_now_playing_details), false)
+
+    var scrobbleEnabled by BooleanSetting(getKey(R.string.setting_key_scrobble), false)
 
     // Normally you don't need to use these Settings directly,
     // use ActiveServerProvider.isID3Enabled() instead
     @JvmStatic
-    var shouldUseId3Tags by BooleanSetting(Constants.PREFERENCES_KEY_ID3_TAGS, false)
+    var shouldUseId3Tags by BooleanSetting(getKey(R.string.setting_key_id3_tags), false)
 
     // See comment above.
     @JvmStatic
-    var useId3TagsOffline by BooleanSetting(Constants.PREFERENCES_KEY_ID3_TAGS_OFFLINE, false)
+    var useId3TagsOffline by BooleanSetting(getKey(R.string.setting_key_id3_tags_offline), false)
 
-    var activeServer by IntSetting(Constants.PREFERENCES_KEY_SERVER_INSTANCE, -1)
+    var activeServer by IntSetting(getKey(R.string.setting_key_server_instance), -1)
 
-    var serverScaling by BooleanSetting(Constants.PREFERENCES_KEY_SERVER_SCALING, false)
+    var serverScaling by BooleanSetting(getKey(R.string.setting_key_server_scaling), false)
 
-    var firstRunExecuted by BooleanSetting(Constants.PREFERENCES_KEY_FIRST_RUN_EXECUTED, false)
+    var firstRunExecuted by BooleanSetting(getKey(R.string.setting_key_first_run_executed), false)
 
     val shouldShowArtistPicture
-        by BooleanSetting(Constants.PREFERENCES_KEY_SHOW_ARTIST_PICTURE, false)
+        by BooleanSetting(getKey(R.string.setting_key_show_artist_picture), false)
 
     @JvmStatic
     var chatRefreshInterval by StringIntSetting(
-        Constants.PREFERENCES_KEY_CHAT_REFRESH_INTERVAL,
+        getKey(R.string.setting_key_chat_refresh_interval),
         "5000"
     )
 
     var directoryCacheTime by StringIntSetting(
-        Constants.PREFERENCES_KEY_DIRECTORY_CACHE_TIME,
+        getKey(R.string.setting_key_directory_cache_time),
         "300"
     )
 
     var shouldSortByDisc
-        by BooleanSetting(Constants.PREFERENCES_KEY_DISC_SORT, false)
+        by BooleanSetting(getKey(R.string.setting_key_disc_sort), false)
 
     var shouldClearBookmark
-        by BooleanSetting(Constants.PREFERENCES_KEY_CLEAR_BOOKMARK, false)
+        by BooleanSetting(getKey(R.string.setting_key_clear_bookmark), false)
 
     var shouldAskForShareDetails
-        by BooleanSetting(Constants.PREFERENCES_KEY_ASK_FOR_SHARE_DETAILS, true)
+        by BooleanSetting(getKey(R.string.setting_key_ask_for_share_details), true)
 
     var defaultShareDescription
-        by StringSetting(Constants.PREFERENCES_KEY_DEFAULT_SHARE_DESCRIPTION, "")
+        by StringSetting(getKey(R.string.setting_key_default_share_description), "")
 
     @JvmStatic
     val shareGreeting: String?
@@ -211,13 +217,13 @@ object Settings {
                 context.resources.getString(R.string.common_appname)
             )
             return preferences.getString(
-                Constants.PREFERENCES_KEY_DEFAULT_SHARE_GREETING,
+                getKey(R.string.setting_key_default_share_greeting),
                 defaultVal
             )
         }
 
     var defaultShareExpiration by StringSetting(
-        Constants.PREFERENCES_KEY_DEFAULT_SHARE_EXPIRATION,
+        getKey(R.string.setting_key_default_share_expiration),
         "0"
     )
 
@@ -225,7 +231,7 @@ object Settings {
         get() {
             val preferences = preferences
             val preference =
-                preferences.getString(Constants.PREFERENCES_KEY_DEFAULT_SHARE_EXPIRATION, "0")!!
+                preferences.getString(getKey(R.string.setting_key_default_share_expiration), "0")!!
             val split = PATTERN.split(preference)
             if (split.size == 2) {
                 val timeSpanAmount = split[0].toInt()
@@ -238,21 +244,27 @@ object Settings {
         }
 
     @JvmStatic
-    var debugLogToFile by BooleanSetting(Constants.PREFERENCES_KEY_DEBUG_LOG_TO_FILE, false)
+    var debugLogToFile by BooleanSetting(getKey(R.string.setting_key_debug_log_to_file), false)
 
     @JvmStatic
     val preferences: SharedPreferences
         get() = PreferenceManager.getDefaultSharedPreferences(Util.appContext())
 
     @JvmStatic
-    val overrideLanguage by StringSetting(Constants.PREFERENCES_KEY_OVERRIDE_LANGUAGE, "")
+    val overrideLanguage by StringSetting(getKey(R.string.setting_key_override_language), "")
 
-    var useFiveStarRating by BooleanSetting(Constants.PREFERENCES_KEY_USE_FIVE_STAR_RATING, false)
+    var useFiveStarRating by BooleanSetting(
+        getKey(R.string.setting_key_use_five_star_rating),
+        false
+    )
 
-    var useHwOffload by BooleanSetting(Constants.PREFERENCES_KEY_HARDWARE_OFFLOAD, false)
+    var useHwOffload by BooleanSetting(getKey(R.string.setting_key_hardware_offload), false)
 
     @JvmStatic
-    var firstInstalledVersion by IntSetting(Constants.PREFERENCES_FIRST_INSTALLED_VERSION, 0)
+    var firstInstalledVersion by IntSetting(
+        getKey(R.string.setting_key_first_installed_version),
+        0
+    )
 
     // TODO: Remove in December 2022
     fun migrateFeatureStorage() {
@@ -264,8 +276,10 @@ object Settings {
         return preferences.contains(key)
     }
 
+    fun getKey(key: Int): String {
+        return appContext.getString(key)
+    }
+
     private val appContext: Context
-        get() {
-            return UApp.applicationContext()
-        }
+        get() = UApp.applicationContext()
 }
