@@ -74,7 +74,7 @@ Push Translations:
     - echo $'[https://www.transifex.com]\nhostname = https://www.transifex.com\nusername = api\npassword = '"${TRANSIFEX_PASSWORD}"$'\n' > ~/.transifexrc
     - tx push -s
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == "37671564"
 
 Generate Signed Develop APK:
   stage: APK
@@ -89,7 +89,7 @@ Generate Signed Develop APK:
     paths:
       - ultrasonic-release/
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == "37671564"
 
 Generate Signed APK:
   stage: APK
