@@ -99,36 +99,38 @@ class SettingsFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTitle(this, R.string.menu_settings)
-        theme = findPreference(Constants.PREFERENCES_KEY_THEME)
-        maxBitrateWifi = findPreference(Constants.PREFERENCES_KEY_MAX_BITRATE_WIFI)
-        maxBitrateMobile = findPreference(Constants.PREFERENCES_KEY_MAX_BITRATE_MOBILE)
-        cacheSize = findPreference(Constants.PREFERENCES_KEY_CACHE_SIZE)
-        cacheLocation = findPreference(Constants.PREFERENCES_KEY_CACHE_LOCATION)
-        preloadCount = findPreference(Constants.PREFERENCES_KEY_PRELOAD_COUNT)
-        bufferLength = findPreference(Constants.PREFERENCES_KEY_BUFFER_LENGTH)
-        incrementTime = findPreference(Constants.PREFERENCES_KEY_INCREMENT_TIME)
-        networkTimeout = findPreference(Constants.PREFERENCES_KEY_NETWORK_TIMEOUT)
-        maxAlbums = findPreference(Constants.PREFERENCES_KEY_MAX_ALBUMS)
-        maxSongs = findPreference(Constants.PREFERENCES_KEY_MAX_SONGS)
-        maxArtists = findPreference(Constants.PREFERENCES_KEY_MAX_ARTISTS)
-        defaultArtists = findPreference(Constants.PREFERENCES_KEY_DEFAULT_ARTISTS)
-        defaultSongs = findPreference(Constants.PREFERENCES_KEY_DEFAULT_SONGS)
-        defaultAlbums = findPreference(Constants.PREFERENCES_KEY_DEFAULT_ALBUMS)
-        chatRefreshInterval = findPreference(Constants.PREFERENCES_KEY_CHAT_REFRESH_INTERVAL)
-        directoryCacheTime = findPreference(Constants.PREFERENCES_KEY_DIRECTORY_CACHE_TIME)
-        mediaButtonsEnabled = findPreference(Constants.PREFERENCES_KEY_MEDIA_BUTTONS)
+        theme = findPreference(getString(R.string.setting_key_theme))
+        maxBitrateWifi = findPreference(getString(R.string.setting_key_max_bitrate_wifi))
+        maxBitrateMobile = findPreference(getString(R.string.setting_key_max_bitrate_mobile))
+        cacheSize = findPreference(getString(R.string.setting_key_cache_size))
+        cacheLocation = findPreference(getString(R.string.setting_key_cache_location))
+        preloadCount = findPreference(getString(R.string.setting_key_preload_count))
+        bufferLength = findPreference(getString(R.string.setting_key_buffer_length))
+        incrementTime = findPreference(getString(R.string.setting_key_increment_time))
+        networkTimeout = findPreference(getString(R.string.setting_key_network_timeout))
+        maxAlbums = findPreference(getString(R.string.setting_key_max_albums))
+        maxSongs = findPreference(getString(R.string.setting_key_max_songs))
+        maxArtists = findPreference(getString(R.string.setting_key_max_artists))
+        defaultArtists = findPreference(getString(R.string.setting_key_default_artists))
+        defaultSongs = findPreference(getString(R.string.setting_key_default_songs))
+        defaultAlbums = findPreference(getString(R.string.setting_key_default_albums))
+        chatRefreshInterval = findPreference(getString(R.string.setting_key_chat_refresh_interval))
+        directoryCacheTime = findPreference(getString(R.string.setting_key_directory_cache_time))
+        mediaButtonsEnabled = findPreference(getString(R.string.setting_key_media_buttons))
         sharingDefaultDescription =
-            findPreference(Constants.PREFERENCES_KEY_DEFAULT_SHARE_DESCRIPTION)
-        sharingDefaultGreeting = findPreference(Constants.PREFERENCES_KEY_DEFAULT_SHARE_GREETING)
+            findPreference(getString(R.string.setting_key_default_share_description))
+        sharingDefaultGreeting =
+            findPreference(getString(R.string.setting_key_default_share_greeting))
         sharingDefaultExpiration =
-            findPreference(Constants.PREFERENCES_KEY_DEFAULT_SHARE_EXPIRATION)
+            findPreference(getString(R.string.setting_key_default_share_expiration))
         resumeOnBluetoothDevice =
-            findPreference(Constants.PREFERENCES_KEY_RESUME_ON_BLUETOOTH_DEVICE)
-        pauseOnBluetoothDevice = findPreference(Constants.PREFERENCES_KEY_PAUSE_ON_BLUETOOTH_DEVICE)
-        debugLogToFile = findPreference(Constants.PREFERENCES_KEY_DEBUG_LOG_TO_FILE)
-        showArtistPicture = findPreference(Constants.PREFERENCES_KEY_SHOW_ARTIST_PICTURE)
-        useId3TagsOffline = findPreference(Constants.PREFERENCES_KEY_ID3_TAGS_OFFLINE)
-        customCacheLocation = findPreference(Constants.PREFERENCES_KEY_CUSTOM_CACHE_LOCATION)
+            findPreference(getString(R.string.setting_key_resume_on_bluetooth_device))
+        pauseOnBluetoothDevice =
+            findPreference(getString(R.string.setting_key_pause_on_bluetooth_device))
+        debugLogToFile = findPreference(getString(R.string.setting_key_debug_log_to_file))
+        showArtistPicture = findPreference(getString(R.string.setting_key_show_artist_picture))
+        useId3TagsOffline = findPreference(getString(R.string.setting_key_id3_tags_offline))
+        customCacheLocation = findPreference(getString(R.string.setting_key_custom_cache_location))
 
         sharingDefaultGreeting?.text = shareGreeting
 
@@ -220,22 +222,22 @@ class SettingsFragment :
         Timber.d("Preference changed: %s", key)
         update()
         when (key) {
-            Constants.PREFERENCES_KEY_HIDE_MEDIA -> {
+            getString(R.string.setting_key_hide_media) -> {
                 setHideMedia(sharedPreferences.getBoolean(key, false))
             }
-            Constants.PREFERENCES_KEY_DEBUG_LOG_TO_FILE -> {
+            getString(R.string.setting_key_debug_log_to_file) -> {
                 setDebugLogToFile(sharedPreferences.getBoolean(key, false))
             }
-            Constants.PREFERENCES_KEY_ID3_TAGS -> {
+            getString(R.string.setting_key_id3_tags) -> {
                 val enabled = sharedPreferences.getBoolean(key, false)
                 showArtistPicture?.isEnabled = enabled
                 useId3TagsOffline?.isEnabled = enabled
                 setupTextColors(enabled)
             }
-            Constants.PREFERENCES_KEY_THEME -> {
+            getString(R.string.setting_key_theme) -> {
                 RxBus.themeChangedEventPublisher.onNext(Unit)
             }
-            Constants.PREFERENCES_KEY_CUSTOM_CACHE_LOCATION -> {
+            getString(R.string.setting_key_custom_cache_location) -> {
                 if (Settings.customCacheLocation) {
                     selectCacheLocation()
                 } else {
@@ -360,7 +362,7 @@ class SettingsFragment :
 
     private fun setupClearSearchPreference() {
         val clearSearchPreference =
-            findPreference<Preference>(Constants.PREFERENCES_KEY_CLEAR_SEARCH_HISTORY)
+            findPreference<Preference>(getString(R.string.setting_key_clear_search_history))
         if (clearSearchPreference != null) {
             clearSearchPreference.onPreferenceClickListener =
                 Preference.OnPreferenceClickListener {

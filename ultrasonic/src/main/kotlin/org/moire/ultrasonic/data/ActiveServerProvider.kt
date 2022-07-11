@@ -245,8 +245,7 @@ class ActiveServerProvider(
             if (isOffline()) {
                 return false
             }
-            val preferences = Settings.preferences
-            return preferences.getBoolean(Constants.PREFERENCES_KEY_SCROBBLE, false)
+            return Settings.scrobbleEnabled
         }
 
         /**

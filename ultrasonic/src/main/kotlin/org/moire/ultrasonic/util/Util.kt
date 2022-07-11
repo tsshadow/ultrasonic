@@ -81,17 +81,35 @@ object Util {
 
     @JvmStatic
     fun applyTheme(context: Context?) {
+        if (context == null) return
+        val style = getStyleFromSettings(context)
+        context.setTheme(style)
+    }
+
+    private fun getStyleFromSettings(context: Context): Int {
+        // Migration
+        // TODO: Remove in June 2023
         when (Settings.theme.lowercase()) {
-            Constants.PREFERENCES_KEY_THEME_DARK,
             "fullscreen" -> {
-                context!!.setTheme(R.style.UltrasonicTheme_Dark)
+                Settings.theme = context.getString(R.string.setting_key_theme_dark)
             }
-            Constants.PREFERENCES_KEY_THEME_BLACK -> {
-                context!!.setTheme(R.style.UltrasonicTheme_Black)
-            }
-            Constants.PREFERENCES_KEY_THEME_LIGHT,
             "fullscreenlight" -> {
-                context!!.setTheme(R.style.UltrasonicTheme_Light)
+                Settings.theme = context.getString(R.string.setting_key_theme_light)
+            }
+        }
+
+        return when (Settings.theme.lowercase()) {
+            context.getString(R.string.setting_key_theme_dark) -> {
+                R.style.UltrasonicTheme_Dark
+            }
+            context.getString(R.string.setting_key_theme_black) -> {
+                R.style.UltrasonicTheme_Black
+            }
+            context.getString(R.string.setting_key_theme_light) -> {
+                R.style.UltrasonicTheme_Light
+            }
+            else -> {
+                R.style.UltrasonicTheme_Dark
             }
         }
     }

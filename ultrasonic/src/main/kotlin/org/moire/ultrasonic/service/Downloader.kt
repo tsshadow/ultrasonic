@@ -190,7 +190,7 @@ class Downloader(
         }
 
         // Fill up active List with waiting tasks
-        while (activelyDownloading.size < PARALLEL_DOWNLOADS && downloadQueue.size > 0) {
+        while (activelyDownloading.size < Settings.parallelDownloads && downloadQueue.size > 0) {
             val task = downloadQueue.remove()
             activelyDownloading.add(task)
             startDownloadOnService(task)
@@ -355,7 +355,6 @@ class Downloader(
     }
 
     companion object {
-        const val PARALLEL_DOWNLOADS = 2
         const val CHECK_INTERVAL = 5000L
     }
 
