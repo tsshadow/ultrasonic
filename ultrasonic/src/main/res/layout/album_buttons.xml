@@ -82,7 +82,7 @@
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/media_stop_normal"
+        android:src="@drawable/ic_menu_close"
         android:visibility="gone"
         android:contentDescription="@string/common.delete" />
 
