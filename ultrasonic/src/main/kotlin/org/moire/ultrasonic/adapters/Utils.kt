@@ -5,11 +5,11 @@ import android.graphics.drawable.Drawable
 import android.view.MenuInflater
 import android.view.View
 import android.widget.PopupMenu
+import androidx.core.content.ContextCompat
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.util.Settings
-import org.moire.ultrasonic.util.Util
 
 object Utils {
     @JvmStatic
@@ -37,8 +37,6 @@ object Utils {
     class ImageHelper(context: Context) {
 
         lateinit var errorImage: Drawable
-        lateinit var starHollowDrawable: Drawable
-        lateinit var starDrawable: Drawable
         lateinit var pinImage: Drawable
         lateinit var downloadedImage: Drawable
         lateinit var downloadingImage: Drawable
@@ -61,13 +59,11 @@ object Utils {
         }
 
         private fun getDrawables(context: Context) {
-            starHollowDrawable = Util.getDrawableFromAttribute(context, R.attr.star_hollow)
-            starDrawable = Util.getDrawableFromAttribute(context, R.attr.star_full)
-            pinImage = Util.getDrawableFromAttribute(context, R.attr.pin)
-            downloadedImage = Util.getDrawableFromAttribute(context, R.attr.downloaded)
-            errorImage = Util.getDrawableFromAttribute(context, R.attr.error)
-            downloadingImage = Util.getDrawableFromAttribute(context, R.attr.downloading)
-            playingImage = Util.getDrawableFromAttribute(context, R.attr.media_play_small)
+            pinImage = ContextCompat.getDrawable(context, R.drawable.ic_menu_pin)!!
+            downloadedImage = ContextCompat.getDrawable(context, R.drawable.ic_menu_download)!!
+            errorImage = ContextCompat.getDrawable(context, R.drawable.ic_baseline_error)!!
+            downloadingImage = ContextCompat.getDrawable(context, R.drawable.stat_sys_download)!!
+            playingImage = ContextCompat.getDrawable(context, R.drawable.ic_stat_play)!!
         }
     }
 

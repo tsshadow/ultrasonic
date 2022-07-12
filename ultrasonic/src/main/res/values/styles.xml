@@ -35,66 +35,10 @@
         <item name="colorControlHighlight">?attr/color_selected</item>
     </style>
 
-    <attr name="star_hollow" format="reference"/>
-    <attr name="star_full" format="reference"/>
-    <attr name="about" format="reference"/>
-    <attr name="select_all" format="reference"/>
-    <attr name="browse" format="reference"/>
-    <attr name="exit" format="reference"/>
-    <attr name="forward" format="reference"/>
-    <attr name="backward" format="reference"/>
-    <attr name="stop" format="reference"/>
-    <attr name="help" format="reference"/>
-    <attr name="home" format="reference"/>
-    <attr name="pin" format="reference"/>
-    <attr name="unpin" format="reference"/>
-    <attr name="playlists" format="reference"/>
-    <attr name="remove_all" format="reference"/>
-    <attr name="save" format="reference"/>
-    <attr name="screen_on_off" format="reference"/>
-    <attr name="search" format="reference"/>
-    <attr name="server" format="reference"/>
-    <attr name="select_server" format="reference"/>
-    <attr name="select_folder" format="reference"/>
-    <attr name="settings" format="reference"/>
-    <attr name="share" format="reference"/>
-    <attr name="download" format="reference"/>
-    <attr name="downloaded" format="reference"/>
-    <attr name="error" format="reference"/>
-    <attr name="downloading" format="reference"/>
-    <attr name="media_previous" format="reference"/>
-    <attr name="media_next" format="reference"/>
-    <attr name="media_pause" format="reference"/>
-    <attr name="media_repeat_all" format="reference"/>
-    <attr name="media_repeat_off" format="reference"/>
-    <attr name="media_repeat_single" format="reference"/>
-    <attr name="media_shuffle" format="reference"/>
-    <attr name="media_play" format="reference"/>
-    <attr name="podcasts" format="reference"/>
-    <attr name="refresh" format="reference"/>
-    <attr name="media_play_small" format="reference"/>
-    <attr name="media_stop" format="reference"/>
-    <attr name="media_toggle" format="reference"/>
-    <attr name="chat" format="reference"/>
-    <attr name="chat_send" format="reference"/>
-    <attr name="bookmark" format="reference"/>
-    <attr name="check_mark_off" format="reference"/>
-    <attr name="check_mark_on" format="reference"/>
-    <attr name="button_check_custom" format="reference"/>
     <attr name="color_background" format="reference"/>
     <attr name="color_selected" format="reference"/>
     <attr name="color_menu_selected" format="reference"/>
     <attr name="color_menu_background" format="reference"/>
     <attr name="color_navigation_header_background" format="reference"/>
-    <attr name="filepicker_create_new_folder" format="reference"/>
-    <attr name="filepicker_folder" format="reference"/>
-    <attr name="filepicker_subdirectory_left" format="reference"/>
-    <attr name="filepicker_subdirectory_up" format="reference"/>
-    <attr name="filepicker_sd_card" format="reference"/>
-    <attr name="drag_queue" format="reference"/>
-    <attr name="drag_vertical" format="reference"/>
-    <attr name="more_vert" format="reference"/>
-    <attr name="list_selector_holo" format="reference"/>
-    <attr name="list_selector_holo_selected" format="reference"/>
 </resources>
 

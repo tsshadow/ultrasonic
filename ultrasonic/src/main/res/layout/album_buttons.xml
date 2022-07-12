@@ -12,7 +12,7 @@
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="?attr/select_all"
+        android:src="@drawable/ic_menu_select_all"
         android:visibility="gone"
         android:contentDescription="@string/common.select_all" />
 
@@ -22,7 +22,7 @@
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="?attr/media_play"
+        android:src="@drawable/media_start_normal"
         android:visibility="gone"
         android:contentDescription="@string/common.play_now" />
     
@@ -52,7 +52,7 @@
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="?attr/pin"
+        android:src="@drawable/ic_menu_pin"
         android:visibility="gone"
         android:contentDescription="@string/common.pin" />
 
@@ -62,7 +62,7 @@
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="?attr/unpin"
+        android:src="@drawable/ic_menu_unpin"
         android:visibility="gone"
         android:contentDescription="@string/common.unpin" />
     
@@ -72,7 +72,7 @@
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="?attr/download"
+        android:src="@drawable/ic_menu_download"
         android:visibility="gone"
         android:contentDescription="@string/common.download" />
 
@@ -82,7 +82,7 @@
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="?attr/stop"
+        android:src="@drawable/media_stop_normal"
         android:visibility="gone"
         android:contentDescription="@string/common.delete" />
 
@@ -92,7 +92,7 @@
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="?attr/forward"
+        android:src="@drawable/media_forward_normal"
         android:visibility="gone"
         android:contentDescription="@string/search.more" />
 

@@ -87,7 +87,7 @@
                 a:layout_weight="1"
                 a:background="@color/transparent"
                 a:scaleType="fitCenter"
-                a:src="@drawable/media_backward_normal_dark" />
+                a:src="@drawable/media_backward_normal" />
 
             <ImageButton
                 a:id="@+id/control_play"
@@ -96,7 +96,7 @@
                 a:layout_weight="1"
                 a:background="@color/transparent"
                 a:scaleType="fitCenter"
-                a:src="@drawable/media_start_normal_dark" />
+                a:src="@drawable/media_start_normal" />
 
             <ImageButton
                 a:id="@+id/control_next"
@@ -105,7 +105,7 @@
                 a:layout_weight="1"
                 a:background="@color/transparent"
                 a:scaleType="fitCenter"
-                a:src="@drawable/media_forward_normal_dark" />
+                a:src="@drawable/media_forward_normal" />
         </LinearLayout>
 
     </LinearLayout>

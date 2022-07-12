@@ -21,7 +21,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_menu_server_dark"
+        tools:src="@drawable/ic_menu_server"
         a:importantForAccessibility="no" />
 
     <TextView
@@ -58,8 +58,7 @@
         a:layout_marginEnd="15dp"
         a:contentDescription="@string/server_editor.advanced"
         a:focusable="false"
-        a:src="?attr/more_vert"
-        tools:src="@drawable/ic_more_vert_dark"
+        a:src="@drawable/ic_more_vert"
         app:layout_constraintTop_toTopOf="@id/server_name"
         app:layout_constraintBottom_toBottomOf="@+id/server_description"
         app:layout_constraintEnd_toEndOf="parent"

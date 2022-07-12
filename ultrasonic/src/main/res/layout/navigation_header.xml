@@ -35,7 +35,7 @@
         a:textColor="?attr/colorOnPrimary"
         a:textSize="17sp"
         a:textStyle="bold"
-        app:icon="@drawable/ic_menu_select_server_dark"
+        app:icon="@drawable/ic_menu_select_server"
         app:iconPadding="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

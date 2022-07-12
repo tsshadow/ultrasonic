@@ -133,9 +133,9 @@ open class UltrasonicAppWidgetProvider : AppWidgetProvider() {
 
         // Set correct drawable for pause state
         if (playing) {
-            views.setImageViewResource(R.id.control_play, R.drawable.media_pause_normal_dark)
+            views.setImageViewResource(R.id.control_play, R.drawable.media_pause_normal)
         } else {
-            views.setImageViewResource(R.id.control_play, R.drawable.media_start_normal_dark)
+            views.setImageViewResource(R.id.control_play, R.drawable.media_start_normal)
         }
 
         // Set the cover art

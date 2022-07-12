@@ -1,6 +1,7 @@
 package org.moire.ultrasonic.app
 
 import android.content.Context
+import android.os.StrictMode
 import androidx.multidex.MultiDexApplication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,8 +32,8 @@ class UApp : MultiDexApplication() {
 
     init {
         instance = this
-//        if (BuildConfig.DEBUG)
-//            StrictMode.enableDefaults()
+        if (BuildConfig.DEBUG)
+            StrictMode.enableDefaults()
     }
 
     var initiated = false

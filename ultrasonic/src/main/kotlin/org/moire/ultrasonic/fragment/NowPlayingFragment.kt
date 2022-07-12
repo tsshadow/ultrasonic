@@ -28,7 +28,6 @@ import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util.applyTheme
-import org.moire.ultrasonic.util.Util.getDrawableFromAttribute
 import org.moire.ultrasonic.util.Util.getNotificationImageSize
 import timber.log.Timber
 
@@ -85,17 +84,9 @@ class NowPlayingFragment : Fragment() {
     private fun update() {
         try {
             if (mediaPlayerController.isPlaying) {
-                playButton!!.setImageDrawable(
-                    getDrawableFromAttribute(
-                        requireContext(), R.attr.media_pause
-                    )
-                )
+                playButton!!.setImageResource(R.drawable.media_pause_normal)
             } else {
-                playButton!!.setImageDrawable(
-                    getDrawableFromAttribute(
-                        requireContext(), R.attr.media_play
-                    )
-                )
+                playButton!!.setImageResource(R.drawable.media_start_normal)
             }
 
             val file = mediaPlayerController.currentPlayingLegacy

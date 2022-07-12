@@ -8,52 +8,52 @@
         <item
             a:id="@+id/mainFragment"
             a:checkable="true"
-            a:icon="?attr/home"
+            a:icon="@drawable/ic_menu_home"
             a:title="@string/button_bar.home" />
         <item
             a:id="@+id/mediaLibraryFragment"
             a:checkable="true"
-            a:icon="?attr/browse"
+            a:icon="@drawable/ic_menu_browse"
             a:title="@string/button_bar.browse" />
         <item
             a:id="@+id/searchFragment"
             a:checkable="true"
-            a:icon="?attr/search"
+            a:icon="@drawable/ic_menu_search_holo"
             a:title="@string/button_bar.search" />
         <item
             a:id="@+id/playlistsFragment"
             a:checkable="true"
-            a:icon="?attr/playlists"
+            a:icon="@drawable/ic_menu_playlists"
             a:title="@string/button_bar.playlists" />
         <item
             a:id="@+id/downloadsFragment"
             a:checkable="true"
-            a:icon="?attr/downloaded"
+            a:icon="@drawable/ic_menu_download"
             a:title="@string/menu.downloads" />
         <item
             a:id="@+id/sharesFragment"
             a:checkable="true"
-            a:icon="?attr/share"
+            a:icon="@drawable/ic_menu_share"
             a:title="@string/button_bar.shares" />
         <item
             a:id="@+id/bookmarksFragment"
             a:checkable="true"
-            a:icon="?attr/bookmark"
+            a:icon="@drawable/ic_menu_bookmark"
             a:title="@string/button_bar.bookmarks" />
         <item
             a:id="@+id/chatFragment"
             a:checkable="true"
-            a:icon="?attr/chat"
+            a:icon="@drawable/ic_menu_chat"
             a:title="@string/button_bar.chat" />
         <item
             a:id="@+id/playerFragment"
             a:checkable="true"
-            a:icon="?attr/media_play"
+            a:icon="@drawable/media_start_normal"
             a:title="@string/button_bar.now_playing" />
         <item
             a:id="@+id/podcastFragment"
             a:checkable="true"
-            a:icon="?attr/podcasts"
+            a:icon="@drawable/ic_menu_podcasts"
             a:title="@string/button_bar.podcasts" />
     </group>
     <item a:title="@string/menu.common">
@@ -61,17 +61,17 @@
             <item
                 a:id="@+id/settingsFragment"
                 a:checkable="true"
-                a:icon="?attr/settings"
+                a:icon="@drawable/ic_menu_settings"
                 a:title="@string/menu.settings" />
             <item
                 a:id="@+id/aboutFragment"
                 a:checkable="true"
-                a:icon="?attr/about"
+                a:icon="@drawable/ic_menu_about"
                 a:title="@string/menu.about" />
             <item
                 a:id="@+id/menu_exit"
                 a:checkable="true"
-                a:icon="?attr/exit"
+                a:icon="@drawable/ic_menu_exit"
                 a:title="@string/menu.exit" />
         </menu>
     </item>

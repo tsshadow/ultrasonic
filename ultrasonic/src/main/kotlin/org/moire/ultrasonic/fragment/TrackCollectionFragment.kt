@@ -137,8 +137,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
             AlbumRowBinder(
                 { entry -> onItemClick(entry) },
                 { menuItem, entry -> onContextMenuItemSelected(menuItem, entry) },
-                imageLoaderProvider.getImageLoader(),
-                context = requireContext()
+                imageLoaderProvider.getImageLoader()
             )
         )
 

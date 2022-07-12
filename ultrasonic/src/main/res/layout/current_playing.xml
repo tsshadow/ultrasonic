@@ -51,7 +51,7 @@
                         a:focusable="false"
                         a:gravity="center_vertical"
                         a:scaleType="fitCenter"
-                        a:src="?attr/star_hollow"
+                        a:src="@drawable/ic_star_hollow"
                         a:importantForAccessibility="no" />
 
                     <ImageView
@@ -64,7 +64,7 @@
                         a:focusable="false"
                         a:gravity="center_vertical"
                         a:scaleType="fitCenter"
-                        a:src="?attr/star_hollow"
+                        a:src="@drawable/ic_star_hollow"
                         a:importantForAccessibility="no" />
 
                     <ImageView
@@ -77,7 +77,7 @@
                         a:focusable="false"
                         a:gravity="center_vertical"
                         a:scaleType="fitCenter"
-                        a:src="?attr/star_hollow"
+                        a:src="@drawable/ic_star_hollow"
                         a:importantForAccessibility="no" />
 
                     <ImageView
@@ -90,7 +90,7 @@
                         a:focusable="false"
                         a:gravity="center_vertical"
                         a:scaleType="fitCenter"
-                        a:src="?attr/star_hollow"
+                        a:src="@drawable/ic_star_hollow"
                         a:importantForAccessibility="no" />
 
                     <ImageView
@@ -103,7 +103,7 @@
                         a:focusable="false"
                         a:gravity="center_vertical"
                         a:scaleType="fitCenter"
-                        a:src="?attr/star_hollow"
+                        a:src="@drawable/ic_star_hollow"
                         a:importantForAccessibility="no" />
 
                 </LinearLayout>

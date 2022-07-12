@@ -10,7 +10,6 @@ package org.moire.ultrasonic.fragment
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.graphics.Point
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -156,9 +155,9 @@ class PlayerFragment :
     private lateinit var playButton: View
     private lateinit var shuffleButton: View
     private lateinit var repeatButton: ImageView
-    private lateinit var hollowStar: Drawable
-    private lateinit var fullStar: Drawable
     private lateinit var progressBar: SeekBar
+    private val hollowStar = R.drawable.ic_star_hollow
+    private val fullStar = R.drawable.ic_star_full
 
     internal val viewAdapter: BaseAdapter<Identifiable> by lazy {
         BaseAdapter()
@@ -231,8 +230,6 @@ class PlayerFragment :
 
         val ratingLinearLayout = view.findViewById<LinearLayout>(R.id.song_rating)
         if (!useFiveStarRating) ratingLinearLayout.isVisible = false
-        hollowStar = Util.getDrawableFromAttribute(view.context, R.attr.star_hollow)
-        fullStar = Util.getDrawableFromAttribute(view.context, R.attr.star_full)
 
         fiveStar1ImageView.setOnClickListener { setSongRating(1) }
         fiveStar2ImageView.setOnClickListener { setSongRating(2) }
@@ -441,27 +438,15 @@ class PlayerFragment :
     private fun updateRepeatButtonState(repeatMode: Int) {
         when (repeatMode) {
             0 -> {
-                repeatButton.setImageDrawable(
-                    Util.getDrawableFromAttribute(
-                        requireContext(), R.attr.media_repeat_off
-                    )
-                )
+                repeatButton.setImageResource(R.drawable.media_repeat_off)
                 repeatButton.alpha = ALPHA_DEACTIVATED
             }
             1 -> {
-                repeatButton.setImageDrawable(
-                    Util.getDrawableFromAttribute(
-                        requireContext(), R.attr.media_repeat_single
-                    )
-                )
+                repeatButton.setImageResource(R.drawable.media_repeat_one)
                 repeatButton.alpha = ALPHA_ACTIVATED
             }
             2 -> {
-                repeatButton.setImageDrawable(
-                    Util.getDrawableFromAttribute(
-                        requireContext(), R.attr.media_repeat_all
-                    )
-                )
+                repeatButton.setImageResource(R.drawable.media_repeat_all)
                 repeatButton.alpha = ALPHA_ACTIVATED
             }
             else -> {
@@ -583,10 +568,10 @@ class PlayerFragment :
         if (useFiveStarRating) starMenuItem.isVisible = false
 
         if (currentSong != null) {
-            starMenuItem.icon = if (currentSong!!.starred) fullStar else hollowStar
+            starMenuItem.setIcon(if (currentSong!!.starred) fullStar else hollowStar)
             shareSongMenuItem.isVisible = true
         } else {
-            starMenuItem.icon = hollowStar
+            starMenuItem.setIcon(hollowStar)
             shareSongMenuItem.isVisible = false
         }
 
@@ -761,10 +746,10 @@ class PlayerFragment :
                         object : FutureCallback<SessionResult> {
                             override fun onSuccess(result: SessionResult?) {
                                 if (isStarred) {
-                                    starMenuItem.icon = hollowStar
+                                    starMenuItem.setIcon(hollowStar)
                                     currentSong!!.starred = false
                                 } else {
-                                    starMenuItem.icon = fullStar
+                                    starMenuItem.setIcon(fullStar)
                                     currentSong!!.starred = true
                                 }
                             }
@@ -1227,11 +1212,11 @@ class PlayerFragment :
             rating = currentSong!!.userRating!!
         }
 
-        fiveStar1ImageView.setImageDrawable(if (rating > 0) fullStar else hollowStar)
-        fiveStar2ImageView.setImageDrawable(if (rating > 1) fullStar else hollowStar)
-        fiveStar3ImageView.setImageDrawable(if (rating > 2) fullStar else hollowStar)
-        fiveStar4ImageView.setImageDrawable(if (rating > 3) fullStar else hollowStar)
-        fiveStar5ImageView.setImageDrawable(if (rating > 4) fullStar else hollowStar)
+        fiveStar1ImageView.setImageResource(if (rating > 0) fullStar else hollowStar)
+        fiveStar2ImageView.setImageResource(if (rating > 1) fullStar else hollowStar)
+        fiveStar3ImageView.setImageResource(if (rating > 2) fullStar else hollowStar)
+        fiveStar4ImageView.setImageResource(if (rating > 3) fullStar else hollowStar)
+        fiveStar5ImageView.setImageResource(if (rating > 4) fullStar else hollowStar)
     }
 
     private fun setSongRating(rating: Int) {

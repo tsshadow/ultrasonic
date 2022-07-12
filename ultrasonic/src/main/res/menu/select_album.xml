@@ -8,11 +8,11 @@
         a:id="@+id/menu_item_share"
         app:showAsAction="ifRoom|withText"
         a:title="@string/menu.share"
-        a:icon="?attr/share"/>
+        a:icon="@drawable/ic_menu_share"/>
 
     <item
         a:id="@+id/select_album_play_all"
-        a:icon="?attr/media_play"
+        a:icon="@drawable/media_start_normal"
         app:showAsAction="ifRoom|withText"
         a:title="@string/select_album.play_all"/>
 

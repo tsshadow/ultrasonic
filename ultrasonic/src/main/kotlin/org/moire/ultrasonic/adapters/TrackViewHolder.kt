@@ -30,7 +30,7 @@ import timber.log.Timber
 class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable, KoinComponent {
 
     var check: CheckedTextView = view.findViewById(R.id.song_check)
-    private var rating: LinearLayout = view.findViewById(R.id.song_rating)
+    private var rating: LinearLayout = view.findViewById(R.id.song_five_star)
     private var fiveStar1: ImageView = view.findViewById(R.id.song_five_star_1)
     private var fiveStar2: ImageView = view.findViewById(R.id.song_five_star_2)
     private var fiveStar3: ImageView = view.findViewById(R.id.song_five_star_3)
@@ -134,7 +134,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     private fun setupStarButtons(song: Track, useFiveStarRating: Boolean) {
         if (useFiveStarRating) {
             // Hide single star
-            star.isVisible = false
+            star.visibility = View.INVISIBLE
             val rating = if (song.userRating == null) 0 else song.userRating!!
             setFiveStars(rating)
         } else {
@@ -147,10 +147,10 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
                 val id = song.id
 
                 if (!isStarred) {
-                    star.setImageDrawable(imageHelper.starDrawable)
+                    star.setImageResource(R.drawable.ic_star_full)
                     song.starred = true
                 } else {
-                    star.setImageDrawable(imageHelper.starHollowDrawable)
+                    star.setImageResource(R.drawable.ic_star_hollow)
                     song.starred = false
                 }
 
@@ -173,32 +173,28 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
 
     @Suppress("MagicNumber")
     private fun setFiveStars(rating: Int) {
-        fiveStar1.setImageDrawable(
-            if (rating > 0) imageHelper.starDrawable else imageHelper.starHollowDrawable
+        fiveStar1.setImageResource(
+            if (rating > 0) R.drawable.ic_star_full else R.drawable.ic_star_hollow
         )
-        fiveStar2.setImageDrawable(
-            if (rating > 1) imageHelper.starDrawable else imageHelper.starHollowDrawable
+        fiveStar2.setImageResource(
+            if (rating > 1) R.drawable.ic_star_full else R.drawable.ic_star_hollow
         )
-        fiveStar3.setImageDrawable(
-            if (rating > 2) imageHelper.starDrawable else imageHelper.starHollowDrawable
+        fiveStar3.setImageResource(
+            if (rating > 2) R.drawable.ic_star_full else R.drawable.ic_star_hollow
         )
-        fiveStar4.setImageDrawable(
-            if (rating > 3) imageHelper.starDrawable else imageHelper.starHollowDrawable
+        fiveStar4.setImageResource(
+            if (rating > 3) R.drawable.ic_star_full else R.drawable.ic_star_hollow
         )
-        fiveStar5.setImageDrawable(
-            if (rating > 4) imageHelper.starDrawable else imageHelper.starHollowDrawable
+        fiveStar5.setImageResource(
+            if (rating > 4) R.drawable.ic_star_full else R.drawable.ic_star_hollow
         )
     }
 
     private fun setSingleStar(starred: Boolean) {
         if (starred) {
-            if (star.drawable !== imageHelper.starDrawable) {
-                star.setImageDrawable(imageHelper.starDrawable)
-            }
+            star.setImageResource(R.drawable.ic_star_full)
         } else {
-            if (star.drawable !== imageHelper.starHollowDrawable) {
-                star.setImageDrawable(imageHelper.starHollowDrawable)
-            }
+            star.setImageResource(R.drawable.ic_star_hollow)
         }
     }
 
