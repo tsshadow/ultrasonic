@@ -19,7 +19,6 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.util.ServerColor
-import org.moire.ultrasonic.util.Util
 
 /**
  * Row Adapter to be used in the Server List
@@ -108,14 +107,13 @@ internal class ServerRowAdapter(
         // Configure icons for the row
         if (setting?.id == ActiveServerProvider.OFFLINE_DB_ID) {
             serverMenu?.visibility = View.INVISIBLE
-            icon = Util.getDrawableFromAttribute(context, R.attr.screen_on_off)
+            icon = ContextCompat.getDrawable(context, R.drawable.ic_menu_screen_on_off)
             background = ContextCompat.getDrawable(context, R.drawable.circle)
         } else {
-            icon = ContextCompat.getDrawable(context, R.drawable.ic_menu_server_dark)
+            icon = ContextCompat.getDrawable(context, R.drawable.ic_menu_server)
             background = ContextCompat.getDrawable(context, R.drawable.circle)
         }
 
-        // Set colors
         icon?.setTint(ServerColor.getForegroundColor(context, setting?.color))
         background?.setTint(ServerColor.getBackgroundColor(context, setting?.color))
 

@@ -3,7 +3,7 @@
     xmlns:a="http://schemas.android.com/apk/res/android">
     <item a:id="@+id/search_item"
         a:title="@string/search.label"
-        a:icon="?attr/searchIcon"
+        a:icon="@drawable/ic_menu_search_holo"
         app:showAsAction="always"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 </menu>

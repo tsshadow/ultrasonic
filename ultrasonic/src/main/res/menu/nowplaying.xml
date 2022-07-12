@@ -6,42 +6,43 @@
 
     <item
         a:id="@+id/menu_item_toggle_list"
-        a:icon="?attr/media_toggle"
+        a:icon="@drawable/media_toggle_list_normal"
         app:showAsAction="always"
         a:title="@string/download.toggle_playlist"/>
     <item
         a:id="@+id/menu_item_star"
-        a:icon="?attr/star_hollow"
+        a:icon="@drawable/ic_star_hollow"
         app:showAsAction="ifRoom|withText"
         a:title="@string/download.menu_star"/>
+
     <item
         a:id="@+id/menu_item_share_song"
-        a:icon="?attr/share"
+        a:icon="@drawable/ic_menu_share"
         app:showAsAction="ifRoom|withText"
         a:title="@string/download.share_song"/>
     <item
         a:id="@+id/menu_item_share"
-        a:icon="?attr/share"
+        a:icon="@drawable/ic_menu_share"
         app:showAsAction="ifRoom|withText"
         a:title="@string/download.share_playlist"/>
     <item
         a:id="@+id/menu_item_save_playlist"
-        a:icon="?attr/save"
+        a:icon="@drawable/ic_menu_save"
         app:showAsAction="ifRoom|withText"
         a:title="@string/download.menu_save"/>
     <item
         a:id="@+id/menu_item_clear_playlist"
-        a:icon="?attr/remove_all"
+        a:icon="@drawable/ic_menu_remove_all"
         app:showAsAction="ifRoom|withText"
         a:title="@string/download.menu_clear_playlist"/>
     <item
         a:id="@+id/menu_item_bookmark_set"
-        a:icon="?attr/bookmark"
+        a:icon="@drawable/ic_menu_bookmark"
         app:showAsAction="ifRoom|withText"
         a:title="@string/download.bookmark_set"/>
     <item
         a:id="@+id/menu_item_bookmark_delete"
-        a:icon="?attr/bookmark"
+        a:icon="@drawable/ic_menu_bookmark"
         app:showAsAction="ifRoom|withText"
         a:title="@string/download.bookmark_delete"/>
     <item

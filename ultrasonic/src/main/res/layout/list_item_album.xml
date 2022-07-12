@@ -67,12 +67,11 @@
         a:layout_marginEnd="20dp"
         a:background="@android:color/transparent"
         a:gravity="center_horizontal"
-        a:src="?attr/star_hollow"
+        a:src="@drawable/ic_star_hollow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/row_album_details"
         app:layout_constraintStart_toEndOf="@+id/row_album_details"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_star_hollow_dark"
         a:contentDescription="@string/download.menu_star" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

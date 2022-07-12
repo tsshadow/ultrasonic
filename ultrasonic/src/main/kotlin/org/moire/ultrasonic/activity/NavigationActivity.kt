@@ -249,10 +249,10 @@ class NavigationActivity : AppCompatActivity() {
 
         if (activeServer.index == 0)
             selectServerButton?.icon =
-                ContextCompat.getDrawable(this, R.drawable.ic_menu_screen_on_off_dark)
+                ContextCompat.getDrawable(this, R.drawable.ic_menu_screen_on_off)
         else
             selectServerButton?.icon =
-                ContextCompat.getDrawable(this, R.drawable.ic_menu_select_server_dark)
+                ContextCompat.getDrawable(this, R.drawable.ic_menu_select_server)
 
         selectServerButton?.iconTint = ColorStateList.valueOf(foregroundColor)
         selectServerButton?.setTextColor(foregroundColor)

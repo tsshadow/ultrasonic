@@ -75,8 +75,7 @@ class AlbumListFragment : EntryListFragment<Album>() {
             AlbumRowBinder(
                 { entry -> onItemClick(entry) },
                 { menuItem, entry -> onContextMenuItemSelected(menuItem, entry) },
-                imageLoaderProvider.getImageLoader(),
-                context = requireContext()
+                imageLoaderProvider.getImageLoader()
             )
         )
 

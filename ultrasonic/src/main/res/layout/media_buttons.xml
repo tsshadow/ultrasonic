@@ -16,7 +16,7 @@
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="?attr/media_shuffle"
+        a:src="@drawable/media_shuffle_normal"
         a:contentDescription="@string/buttons.shuffle" />
 
     <org.moire.ultrasonic.view.AutoRepeatButton
@@ -28,7 +28,7 @@
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="?attr/media_previous"
+        a:src="@drawable/media_backward_normal"
         a:contentDescription="@string/buttons.previous" />
 
     <ImageView
@@ -39,7 +39,7 @@
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="?attr/media_play"
+        a:src="@drawable/media_start_normal"
         tools:visibility="gone"
         a:contentDescription="@string/buttons.play" />
 
@@ -51,7 +51,7 @@
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="?attr/media_pause"
+        a:src="@drawable/media_pause_normal"
         a:contentDescription="@string/buttons.pause" />
 
     <ImageView
@@ -62,7 +62,7 @@
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="?attr/media_stop"
+        a:src="@drawable/media_stop_normal"
         tools:visibility="gone"
         a:contentDescription="@string/buttons.stop" />
 
@@ -75,7 +75,7 @@
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="?attr/media_next"
+        a:src="@drawable/media_forward_normal"
         a:contentDescription="@string/buttons.next"/>
 
     <ImageView
@@ -87,7 +87,7 @@
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="?attr/media_repeat_off"
+        a:src="@drawable/media_repeat_off"
         a:contentDescription="@string/buttons.repeat" />
 
     </LinearLayout>

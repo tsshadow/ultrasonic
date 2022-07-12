@@ -7,8 +7,6 @@
 
 package org.moire.ultrasonic.adapters
 
-import android.content.Context
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -24,7 +22,6 @@ import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.imageloader.ImageLoader
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.Settings.shouldUseId3Tags
-import org.moire.ultrasonic.util.Util
 import timber.log.Timber
 
 /**
@@ -33,18 +30,14 @@ import timber.log.Timber
 class AlbumRowBinder(
     val onItemClick: (Album) -> Unit,
     val onContextMenuClick: (MenuItem, Album) -> Boolean,
-    private val imageLoader: ImageLoader,
-    context: Context
+    private val imageLoader: ImageLoader
 ) : ItemViewBinder<Album, AlbumRowBinder.ViewHolder>(), KoinComponent {
 
-    private val starDrawable: Drawable =
-        Util.getDrawableFromAttribute(context, R.attr.star_full)
-    private val starHollowDrawable: Drawable =
-        Util.getDrawableFromAttribute(context, R.attr.star_hollow)
+    private val starDrawable: Int = R.drawable.ic_star_full
+    private val starHollowDrawable: Int = R.drawable.ic_star_hollow
 
     // Set our layout files
     val layout = R.layout.list_item_album
-    val contextMenuLayout = R.menu.context_menu_artist
 
     override fun onBindViewHolder(holder: ViewHolder, item: Album) {
         holder.album.text = item.title
@@ -60,7 +53,7 @@ class AlbumRowBinder(
             true
         }
         holder.coverArtId = item.coverArt
-        holder.star.setImageDrawable(if (item.starred) starDrawable else starHollowDrawable)
+        holder.star.setImageResource(if (item.starred) starDrawable else starHollowDrawable)
         holder.star.setOnClickListener { onStarClick(item, holder.star) }
 
         imageLoader.loadImage(
@@ -88,7 +81,7 @@ class AlbumRowBinder(
      */
     private fun onStarClick(entry: Album, star: ImageView) {
         entry.starred = !entry.starred
-        star.setImageDrawable(if (entry.starred) starDrawable else starHollowDrawable)
+        star.setImageResource(if (entry.starred) starDrawable else starHollowDrawable)
         val musicService = getMusicService()
         Thread {
             val useId3 = shouldUseId3Tags

@@ -40,6 +40,6 @@
             a:layout_width="55dip"
             a:layout_height="40dip"
             a:background="@color/transparent"
-            a:src="?attr/chat_send" />
+            a:src="@drawable/ic_menu_chat_send" />
     </LinearLayout>
 </LinearLayout>

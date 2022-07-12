@@ -102,8 +102,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             AlbumRowBinder(
                 onItemClick = ::onItemClick,
                 onContextMenuClick = ::onContextMenuItemSelected,
-                imageLoader = imageLoaderProvider.getImageLoader(),
-                context = requireContext()
+                imageLoader = imageLoaderProvider.getImageLoader()
             )
         )
 
