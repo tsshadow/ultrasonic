@@ -107,6 +107,8 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
             .setHandleAudioBecomingNoisy(true)
             .setMediaSourceFactory(DefaultMediaSourceFactory(cacheDataSourceFactory))
             .setRenderersFactory(renderer)
+            .setSeekBackIncrementMs(Settings.seekInterval.toLong())
+            .setSeekForwardIncrementMs(Settings.seekInterval.toLong())
             .build()
 
         // Enable audio offload

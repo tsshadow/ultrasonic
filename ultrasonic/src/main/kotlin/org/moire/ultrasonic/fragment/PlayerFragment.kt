@@ -255,8 +255,7 @@ class PlayerFragment :
         }
 
         previousButton.setOnRepeatListener {
-            val incrementTime = Settings.incrementTime
-            changeProgress(-incrementTime)
+            seek(false)
         }
 
         nextButton.setOnClickListener {
@@ -269,8 +268,7 @@ class PlayerFragment :
         }
 
         nextButton.setOnRepeatListener {
-            val incrementTime = Settings.incrementTime
-            changeProgress(incrementTime)
+            seek(true)
         }
 
         pauseButton.setOnClickListener {
@@ -1126,13 +1124,13 @@ class PlayerFragment :
         displaySongRating()
     }
 
-    private fun changeProgress(ms: Int) {
+    private fun seek(forward: Boolean) {
         launch(CommunicationError.getHandler(context)) {
-            val msPlayed: Int = max(0, mediaPlayerController.playerPosition)
-            val duration = mediaPlayerController.playerDuration
-            val seekTo = (msPlayed + ms).coerceAtMost(duration)
-            mediaPlayerController.seekTo(seekTo)
-            progressBar.progress = seekTo
+            if (forward) {
+                mediaPlayerController.controller?.seekForward()
+            } else {
+                mediaPlayerController.controller?.seekBack()
+            }
         }
     }
 

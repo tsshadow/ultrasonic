@@ -97,17 +97,6 @@
         <item>@string/settings.max_bitrate_320</item>
         <item>@string/settings.max_bitrate_unlimited</item>
     </string-array>
-    <string-array name="bufferLengthValues" translatable="false">
-        <item>1</item>
-        <item>2</item>
-        <item>5</item>
-        <item>8</item>
-        <item>10</item>
-        <item>12</item>
-        <item>15</item>
-        <item>20</item>
-        <item>30</item>
-    </string-array>
     <string-array name="incrementTimeValues" translatable="false">
         <item>1000</item>
         <item>2000</item>
@@ -134,18 +123,18 @@
         <item>120000</item>
     </string-array>
     <string-array name="chatRefreshNames" translatable="false">
-        <item>@string/settings.buffer_length_0</item>
-        <item>@string/settings.buffer_length_1</item>
-        <item>@string/settings.buffer_length_2</item>
-        <item>@string/settings.buffer_length_5</item>
-        <item>@string/settings.buffer_length_8</item>
-        <item>@string/settings.buffer_length_10</item>
-        <item>@string/settings.buffer_length_12</item>
-        <item>@string/settings.buffer_length_15</item>
-        <item>@string/settings.buffer_length_20</item>
-        <item>@string/settings.buffer_length_30</item>
-        <item>@string/settings.buffer_length_60</item>
-        <item>@string/settings.buffer_length_120</item>
+        <item>@string/settings.increment_time_0</item>
+        <item>@string/settings.increment_time_1</item>
+        <item>@string/settings.increment_time_2</item>
+        <item>@string/settings.increment_time_5</item>
+        <item>@string/settings.increment_time_8</item>
+        <item>@string/settings.increment_time_10</item>
+        <item>@string/settings.increment_time_12</item>
+        <item>@string/settings.increment_time_15</item>
+        <item>@string/settings.increment_time_20</item>
+        <item>@string/settings.increment_time_30</item>
+        <item>@string/settings.increment_time_60</item>
+        <item>@string/settings.increment_time_120</item>
     </string-array>
     <string-array name="directoryCacheTimeValues" translatable="false">
         <item>0</item>
@@ -165,16 +154,16 @@
         <item>@string/settings.directory_cache_time_30</item>
         <item>@string/settings.directory_cache_time_60</item>
     </string-array>
-    <string-array name="bufferLengthNames" translatable="false">
-        <item>@string/settings.buffer_length_1</item>
-        <item>@string/settings.buffer_length_2</item>
-        <item>@string/settings.buffer_length_5</item>
-        <item>@string/settings.buffer_length_8</item>
-        <item>@string/settings.buffer_length_10</item>
-        <item>@string/settings.buffer_length_12</item>
-        <item>@string/settings.buffer_length_15</item>
-        <item>@string/settings.buffer_length_20</item>
-        <item>@string/settings.buffer_length_30</item>
+    <string-array name="incrementTimeNames" translatable="false">
+        <item>@string/settings.increment_time_1</item>
+        <item>@string/settings.increment_time_2</item>
+        <item>@string/settings.increment_time_5</item>
+        <item>@string/settings.increment_time_8</item>
+        <item>@string/settings.increment_time_10</item>
+        <item>@string/settings.increment_time_12</item>
+        <item>@string/settings.increment_time_15</item>
+        <item>@string/settings.increment_time_20</item>
+        <item>@string/settings.increment_time_30</item>
     </string-array>
     <string-array name="networkTimeoutValues" translatable="false">
         <item>15000</item>

@@ -60,7 +60,8 @@ object Utils {
 
         private fun getDrawables(context: Context) {
             pinImage = ContextCompat.getDrawable(context, R.drawable.ic_menu_pin)!!
-            downloadedImage = ContextCompat.getDrawable(context, R.drawable.ic_menu_download)!!
+            downloadedImage =
+                ContextCompat.getDrawable(context, R.drawable.stat_sys_download_anim_0)!!
             errorImage = ContextCompat.getDrawable(context, R.drawable.ic_baseline_error)!!
             downloadingImage = ContextCompat.getDrawable(context, R.drawable.stat_sys_download)!!
             playingImage = ContextCompat.getDrawable(context, R.drawable.ic_stat_play)!!

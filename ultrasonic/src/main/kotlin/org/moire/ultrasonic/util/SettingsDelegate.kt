@@ -40,10 +40,10 @@ class IntSetting(private val key: String, private val defaultValue: Int = 0) :
         sharedPreferences.edit { putInt(key, value) }
 }
 
-class StringIntSetting(private val key: String, private val defaultValue: String = "0") :
+class StringIntSetting(private val key: String, private val defaultValue: Int = 0) :
     SettingsDelegate<Int>() {
     override fun getValue(thisRef: Any, property: KProperty<*>) =
-        sharedPreferences.getString(key, defaultValue)!!.toInt()
+        sharedPreferences.getString(key, defaultValue.toString())!!.toInt()
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) =
         sharedPreferences.edit { putString(key, value.toString()) }

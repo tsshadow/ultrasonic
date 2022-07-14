@@ -21,7 +21,6 @@
     <string name="setting_key.scrobble" translatable="false">scrobble</string>
     <string name="setting_key.server_scaling" translatable="false">serverScaling</string>
     <string name="setting_key.wifi_required_for_download" translatable="false">wifiRequiredForDownload</string>
-    <string name="setting_key.buffer_length" translatable="false">bufferLength</string>
     <string name="setting_key.network_timeout" translatable="false">networkTimeout</string>
     <string name="setting_key.max_albums" translatable="false">maxAlbums</string>
     <string name="setting_key.max_songs" translatable="false">maxSongs</string>

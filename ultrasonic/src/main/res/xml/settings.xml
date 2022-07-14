@@ -92,7 +92,7 @@
             app:iconSpaceReserved="false"/>
         <ListPreference
             a:defaultValue="5000"
-            a:entries="@array/bufferLengthNames"
+            a:entries="@array/incrementTimeNames"
             a:entryValues="@array/incrementTimeValues"
             a:key="@string/setting_key.increment_time"
             a:title="@string/settings.increment_time"
@@ -185,13 +185,6 @@
             a:key="@string/setting_key.wifi_required_for_download"
             a:summary="@string/settings.wifi_required_summary"
             a:title="@string/settings.wifi_required_title"
-            app:iconSpaceReserved="false"/>
-        <ListPreference
-            a:defaultValue="5"
-            a:entries="@array/bufferLengthNames"
-            a:entryValues="@array/bufferLengthValues"
-            a:key="@string/setting_key.buffer_length"
-            a:title="@string/settings.buffer_length"
             app:iconSpaceReserved="false"/>
         <ListPreference
             a:defaultValue="15000"
