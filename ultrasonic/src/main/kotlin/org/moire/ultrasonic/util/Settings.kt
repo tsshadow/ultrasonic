@@ -33,10 +33,10 @@ object Settings {
 
             if (!network.connected) return 0
 
-            if (network.unmetered) {
-                return maxWifiBitRate
+            return if (network.unmetered) {
+                maxWifiBitRate
             } else {
-                return maxMobileBitRate
+                maxMobileBitRate
             }
         }
 
@@ -105,31 +105,31 @@ object Settings {
 
     @JvmStatic
     var defaultAlbums
-        by StringIntSetting(getKey(R.string.setting_key_default_albums), "5")
+        by StringIntSetting(getKey(R.string.setting_key_default_albums), 5)
 
     @JvmStatic
     var maxAlbums
-        by StringIntSetting(getKey(R.string.setting_key_max_albums), "20")
+        by StringIntSetting(getKey(R.string.setting_key_max_albums), 20)
 
     @JvmStatic
     var defaultSongs
-        by StringIntSetting(getKey(R.string.setting_key_default_songs), "10")
+        by StringIntSetting(getKey(R.string.setting_key_default_songs), 10)
 
     @JvmStatic
     var maxSongs
-        by StringIntSetting(getKey(R.string.setting_key_max_songs), "25")
+        by StringIntSetting(getKey(R.string.setting_key_max_songs), 25)
 
     @JvmStatic
     var maxArtists
-        by StringIntSetting(getKey(R.string.setting_key_max_artists), "10")
+        by StringIntSetting(getKey(R.string.setting_key_max_artists), 10)
 
     @JvmStatic
     var defaultArtists
-        by StringIntSetting(getKey(R.string.setting_key_default_artists), "3")
+        by StringIntSetting(getKey(R.string.setting_key_default_artists), 3)
 
     @JvmStatic
-    var incrementTime
-        by StringIntSetting(getKey(R.string.setting_key_increment_time), "5")
+    var seekInterval
+        by StringIntSetting(getKey(R.string.setting_key_increment_time), 5000)
 
     @JvmStatic
     var mediaButtonsEnabled
@@ -187,12 +187,12 @@ object Settings {
     @JvmStatic
     var chatRefreshInterval by StringIntSetting(
         getKey(R.string.setting_key_chat_refresh_interval),
-        "5000"
+        5000
     )
 
     var directoryCacheTime by StringIntSetting(
         getKey(R.string.setting_key_directory_cache_time),
-        "300"
+        300
     )
 
     var shouldSortByDisc
@@ -229,7 +229,6 @@ object Settings {
 
     val defaultShareExpirationInMillis: Long
         get() {
-            val preferences = preferences
             val preference =
                 preferences.getString(getKey(R.string.setting_key_default_share_expiration), "0")!!
             val split = PATTERN.split(preference)
@@ -276,7 +275,7 @@ object Settings {
         return preferences.contains(key)
     }
 
-    fun getKey(key: Int): String {
+    private fun getKey(key: Int): String {
         return appContext.getString(key)
     }
 

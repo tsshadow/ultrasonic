@@ -68,7 +68,6 @@ class SettingsFragment :
     private var cacheSize: ListPreference? = null
     private var cacheLocation: Preference? = null
     private var preloadCount: ListPreference? = null
-    private var bufferLength: ListPreference? = null
     private var incrementTime: ListPreference? = null
     private var networkTimeout: ListPreference? = null
     private var maxAlbums: ListPreference? = null
@@ -105,7 +104,6 @@ class SettingsFragment :
         cacheSize = findPreference(getString(R.string.setting_key_cache_size))
         cacheLocation = findPreference(getString(R.string.setting_key_cache_location))
         preloadCount = findPreference(getString(R.string.setting_key_preload_count))
-        bufferLength = findPreference(getString(R.string.setting_key_buffer_length))
         incrementTime = findPreference(getString(R.string.setting_key_increment_time))
         networkTimeout = findPreference(getString(R.string.setting_key_network_timeout))
         maxAlbums = findPreference(getString(R.string.setting_key_max_albums))
@@ -384,7 +382,6 @@ class SettingsFragment :
         maxBitrateMobile!!.summary = maxBitrateMobile!!.entry
         cacheSize!!.summary = cacheSize!!.entry
         preloadCount!!.summary = preloadCount!!.entry
-        bufferLength!!.summary = bufferLength!!.entry
         incrementTime!!.summary = incrementTime!!.entry
         networkTimeout!!.summary = networkTimeout!!.entry
         maxAlbums!!.summary = maxAlbums!!.entry
