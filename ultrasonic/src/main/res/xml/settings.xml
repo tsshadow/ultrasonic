@@ -317,6 +317,12 @@
             a:title="@string/settings.override_language"
             a:summary="@string/settings.override_language_summary"
             app:iconSpaceReserved="false"/>
+        <CheckBoxPreference
+            a:defaultValue="false"
+            a:key="@string/setting_key.show_confirmation_dialog"
+            a:title="@string/settings.show_confirmation_dialog"
+            a:summary="@string/settings.show_confirmation_dialog_summary"
+            app:iconSpaceReserved="false"/>
     </PreferenceCategory>
     <PreferenceCategory
         a:title="@string/settings.debug.title"

@@ -44,6 +44,7 @@ import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.subsonic.VideoPlayer
 import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.CommunicationError
+import org.moire.ultrasonic.util.ConfirmationDialog
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
 import org.moire.ultrasonic.util.Settings
@@ -187,7 +188,15 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         }
 
         unpinButton?.setOnClickListener {
-            unpin()
+            if (Settings.showConfirmationDialog) {
+                ConfirmationDialog.Builder(context)
+                    .setMessage(R.string.common_unpin_selection_confirmation)
+                    .setPositiveButton(R.string.common_unpin) { _, _ ->
+                        unpin()
+                    }.show()
+            } else {
+                unpin()
+            }
         }
 
         downloadButton?.setOnClickListener {
@@ -195,7 +204,15 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         }
 
         deleteButton?.setOnClickListener {
-            delete()
+            if (Settings.showConfirmationDialog) {
+                ConfirmationDialog.Builder(context)
+                    .setMessage(R.string.common_delete_selection_confirmation)
+                    .setPositiveButton(R.string.common_delete) { _, _ ->
+                        delete()
+                    }.show()
+            } else {
+                delete()
+            }
         }
     }
 
