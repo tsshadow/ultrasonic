@@ -53,4 +53,5 @@
     <string name="setting_key.debug_log_to_file" translatable="false">debugLogToFile</string>
     <string name="setting_key.override_language" translatable="false">overrideLanguage</string>
     <string name="setting_key.first_installed_version" translatable="false">firstInstalledVersion</string>
+    <string name="setting_key.show_confirmation_dialog" translatable="false">showConfirmationDialog</string>
 </resources>

@@ -76,3 +76,33 @@ class ErrorDialog(
         }
     }
 }
+
+class ConfirmationDialog(
+    context: Context,
+    message: CharSequence?,
+    activity: Activity? = null,
+    finishActivityOnClose: Boolean = false
+) : InfoDialog(context, message, activity, finishActivityOnClose) {
+
+    override var builder: AlertDialog.Builder = Builder(activity ?: context, message)
+
+    class Builder(context: Context?) : AlertDialog.Builder(context) {
+        constructor(context: Context, message: CharSequence?) : this(context) {
+            setMessage(message)
+        }
+
+        init {
+            setIcon(R.drawable.ic_baseline_info)
+            setTitle(R.string.common_confirm)
+            setCancelable(true)
+
+            setPositiveButton(R.string.common_confirm) { _, _ ->
+                // Gets overwritten
+            }
+
+            setNegativeButton(R.string.common_cancel) { _, _ ->
+                // Just close it
+            }
+        }
+    }
+}

@@ -265,6 +265,12 @@ object Settings {
         0
     )
 
+    @JvmStatic
+    var showConfirmationDialog by BooleanSetting(
+        getKey(R.string.setting_key_show_confirmation_dialog),
+        false
+    )
+
     // TODO: Remove in December 2022
     fun migrateFeatureStorage() {
         val sp = appContext.getSharedPreferences("feature_flags", Context.MODE_PRIVATE)
