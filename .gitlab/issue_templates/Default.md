@@ -2,7 +2,7 @@
 
 Describe your problem here. Describe what you want to happen, and what
 happens if you try to do it. If you have a stack trace or any logs, please
-format them using GitHub triple backquote notation.
+format them using Markdown triple backquote notation.
 
 ### Steps to reproduce
 
