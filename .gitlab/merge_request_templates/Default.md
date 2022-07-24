@@ -3,6 +3,7 @@
 
 ----------------------------------------------------------------------------
 
+- [ ] I have opened an issue where I discuss the change I wish to make.
 - [ ] I ran `./gradlew -Pqc ktlintCheck`, `./gradlew -Pqc detekt` and
   `./gradlew :ultrasonic:lintRelease` and no problems found. See
   [CONTRIBUTING](CONTRIBUTING.md) for further information.
