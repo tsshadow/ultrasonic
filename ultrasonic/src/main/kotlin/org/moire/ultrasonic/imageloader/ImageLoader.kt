@@ -3,7 +3,7 @@ package org.moire.ultrasonic.imageloader
 import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.text.TextUtils
+import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
@@ -14,6 +14,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CountDownLatch
 import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
@@ -33,6 +35,8 @@ class ImageLoader(
     apiClient: SubsonicAPIClient,
     private val config: ImageLoaderConfig
 ) {
+    private val cacheInProgress: ConcurrentHashMap<String, CountDownLatch> = ConcurrentHashMap()
+
     // Shortcut
     @Suppress("VariableNaming", "PropertyName")
     val API = apiClient.api
@@ -58,6 +62,14 @@ class ImageLoader(
             .into(request.imageView)
     }
 
+    private fun getCoverArt(request: ImageRequest.CoverArt): Bitmap {
+        return picasso.load(createLoadCoverArtRequest(request.entityId, request.size.toLong()))
+            .addPlaceholder(request)
+            .addError(request)
+            .stableKey(request.cacheKey)
+            .get()
+    }
+
     private fun loadAvatar(request: ImageRequest.Avatar) {
         picasso.load(createLoadAvatarRequest(request.username))
             .addPlaceholder(request)
@@ -80,6 +92,26 @@ class ImageLoader(
         }
 
         return this
+    }
+
+    /**
+     * Load the cover of a given entry into a Bitmap
+     */
+    fun getImage(
+        id: String?,
+        cacheKey: String?,
+        large: Boolean,
+        size: Int,
+        defaultResourceId: Int = R.drawable.unknown_album
+    ): Bitmap {
+        val requestedSize = resolveSize(size, large)
+
+        val request = ImageRequest.CoverArt(
+            id!!, cacheKey!!, null, requestedSize,
+            placeHolderDrawableRes = defaultResourceId,
+            errorDrawableRes = defaultResourceId
+        )
+        return getCoverArt(request)
     }
 
     /**
@@ -148,30 +180,30 @@ class ImageLoader(
     /**
      * Download a cover art file and cache it on disk
      */
-    fun cacheCoverArt(
-        track: Track
-    ) {
+    fun cacheCoverArt(track: Track) {
+        cacheCoverArt(track.coverArt!!, FileUtil.getAlbumArtFile(track))
+    }
 
-        // Synchronize on the entry so that we don't download concurrently for
-        // the same song.
-        synchronized(track) {
+    fun cacheCoverArt(id: String, file: String) {
+        if (id.isNullOrBlank()) return
+        // Return if have a cache hit
+        if (File(file).exists()) return
+
+        // If another thread has started caching, wait until it finishes
+        val latch = cacheInProgress.putIfAbsent(file, CountDownLatch(1))
+        if (latch != null) {
+            latch.await()
+            return
+        }
+
+        try {
             // Always download the large size..
             val size = config.largeSize
-
-            // Check cache to avoid downloading existing files
-            val file = FileUtil.getAlbumArtFile(track)
-
-            // Return if have a cache hit
-            if (file != null && File(file).exists()) return
-            File(file!!).createNewFile()
-
-            // Can't load empty string ids
-            val id = track.coverArt
-            if (TextUtils.isEmpty(id)) return
+            File(file).createNewFile()
 
             // Query the API
-            Timber.d("Loading cover art for: %s", track)
-            val response = API.getCoverArt(id!!, size.toLong()).execute().toStreamResponse()
+            Timber.d("Loading cover art for: %s", id)
+            val response = API.getCoverArt(id, size.toLong()).execute().toStreamResponse()
             response.throwOnFailure()
 
             // Check for failure
@@ -192,6 +224,8 @@ class ImageLoader(
             } finally {
                 inputStream.safeClose()
             }
+        } finally {
+            cacheInProgress.remove(file)?.countDown()
         }
     }
 
@@ -222,12 +256,12 @@ class ImageLoader(
 sealed class ImageRequest(
     val placeHolderDrawableRes: Int? = null,
     val errorDrawableRes: Int? = null,
-    val imageView: ImageView
+    val imageView: ImageView?
 ) {
     class CoverArt(
         val entityId: String,
         val cacheKey: String,
-        imageView: ImageView,
+        imageView: ImageView?,
         val size: Int,
         placeHolderDrawableRes: Int? = null,
         errorDrawableRes: Int? = null,

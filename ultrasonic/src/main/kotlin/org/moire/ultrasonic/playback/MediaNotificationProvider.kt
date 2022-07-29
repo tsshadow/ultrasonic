@@ -22,6 +22,7 @@ import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.imageloader.ArtworkBitmapLoader
 import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.util.toTrack
 
 @UnstableApi
 class MediaNotificationProvider(context: Context) :
@@ -47,7 +48,7 @@ class MediaNotificationProvider(context: Context) :
         * is stored in the track.starred value
         * See https://github.com/androidx/media/issues/33
         */
-        val rating = mediaPlayerController.currentPlayingLegacy?.track?.starred?.let {
+        val rating = mediaPlayerController.currentMediaItem?.toTrack()?.starred?.let {
             HeartRating(
                 it
             )

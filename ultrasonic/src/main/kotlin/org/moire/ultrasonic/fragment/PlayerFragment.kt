@@ -1,6 +1,6 @@
 /*
  * PlayerFragment.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -37,6 +37,7 @@ import android.widget.ViewFlipper
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.media3.common.HeartRating
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.session.SessionResult
@@ -74,7 +75,6 @@ import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
-import org.moire.ultrasonic.service.DownloadFile
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
@@ -87,6 +87,7 @@ import org.moire.ultrasonic.util.CommunicationError
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.toTrack
 import org.moire.ultrasonic.view.AutoRepeatButton
 import org.moire.ultrasonic.view.VisualizerView
 import timber.log.Timber
@@ -120,7 +121,6 @@ class PlayerFragment :
     private val mediaPlayerController: MediaPlayerController by inject()
     private val shareHandler: ShareHandler by inject()
     private val imageLoaderProvider: ImageLoaderProvider by inject()
-    private var currentPlaying: DownloadFile? = null
     private var currentSong: Track? = null
     private lateinit var viewManager: LinearLayoutManager
     private var rxBusSubscription: CompositeDisposable = CompositeDisposable()
@@ -466,7 +466,7 @@ class PlayerFragment :
 
     override fun onResume() {
         super.onResume()
-        if (mediaPlayerController.currentPlayingLegacy == null) {
+        if (mediaPlayerController.currentMediaItem == null) {
             playlistFlipper.displayedChild = 1
         } else {
             // Download list and Album art must be updated when resumed
@@ -557,10 +557,10 @@ class PlayerFragment :
             visualizerMenuItem.isVisible = isVisualizerAvailable
         }
         val mediaPlayerController = mediaPlayerController
-        val downloadFile = mediaPlayerController.currentPlayingLegacy
+        val track = mediaPlayerController.currentMediaItem?.toTrack()
 
-        if (downloadFile != null) {
-            currentSong = downloadFile.track
+        if (track != null) {
+            currentSong = track
         }
 
         if (useFiveStarRating) starMenuItem.isVisible = false
@@ -594,14 +594,11 @@ class PlayerFragment :
         super.onCreateContextMenu(menu, view, menuInfo)
         if (view === playlistView) {
             val info = menuInfo as AdapterContextMenuInfo?
-            val downloadFile = viewAdapter.getCurrentList()[info!!.position] as DownloadFile
+            val track = viewAdapter.getCurrentList()[info!!.position] as Track
             val menuInflater = requireActivity().menuInflater
             menuInflater.inflate(R.menu.nowplaying_context, menu)
-            val song: Track?
 
-            song = downloadFile.track
-
-            if (song.parent == null) {
+            if (track.parent == null) {
                 val menuItem = menu.findItem(R.id.menu_show_album)
                 if (menuItem != null) {
                     menuItem.isVisible = false
@@ -619,16 +616,13 @@ class PlayerFragment :
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // TODO Why is Track null?
         return menuItemSelected(item.itemId, null) || super.onOptionsItemSelected(item)
     }
 
     @Suppress("ComplexMethod", "LongMethod", "ReturnCount")
-    private fun menuItemSelected(menuItemId: Int, song: DownloadFile?): Boolean {
-        var track: Track? = null
+    private fun menuItemSelected(menuItemId: Int, track: Track?): Boolean {
         val bundle: Bundle
-        if (song != null) {
-            track = song.track
-        }
 
         when (menuItemId) {
             R.id.menu_show_artist -> {
@@ -804,9 +798,9 @@ class PlayerFragment :
             R.id.menu_item_share -> {
                 val mediaPlayerController = mediaPlayerController
                 val tracks: MutableList<Track?> = ArrayList()
-                val downloadServiceSongs = mediaPlayerController.playList
-                for (downloadFile in downloadServiceSongs) {
-                    val playlistEntry = downloadFile.track
+                val playlist = mediaPlayerController.playlist
+                for (item in playlist) {
+                    val playlistEntry = item.toTrack()
                     tracks.add(playlistEntry)
                 }
                 shareHandler.createShare(this, tracks, null, cancellationToken)
@@ -828,7 +822,7 @@ class PlayerFragment :
     private fun update(cancel: CancellationToken? = null) {
         if (cancel?.isCancellationRequested == true) return
         val mediaPlayerController = mediaPlayerController
-        if (currentPlaying != mediaPlayerController.currentPlayingLegacy) {
+        if (currentSong?.id != mediaPlayerController.currentMediaItem?.mediaId) {
             onCurrentChanged()
         }
         onSliderProgressChanged()
@@ -841,8 +835,8 @@ class PlayerFragment :
 
         ioScope.launch {
 
-            val entries = mediaPlayerController.playList.map {
-                it.track
+            val entries = mediaPlayerController.playlist.map {
+                it.toTrack()
             }
             val musicService = getMusicService()
             musicService.createPlaylist(null, playlistName, entries)
@@ -891,7 +885,7 @@ class PlayerFragment :
         }
 
         // Create listener
-        val clickHandler: ((DownloadFile, Int) -> Unit) = { _, pos ->
+        val clickHandler: ((Track, Int) -> Unit) = { _, pos ->
             mediaPlayerController.seekTo(pos, 0)
             mediaPlayerController.prepare()
             mediaPlayerController.play()
@@ -978,10 +972,10 @@ class PlayerFragment :
 
     private fun onPlaylistChanged() {
         val mediaPlayerController = mediaPlayerController
-        val list = mediaPlayerController.playList
+        val list = mediaPlayerController.playlist
         emptyTextView.setText(R.string.playlist_empty)
 
-        viewAdapter.submitList(list)
+        viewAdapter.submitList(list.map(MediaItem::toTrack))
 
         emptyTextView.isVisible = list.isEmpty()
 
@@ -989,17 +983,16 @@ class PlayerFragment :
     }
 
     private fun onCurrentChanged() {
-        currentPlaying = mediaPlayerController.currentPlayingLegacy
+        currentSong = mediaPlayerController.currentMediaItem?.toTrack()
 
         scrollToCurrent()
         val totalDuration = mediaPlayerController.playListDuration
-        val totalSongs = mediaPlayerController.playlistSize.toLong()
+        val totalSongs = mediaPlayerController.playlistSize
         val currentSongIndex = mediaPlayerController.currentMediaItemIndex + 1
         val duration = Util.formatTotalDuration(totalDuration)
         val trackFormat =
             String.format(Locale.getDefault(), "%d / %d", currentSongIndex, totalSongs)
-        if (currentPlaying != null) {
-            currentSong = currentPlaying!!.track
+        if (currentSong != null) {
             songTitleTextView.text = currentSong!!.title
             artistTextView.text = currentSong!!.artist
             albumTextView.text = currentSong!!.album
@@ -1057,7 +1050,7 @@ class PlayerFragment :
         val isPlaying = mediaPlayerController.isPlaying
 
         if (cancellationToken.isCancellationRequested) return
-        if (currentPlaying != null) {
+        if (currentSong != null) {
             positionTextView.text = Util.formatTotalDuration(millisPlayed.toLong(), true)
             durationTextView.text = Util.formatTotalDuration(duration.toLong(), true)
             progressBar.max =

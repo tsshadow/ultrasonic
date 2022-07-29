@@ -16,8 +16,12 @@ import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
 import java.io.IOException
 import java.util.concurrent.Executors
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class ArtworkBitmapLoader : BitmapLoader {
+class ArtworkBitmapLoader : BitmapLoader, KoinComponent {
+
+    private val imageLoader: ImageLoader by inject()
 
     private val executorService: ListeningExecutorService by lazy {
         MoreExecutors.listeningDecorator(
@@ -46,6 +50,8 @@ class ArtworkBitmapLoader : BitmapLoader {
 
     @Throws(IOException::class)
     private fun load(uri: Uri): Bitmap {
-        return BitmapFactory.decodeFile(uri.path)
+        val parts = uri.path?.trim('/')?.split('|')
+        if (parts?.count() != 2) throw IllegalArgumentException("Invalid bitmap Uri")
+        return imageLoader.getImage(parts[0], parts[1], false, 0)
     }
 }

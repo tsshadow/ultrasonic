@@ -1,6 +1,6 @@
 /*
  * MediaPlayerController.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -10,11 +10,11 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import androidx.core.net.toUri
+import androidx.media3.common.C
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionResult
@@ -23,7 +23,6 @@ import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,16 +31,17 @@ import org.koin.core.component.inject
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.playback.LegacyPlaylistManager
 import org.moire.ultrasonic.playback.PlaybackService
 import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider4X1
 import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider4X2
 import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider4X3
 import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider4X4
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.MainThreadExecutor
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.setPin
+import org.moire.ultrasonic.util.toMediaItem
+import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
 
 /**
@@ -54,7 +54,6 @@ class MediaPlayerController(
     private val playbackStateSerializer: PlaybackStateSerializer,
     private val externalStorageMonitor: ExternalStorageMonitor,
     private val downloader: Downloader,
-    private val legacyPlaylistManager: LegacyPlaylistManager,
     val context: Context
 ) : KoinComponent {
 
@@ -85,6 +84,8 @@ class MediaPlayerController(
 
     private lateinit var listeners: Player.Listener
 
+    private var cachedMediaItem: MediaItem? = null
+
     fun onCreate(onCreated: () -> Unit) {
         if (created) return
         externalStorageMonitor.onCreate { reset() }
@@ -111,7 +112,7 @@ class MediaPlayerController(
                  * We run the event through RxBus in order to throttle them
                  */
                 override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-                    legacyPlaylistManager.rebuildPlaylist(controller!!)
+                    RxBus.playlistPublisher.onNext(playlist.map(MediaItem::toTrack))
                 }
 
                 override fun onPlaybackStateChanged(playbackState: Int) {
@@ -125,8 +126,8 @@ class MediaPlayerController(
                 }
 
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                    onTrackCompleted()
-                    legacyPlaylistManager.updateCurrentPlaying(mediaItem)
+                    clearBookmark()
+                    cachedMediaItem = mediaItem
                     publishPlaybackState()
                 }
 
@@ -180,7 +181,7 @@ class MediaPlayerController(
 
         rxBusSubscription += RxBus.shutdownCommandObservable.subscribe {
             playbackStateSerializer.serializeNow(
-                playList,
+                playlist.map { it.toTrack() },
                 currentMediaItemIndex,
                 playerPosition,
                 isShufflePlayEnabled,
@@ -196,7 +197,7 @@ class MediaPlayerController(
 
     private fun playerStateChangedHandler() {
 
-        val currentPlaying = legacyPlaylistManager.currentPlaying
+        val currentPlaying = controller?.currentMediaItem?.toTrack() ?: return
 
         when (playbackState) {
             Player.STATE_READY -> {
@@ -210,16 +211,14 @@ class MediaPlayerController(
         }
 
         // Update widget
-        if (currentPlaying != null) {
-            updateWidget(currentPlaying.track)
-        }
+        updateWidget(currentPlaying)
     }
 
-    private fun onTrackCompleted() {
-        // This method is called before we update the currentPlaying,
-        // so in fact currentPlaying will refer to the track that has just finished.
-        if (legacyPlaylistManager.currentPlaying != null) {
-            val song = legacyPlaylistManager.currentPlaying!!.track
+    private fun clearBookmark() {
+        // This method is called just before we update the cachedMediaItem,
+        // so in fact cachedMediaItem will refer to the track that has just finished.
+        if (cachedMediaItem != null) {
+            val song = cachedMediaItem!!.toTrack()
             if (song.bookmarkPosition > 0 && Settings.shouldClearBookmark) {
                 val musicService = getMusicService()
                 try {
@@ -232,7 +231,7 @@ class MediaPlayerController(
 
     private fun publishPlaybackState() {
         val newState = RxBus.StateWithTrack(
-            track = legacyPlaylistManager.currentPlaying,
+            track = currentMediaItem?.let { it.toTrack() },
             index = currentMediaItemIndex,
             isPlaying = isPlaying,
             state = playbackState
@@ -261,7 +260,6 @@ class MediaPlayerController(
         val context = UApp.applicationContext()
         externalStorageMonitor.onDestroy()
         context.stopService(Intent(context, DownloadService::class.java))
-        legacyPlaylistManager.onDestroy()
         downloader.onDestroy()
         created = false
         Timber.i("MediaPlayerController destroyed")
@@ -345,12 +343,17 @@ class MediaPlayerController(
 
     @Synchronized
     fun seekTo(position: Int) {
+        if (controller?.currentTimeline?.isEmpty != false) return
         Timber.i("SeekTo: %s", position)
         controller?.seekTo(position.toLong())
     }
 
     @Synchronized
     fun seekTo(index: Int, position: Int) {
+        // This case would throw an exception in Media3. It can happen when an inconsistent state is saved.
+        if (controller?.currentTimeline?.isEmpty != false ||
+            index >= controller!!.currentTimeline.windowCount
+        ) return
         Timber.i("SeekTo: %s %s", index, position)
         controller?.seekTo(index, position.toLong())
     }
@@ -390,10 +393,8 @@ class MediaPlayerController(
         }
 
         val mediaItems: List<MediaItem> = songs.map {
-            val downloadFile = downloader.getDownloadFileForSong(it)
-            if (cachePermanently) downloadFile.shouldSave = true
             val result = it.toMediaItem()
-            legacyPlaylistManager.addToCache(result, downloader.getDownloadFileForSong(it))
+            if (cachePermanently) result.setPin(true)
             result
         }
 
@@ -426,9 +427,8 @@ class MediaPlayerController(
         get() = controller?.shuffleModeEnabled == true
         set(enabled) {
             controller?.shuffleModeEnabled = enabled
-            if (enabled) {
-                downloader.checkDownloads()
-            }
+            // Changing Shuffle may change the playlist, so the next tracks may need to be downloaded
+            downloader.checkDownloads()
         }
 
     @Synchronized
@@ -468,11 +468,6 @@ class MediaPlayerController(
     }
 
     @Synchronized
-    fun clearCaches() {
-        downloader.clearDownloadFileCache()
-    }
-
-    @Synchronized
     fun clearIncomplete() {
         reset()
 
@@ -496,7 +491,7 @@ class MediaPlayerController(
         if (currentMediaItemIndex == -1) return
 
         playbackStateSerializer.serializeAsync(
-            songs = legacyPlaylistManager.playlist,
+            songs = playlist.map { it.toTrack() },
             currentPlayingIndex = currentMediaItemIndex,
             currentPlayingPosition = playerPosition,
             isShufflePlayEnabled,
@@ -506,17 +501,17 @@ class MediaPlayerController(
 
     @Synchronized
     // TODO: Make it require not null
-    fun delete(songs: List<Track?>) {
-        for (song in songs.filterNotNull()) {
-            downloader.getDownloadFileForSong(song).delete()
+    fun delete(tracks: List<Track?>) {
+        for (track in tracks.filterNotNull()) {
+            downloader.delete(track)
         }
     }
 
     @Synchronized
     // TODO: Make it require not null
-    fun unpin(songs: List<Track?>) {
-        for (song in songs.filterNotNull()) {
-            downloader.getDownloadFileForSong(song).unpin()
+    fun unpin(tracks: List<Track?>) {
+        for (track in tracks.filterNotNull()) {
+            downloader.unpin(track)
         }
     }
 
@@ -598,8 +593,8 @@ class MediaPlayerController(
     }
 
     fun toggleSongStarred() {
-        if (legacyPlaylistManager.currentPlaying == null) return
-        val song = legacyPlaylistManager.currentPlaying!!.track
+        if (currentMediaItem == null) return
+        val song = currentMediaItem!!.toTrack()
 
         controller?.setRating(
             HeartRating(!song.starred)
@@ -630,8 +625,8 @@ class MediaPlayerController(
     @Suppress("TooGenericExceptionCaught") // The interface throws only generic exceptions
     fun setSongRating(rating: Int) {
         if (!Settings.useFiveStarRating) return
-        if (legacyPlaylistManager.currentPlaying == null) return
-        val song = legacyPlaylistManager.currentPlaying!!.track
+        if (currentMediaItem == null) return
+        val song = currentMediaItem!!.toTrack()
         song.userRating = rating
         Thread {
             try {
@@ -650,28 +645,55 @@ class MediaPlayerController(
     val currentMediaItemIndex: Int
         get() = controller?.currentMediaItemIndex ?: -1
 
-    @Deprecated("Use currentMediaItem")
-    val currentPlayingLegacy: DownloadFile?
-        get() = legacyPlaylistManager.currentPlaying
-
     val mediaItemCount: Int
         get() = controller?.mediaItemCount ?: 0
 
-    @Deprecated("Use mediaItemCount")
     val playlistSize: Int
-        get() = legacyPlaylistManager.playlist.size
+        get() = controller?.currentTimeline?.windowCount ?: 0
 
-    @Deprecated("Use native APIs")
-    val playList: List<DownloadFile>
-        get() = legacyPlaylistManager.playlist
+    val playlist: List<MediaItem>
+        get() {
+            return getPlayList(false)
+        }
 
-    @Deprecated("Use timeline")
-    val playListDuration: Long
-        get() = legacyPlaylistManager.playlistDuration
+    val playlistInPlayOrder: List<MediaItem>
+        get() {
+            return getPlayList(controller?.shuffleModeEnabled ?: false)
+        }
 
-    fun getDownloadFileForSong(song: Track): DownloadFile {
-        return downloader.getDownloadFileForSong(song)
+    fun getNextPlaylistItemsInPlayOrder(count: Int? = null): List<MediaItem> {
+        return getPlayList(
+            controller?.shuffleModeEnabled ?: false,
+            controller?.currentMediaItemIndex,
+            count
+        )
     }
+
+    private fun getPlayList(
+        shuffle: Boolean,
+        firstIndex: Int? = null,
+        count: Int? = null
+    ): List<MediaItem> {
+        if (controller?.currentTimeline == null) return emptyList()
+        if (controller!!.currentTimeline.windowCount < 1) return emptyList()
+        val timeline = controller!!.currentTimeline
+
+        val playlist: MutableList<MediaItem> = mutableListOf()
+        var i = firstIndex ?: timeline.getFirstWindowIndex(false)
+        if (i == C.INDEX_UNSET) return emptyList()
+
+        while (i != C.INDEX_UNSET && (count != playlist.count())) {
+            val window = timeline.getWindow(i, Timeline.Window())
+            playlist.add(window.mediaItem)
+            i = timeline.getNextWindowIndex(i, REPEAT_MODE_OFF, shuffle)
+        }
+        return playlist
+    }
+
+    val playListDuration: Long
+        get() = playlist.fold(0) { i, file ->
+            i + (file.mediaMetadata.extras?.getInt("duration") ?: 0)
+        }
 
     init {
         Timber.i("MediaPlayerController instance initiated")
@@ -680,39 +702,4 @@ class MediaPlayerController(
     enum class InsertionMode {
         CLEAR, APPEND, AFTER_CURRENT
     }
-}
-
-/*
- * TODO: Merge with the Builder functions in AutoMediaBrowserCallback
- */
-fun Track.toMediaItem(): MediaItem {
-
-    val filePath = FileUtil.getSongFile(this)
-    val bitrate = Settings.maxBitRate
-    val uri = "$id|$bitrate|$filePath"
-
-    val rmd = MediaItem.RequestMetadata.Builder()
-        .setMediaUri(uri.toUri())
-        .build()
-
-    val artworkFile = File(FileUtil.getAlbumArtFile(this))
-
-    val metadata = MediaMetadata.Builder()
-    metadata.setTitle(title)
-        .setArtist(artist)
-        .setAlbumTitle(album)
-        .setAlbumArtist(artist)
-        .setUserRating(HeartRating(starred))
-
-    if (artworkFile.exists()) {
-        metadata.setArtworkUri(artworkFile.toUri())
-    }
-
-    val mediaItem = MediaItem.Builder()
-        .setUri(uri)
-        .setMediaId(id)
-        .setRequestMetadata(rmd)
-        .setMediaMetadata(metadata.build())
-
-    return mediaItem.build()
 }

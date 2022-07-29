@@ -433,7 +433,6 @@ class SettingsFragment :
 
         // Clear download queue.
         mediaPlayerController.clear()
-        mediaPlayerController.clearCaches()
         Storage.reset()
     }
 

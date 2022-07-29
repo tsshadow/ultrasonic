@@ -38,6 +38,8 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.TrackCollectionModel
+import org.moire.ultrasonic.service.DownloadStatus
+import org.moire.ultrasonic.service.Downloader
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
 import org.moire.ultrasonic.subsonic.ShareHandler
@@ -79,6 +81,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
     private var shareButton: MenuItem? = null
 
     internal val mediaPlayerController: MediaPlayerController by inject()
+    internal val downloader: Downloader by inject()
     private val networkAndStorageChecker: NetworkAndStorageChecker by inject()
     private val shareHandler: ShareHandler by inject()
     internal var cancellationToken: CancellationToken? = null
@@ -125,8 +128,8 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
 
         viewAdapter.register(
             TrackViewBinder(
-                onItemClick = { file, _ -> onItemClick(file.track) },
-                onContextMenuClick = { menu, id -> onContextMenuItemSelected(menu, id.track) },
+                onItemClick = { file, _ -> onItemClick(file) },
+                onContextMenuClick = { menu, id -> onContextMenuItemSelected(menu, id) },
                 checkable = true,
                 draggable = false,
                 context = requireContext(),
@@ -364,11 +367,11 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         var pinnedCount = 0
 
         for (song in selection) {
-            val downloadFile = mediaPlayerController.getDownloadFileForSong(song)
-            if (downloadFile.isWorkDone) {
+            val state = downloader.getDownloadState(song)
+            if (state == DownloadStatus.DONE || state == DownloadStatus.PINNED) {
                 deleteEnabled = true
             }
-            if (downloadFile.isSaved) {
+            if (state == DownloadStatus.PINNED) {
                 pinnedCount++
                 unpinEnabled = true
             }

@@ -1,3 +1,10 @@
+/*
+ * CacheCleaner.kt
+ * Copyright (C) 2009-2022 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 package org.moire.ultrasonic.util
 
 import android.system.Os
@@ -6,12 +13,16 @@ import java.util.HashSet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Playlist
-import org.moire.ultrasonic.service.Downloader
+import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.util.FileUtil.getAlbumArtFile
+import org.moire.ultrasonic.util.FileUtil.getCompleteFile
+import org.moire.ultrasonic.util.FileUtil.getPartialFile
+import org.moire.ultrasonic.util.FileUtil.getPinnedFile
 import org.moire.ultrasonic.util.FileUtil.getPlaylistDirectory
 import org.moire.ultrasonic.util.FileUtil.getPlaylistFile
 import org.moire.ultrasonic.util.FileUtil.listFiles
@@ -25,6 +36,8 @@ import timber.log.Timber
  * Responsible for cleaning up files from the offline download cache on the filesystem.
  */
 class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO) {
+
+    private var mainScope = CoroutineScope(Dispatchers.Main)
 
     private fun exceptionHandler(tag: String): CoroutineExceptionHandler {
         return CoroutineExceptionHandler { _, exception ->
@@ -127,6 +140,24 @@ class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO) {
         } finally {
             playlistCleaning = false
         }
+    }
+
+    private fun findFilesToNotDelete(): Set<String> {
+        val filesToNotDelete: MutableSet<String> = HashSet(5)
+        val mediaController = inject<MediaPlayerController>(
+            MediaPlayerController::class.java
+        )
+
+        val playlist = mainScope.future { mediaController.value.playlist }.get()
+        for (item in playlist) {
+            val track = item.toTrack()
+            filesToNotDelete.add(track.getPartialFile())
+            filesToNotDelete.add(track.getCompleteFile())
+            filesToNotDelete.add(track.getPinnedFile())
+        }
+
+        filesToNotDelete.add(musicDirectory.path)
+        return filesToNotDelete
     }
 
     companion object {
@@ -246,22 +277,6 @@ class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO) {
             files.sortWith { a: AbstractFile, b: AbstractFile ->
                 a.lastModified.compareTo(b.lastModified)
             }
-        }
-
-        private fun findFilesToNotDelete(): Set<String> {
-            val filesToNotDelete: MutableSet<String> = HashSet(5)
-            val downloader = inject<Downloader>(
-                Downloader::class.java
-            )
-
-            for (downloadFile in downloader.value.all) {
-                filesToNotDelete.add(downloadFile.partialFile)
-                filesToNotDelete.add(downloadFile.completeFile)
-                filesToNotDelete.add(downloadFile.pinnedFile)
-            }
-
-            filesToNotDelete.add(musicDirectory.path)
-            return filesToNotDelete
         }
     }
 }

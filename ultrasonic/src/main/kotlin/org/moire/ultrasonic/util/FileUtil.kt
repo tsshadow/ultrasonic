@@ -80,6 +80,20 @@ object FileUtil {
         return "$dir/$fileName"
     }
 
+    fun Track.getPinnedFile(): String {
+        return getSongFile(this)
+    }
+
+    fun Track.getPartialFile(): String {
+        return getParentPath(this.getPinnedFile()) + "/" +
+            getPartialFile(getNameFromPath(this.getPinnedFile()))
+    }
+
+    fun Track.getCompleteFile(): String {
+        return getParentPath(this.getPinnedFile()) + "/" +
+            getCompleteFile(getNameFromPath(this.getPinnedFile()))
+    }
+
     @JvmStatic
     fun getPlaylistFile(server: String?, name: String?): File {
         val playlistDir = getPlaylistDirectory(server)

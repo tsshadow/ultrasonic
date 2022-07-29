@@ -1,6 +1,6 @@
 /*
  * Util.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -14,9 +14,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
 import android.net.Network
@@ -342,7 +339,7 @@ object Util {
      */
     @Suppress("DEPRECATION")
     fun networkInfo(): NetworkInfo {
-        val manager = getConnectivityManager()
+        val manager = connectivityManager
         val info = NetworkInfo()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -376,34 +373,6 @@ object Util {
         }
     }
 
-    @JvmStatic
-    fun getDrawableFromAttribute(context: Context, attr: Int): Drawable {
-        val attrs = intArrayOf(attr)
-        val ta = context.obtainStyledAttributes(attrs)
-        val drawableFromTheme: Drawable? = ta.getDrawable(0)
-        ta.recycle()
-        return drawableFromTheme!!
-    }
-
-    fun createDrawableFromBitmap(context: Context, bitmap: Bitmap?): Drawable {
-        return BitmapDrawable(context.resources, bitmap)
-    }
-
-    fun createBitmapFromDrawable(drawable: Drawable): Bitmap {
-        if (drawable is BitmapDrawable) {
-            return drawable.bitmap
-        }
-        val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-        return bitmap
-    }
-
     fun createWifiLock(tag: String?): WifiLock {
         val wm =
             appContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
@@ -421,15 +390,6 @@ object Util {
 
     private fun getScaledHeight(bitmap: Bitmap, width: Int): Int {
         return getScaledHeight(bitmap.height.toDouble(), bitmap.width.toDouble(), width)
-    }
-
-    fun scaleBitmap(bitmap: Bitmap?, size: Int): Bitmap? {
-        return if (bitmap == null) null else Bitmap.createScaledBitmap(
-            bitmap,
-            size,
-            getScaledHeight(bitmap, size),
-            true
-        )
     }
 
     fun getSongsFromSearchResult(searchResult: SearchResult): MusicDirectory {
@@ -707,10 +667,8 @@ object Util {
         )
     }
 
-    fun getConnectivityManager(): ConnectivityManager {
-        val context = appContext()
-        return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    }
+    private val connectivityManager: ConnectivityManager
+        get() = appContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     /**
      * Executes the given block if this is not null.

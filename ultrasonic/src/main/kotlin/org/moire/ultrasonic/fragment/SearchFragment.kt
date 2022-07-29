@@ -33,7 +33,6 @@ import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.SearchListModel
-import org.moire.ultrasonic.service.DownloadFile
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
 import org.moire.ultrasonic.subsonic.ShareHandler
@@ -353,13 +352,13 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             this
         )
 
-        if (found || item !is DownloadFile) return true
+        if (found || item !is Track) return true
 
         val songs = mutableListOf<Track>()
 
         when (menuItem.itemId) {
             R.id.song_menu_play_now -> {
-                songs.add(item.track)
+                songs.add(item)
                 downloadHandler.download(
                     fragment = this,
                     append = false,
@@ -371,7 +370,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 )
             }
             R.id.song_menu_play_next -> {
-                songs.add(item.track)
+                songs.add(item)
                 downloadHandler.download(
                     fragment = this,
                     append = true,
@@ -383,7 +382,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 )
             }
             R.id.song_menu_play_last -> {
-                songs.add(item.track)
+                songs.add(item)
                 downloadHandler.download(
                     fragment = this,
                     append = true,
@@ -395,7 +394,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 )
             }
             R.id.song_menu_pin -> {
-                songs.add(item.track)
+                songs.add(item)
                 toast(
                     context,
                     resources.getQuantityString(
@@ -407,7 +406,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 downloadBackground(true, songs)
             }
             R.id.song_menu_download -> {
-                songs.add(item.track)
+                songs.add(item)
                 toast(
                     context,
                     resources.getQuantityString(
@@ -419,7 +418,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 downloadBackground(false, songs)
             }
             R.id.song_menu_unpin -> {
-                songs.add(item.track)
+                songs.add(item)
                 toast(
                     context,
                     resources.getQuantityString(
@@ -431,7 +430,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 mediaPlayerController.unpin(songs)
             }
             R.id.song_menu_share -> {
-                songs.add(item.track)
+                songs.add(item)
                 shareHandler.createShare(this, songs, searchRefresh, cancellationToken!!)
             }
         }

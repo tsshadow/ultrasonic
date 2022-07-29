@@ -325,7 +325,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
         if (isValid) {
             currentServerSetting!!.name = serverNameEditText!!.editText?.text.toString()
             currentServerSetting!!.url = serverAddressEditText!!.editText?.text.toString()
-            currentServerSetting!!.color = selectedColor
+            currentServerSetting!!.color = selectedColor ?: currentColor
             currentServerSetting!!.userName = userNameEditText!!.editText?.text.toString()
             currentServerSetting!!.password = passwordEditText!!.editText?.text.toString()
             currentServerSetting!!.allowSelfSignedCertificate = selfSignedSwitch!!.isChecked

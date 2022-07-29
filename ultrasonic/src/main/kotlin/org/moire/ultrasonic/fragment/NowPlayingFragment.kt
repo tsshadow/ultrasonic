@@ -1,6 +1,6 @@
 /*
  * NowPlayingFragment.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -29,6 +29,7 @@ import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.Util.getNotificationImageSize
+import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
 
 /**
@@ -89,16 +90,15 @@ class NowPlayingFragment : Fragment() {
                 playButton!!.setImageResource(R.drawable.media_start_normal)
             }
 
-            val file = mediaPlayerController.currentPlayingLegacy
+            val file = mediaPlayerController.currentMediaItem?.toTrack()
 
             if (file != null) {
-                val song = file.track
-                val title = song.title
-                val artist = song.artist
+                val title = file.title
+                val artist = file.artist
 
                 imageLoader.getImageLoader().loadImage(
                     nowPlayingAlbumArtImage,
-                    song,
+                    file,
                     false,
                     getNotificationImageSize(requireContext())
                 )
@@ -111,14 +111,14 @@ class NowPlayingFragment : Fragment() {
 
                     if (Settings.shouldUseId3Tags) {
                         bundle.putBoolean(Constants.INTENT_IS_ALBUM, true)
-                        bundle.putString(Constants.INTENT_ID, song.albumId)
+                        bundle.putString(Constants.INTENT_ID, file.albumId)
                     } else {
                         bundle.putBoolean(Constants.INTENT_IS_ALBUM, false)
-                        bundle.putString(Constants.INTENT_ID, song.parent)
+                        bundle.putString(Constants.INTENT_ID, file.parent)
                     }
 
-                    bundle.putString(Constants.INTENT_NAME, song.album)
-                    bundle.putString(Constants.INTENT_NAME, song.album)
+                    bundle.putString(Constants.INTENT_NAME, file.album)
+                    bundle.putString(Constants.INTENT_NAME, file.album)
 
                     Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                         .navigate(R.id.trackCollectionFragment, bundle)

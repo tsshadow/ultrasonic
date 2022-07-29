@@ -11,15 +11,17 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
-import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.service.DownloadFile
 import org.moire.ultrasonic.service.DownloadStatus
+import org.moire.ultrasonic.service.Downloader
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RxBus
+import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import timber.log.Timber
@@ -28,6 +30,8 @@ import timber.log.Timber
  * Used to display songs and videos in a `ListView`.
  */
 class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable, KoinComponent {
+
+    private val downloader: Downloader by inject()
 
     var check: CheckedTextView = view.findViewById(R.id.song_check)
     private var rating: LinearLayout = view.findViewById(R.id.song_five_star)
@@ -46,29 +50,25 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
 
     var entry: Track? = null
         private set
-    var downloadFile: DownloadFile? = null
-        private set
 
     private var isMaximized = false
     private var cachedStatus = DownloadStatus.UNKNOWN
     private var statusImage: Drawable? = null
     private var isPlayingCached = false
 
-    private var rxSubscription: Disposable? = null
+    private var rxBusSubscription: CompositeDisposable? = null
 
     var observableChecked = MutableLiveData(false)
 
     lateinit var imageHelper: Utils.ImageHelper
 
     fun setSong(
-        file: DownloadFile,
+        song: Track,
         checkable: Boolean,
         draggable: Boolean,
         isSelected: Boolean = false
     ) {
         val useFiveStarRating = Settings.useFiveStarRating
-        val song = file.track
-        downloadFile = file
         entry = song
 
         val entryDescription = Util.readableEntryDescription(song)
@@ -94,8 +94,8 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
             setupStarButtons(song, useFiveStarRating)
         }
 
-        updateProgress(downloadFile!!.progress.value!!)
-        updateStatus(downloadFile!!.status.value!!)
+        updateStatus(downloader.getDownloadState(song))
+        updateProgress(0)
 
         if (useFiveStarRating) {
             setFiveStars(entry?.userRating ?: 0)
@@ -108,13 +108,22 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
             progress.isVisible = false
         }
 
-        rxSubscription = RxBus.playerStateObservable.subscribe {
-            setPlayIcon(it.index == bindingAdapterPosition && it.track == downloadFile)
+        // Create new Disposable for the new Subscriptions
+        rxBusSubscription = CompositeDisposable()
+        rxBusSubscription!! += RxBus.playerStateObservable.subscribe {
+            setPlayIcon(it.index == bindingAdapterPosition && it.track?.id == song.id)
+        }
+
+        rxBusSubscription!! += RxBus.trackDownloadStateObservable.subscribe {
+            if (it.track.id != song.id) return@subscribe
+            updateStatus(it.state)
+            updateProgress(it.progress)
         }
     }
 
+    // This is called when the Holder is recycled and receives a new Song
     fun dispose() {
-        rxSubscription?.dispose()
+        rxBusSubscription?.dispose()
     }
 
     private fun setPlayIcon(isPlaying: Boolean) {
@@ -198,7 +207,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         }
     }
 
-    fun updateStatus(status: DownloadStatus) {
+    private fun updateStatus(status: DownloadStatus) {
         if (status == cachedStatus) return
         cachedStatus = status
 
@@ -227,7 +236,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         updateImages()
     }
 
-    fun updateProgress(p: Int) {
+    private fun updateProgress(p: Int) {
         if (cachedStatus == DownloadStatus.DOWNLOADING) {
             progress.text = Util.formatPercentage(p)
         } else {
