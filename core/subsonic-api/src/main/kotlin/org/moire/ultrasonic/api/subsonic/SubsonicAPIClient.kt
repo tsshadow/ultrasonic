@@ -10,6 +10,7 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import org.moire.ultrasonic.api.subsonic.interceptors.PasswordHexInterceptor
@@ -64,6 +65,9 @@ class SubsonicAPIClient(
         }
 
     val okHttpClient: OkHttpClient = baseOkClient.newBuilder()
+        // Disable HTTP2 because OkHttp with Exoplayer causes a bug. See https://github.com/square/okhttp/issues/6749
+        // TODO Check if the bug is fixed and try to re-enable HTTP2
+        .protocols(listOf(Protocol.HTTP_1_1))
         .readTimeout(READ_TIMEOUT, MILLISECONDS)
         .apply { if (config.allowSelfSignedCertificate) allowSelfSignedCertificates() }
         .addInterceptor { chain ->
