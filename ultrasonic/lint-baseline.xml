@@ -19,7 +19,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="154"
+            line="156"
             column="5"/>
     </issue>
 
@@ -56,6 +56,17 @@
         <location
             file="src/main/AndroidManifest.xml"
             line="155"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ExportedContentProvider"
+        message="Exported content providers can provide access to potentially sensitive data"
+        errorLine1="        &lt;provider"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="160"
             column="10"/>
     </issue>
 
@@ -209,17 +220,6 @@
         errorLine2="^">
         <location
             file="src/main/res/drawable/ic_menu_backward.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_menu_close` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_menu_close.xml"
             line="1"
             column="1"/>
     </issue>

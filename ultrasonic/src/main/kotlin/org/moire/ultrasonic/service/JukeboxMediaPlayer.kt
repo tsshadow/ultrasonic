@@ -42,7 +42,7 @@ import timber.log.Timber
  * TODO: Persist RC state?
  * TODO: Minimize status updates.
  */
-class JukeboxMediaPlayer(private val downloader: Downloader) {
+class JukeboxMediaPlayer {
     private val tasks = TaskQueue()
     private val executorService = Executors.newSingleThreadScheduledExecutor()
     private var statusUpdateFuture: ScheduledFuture<*>? = null
@@ -156,8 +156,8 @@ class JukeboxMediaPlayer(private val downloader: Downloader) {
         tasks.remove(Stop::class.java)
         tasks.remove(Start::class.java)
         val ids: MutableList<String> = ArrayList()
-        for (file in downloader.all) {
-            ids.add(file.track.id)
+        for (item in mediaPlayerControllerLazy.value.playlist) {
+            ids.add(item.mediaId)
         }
         tasks.add(SetPlaylist(ids))
     }

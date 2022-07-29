@@ -2,6 +2,7 @@ package org.moire.ultrasonic.service;
 
 import timber.log.Timber;
 import org.moire.ultrasonic.data.ActiveServerProvider;
+import org.moire.ultrasonic.domain.Track;
 
 /**
  * Scrobbles played songs to Last.fm.
@@ -14,12 +15,11 @@ public class Scrobbler
 	private String lastSubmission;
 	private String lastNowPlaying;
 
-	public void scrobble(final DownloadFile song, final boolean submission)
+	public void scrobble(final Track song, final boolean submission)
 	{
 		if (song == null || !ActiveServerProvider.Companion.isScrobblingEnabled()) return;
 
-		final String id = song.getTrack().getId();
-		if (id == null) return;
+		final String id = song.getId();
 
 		// Avoid duplicate registrations.
 		if (submission && id.equals(lastSubmission)) return;

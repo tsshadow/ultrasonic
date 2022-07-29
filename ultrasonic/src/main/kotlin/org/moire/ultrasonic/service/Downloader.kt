@@ -1,8 +1,16 @@
+/*
+ * Downloader.kt
+ * Copyright (C) 2009-2022 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 package org.moire.ultrasonic.service
 
 import android.net.wifi.WifiManager
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock as SystemClock
 import android.text.TextUtils
 import androidx.lifecycle.MutableLiveData
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -16,17 +24,21 @@ import org.koin.core.component.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.MetaDatabase
 import org.moire.ultrasonic.domain.Artist
+import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.playback.LegacyPlaylistManager
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.CacheCleaner
 import org.moire.ultrasonic.util.CancellableTask
 import org.moire.ultrasonic.util.FileUtil
-import org.moire.ultrasonic.util.LRUCache
+import org.moire.ultrasonic.util.FileUtil.getCompleteFile
+import org.moire.ultrasonic.util.FileUtil.getPartialFile
+import org.moire.ultrasonic.util.FileUtil.getPinnedFile
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.safeClose
+import org.moire.ultrasonic.util.shouldBePinned
+import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
 
 /**
@@ -37,27 +49,25 @@ import timber.log.Timber
  */
 class Downloader(
     private val storageMonitor: ExternalStorageMonitor,
-    private val legacyPlaylistManager: LegacyPlaylistManager,
 ) : KoinComponent {
 
     // Dependencies
     private val imageLoaderProvider: ImageLoaderProvider by inject()
     private val activeServerProvider: ActiveServerProvider by inject()
     private val mediaController: MediaPlayerController by inject()
+    private val jukeboxMediaPlayer: JukeboxMediaPlayer by inject()
 
     var started: Boolean = false
     var shouldStop: Boolean = false
     var isPolling: Boolean = false
 
-    private val downloadQueue = PriorityQueue<DownloadFile>()
-    private val activelyDownloading = mutableListOf<DownloadFile>()
+    private val downloadQueue = PriorityQueue<DownloadableTrack>()
+    private val activelyDownloading = mutableMapOf<DownloadableTrack, DownloadTask>()
+    private val failedList = mutableListOf<DownloadableTrack>()
 
     // The generic list models expect a LiveData, so even though we are using Rx for many events
     // surrounding playback the list of Downloads is published as LiveData.
-    val observableDownloads = MutableLiveData<List<DownloadFile>>()
-
-    // This cache helps us to avoid creating duplicate DownloadFile instances when showing Entries
-    private val downloadFileCache = LRUCache<Track, DownloadFile>(500)
+    val observableDownloads = MutableLiveData<List<Track>>()
 
     private var handler: Handler = Handler(Looper.getMainLooper())
     private var wifiLock: WifiManager.WifiLock? = null
@@ -124,7 +134,10 @@ class Downloader(
         shouldStop = true
         wifiLock?.release()
         wifiLock = null
-        DownloadService.runningInstance?.notifyDownloaderStopped()
+        handler.postDelayed(
+            Runnable { DownloadService.runningInstance?.notifyDownloaderStopped() },
+            100
+        )
         Timber.i("Downloader stopped")
     }
 
@@ -150,56 +163,48 @@ class Downloader(
             return
         }
 
-        if (legacyPlaylistManager.jukeboxMediaPlayer.isEnabled || !Util.isNetworkConnected()) {
+        if (jukeboxMediaPlayer.isEnabled || !Util.isNetworkConnected()) {
             return
         }
 
         Timber.v("Downloader checkDownloadsInternal checking downloads")
 
-        // Check the active downloads for failures or completions and remove them
-        // Store the result in a flag to know if changes have occurred
-        var listChanged = cleanupActiveDownloads()
+        var listChanged = false
+        val playlist = mediaController.getNextPlaylistItemsInPlayOrder(Settings.preloadCount)
+        var priority = 0
 
-        val playlist = legacyPlaylistManager.playlist
-
-        // Check if need to preload more from playlist
-        val preloadCount = Settings.preloadCount
-
-        // Start preloading at the current playing song
-        var start = mediaController.currentMediaItemIndex
-
-        if (start == -1 || start > playlist.size) start = 0
-
-        val end = (start + preloadCount).coerceAtMost(playlist.size)
-
-        for (i in start until end) {
-            val download = playlist[i]
-
-            // Set correct priority (the lower the number, the higher the priority)
-            download.priority = i
+        for (item in playlist) {
+            val track = item.toTrack()
 
             // Add file to queue if not in one of the queues already.
-            if (!download.isWorkDone &&
-                !activelyDownloading.contains(download) &&
-                !downloadQueue.contains(download) &&
-                download.shouldRetry()
-            ) {
+            if (getDownloadState(track) == DownloadStatus.IDLE) {
                 listChanged = true
-                downloadQueue.add(download)
+
+                // If a track is already in the manual download queue,
+                // and is now due to be played soon we add it to the queue with high priority instead.
+                val existingItem = downloadQueue.firstOrNull { it.track.id == track.id }
+                if (existingItem != null) {
+                    existingItem.priority = priority + 1
+                    return
+                }
+
+                // Set correct priority (the lower the number, the higher the priority)
+                downloadQueue.add(DownloadableTrack(track, item.shouldBePinned(), 0, priority++))
             }
         }
 
         // Fill up active List with waiting tasks
         while (activelyDownloading.size < Settings.parallelDownloads && downloadQueue.size > 0) {
             val task = downloadQueue.remove()
-            activelyDownloading.add(task)
+            val downloadTask = DownloadTask(task)
+            activelyDownloading[task] = downloadTask
             startDownloadOnService(task)
 
             listChanged = true
         }
 
         // Stop Executor service when done downloading
-        if (activelyDownloading.size == 0) {
+        if (activelyDownloading.isEmpty()) {
             stop()
         }
 
@@ -212,78 +217,25 @@ class Downloader(
         observableDownloads.postValue(downloads)
     }
 
-    private fun startDownloadOnService(file: DownloadFile) {
-        if (file.isDownloading) return
-        file.prepare()
+    private fun startDownloadOnService(track: DownloadableTrack) {
         DownloadService.executeOnStartedDownloadService {
-            FileUtil.createDirectoryForParent(file.pinnedFile)
-            file.isFailed = false
-            file.downloadTask = DownloadTask(file)
-            file.downloadTask!!.start()
-            Timber.v("startDownloadOnService started downloading file ${file.completeFile}")
+            FileUtil.createDirectoryForParent(track.pinnedFile)
+            activelyDownloading[track]?.start()
+            Timber.v("startDownloadOnService started downloading file ${track.completeFile}")
         }
     }
-
-    /**
-     * Return true if modifications were made
-     */
-    private fun cleanupActiveDownloads(): Boolean {
-        val oldSize = activelyDownloading.size
-
-        activelyDownloading.retainAll {
-            when {
-                it.isDownloading -> true
-                it.isFailed && it.shouldRetry() -> {
-                    // Add it back to queue
-                    downloadQueue.add(it)
-                    false
-                }
-                else -> {
-                    it.cleanup()
-                    false
-                }
-            }
-        }
-
-        return (oldSize != activelyDownloading.size)
-    }
-
-    @get:Synchronized
-    val all: List<DownloadFile>
-        get() {
-            val temp: MutableList<DownloadFile> = ArrayList()
-            temp.addAll(activelyDownloading)
-            temp.addAll(downloadQueue)
-            temp.addAll(legacyPlaylistManager.playlist)
-            return temp.distinct().sorted()
-        }
 
     /*
     * Returns a list of all DownloadFiles that are currently downloading or waiting for download,
-    * including undownloaded files from the playlist.
-     */
+    */
     @get:Synchronized
-    val downloads: List<DownloadFile>
+    val downloads: List<Track>
         get() {
-            val temp: MutableList<DownloadFile> = ArrayList()
-            temp.addAll(activelyDownloading)
-            temp.addAll(downloadQueue)
-            temp.addAll(
-                legacyPlaylistManager.playlist.filter {
-                    if (!it.isStatusInitialized) false
-                    else when (it.status.value) {
-                        DownloadStatus.DOWNLOADING -> true
-                        else -> false
-                    }
-                }
-            )
+            val temp: MutableList<Track> = ArrayList()
+            temp.addAll(activelyDownloading.keys.map { x -> x.track })
+            temp.addAll(downloadQueue.map { x -> x.track })
             return temp.distinct().sorted()
         }
-
-    @Synchronized
-    fun clearDownloadFileCache() {
-        downloadFileCache.clear()
-    }
 
     @Synchronized
     fun clearBackground() {
@@ -291,10 +243,10 @@ class Downloader(
         downloadQueue.clear()
 
         // Cancel all active downloads with a low priority
-        for (download in activelyDownloading) {
-            if (download.priority >= 100) {
-                download.cancelDownload()
-                activelyDownloading.remove(download)
+        for (key in activelyDownloading.keys) {
+            if (key.priority >= 100) {
+                activelyDownloading[key]?.cancel()
+                activelyDownloading.remove(key)
             }
         }
 
@@ -305,125 +257,125 @@ class Downloader(
     fun clearActiveDownloads() {
         // Cancel all active downloads
         for (download in activelyDownloading) {
-            download.cancelDownload()
+            download.value.cancel()
         }
         activelyDownloading.clear()
         updateLiveData()
     }
 
     @Synchronized
-    fun downloadBackground(songs: List<Track>, save: Boolean) {
-
+    fun downloadBackground(tracks: List<Track>, save: Boolean) {
         // By using the counter we ensure that the songs are added in the correct order
-        for (song in songs) {
-            val file = song.getDownloadFile()
-            file.shouldSave = save
-            if (!file.isDownloading) {
-                file.priority = backgroundPriorityCounter++
-                downloadQueue.add(file)
-            }
+        for (track in tracks) {
+            if (downloadQueue.any { t -> t.track.id == track.id }) continue
+            val file = DownloadableTrack(track, save, 0, backgroundPriorityCounter++)
+            downloadQueue.add(file)
         }
 
         Timber.v("downloadBackground Checking Downloads")
         checkDownloads()
     }
 
-    @Synchronized
+    fun delete(track: Track) {
+        cancelDownload(track)
+        Storage.delete(track.getPartialFile())
+        Storage.delete(track.getCompleteFile())
+        Storage.delete(track.getPinnedFile())
+        postState(track, DownloadStatus.IDLE, 0)
+        Util.scanMedia(track.getPinnedFile())
+    }
+
+    fun cancelDownload(track: Track) {
+        val key = activelyDownloading.keys.singleOrNull { t -> t.track.id == track.id } ?: return
+        activelyDownloading[key]?.cancel()
+    }
+
+    fun unpin(track: Track) {
+        val file = Storage.getFromPath(track.getPinnedFile()) ?: return
+        Storage.rename(file, track.getCompleteFile())
+        postState(track, DownloadStatus.DONE, 100)
+    }
+
     @Suppress("ReturnCount")
-    fun getDownloadFileForSong(song: Track): DownloadFile {
-        for (downloadFile in legacyPlaylistManager.playlist) {
-            if (downloadFile.track == song) {
-                return downloadFile
-            }
+    fun getDownloadState(track: Track): DownloadStatus {
+        if (Storage.isPathExists(track.getCompleteFile())) return DownloadStatus.DONE
+        if (Storage.isPathExists(track.getPinnedFile())) return DownloadStatus.PINNED
+
+        val key = activelyDownloading.keys.firstOrNull { k -> k.track.id == track.id }
+        if (key != null) {
+            if (key.tryCount > 0) return DownloadStatus.RETRYING
+            return DownloadStatus.DOWNLOADING
         }
-        for (downloadFile in activelyDownloading) {
-            if (downloadFile.track == song) {
-                return downloadFile
-            }
-        }
-        for (downloadFile in downloadQueue) {
-            if (downloadFile.track == song) {
-                return downloadFile
-            }
-        }
-        var downloadFile = downloadFileCache[song]
-        if (downloadFile == null) {
-            downloadFile = DownloadFile(song, false)
-            downloadFileCache.put(song, downloadFile)
-        }
-        return downloadFile
+        if (failedList.any { t -> t.track.id == track.id }) return DownloadStatus.FAILED
+        return DownloadStatus.IDLE
     }
 
     companion object {
         const val CHECK_INTERVAL = 5000L
+        const val MAX_RETRIES = 5
+        const val REFRESH_INTERVAL = 100
     }
 
-    /**
-     * Extension function
-     * Gathers the download file for a given song, and modifies shouldSave if provided.
-     */
-    private fun Track.getDownloadFile(save: Boolean? = null): DownloadFile {
-        return getDownloadFileForSong(this).apply {
-            if (save != null) this.shouldSave = save
-        }
+    private fun postState(track: Track, state: DownloadStatus, progress: Int) {
+        RxBus.trackDownloadStatePublisher.onNext(
+            RxBus.TrackDownloadState(
+                track,
+                state,
+                progress
+            )
+        )
     }
 
-    private inner class DownloadTask(private val downloadFile: DownloadFile) : CancellableTask() {
+    private inner class DownloadTask(private val item: DownloadableTrack) :
+        CancellableTask() {
         val musicService = MusicServiceFactory.getMusicService()
 
-        @Suppress("LongMethod", "ComplexMethod", "NestedBlockDepth")
+        @Suppress("LongMethod", "ComplexMethod", "NestedBlockDepth", "TooGenericExceptionThrown")
         override fun execute() {
 
-            downloadFile.downloadPrepared = false
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
             try {
-                if (Storage.isPathExists(downloadFile.pinnedFile)) {
-                    Timber.i("%s already exists. Skipping.", downloadFile.pinnedFile)
-                    downloadFile.status.postValue(DownloadStatus.PINNED)
+                if (Storage.isPathExists(item.pinnedFile)) {
+                    Timber.i("%s already exists. Skipping.", item.pinnedFile)
+                    postState(item.track, DownloadStatus.PINNED, 100)
                     return
                 }
 
-                if (Storage.isPathExists(downloadFile.completeFile)) {
+                if (Storage.isPathExists(item.completeFile)) {
                     var newStatus: DownloadStatus = DownloadStatus.DONE
-                    if (downloadFile.shouldSave) {
-                        if (downloadFile.isPlaying) {
-                            downloadFile.saveWhenDone = true
-                        } else {
-                            Storage.rename(
-                                downloadFile.completeFile,
-                                downloadFile.pinnedFile
-                            )
-                            newStatus = DownloadStatus.PINNED
-                        }
+                    if (item.pinned) {
+                        Storage.rename(
+                            item.completeFile,
+                            item.pinnedFile
+                        )
+                        newStatus = DownloadStatus.PINNED
                     } else {
                         Timber.i(
                             "%s already exists. Skipping.",
-                            downloadFile.completeFile
+                            item.completeFile
                         )
                     }
 
                     // Hidden feature: If track is toggled between pinned/saved, refresh the metadata..
                     try {
-                        downloadFile.track.cacheMetadata()
+                        item.track.cacheMetadata()
                     } catch (ignore: Exception) {
                         Timber.w(ignore)
                     }
-
-                    downloadFile.status.postValue(newStatus)
+                    postState(item.track, newStatus, 100)
                     return
                 }
 
-                downloadFile.status.postValue(DownloadStatus.DOWNLOADING)
+                postState(item.track, DownloadStatus.DOWNLOADING, 0)
 
                 // Some devices seem to throw error on partial file which doesn't exist
                 val needsDownloading: Boolean
-                val duration = downloadFile.track.duration
-                val fileLength = Storage.getFromPath(downloadFile.partialFile)?.length ?: 0
+                val duration = item.track.duration
+                val fileLength = Storage.getFromPath(item.partialFile)?.length ?: 0
 
                 needsDownloading = (
-                    downloadFile.desiredBitRate == 0 ||
-                        duration == null ||
+                    duration == null ||
                         duration == 0 ||
                         fileLength == 0L
                     )
@@ -431,9 +383,9 @@ class Downloader(
                 if (needsDownloading) {
                     // Attempt partial HTTP GET, appending to the file if it exists.
                     val (inStream, isPartial) = musicService.getDownloadInputStream(
-                        downloadFile.track, fileLength,
-                        downloadFile.desiredBitRate,
-                        downloadFile.shouldSave
+                        item.track, fileLength,
+                        Settings.maxBitRate,
+                        item.pinned
                     )
 
                     inputStream = inStream
@@ -442,31 +394,40 @@ class Downloader(
                         Timber.i("Executed partial HTTP GET, skipping %d bytes", fileLength)
                     }
 
-                    outputStream = Storage.getOrCreateFileFromPath(downloadFile.partialFile)
+                    outputStream = Storage.getOrCreateFileFromPath(item.partialFile)
                         .getFileOutputStream(isPartial)
 
+                    var lastPostTime: Long = 0
                     val len = inputStream.copyTo(outputStream) { totalBytesCopied ->
-                        downloadFile.setProgress(totalBytesCopied)
+                        // Manual throttling to avoid overloading Rx
+                        if (SystemClock.elapsedRealtime() - lastPostTime > REFRESH_INTERVAL) {
+                            lastPostTime = SystemClock.elapsedRealtime()
+                            postState(
+                                item.track,
+                                DownloadStatus.DOWNLOADING,
+                                (totalBytesCopied * 100 / (item.track.size ?: 1)).toInt()
+                            )
+                        }
                     }
 
-                    Timber.i("Downloaded %d bytes to %s", len, downloadFile.partialFile)
+                    Timber.i("Downloaded %d bytes to %s", len, item.partialFile)
 
                     inputStream.close()
                     outputStream.flush()
                     outputStream.close()
 
                     if (isCancelled) {
-                        downloadFile.status.postValue(DownloadStatus.CANCELLED)
+                        postState(item.track, DownloadStatus.CANCELLED, 0)
                         throw RuntimeException(
                             String.format(
                                 Locale.ROOT, "Download of '%s' was cancelled",
-                                downloadFile.track
+                                item
                             )
                         )
                     }
 
                     try {
-                        downloadFile.track.cacheMetadata()
+                        item.track.cacheMetadata()
                     } catch (ignore: Exception) {
                         Timber.w(ignore)
                     }
@@ -474,40 +435,40 @@ class Downloader(
                     downloadAndSaveCoverArt()
                 }
 
-                if (downloadFile.isPlaying) {
-                    downloadFile.completeWhenDone = true
+                if (item.pinned) {
+                    Storage.rename(
+                        item.partialFile,
+                        item.pinnedFile
+                    )
+                    postState(item.track, DownloadStatus.PINNED, 100)
+                    Util.scanMedia(item.pinnedFile)
                 } else {
-                    if (downloadFile.shouldSave) {
-                        Storage.rename(
-                            downloadFile.partialFile,
-                            downloadFile.pinnedFile
-                        )
-                        downloadFile.status.postValue(DownloadStatus.PINNED)
-                        Util.scanMedia(downloadFile.pinnedFile)
-                    } else {
-                        Storage.rename(
-                            downloadFile.partialFile,
-                            downloadFile.completeFile
-                        )
-                        downloadFile.status.postValue(DownloadStatus.DONE)
-                    }
+                    Storage.rename(
+                        item.partialFile,
+                        item.completeFile
+                    )
+                    postState(item.track, DownloadStatus.DONE, 100)
                 }
             } catch (all: Exception) {
                 outputStream.safeClose()
-                Storage.delete(downloadFile.completeFile)
-                Storage.delete(downloadFile.pinnedFile)
+                Storage.delete(item.completeFile)
+                Storage.delete(item.pinnedFile)
                 if (!isCancelled) {
-                    downloadFile.isFailed = true
-                    if (downloadFile.retryCount > 1) {
-                        downloadFile.status.postValue(DownloadStatus.RETRYING)
-                        --downloadFile.retryCount
-                    } else if (downloadFile.retryCount == 1) {
-                        downloadFile.status.postValue(DownloadStatus.FAILED)
-                        --downloadFile.retryCount
+                    if (item.tryCount < MAX_RETRIES) {
+                        postState(item.track, DownloadStatus.RETRYING, 0)
+                        item.tryCount++
+                        activelyDownloading.remove(item)
+                        downloadQueue.add(item)
+                    } else {
+                        postState(item.track, DownloadStatus.FAILED, 0)
+                        activelyDownloading.remove(item)
+                        downloadQueue.remove(item)
+                        failedList.add(item)
                     }
-                    Timber.w(all, "Failed to download '%s'.", downloadFile.track)
+                    Timber.w(all, "Failed to download '%s'.", item)
                 }
             } finally {
+                activelyDownloading.remove(item)
                 inputStream.safeClose()
                 outputStream.safeClose()
                 CacheCleaner().cleanSpace()
@@ -517,7 +478,7 @@ class Downloader(
         }
 
         override fun toString(): String {
-            return String.format(Locale.ROOT, "DownloadTask (%s)", downloadFile.track)
+            return String.format(Locale.ROOT, "DownloadTask (%s)", item)
         }
 
         private fun Track.cacheMetadata() {
@@ -567,9 +528,9 @@ class Downloader(
 
         private fun downloadAndSaveCoverArt() {
             try {
-                if (!TextUtils.isEmpty(downloadFile.track.coverArt)) {
+                if (!TextUtils.isEmpty(item.track.coverArt)) {
                     // Download the largest size that we can display in the UI
-                    imageLoaderProvider.getImageLoader().cacheCoverArt(downloadFile.track)
+                    imageLoaderProvider.getImageLoader().cacheCoverArt(item.track)
                 }
             } catch (all: Exception) {
                 Timber.e(all, "Failed to get cover art.")
@@ -590,4 +551,26 @@ class Downloader(
             return bytesCopied
         }
     }
+
+    private class DownloadableTrack(
+        val track: Track,
+        val pinned: Boolean,
+        var tryCount: Int,
+        var priority: Int
+    ) : Identifiable {
+        val pinnedFile = track.getPinnedFile()
+        val partialFile = track.getPartialFile()
+        val completeFile = track.getCompleteFile()
+        override val id: String
+            get() = track.id
+
+        override fun compareTo(other: Identifiable) = compareTo(other as DownloadableTrack)
+        fun compareTo(other: DownloadableTrack): Int {
+            return priority.compareTo(other.priority)
+        }
+    }
+}
+
+enum class DownloadStatus {
+    IDLE, DOWNLOADING, RETRYING, FAILED, CANCELLED, DONE, PINNED, UNKNOWN
 }

@@ -9,16 +9,13 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.drakeet.multitype.ItemViewBinder
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.service.DownloadFile
-import org.moire.ultrasonic.service.Downloader
 
 class TrackViewBinder(
-    val onItemClick: (DownloadFile, Int) -> Unit,
-    val onContextMenuClick: ((MenuItem, DownloadFile) -> Boolean)? = null,
+    val onItemClick: (Track, Int) -> Unit,
+    val onContextMenuClick: ((MenuItem, Track) -> Boolean)? = null,
     val checkable: Boolean,
     val draggable: Boolean,
     context: Context,
@@ -31,7 +28,6 @@ class TrackViewBinder(
     val layout = R.layout.list_item_track
     private val contextMenuLayout = R.menu.context_menu_track
 
-    private val downloader: Downloader by inject()
     private val imageHelper: Utils.ImageHelper = Utils.ImageHelper(context)
 
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): TrackViewHolder {
@@ -43,11 +39,8 @@ class TrackViewBinder(
     override fun onBindViewHolder(holder: TrackViewHolder, item: Identifiable) {
         val diffAdapter = adapter as BaseAdapter<*>
 
-        val downloadFile: DownloadFile = when (item) {
+        val track: Track = when (item) {
             is Track -> {
-                downloader.getDownloadFileForSong(item)
-            }
-            is DownloadFile -> {
                 item
             }
             else -> {
@@ -61,7 +54,7 @@ class TrackViewBinder(
         holder.observableChecked.removeObservers(lifecycleOwner)
 
         holder.setSong(
-            file = downloadFile,
+            song = track,
             checkable = checkable,
             draggable = draggable,
             diffAdapter.isSelected(item.longId)
@@ -72,11 +65,11 @@ class TrackViewBinder(
                 val popup = Utils.createPopupMenu(holder.itemView, contextMenuLayout)
 
                 popup.setOnMenuItemClickListener { menuItem ->
-                    onContextMenuClick.invoke(menuItem, downloadFile)
+                    onContextMenuClick.invoke(menuItem, track)
                 }
             } else {
                 // Minimize or maximize the Text view (if song title is very long)
-                if (!downloadFile.track.isDirectory) {
+                if (!track.isDirectory) {
                     holder.maximizeOrMinimize()
                 }
             }
@@ -85,11 +78,11 @@ class TrackViewBinder(
         }
 
         holder.itemView.setOnClickListener {
-            if (checkable && !downloadFile.track.isVideo) {
+            if (checkable && !track.isVideo) {
                 val nowChecked = !holder.check.isChecked
                 holder.isChecked = nowChecked
             } else {
-                onItemClick(downloadFile, holder.bindingAdapterPosition)
+                onItemClick(track, holder.bindingAdapterPosition)
             }
         }
 
@@ -118,20 +111,6 @@ class TrackViewBinder(
             val newStatus = diffAdapter.isSelected(item.longId)
 
             if (newStatus != holder.check.isChecked) holder.check.isChecked = newStatus
-        }
-
-        // Observe download status
-        downloadFile.status.observe(
-            lifecycleOwner
-        ) {
-            holder.updateStatus(it)
-            diffAdapter.notifyChanged()
-        }
-
-        downloadFile.progress.observe(
-            lifecycleOwner
-        ) {
-            holder.updateProgress(it)
         }
     }
 

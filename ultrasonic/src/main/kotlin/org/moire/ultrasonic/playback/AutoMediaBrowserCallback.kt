@@ -1,5 +1,5 @@
 /*
- * CustomMediaLibrarySessionCallback.kt
+ * AutoMediaBrowserCallback.kt
  * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
@@ -7,17 +7,14 @@
 
 package org.moire.ultrasonic.playback
 
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_ALBUMS
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_ARTISTS
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_MIXED
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_NONE
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_PLAYLISTS
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_TITLES
 import androidx.media3.common.Player
@@ -37,8 +34,8 @@ import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.guava.future
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
@@ -54,6 +51,9 @@ import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.util.MainThreadExecutor
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.buildMediaItem
+import org.moire.ultrasonic.util.toMediaItem
+import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
 
 private const val MEDIA_ROOT_ID = "MEDIA_ROOT_ID"
@@ -106,6 +106,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
+    private val mainScope = CoroutineScope(Dispatchers.Main)
 
     private var playlistCache: List<Track>? = null
     private var starredSongsCache: List<Track>? = null
@@ -226,7 +227,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 * is stored in the track.starred value
                 * See https://github.com/androidx/media/issues/33
                 */
-                val track = mediaPlayerController.currentPlayingLegacy?.track
+                val track = mediaPlayerController.currentMediaItem?.toTrack()
                 if (track != null) {
                     customCommandFuture = onSetRating(
                         session,
@@ -312,18 +313,61 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
      * and thereby customarily it is required to rebuild it..
      * See also: https://stackoverflow.com/questions/70096715/adding-mediaitem-when-using-the-media3-library-caused-an-error
      */
+    @Suppress("MagicNumber", "ComplexMethod")
     override fun onAddMediaItems(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo,
         mediaItems: MutableList<MediaItem>
     ): ListenableFuture<MutableList<MediaItem>> {
 
-        val updatedMediaItems = mediaItems.map { mediaItem ->
-            mediaItem.buildUpon()
-                .setUri(mediaItem.requestMetadata.mediaUri)
-                .build()
+        if (!mediaItems.any()) return Futures.immediateFuture(mediaItems)
+
+        // Try to find out if the requester understands requestMetadata in the mediaItems
+        if (mediaItems.firstOrNull()?.requestMetadata?.mediaUri != null) {
+            val updatedMediaItems = mediaItems.map { mediaItem ->
+                mediaItem.buildUpon()
+                    .setUri(mediaItem.requestMetadata.mediaUri)
+                    .build()
+            }
+            return Futures.immediateFuture(updatedMediaItems.toMutableList())
+        } else {
+            // Android Auto devices still only use the MediaId to identify the selected Items
+            // They also only select a single item at once
+            val mediaIdParts = mediaItems.first().mediaId.split('|')
+
+            val tracks = when (mediaIdParts.first()) {
+                MEDIA_PLAYLIST_ITEM -> playPlaylist(mediaIdParts[1], mediaIdParts[2])
+                MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
+                    mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
+                )
+                MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[1], mediaIdParts[2])
+                MEDIA_ALBUM_SONG_ITEM -> playAlbumSong(
+                    mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
+                )
+                MEDIA_SONG_STARRED_ID -> playStarredSongs()
+                MEDIA_SONG_STARRED_ITEM -> playStarredSong(mediaIdParts[1])
+                MEDIA_SONG_RANDOM_ID -> playRandomSongs()
+                MEDIA_SONG_RANDOM_ITEM -> playRandomSong(mediaIdParts[1])
+                MEDIA_SHARE_ITEM -> playShare(mediaIdParts[1])
+                MEDIA_SHARE_SONG_ITEM -> playShareSong(mediaIdParts[1], mediaIdParts[2])
+                MEDIA_BOOKMARK_ITEM -> playBookmark(mediaIdParts[1])
+                MEDIA_PODCAST_ITEM -> playPodcast(mediaIdParts[1])
+                MEDIA_PODCAST_EPISODE_ITEM -> playPodcastEpisode(
+                    mediaIdParts[1], mediaIdParts[2]
+                )
+                MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
+                else -> null
+            }
+            if (tracks != null) {
+                return Futures.immediateFuture(
+                    tracks.map { track -> track.toMediaItem() }
+                        .toMutableList()
+                )
+            }
+
+            // Fallback to the original list
+            return Futures.immediateFuture(mediaItems)
         }
-        return Futures.immediateFuture(updatedMediaItems.toMutableList())
     }
 
     @Suppress("ReturnCount", "ComplexMethod")
@@ -398,10 +442,8 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 searchSongsCache = searchResult.songs
                 searchResult.songs.map { song ->
                     mediaItems.add(
-                        buildMediaItemFromTrack(
-                            song,
-                            listOf(MEDIA_SEARCH_SONG_ITEM, song.id).joinToString("|"),
-                            isPlayable = true
+                        song.toMediaItem(
+                            listOf(MEDIA_SEARCH_SONG_ITEM, song.id).joinToString("|")
                         )
                     )
                 }
@@ -444,37 +486,13 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         }
     }
 
-    private fun playFromSearchCommand(query: String?) {
-        Timber.d("AutoMediaBrowserService onPlayFromSearchRequested query: %s", query)
-        if (query.isNullOrBlank()) playRandomSongs()
-
-        serviceScope.launch {
-            val criteria = SearchCriteria(query!!, 0, 0, DISPLAY_LIMIT)
-            val searchResult = callWithErrorHandling { musicService.search(criteria) }
-
-            // Try to find the best match
-            if (searchResult != null) {
-                val song = searchResult.songs
-                    .asSequence()
-                    .sortedByDescending { song -> song.starred }
-                    .sortedByDescending { song -> song.averageRating }
-                    .sortedByDescending { song -> song.userRating }
-                    .sortedByDescending { song -> song.closeness }
-                    .firstOrNull()
-
-                if (song != null) playSong(song)
-            }
+    private fun playSearch(id: String): List<Track>? {
+        // If there is no cache, we can't play the selected song.
+        if (searchSongsCache != null) {
+            val song = searchSongsCache!!.firstOrNull { x -> x.id == id }
+            if (song != null) return listOf(song)
         }
-    }
-
-    private fun playSearch(id: String) {
-        serviceScope.launch {
-            // If there is no cache, we can't play the selected song.
-            if (searchSongsCache != null) {
-                val song = searchSongsCache!!.firstOrNull { x -> x.id == id }
-                if (song != null) playSong(song)
-            }
-        }
+        return null
     }
 
     private fun getRootItems(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
@@ -484,14 +502,16 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
             mediaItems.add(
                 R.string.music_library_label,
                 MEDIA_LIBRARY_ID,
-                null
+                null,
+                icon = R.drawable.ic_library
             )
 
         mediaItems.add(
             R.string.main_artists_title,
             MEDIA_ARTIST_ID,
             null,
-            folderType = FOLDER_TYPE_ARTISTS
+            folderType = FOLDER_TYPE_ARTISTS,
+            icon = R.drawable.ic_artist
         )
 
         if (!isOffline)
@@ -499,14 +519,16 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 R.string.main_albums_title,
                 MEDIA_ALBUM_ID,
                 null,
-                folderType = FOLDER_TYPE_ALBUMS
+                folderType = FOLDER_TYPE_ALBUMS,
+                icon = R.drawable.ic_menu_browse
             )
 
         mediaItems.add(
             R.string.playlist_label,
             MEDIA_PLAYLIST_ID,
             null,
-            folderType = FOLDER_TYPE_PLAYLISTS
+            folderType = FOLDER_TYPE_PLAYLISTS,
+            icon = R.drawable.ic_menu_playlists
         )
 
         return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems, null))
@@ -578,18 +600,21 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
-            val childMediaId: String
-            var artists = if (!isOffline && useId3Tags) {
-                childMediaId = MEDIA_ARTIST_ITEM
-                // TODO this list can be big so we're not refreshing.
-                //  Maybe a refresh menu item can be added
-                callWithErrorHandling { musicService.getArtists(false) }
-            } else {
-                // This will be handled at getSongsForAlbum, which supports navigation
-                childMediaId = MEDIA_ALBUM_ITEM
-                callWithErrorHandling { musicService.getIndexes(musicFolderId, false) }
-            }
+        // It seems double scoping is required: Media3 requires the Main thread, network operations with musicService forbid the Main thread...
+        return mainScope.future {
+            var childMediaId: String = MEDIA_ARTIST_ITEM
+
+            var artists = serviceScope.future {
+                if (!isOffline && useId3Tags) {
+                    // TODO this list can be big so we're not refreshing.
+                    //  Maybe a refresh menu item can be added
+                    callWithErrorHandling { musicService.getArtists(false) }
+                } else {
+                    // This will be handled at getSongsForAlbum, which supports navigation
+                    childMediaId = MEDIA_ALBUM_ITEM
+                    callWithErrorHandling { musicService.getIndexes(musicFolderId, false) }
+                }
+            }.await()
 
             if (artists != null) {
                 if (section != null)
@@ -633,14 +658,16 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
-            val albums = if (!isOffline && useId3Tags) {
-                callWithErrorHandling { musicService.getAlbumsOfArtist(id, name, false) }
-            } else {
-                callWithErrorHandling {
-                    musicService.getMusicDirectory(id, name, false).getAlbums()
+        return mainScope.future {
+            val albums = serviceScope.future {
+                if (!isOffline && useId3Tags) {
+                    callWithErrorHandling { musicService.getAlbumsOfArtist(id, name, false) }
+                } else {
+                    callWithErrorHandling {
+                        musicService.getMusicDirectory(id, name, false).getAlbums()
+                    }
                 }
-            }
+            }.await()
 
             albums?.map { album ->
                 mediaItems.add(
@@ -660,8 +687,8 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
-            val songs = listSongsInMusicService(id, name)
+        return mainScope.future {
+            val songs = serviceScope.future { listSongsInMusicService(id, name) }.await()
 
             if (songs != null) {
                 if (songs.getChildren(includeDirs = true, includeFiles = false).isEmpty() &&
@@ -680,15 +707,13 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                         )
                     else
                         mediaItems.add(
-                            buildMediaItemFromTrack(
-                                item,
+                            item.toMediaItem(
                                 listOf(
                                     MEDIA_ALBUM_SONG_ITEM,
                                     id,
                                     name,
                                     item.id
-                                ).joinToString("|"),
-                                isPlayable = true
+                                ).joinToString("|")
                             )
                         )
                 }
@@ -703,21 +728,24 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
+        return mainScope.future {
             val offset = (page ?: 0) * DISPLAY_LIMIT
-            val albums = if (useId3Tags) {
-                callWithErrorHandling {
-                    musicService.getAlbumList2(
-                        type.typeName, DISPLAY_LIMIT, offset, null
-                    )
+
+            val albums = serviceScope.future {
+                if (useId3Tags) {
+                    callWithErrorHandling {
+                        musicService.getAlbumList2(
+                            type.typeName, DISPLAY_LIMIT, offset, null
+                        )
+                    }
+                } else {
+                    callWithErrorHandling {
+                        musicService.getAlbumList(
+                            type.typeName, DISPLAY_LIMIT, offset, null
+                        )
+                    }
                 }
-            } else {
-                callWithErrorHandling {
-                    musicService.getAlbumList(
-                        type.typeName, DISPLAY_LIMIT, offset, null
-                    )
-                }
-            }
+            }.await()
 
             albums?.map { album ->
                 mediaItems.add(
@@ -742,8 +770,11 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
     private fun getPlaylists(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
-            val playlists = callWithErrorHandling { musicService.getPlaylists(true) }
+        return mainScope.future {
+            val playlists = serviceScope.future {
+                callWithErrorHandling { musicService.getPlaylists(true) }
+            }.await()
+
             playlists?.map { playlist ->
                 mediaItems.add(
                     playlist.name,
@@ -762,8 +793,10 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
-            val content = callWithErrorHandling { musicService.getPlaylist(id, name) }
+        return mainScope.future {
+            val content = serviceScope.future {
+                callWithErrorHandling { musicService.getPlaylist(id, name) }
+            }.await()
 
             if (content != null) {
                 if (content.size > 1)
@@ -775,15 +808,13 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 playlistCache = content.getTracks()
                 playlistCache!!.take(DISPLAY_LIMIT).map { item ->
                     mediaItems.add(
-                        buildMediaItemFromTrack(
-                            item,
+                        item.toMediaItem(
                             listOf(
                                 MEDIA_PLAYLIST_SONG_ITEM,
                                 id,
                                 name,
                                 item.id
-                            ).joinToString("|"),
-                            isPlayable = true
+                            ).joinToString("|")
                         )
                     )
                 }
@@ -792,49 +823,52 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         }
     }
 
-    private fun playPlaylist(id: String, name: String) {
-        serviceScope.launch {
-            if (playlistCache == null) {
-                // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
-                val content = callWithErrorHandling { musicService.getPlaylist(id, name) }
-                playlistCache = content?.getTracks()
-            }
-            if (playlistCache != null) playSongs(playlistCache!!)
+    private fun playPlaylist(id: String, name: String): List<Track>? {
+        if (playlistCache == null) {
+            // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
+            val content =
+                serviceScope.future {
+                    callWithErrorHandling { musicService.getPlaylist(id, name) }
+                }.get()
+            playlistCache = content?.getTracks()
         }
+        if (playlistCache != null) return playlistCache!!
+        return null
     }
 
-    private fun playPlaylistSong(id: String, name: String, songId: String) {
-        serviceScope.launch {
-            if (playlistCache == null) {
-                // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
-                val content = callWithErrorHandling { musicService.getPlaylist(id, name) }
-                playlistCache = content?.getTracks()
-            }
-            val song = playlistCache?.firstOrNull { x -> x.id == songId }
-            if (song != null) playSong(song)
+    private fun playPlaylistSong(id: String, name: String, songId: String): List<Track>? {
+        if (playlistCache == null) {
+            // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
+            val content = serviceScope.future {
+                callWithErrorHandling { musicService.getPlaylist(id, name) }
+            }.get()
+            playlistCache = content?.getTracks()
         }
+        val song = playlistCache?.firstOrNull { x -> x.id == songId }
+        if (song != null) return listOf(song)
+        return null
     }
 
-    private fun playAlbum(id: String, name: String) {
-        serviceScope.launch {
-            val songs = listSongsInMusicService(id, name)
-            if (songs != null) playSongs(songs.getTracks())
-        }
+    private fun playAlbum(id: String, name: String): List<Track>? {
+        val songs = listSongsInMusicService(id, name)
+        if (songs != null) return songs.getTracks()
+        return null
     }
 
-    private fun playAlbumSong(id: String, name: String, songId: String) {
-        serviceScope.launch {
-            val songs = listSongsInMusicService(id, name)
-            val song = songs?.getTracks()?.firstOrNull { x -> x.id == songId }
-            if (song != null) playSong(song)
-        }
+    private fun playAlbumSong(id: String, name: String, songId: String): List<Track>? {
+        val songs = listSongsInMusicService(id, name)
+        val song = songs?.getTracks()?.firstOrNull { x -> x.id == songId }
+        if (song != null) return listOf(song)
+        return null
     }
 
     private fun getPodcasts(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
-            val podcasts = callWithErrorHandling { musicService.getPodcastsChannels(false) }
+        return mainScope.future {
+            val podcasts = serviceScope.future {
+                callWithErrorHandling { musicService.getPodcastsChannels(false) }
+            }.await()
 
             podcasts?.map { podcast ->
                 mediaItems.add(
@@ -851,8 +885,10 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         id: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
-        return serviceScope.future {
-            val episodes = callWithErrorHandling { musicService.getPodcastEpisodes(id) }
+        return mainScope.future {
+            val episodes = serviceScope.future {
+                callWithErrorHandling { musicService.getPodcastEpisodes(id) }
+            }.await()
 
             if (episodes != null) {
                 if (episodes.getTracks().count() > 1)
@@ -860,11 +896,9 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
                 episodes.getTracks().map { episode ->
                     mediaItems.add(
-                        buildMediaItemFromTrack(
-                            episode,
+                        episode.toMediaItem(
                             listOf(MEDIA_PODCAST_EPISODE_ITEM, id, episode.id)
-                                .joinToString("|"),
-                            isPlayable = true
+                                .joinToString("|")
                         )
                     )
                 }
@@ -873,40 +907,43 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         }
     }
 
-    private fun playPodcast(id: String) {
-        serviceScope.launch {
-            val episodes = callWithErrorHandling { musicService.getPodcastEpisodes(id) }
-            if (episodes != null) {
-                playSongs(episodes.getTracks())
-            }
+    private fun playPodcast(id: String): List<Track>? {
+        val episodes = serviceScope.future {
+            callWithErrorHandling { musicService.getPodcastEpisodes(id) }
+        }.get()
+        if (episodes != null) {
+            return episodes.getTracks()
         }
+        return null
     }
 
-    private fun playPodcastEpisode(id: String, episodeId: String) {
-        serviceScope.launch {
-            val episodes = callWithErrorHandling { musicService.getPodcastEpisodes(id) }
-            if (episodes != null) {
-                val selectedEpisode = episodes
-                    .getTracks()
-                    .firstOrNull { episode -> episode.id == episodeId }
-                if (selectedEpisode != null) playSong(selectedEpisode)
-            }
+    private fun playPodcastEpisode(id: String, episodeId: String): List<Track>? {
+        val episodes = serviceScope.future {
+            callWithErrorHandling { musicService.getPodcastEpisodes(id) }
+        }.get()
+        if (episodes != null) {
+            val selectedEpisode = episodes
+                .getTracks()
+                .firstOrNull { episode -> episode.id == episodeId }
+            if (selectedEpisode != null) return listOf(selectedEpisode)
         }
+        return null
     }
 
     private fun getBookmarks(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
-        return serviceScope.future {
-            val bookmarks = callWithErrorHandling { musicService.getBookmarks() }
+        return mainScope.future {
+            val bookmarks = serviceScope.future {
+                callWithErrorHandling { musicService.getBookmarks() }
+            }.await()
+
             if (bookmarks != null) {
                 val songs = Util.getSongsFromBookmarks(bookmarks)
 
                 songs.getTracks().map { song ->
                     mediaItems.add(
-                        buildMediaItemFromTrack(
-                            song,
-                            listOf(MEDIA_BOOKMARK_ITEM, song.id).joinToString("|"),
-                            isPlayable = true
+                        song.toMediaItem(
+                            listOf(MEDIA_BOOKMARK_ITEM, song.id).joinToString("|")
                         )
                     )
                 }
@@ -915,22 +952,25 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         }
     }
 
-    private fun playBookmark(id: String) {
-        serviceScope.launch {
-            val bookmarks = callWithErrorHandling { musicService.getBookmarks() }
-            if (bookmarks != null) {
-                val songs = Util.getSongsFromBookmarks(bookmarks)
-                val song = songs.getTracks().firstOrNull { song -> song.id == id }
-                if (song != null) playSong(song)
-            }
+    private fun playBookmark(id: String): List<Track>? {
+        val bookmarks = serviceScope.future {
+            callWithErrorHandling { musicService.getBookmarks() }
+        }.get()
+        if (bookmarks != null) {
+            val songs = Util.getSongsFromBookmarks(bookmarks)
+            val song = songs.getTracks().firstOrNull { song -> song.id == id }
+            if (song != null) return listOf(song)
         }
+        return null
     }
 
     private fun getShares(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
-            val shares = callWithErrorHandling { musicService.getShares(false) }
+        return mainScope.future {
+            val shares = serviceScope.future {
+                callWithErrorHandling { musicService.getShares(false) }
+            }.await()
 
             shares?.map { share ->
                 mediaItems.add(
@@ -949,8 +989,10 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
-            val shares = callWithErrorHandling { musicService.getShares(false) }
+        return mainScope.future {
+            val shares = serviceScope.future {
+                callWithErrorHandling { musicService.getShares(false) }
+            }.await()
 
             val selectedShare = shares?.firstOrNull { share -> share.id == id }
             if (selectedShare != null) {
@@ -960,10 +1002,8 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
                 selectedShare.getEntries().map { song ->
                     mediaItems.add(
-                        buildMediaItemFromTrack(
-                            song,
-                            listOf(MEDIA_SHARE_SONG_ITEM, id, song.id).joinToString("|"),
-                            isPlayable = true
+                        song.toMediaItem(
+                            listOf(MEDIA_SHARE_SONG_ITEM, id, song.id).joinToString("|")
                         )
                     )
                 }
@@ -972,32 +1012,36 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         }
     }
 
-    private fun playShare(id: String) {
-        serviceScope.launch {
-            val shares = callWithErrorHandling { musicService.getShares(false) }
-            val selectedShare = shares?.firstOrNull { share -> share.id == id }
-            if (selectedShare != null) {
-                playSongs(selectedShare.getEntries())
-            }
+    private fun playShare(id: String): List<Track>? {
+        val shares = serviceScope.future {
+            callWithErrorHandling { musicService.getShares(false) }
+        }.get()
+        val selectedShare = shares?.firstOrNull { share -> share.id == id }
+        if (selectedShare != null) {
+            return selectedShare.getEntries()
         }
+        return null
     }
 
-    private fun playShareSong(id: String, songId: String) {
-        serviceScope.launch {
-            val shares = callWithErrorHandling { musicService.getShares(false) }
-            val selectedShare = shares?.firstOrNull { share -> share.id == id }
-            if (selectedShare != null) {
-                val song = selectedShare.getEntries().firstOrNull { x -> x.id == songId }
-                if (song != null) playSong(song)
-            }
+    private fun playShareSong(id: String, songId: String): List<Track>? {
+        val shares = serviceScope.future {
+            callWithErrorHandling { musicService.getShares(false) }
+        }.get()
+        val selectedShare = shares?.firstOrNull { share -> share.id == id }
+        if (selectedShare != null) {
+            val song = selectedShare.getEntries().firstOrNull { x -> x.id == songId }
+            if (song != null) return listOf(song)
         }
+        return null
     }
 
     private fun getStarredSongs(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
-            val songs = listStarredSongsInMusicService()
+        return mainScope.future {
+            val songs = serviceScope.future {
+                listStarredSongsInMusicService()
+            }.await()
 
             if (songs != null) {
                 if (songs.songs.count() > 1)
@@ -1008,10 +1052,8 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 starredSongsCache = items
                 items.map { song ->
                     mediaItems.add(
-                        buildMediaItemFromTrack(
-                            song,
-                            listOf(MEDIA_SONG_STARRED_ITEM, song.id).joinToString("|"),
-                            isPlayable = true
+                        song.toMediaItem(
+                            listOf(MEDIA_SONG_STARRED_ITEM, song.id).joinToString("|")
                         )
                     )
                 }
@@ -1020,34 +1062,34 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         }
     }
 
-    private fun playStarredSongs() {
-        serviceScope.launch {
-            if (starredSongsCache == null) {
-                // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
-                val content = listStarredSongsInMusicService()
-                starredSongsCache = content?.songs
-            }
-            if (starredSongsCache != null) playSongs(starredSongsCache!!)
+    private fun playStarredSongs(): List<Track>? {
+        if (starredSongsCache == null) {
+            // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
+            val content = listStarredSongsInMusicService()
+            starredSongsCache = content?.songs
         }
+        if (starredSongsCache != null) return starredSongsCache!!
+        return null
     }
 
-    private fun playStarredSong(songId: String) {
-        serviceScope.launch {
-            if (starredSongsCache == null) {
-                // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
-                val content = listStarredSongsInMusicService()
-                starredSongsCache = content?.songs
-            }
-            val song = starredSongsCache?.firstOrNull { x -> x.id == songId }
-            if (song != null) playSong(song)
+    private fun playStarredSong(songId: String): List<Track>? {
+        if (starredSongsCache == null) {
+            // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
+            val content = listStarredSongsInMusicService()
+            starredSongsCache = content?.songs
         }
+        val song = starredSongsCache?.firstOrNull { x -> x.id == songId }
+        if (song != null) return listOf(song)
+        return null
     }
 
     private fun getRandomSongs(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return serviceScope.future {
-            val songs = callWithErrorHandling { musicService.getRandomSongs(DISPLAY_LIMIT) }
+        return mainScope.future {
+            val songs = serviceScope.future {
+                callWithErrorHandling { musicService.getRandomSongs(DISPLAY_LIMIT) }
+            }.await()
 
             if (songs != null) {
                 if (songs.size > 1)
@@ -1058,10 +1100,8 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 randomSongsCache = items
                 items.map { song ->
                     mediaItems.add(
-                        buildMediaItemFromTrack(
-                            song,
-                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|"),
-                            isPlayable = true
+                        song.toMediaItem(
+                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
                         )
                     )
                 }
@@ -1070,42 +1110,46 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         }
     }
 
-    private fun playRandomSongs() {
-        serviceScope.launch {
-            if (randomSongsCache == null) {
-                // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
-                // In this case we request a new set of random songs
-                val content = callWithErrorHandling { musicService.getRandomSongs(DISPLAY_LIMIT) }
-                randomSongsCache = content?.getTracks()
-            }
-            if (randomSongsCache != null) playSongs(randomSongsCache!!)
+    private fun playRandomSongs(): List<Track>? {
+        if (randomSongsCache == null) {
+            // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
+            // In this case we request a new set of random songs
+            val content = serviceScope.future {
+                callWithErrorHandling { musicService.getRandomSongs(DISPLAY_LIMIT) }
+            }.get()
+            randomSongsCache = content?.getTracks()
         }
+        if (randomSongsCache != null) return randomSongsCache!!
+        return null
     }
 
-    private fun playRandomSong(songId: String) {
-        serviceScope.launch {
-            // If there is no cache, we can't play the selected song.
-            if (randomSongsCache != null) {
-                val song = randomSongsCache!!.firstOrNull { x -> x.id == songId }
-                if (song != null) playSong(song)
-            }
+    private fun playRandomSong(songId: String): List<Track>? {
+        // If there is no cache, we can't play the selected song.
+        if (randomSongsCache != null) {
+            val song = randomSongsCache!!.firstOrNull { x -> x.id == songId }
+            if (song != null) return listOf(song)
         }
+        return null
     }
 
     private fun listSongsInMusicService(id: String, name: String): MusicDirectory? {
-        return if (!ActiveServerProvider.isOffline() && Settings.shouldUseId3Tags) {
-            callWithErrorHandling { musicService.getAlbum(id, name, false) }
-        } else {
-            callWithErrorHandling { musicService.getMusicDirectory(id, name, false) }
-        }
+        return serviceScope.future {
+            if (!ActiveServerProvider.isOffline() && Settings.shouldUseId3Tags) {
+                callWithErrorHandling { musicService.getAlbum(id, name, false) }
+            } else {
+                callWithErrorHandling { musicService.getMusicDirectory(id, name, false) }
+            }
+        }.get()
     }
 
     private fun listStarredSongsInMusicService(): SearchResult? {
-        return if (Settings.shouldUseId3Tags) {
-            callWithErrorHandling { musicService.getStarred2() }
-        } else {
-            callWithErrorHandling { musicService.getStarred() }
-        }
+        return serviceScope.future {
+            if (Settings.shouldUseId3Tags) {
+                callWithErrorHandling { musicService.getStarred2() }
+            } else {
+                callWithErrorHandling { musicService.getStarred() }
+            }
+        }.get()
     }
 
     private fun MutableList<MediaItem>.add(
@@ -1124,20 +1168,28 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         this.add(mediaItem)
     }
 
+    @Suppress("LongParameterList")
     private fun MutableList<MediaItem>.add(
         resId: Int,
         mediaId: String,
         groupNameId: Int?,
         browsable: Boolean = true,
-        folderType: Int = FOLDER_TYPE_MIXED
+        folderType: Int = FOLDER_TYPE_MIXED,
+        icon: Int? = null
     ) {
         val applicationContext = UApp.applicationContext()
 
         val mediaItem = buildMediaItem(
             applicationContext.getString(resId),
             mediaId,
-            isPlayable = false,
-            folderType = folderType
+            isPlayable = !browsable,
+            folderType = folderType,
+            group = if (groupNameId != null) {
+                applicationContext.getString(groupNameId)
+            } else null,
+            imageUri = if (icon != null) {
+                Util.getUriToDrawable(applicationContext, icon)
+            } else null
         )
 
         this.add(mediaItem)
@@ -1150,7 +1202,8 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
             R.string.select_album_play_all,
             mediaId,
             null,
-            false
+            false,
+            icon = R.drawable.media_start_normal
         )
     }
 
@@ -1158,28 +1211,6 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         var section = name.first().uppercaseChar()
         if (!section.isLetter()) section = '#'
         return section.toString()
-    }
-
-    private fun playSongs(songs: List<Track>) {
-        mediaPlayerController.addToPlaylist(
-            songs,
-            cachePermanently = false,
-            autoPlay = true,
-            shuffle = false,
-            insertionMode = MediaPlayerController.InsertionMode.CLEAR
-        )
-    }
-
-    private fun playSong(song: Track) {
-        mediaPlayerController.addToPlaylist(
-            listOf(song),
-            cachePermanently = false,
-            autoPlay = false,
-            shuffle = false,
-            insertionMode = MediaPlayerController.InsertionMode.AFTER_CURRENT
-        )
-        if (mediaPlayerController.mediaItemCount > 1) mediaPlayerController.next()
-        else mediaPlayerController.play()
     }
 
     private fun <T> callWithErrorHandling(function: () -> T): T? {
@@ -1190,54 +1221,5 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
             Timber.i(all)
             null
         }
-    }
-
-    private fun buildMediaItemFromTrack(
-        track: Track,
-        mediaId: String,
-        isPlayable: Boolean
-    ): MediaItem {
-
-        return buildMediaItem(
-            title = track.title ?: "",
-            mediaId = mediaId,
-            isPlayable = isPlayable,
-            folderType = FOLDER_TYPE_NONE,
-            album = track.album,
-            artist = track.artist,
-            genre = track.genre,
-            starred = track.starred
-        )
-    }
-
-    @Suppress("LongParameterList")
-    private fun buildMediaItem(
-        title: String,
-        mediaId: String,
-        isPlayable: Boolean,
-        @MediaMetadata.FolderType folderType: Int,
-        album: String? = null,
-        artist: String? = null,
-        genre: String? = null,
-        sourceUri: Uri? = null,
-        imageUri: Uri? = null,
-        starred: Boolean = false
-    ): MediaItem {
-        val metadata =
-            MediaMetadata.Builder()
-                .setAlbumTitle(album)
-                .setTitle(title)
-                .setArtist(artist)
-                .setGenre(genre)
-                .setUserRating(HeartRating(starred))
-                .setFolderType(folderType)
-                .setIsPlayable(isPlayable)
-                .setArtworkUri(imageUri)
-                .build()
-        return MediaItem.Builder()
-            .setMediaId(mediaId)
-            .setMediaMetadata(metadata)
-            .setUri(sourceUri)
-            .build()
     }
 }

@@ -17,8 +17,8 @@ import androidx.lifecycle.LiveData
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.TrackViewBinder
+import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.model.GenericListModel
-import org.moire.ultrasonic.service.DownloadFile
 import org.moire.ultrasonic.service.Downloader
 import org.moire.ultrasonic.util.Util
 
@@ -31,7 +31,7 @@ import org.moire.ultrasonic.util.Util
  *
  * TODO: Add code to enable manipulation of the download list
  */
-class DownloadsFragment : MultiListFragment<DownloadFile>() {
+class DownloadsFragment : MultiListFragment<Track>() {
 
     /**
      * The ViewModel to use to get the data
@@ -41,7 +41,7 @@ class DownloadsFragment : MultiListFragment<DownloadFile>() {
     /**
      * The central function to pass a query to the model and return a LiveData object
      */
-    override fun getLiveData(args: Bundle?, refresh: Boolean): LiveData<List<DownloadFile>> {
+    override fun getLiveData(args: Bundle?, refresh: Boolean): LiveData<List<Track>> {
         return listModel.getList()
     }
 
@@ -71,12 +71,12 @@ class DownloadsFragment : MultiListFragment<DownloadFile>() {
         viewAdapter.submitList(liveDataList.value)
     }
 
-    override fun onContextMenuItemSelected(menuItem: MenuItem, item: DownloadFile): Boolean {
+    override fun onContextMenuItemSelected(menuItem: MenuItem, item: Track): Boolean {
         // TODO: Add code to enable manipulation of the download list
         return true
     }
 
-    override fun onItemClick(item: DownloadFile) {
+    override fun onItemClick(item: Track) {
         // TODO: Add code to enable manipulation of the download list
     }
 }
@@ -84,7 +84,7 @@ class DownloadsFragment : MultiListFragment<DownloadFile>() {
 class DownloadListModel(application: Application) : GenericListModel(application) {
     private val downloader by inject<Downloader>()
 
-    fun getList(): LiveData<List<DownloadFile>> {
+    fun getList(): LiveData<List<Track>> {
         return downloader.observableDownloads
     }
 }

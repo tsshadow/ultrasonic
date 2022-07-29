@@ -1,6 +1,6 @@
 /*
  * TimeLimitedCache.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -15,7 +15,12 @@ class TimeLimitedCache<T>(expiresAfter: Long = 60L, timeUnit: TimeUnit = TimeUni
     private var expires: Long = 0
 
     fun get(): T? {
-        return if (System.currentTimeMillis() < expires) value!!.get() else null
+        return if (System.currentTimeMillis() < expires) {
+            value!!.get()
+        } else {
+            clear()
+            null
+        }
     }
 
     @JvmOverloads

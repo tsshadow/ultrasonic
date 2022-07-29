@@ -157,6 +157,10 @@
             android:authorities="org.moire.ultrasonic.provider.SearchSuggestionProvider"
             android:exported="true" />
 
+        <provider
+            android:name=".provider.AlbumArtContentProvider"
+            android:authorities="org.moire.ultrasonic.provider.AlbumArtContentProvider"
+            android:exported="true" />
     </application>
 
 </manifest>

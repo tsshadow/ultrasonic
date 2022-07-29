@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
+import org.moire.ultrasonic.domain.Track
 
 class RxBus {
 
@@ -41,17 +42,22 @@ class RxBus {
                 .autoConnect(0)
                 .throttleLatest(300, TimeUnit.MILLISECONDS)
 
-        val playlistPublisher: PublishSubject<List<DownloadFile>> =
+        val playlistPublisher: PublishSubject<List<Track>> =
             PublishSubject.create()
-        val playlistObservable: Observable<List<DownloadFile>> =
+        val playlistObservable: Observable<List<Track>> =
             playlistPublisher.observeOn(mainThread())
                 .replay(1)
                 .autoConnect(0)
-        val throttledPlaylistObservable: Observable<List<DownloadFile>> =
+        val throttledPlaylistObservable: Observable<List<Track>> =
             playlistPublisher.observeOn(mainThread())
                 .replay(1)
                 .autoConnect(0)
                 .throttleLatest(300, TimeUnit.MILLISECONDS)
+
+        val trackDownloadStatePublisher: PublishSubject<TrackDownloadState> =
+            PublishSubject.create()
+        val trackDownloadStateObservable: Observable<TrackDownloadState> =
+            trackDownloadStatePublisher.observeOn(mainThread())
 
         // Commands
         val dismissNowPlayingCommandPublisher: PublishSubject<Unit> =
@@ -76,10 +82,16 @@ class RxBus {
     }
 
     data class StateWithTrack(
-        val track: DownloadFile?,
+        val track: Track?,
         val index: Int = -1,
         val isPlaying: Boolean = false,
         val state: Int
+    )
+
+    data class TrackDownloadState(
+        val track: Track,
+        val state: DownloadStatus,
+        val progress: Int
     )
 }
 

@@ -15,6 +15,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.FileUtil
 import timber.log.Timber
@@ -32,7 +33,7 @@ class PlaybackStateSerializer : KoinComponent {
     private val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     fun serializeAsync(
-        songs: Iterable<DownloadFile>,
+        songs: Iterable<Track>,
         currentPlayingIndex: Int,
         currentPlayingPosition: Int,
         shufflePlay: Boolean,
@@ -56,19 +57,14 @@ class PlaybackStateSerializer : KoinComponent {
     }
 
     fun serializeNow(
-        referencedList: Iterable<DownloadFile>,
+        tracks: Iterable<Track>,
         currentPlayingIndex: Int,
         currentPlayingPosition: Int,
         shufflePlay: Boolean,
         repeatMode: Int
     ) {
-
-        val tracks = referencedList.toList().map {
-            it.track
-        }
-
         val state = PlaybackState(
-            tracks,
+            tracks.toList(),
             currentPlayingIndex,
             currentPlayingPosition,
             shufflePlay,
