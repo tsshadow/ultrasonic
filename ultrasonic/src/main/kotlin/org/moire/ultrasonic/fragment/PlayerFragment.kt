@@ -10,6 +10,7 @@ package org.moire.ultrasonic.fragment
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.graphics.Point
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -209,12 +210,23 @@ class PlayerFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         cancellationToken = CancellationToken()
         setTitle(this, R.string.common_appname)
+
         val windowManager = requireActivity().windowManager
-        val display = windowManager.defaultDisplay
-        val size = Point()
-        display.getSize(size)
-        val width = size.x
-        val height = size.y
+        val width: Int
+        val height: Int
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val bounds = windowManager.currentWindowMetrics.bounds
+            width = bounds.width()
+            height = bounds.height()
+        } else {
+            val display = windowManager.defaultDisplay
+            val size = Point()
+            display.getSize(size)
+            width = size.x
+            height = size.y
+        }
+
         setHasOptionsMenu(true)
         useFiveStarRating = Settings.useFiveStarRating
         swipeDistance = (width + height) * PERCENTAGE_OF_SCREEN_FOR_SWIPE / 100
