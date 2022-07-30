@@ -735,13 +735,13 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 if (useId3Tags) {
                     callWithErrorHandling {
                         musicService.getAlbumList2(
-                            type.typeName, DISPLAY_LIMIT, offset, null
+                            type, DISPLAY_LIMIT, offset, null
                         )
                     }
                 } else {
                     callWithErrorHandling {
                         musicService.getAlbumList(
-                            type.typeName, DISPLAY_LIMIT, offset, null
+                            type, DISPLAY_LIMIT, offset, null
                         )
                     }
                 }
@@ -756,7 +756,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 )
             }
 
-            if (albums?.size ?: 0 >= DISPLAY_LIMIT)
+            if ((albums?.size ?: 0) >= DISPLAY_LIMIT)
                 mediaItems.add(
                     R.string.search_more,
                     listOf(MEDIA_ALBUM_PAGE_ID, type.typeName, (page ?: 0) + 1).joinToString("|"),

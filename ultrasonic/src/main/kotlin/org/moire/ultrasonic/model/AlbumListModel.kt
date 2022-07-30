@@ -82,20 +82,22 @@ class AlbumListModel(application: Application) : GenericListModel(application) {
             )
         }
 
+        val type = AlbumListType.fromName(albumListType)
+
         if (useId3Tags) {
             musicDirectory =
                 musicService.getAlbumList2(
-                    albumListType, size,
+                    type, size,
                     offset, musicFolderId
                 )
         } else {
             musicDirectory = musicService.getAlbumList(
-                albumListType, size,
+                type, size,
                 offset, musicFolderId
             )
         }
 
-        currentListIsSortable = isCollectionSortable(albumListType)
+        currentListIsSortable = isCollectionSortable(type)
 
         if (append && list.value != null) {
             val newList = ArrayList<Album>()
@@ -112,17 +114,23 @@ class AlbumListModel(application: Application) : GenericListModel(application) {
     override fun showSelectFolderHeader(args: Bundle?): Boolean {
         if (args == null) return false
 
-        val albumListType = args.getString(Constants.INTENT_ALBUM_LIST_TYPE)!!
+        val albumListType =
+            AlbumListType.fromName(args.getString(Constants.INTENT_ALBUM_LIST_TYPE)!!)
 
-        val isAlphabetical = (albumListType == AlbumListType.SORTED_BY_NAME.toString()) ||
-            (albumListType == AlbumListType.SORTED_BY_ARTIST.toString())
+        val isAlphabetical = (albumListType == AlbumListType.SORTED_BY_NAME) ||
+            (albumListType == AlbumListType.SORTED_BY_ARTIST)
 
         return !isOffline() && !Settings.shouldUseId3Tags && isAlphabetical
     }
 
-    private fun isCollectionSortable(albumListType: String): Boolean {
-        return albumListType != "newest" && albumListType != "random" &&
-            albumListType != "highest" && albumListType != "recent" &&
-            albumListType != "frequent"
+    private fun isCollectionSortable(albumListType: AlbumListType): Boolean {
+        return when (albumListType) {
+            AlbumListType.RANDOM -> false
+            AlbumListType.NEWEST -> false
+            AlbumListType.HIGHEST -> false
+            AlbumListType.FREQUENT -> false
+            AlbumListType.RECENT -> false
+            else -> true
+        }
     }
 }

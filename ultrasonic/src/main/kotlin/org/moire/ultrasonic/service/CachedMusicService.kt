@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.Pair
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.MetaDatabase
 import org.moire.ultrasonic.domain.Album
@@ -256,7 +257,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
 
     @Throws(Exception::class)
     override fun getAlbumList(
-        type: String,
+        type: AlbumListType,
         size: Int,
         offset: Int,
         musicFolderId: String?
@@ -266,7 +267,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
 
     @Throws(Exception::class)
     override fun getAlbumList2(
-        type: String,
+        type: AlbumListType,
         size: Int,
         offset: Int,
         musicFolderId: String?

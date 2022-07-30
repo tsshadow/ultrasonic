@@ -7,6 +7,7 @@
 package org.moire.ultrasonic.service
 
 import java.io.InputStream
+import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.Bookmark
@@ -93,7 +94,7 @@ interface MusicService {
 
     @Throws(Exception::class)
     fun getAlbumList(
-        type: String,
+        type: AlbumListType,
         size: Int,
         offset: Int,
         musicFolderId: String?
@@ -101,7 +102,7 @@ interface MusicService {
 
     @Throws(Exception::class)
     fun getAlbumList2(
-        type: String,
+        type: AlbumListType,
         size: Int,
         offset: Int,
         musicFolderId: String?
