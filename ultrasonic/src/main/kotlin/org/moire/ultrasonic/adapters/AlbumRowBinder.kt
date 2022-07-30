@@ -43,6 +43,7 @@ class AlbumRowBinder(
         holder.album.text = item.title
         holder.artist.text = item.artist
         holder.details.setOnClickListener { onItemClick(item) }
+        holder.coverArt.setOnClickListener { onItemClick(item) }
         holder.details.setOnLongClickListener {
             val popup = Utils.createPopupMenu(holder.itemView)
 
