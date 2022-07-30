@@ -126,15 +126,15 @@ class MainFragment : Fragment(), KoinComponent {
         songsStarredButton.isVisible = isOnline
 
         // Albums
-        albumsTitle.isVisible = isOnline
-        albumsNewestButton.isVisible = isOnline
+        albumsTitle.isVisible = isOnline || useId3Offline
+        albumsNewestButton.isVisible = isOnline || useId3Offline
         albumsRecentButton.isVisible = isOnline
         albumsFrequentButton.isVisible = isOnline
         albumsHighestButton.isVisible = isOnline && !useId3
         albumsRandomButton.isVisible = isOnline
         albumsStarredButton.isVisible = isOnline
-        albumsAlphaByNameButton.isVisible = isOnline
-        albumsAlphaByArtistButton.isVisible = isOnline
+        albumsAlphaByNameButton.isVisible = isOnline || useId3Offline
+        albumsAlphaByArtistButton.isVisible = isOnline || useId3Offline
 
         // Videos
         videosTitle.isVisible = isOnline

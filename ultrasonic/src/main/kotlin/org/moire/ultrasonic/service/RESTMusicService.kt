@@ -13,7 +13,7 @@ import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
-import org.moire.ultrasonic.api.subsonic.models.AlbumListType.Companion.fromName
+import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
 import org.moire.ultrasonic.api.subsonic.toStreamResponse
@@ -351,13 +351,13 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun getAlbumList(
-        type: String,
+        type: AlbumListType,
         size: Int,
         offset: Int,
         musicFolderId: String?
     ): List<Album> {
         val response = API.getAlbumList(
-            fromName(type),
+            type,
             size,
             offset,
             null,
@@ -371,13 +371,13 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun getAlbumList2(
-        type: String,
+        type: AlbumListType,
         size: Int,
         offset: Int,
         musicFolderId: String?
     ): List<Album> {
         val response = API.getAlbumList2(
-            fromName(type),
+            type,
             size,
             offset,
             null,

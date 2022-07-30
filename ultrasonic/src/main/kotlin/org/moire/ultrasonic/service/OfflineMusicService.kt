@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.MetaDatabase
 import org.moire.ultrasonic.domain.Album
@@ -313,7 +314,7 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Throws(Exception::class)
     override fun getAlbumList(
-        type: String,
+        type: AlbumListType,
         size: Int,
         offset: Int,
         musicFolderId: String?
@@ -323,13 +324,17 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Throws(OfflineException::class)
     override fun getAlbumList2(
-        type: String,
+        type: AlbumListType,
         size: Int,
         offset: Int,
         musicFolderId: String?
     ): List<Album> {
         // TODO: Implement filtering by musicFolder?
-        return cachedAlbums.get(size, offset)
+        return when (type) {
+            AlbumListType.NEWEST -> cachedAlbums.orderedByAge(size, offset)
+            AlbumListType.SORTED_BY_ARTIST -> cachedAlbums.orderedByArtist(size, offset)
+            else -> cachedAlbums.orderedByName(size, offset)
+        }
     }
 
     @Throws(Exception::class)

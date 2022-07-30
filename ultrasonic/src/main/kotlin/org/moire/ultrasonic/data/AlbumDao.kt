@@ -26,6 +26,24 @@ interface AlbumDao : GenericDao<Album> {
     fun get(size: Int, offset: Int = 0): List<Album>
 
     /**
+     * Get all albums in a specific range in a certain order
+     */
+    @Query("SELECT * FROM albums ORDER BY artist ASC LIMIT :offset,:size ")
+    fun orderedByArtist(size: Int, offset: Int = 0): List<Album>
+
+    /**
+     * Get all albums in a specific range in a certain order
+     */
+    @Query("SELECT * FROM albums ORDER BY created DESC LIMIT :offset,:size ")
+    fun orderedByAge(size: Int, offset: Int = 0): List<Album>
+
+    /**
+     * Get all albums in a specific range in a certain order
+     */
+    @Query("SELECT * FROM albums ORDER BY title ASC LIMIT :offset,:size ")
+    fun orderedByName(size: Int, offset: Int = 0): List<Album>
+
+    /**
      * Get album by id
      */
     @Query("SELECT * FROM albums where id LIKE :albumId LIMIT 1")
