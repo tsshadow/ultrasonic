@@ -11,7 +11,6 @@ import android.net.wifi.WifiManager
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock as SystemClock
-import android.text.TextUtils
 import androidx.lifecycle.MutableLiveData
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.io.IOException
@@ -23,6 +22,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.MetaDatabase
+import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.Track
@@ -285,7 +285,7 @@ class Downloader(
         Util.scanMedia(track.getPinnedFile())
     }
 
-    fun cancelDownload(track: Track) {
+    private fun cancelDownload(track: Track) {
         val key = activelyDownloading.keys.singleOrNull { t -> t.track.id == track.id } ?: return
         activelyDownloading[key]?.cancel()
     }
@@ -359,7 +359,7 @@ class Downloader(
 
                     // Hidden feature: If track is toggled between pinned/saved, refresh the metadata..
                     try {
-                        item.track.cacheMetadata()
+                        item.track.cacheMetadataAndArtwork()
                     } catch (ignore: Exception) {
                         Timber.w(ignore)
                     }
@@ -427,12 +427,10 @@ class Downloader(
                     }
 
                     try {
-                        item.track.cacheMetadata()
+                        item.track.cacheMetadataAndArtwork()
                     } catch (ignore: Exception) {
                         Timber.w(ignore)
                     }
-
-                    downloadAndSaveCoverArt()
                 }
 
                 if (item.pinned) {
@@ -481,11 +479,12 @@ class Downloader(
             return String.format(Locale.ROOT, "DownloadTask (%s)", item)
         }
 
-        private fun Track.cacheMetadata() {
+        private fun Track.cacheMetadataAndArtwork() {
             if (artistId.isNullOrEmpty()) return
 
             val onlineDB = activeServerProvider.getActiveMetaDatabase()
             val offlineDB = activeServerProvider.offlineMetaDatabase
+            val album: Album?
 
             cacheArtist(onlineDB, offlineDB, artistId!!)
 
@@ -493,9 +492,12 @@ class Downloader(
             if (albumId?.isNotEmpty() == true) {
                 // This is a cached call
                 val albums = musicService.getAlbumsOfArtist(artistId!!, null, false)
-                val album = albums.find { it.id == albumId }
+                album = albums.find { it.id == albumId }
 
                 if (album != null) {
+                    // Often the album entity returned from the server won't have the path set.
+                    if (album.path.isNullOrEmpty()) album.path = FileUtil.getParentPath(path)
+
                     offlineDB.albumDao().insert(album)
 
                     // If the album is a Compilation, also cache the Album artist
@@ -506,6 +508,9 @@ class Downloader(
 
             // Now cache the track data
             offlineDB.trackDao().insert(this)
+
+            // Download the largest size that we can display in the UI
+            imageLoaderProvider.getImageLoader().cacheCoverArt(this)
         }
 
         private fun cacheArtist(onlineDB: MetaDatabase, offlineDB: MetaDatabase, artistId: String) {
@@ -523,17 +528,6 @@ class Downloader(
             // If we have found an artist, cache it.
             if (artist != null) {
                 offlineDB.artistDao().insert(artist)
-            }
-        }
-
-        private fun downloadAndSaveCoverArt() {
-            try {
-                if (!TextUtils.isEmpty(item.track.coverArt)) {
-                    // Download the largest size that we can display in the UI
-                    imageLoaderProvider.getImageLoader().cacheCoverArt(item.track)
-                }
-            } catch (all: Exception) {
-                Timber.e(all, "Failed to get cover art.")
             }
         }
 
