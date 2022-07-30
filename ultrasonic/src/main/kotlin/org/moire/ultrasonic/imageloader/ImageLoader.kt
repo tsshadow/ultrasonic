@@ -178,14 +178,14 @@ class ImageLoader(
     }
 
     /**
-     * Download a cover art file and cache it on disk
+     * Download a cover art file of a Track and cache it on disk
      */
     fun cacheCoverArt(track: Track) {
         cacheCoverArt(track.coverArt!!, FileUtil.getAlbumArtFile(track))
     }
 
     fun cacheCoverArt(id: String, file: String) {
-        if (id.isNullOrBlank()) return
+        if (id.isBlank()) return
         // Return if have a cache hit
         if (File(file).exists()) return
 
@@ -230,10 +230,10 @@ class ImageLoader(
     }
 
     private fun resolveSize(requested: Int, large: Boolean): Int {
-        if (requested <= 0) {
-            return if (large) config.largeSize else config.defaultSize
+        return if (requested <= 0) {
+            if (large) config.largeSize else config.defaultSize
         } else {
-            return requested
+            requested
         }
     }
 

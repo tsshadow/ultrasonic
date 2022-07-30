@@ -209,7 +209,8 @@ object FileUtil {
 
     private fun getAlbumDirectory(entry: MusicDirectory.Child): String {
         val dir: String
-        if (!TextUtils.isEmpty(entry.path) && getParentPath(entry.path!!) != null) {
+        val isFileInRoot = !entry.isDirectory && (getParentPath(entry.path) == null)
+        if (!TextUtils.isEmpty(entry.path) && !isFileInRoot) {
             val f = fileSystemSafeDir(entry.path)
             dir = String.format(
                 Locale.ROOT,
@@ -413,8 +414,8 @@ object FileUtil {
         return path.substringAfterLast('/')
     }
 
-    fun getParentPath(path: String): String? {
-        if (!path.contains('/')) return null
+    fun getParentPath(path: String?): String? {
+        if (path == null || !path.contains('/')) return null
         return path.substringBeforeLast('/')
     }
 
