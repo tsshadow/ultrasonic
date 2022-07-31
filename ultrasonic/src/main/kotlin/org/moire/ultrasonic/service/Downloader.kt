@@ -291,6 +291,8 @@ class Downloader(
     }
 
     fun unpin(track: Track) {
+        val pinnedFile = track.getPinnedFile()
+        if (!Storage.isPathExists(pinnedFile)) return
         val file = Storage.getFromPath(track.getPinnedFile()) ?: return
         Storage.rename(file, track.getCompleteFile())
         postState(track, DownloadStatus.DONE, 100)
@@ -319,7 +321,7 @@ class Downloader(
     private fun postState(track: Track, state: DownloadStatus, progress: Int) {
         RxBus.trackDownloadStatePublisher.onNext(
             RxBus.TrackDownloadState(
-                track,
+                track.id,
                 state,
                 progress
             )
@@ -374,11 +376,7 @@ class Downloader(
                 val duration = item.track.duration
                 val fileLength = Storage.getFromPath(item.partialFile)?.length ?: 0
 
-                needsDownloading = (
-                    duration == null ||
-                        duration == 0 ||
-                        fileLength == 0L
-                    )
+                needsDownloading = (duration == null || duration == 0 || fileLength == 0L)
 
                 if (needsDownloading) {
                     // Attempt partial HTTP GET, appending to the file if it exists.
@@ -480,19 +478,32 @@ class Downloader(
         }
 
         private fun Track.cacheMetadataAndArtwork() {
-            if (artistId.isNullOrEmpty()) return
-
             val onlineDB = activeServerProvider.getActiveMetaDatabase()
             val offlineDB = activeServerProvider.offlineMetaDatabase
-            val album: Album?
 
-            cacheArtist(onlineDB, offlineDB, artistId!!)
+            var artistId: String? = if (artistId.isNullOrEmpty()) null else artistId
+            val albumId: String? = if (albumId.isNullOrEmpty()) null else albumId
+
+            var album: Album? = null
+
+            // Sometime in compilation albums, the individual tracks won't have an Artist id
+            // In this case, try to get the ArtistId of the album...
+            if (artistId == null && albumId != null) {
+                album = musicService.getAlbum(albumId, null, false)
+                artistId = album?.artistId
+            }
+
+            // Cache the artist
+            if (artistId != null)
+                cacheArtist(onlineDB, offlineDB, artistId)
 
             // Now cache the album
-            if (albumId?.isNotEmpty() == true) {
-                // This is a cached call
-                val albums = musicService.getAlbumsOfArtist(artistId!!, null, false)
-                album = albums.find { it.id == albumId }
+            if (albumId != null) {
+                if (album == null) {
+                    // This is a cached call
+                    val albums = musicService.getAlbumsOfArtist(artistId!!, null, false)
+                    album = albums.find { it.id == albumId }
+                }
 
                 if (album != null) {
                     // Often the album entity returned from the server won't have the path set.

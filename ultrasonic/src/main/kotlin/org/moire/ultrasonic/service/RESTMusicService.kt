@@ -155,7 +155,7 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getAlbum(
+    override fun getAlbumAsDir(
         id: String,
         name: String?,
         refresh: Boolean
@@ -163,6 +163,17 @@ open class RESTMusicService(
         val response = API.getAlbum(id).execute().throwOnFailure()
 
         return response.body()!!.album.toMusicDirectoryDomainEntity(activeServerId)
+    }
+
+    @Throws(Exception::class)
+    override fun getAlbum(
+        id: String,
+        name: String?,
+        refresh: Boolean
+    ): Album {
+        val response = API.getAlbum(id).execute().throwOnFailure()
+
+        return response.body()!!.album.toDomainEntity(activeServerId)
     }
 
     @Throws(Exception::class)

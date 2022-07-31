@@ -1135,7 +1135,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
     private fun listSongsInMusicService(id: String, name: String): MusicDirectory? {
         return serviceScope.future {
             if (!ActiveServerProvider.isOffline() && Settings.shouldUseId3Tags) {
-                callWithErrorHandling { musicService.getAlbum(id, name, false) }
+                callWithErrorHandling { musicService.getAlbumAsDir(id, name, false) }
             } else {
                 callWithErrorHandling { musicService.getMusicDirectory(id, name, false) }
             }

@@ -115,7 +115,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         }
 
         rxBusSubscription!! += RxBus.trackDownloadStateObservable.subscribe {
-            if (it.track.id != song.id) return@subscribe
+            if (it.id != song.id) return@subscribe
             updateStatus(it.state)
             updateProgress(it.progress)
         }

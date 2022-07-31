@@ -177,12 +177,12 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun getAlbum(id: String, name: String?, refresh: Boolean): MusicDirectory {
+    override fun getAlbumAsDir(id: String, name: String?, refresh: Boolean): MusicDirectory {
         checkSettingsChanged()
         var cache = if (refresh) null else cachedAlbum[id]
         var dir = cache?.get()
         if (dir == null) {
-            dir = musicService.getAlbum(id, name, refresh)
+            dir = musicService.getAlbumAsDir(id, name, refresh)
             cache = TimeLimitedCache(
                 Settings.directoryCacheTime.toLong(), TimeUnit.SECONDS
             )
@@ -190,6 +190,21 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
             cachedAlbum.put(id, cache)
         }
         return dir
+    }
+
+    @Throws(Exception::class)
+    override fun getAlbum(id: String, name: String?, refresh: Boolean): Album? {
+        checkSettingsChanged()
+        var cache = if (refresh) null else cachedAlbums.get(id)
+        if (cache == null) {
+            try {
+                cache = musicService.getAlbum(id, name, refresh)
+            } catch (ignored: Exception) {
+            }
+
+            cache?.let { cachedAlbums.upsert(it) }
+        }
+        return cache
     }
 
     @Throws(Exception::class)

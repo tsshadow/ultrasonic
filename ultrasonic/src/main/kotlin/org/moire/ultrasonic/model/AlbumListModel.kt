@@ -114,11 +114,11 @@ class AlbumListModel(application: Application) : GenericListModel(application) {
     override fun showSelectFolderHeader(args: Bundle?): Boolean {
         if (args == null) return false
 
-        val albumListType =
-            AlbumListType.fromName(args.getString(Constants.INTENT_ALBUM_LIST_TYPE)!!)
+        // TODO: Use proper type here
+        val albumListType = args.getString(Constants.INTENT_ALBUM_LIST_TYPE)!!
 
-        val isAlphabetical = (albumListType == AlbumListType.SORTED_BY_NAME) ||
-            (albumListType == AlbumListType.SORTED_BY_ARTIST)
+        val isAlphabetical = (albumListType == AlbumListType.SORTED_BY_NAME.typeName) ||
+            (albumListType == AlbumListType.SORTED_BY_ARTIST.typeName)
 
         return !isOffline() && !Settings.shouldUseId3Tags && isAlphabetical
     }
