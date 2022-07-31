@@ -45,7 +45,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
 
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory: MusicDirectory = service.getAlbum(id, name, refresh)
+            val musicDirectory: MusicDirectory = service.getAlbumAsDir(id, name, refresh)
 
             updateList(musicDirectory)
         }

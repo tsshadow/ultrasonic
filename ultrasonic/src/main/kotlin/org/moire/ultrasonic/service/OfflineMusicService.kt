@@ -109,9 +109,7 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Throws(OfflineException::class)
     override fun getArtists(refresh: Boolean): List<Artist> {
-        val result = cachedArtists.get()
-
-        return result
+        return cachedArtists.get()
     }
 
     /*
@@ -473,8 +471,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     override fun isLicenseValid(): Boolean = true
 
     @Throws(Exception::class)
-    override fun getAlbumsOfArtist(id: String, name: String?, refresh: Boolean):
-        List<Album> {
+    override fun getAlbumsOfArtist(id: String, name: String?, refresh: Boolean): List<Album> {
         val directAlbums = cachedAlbums.byArtist(id)
 
         // The direct albums won't contain any compilations that the artist has participated in
@@ -488,11 +485,11 @@ class OfflineMusicService : MusicService, KoinComponent {
             cachedAlbums.get(it)
         }
 
-        return directAlbums.plus(compilationAlbums).distinct()
+        return directAlbums.plus(compilationAlbums.filterNotNull()).distinct()
     }
 
     @Throws(OfflineException::class)
-    override fun getAlbum(id: String, name: String?, refresh: Boolean): MusicDirectory {
+    override fun getAlbumAsDir(id: String, name: String?, refresh: Boolean): MusicDirectory {
 
         Timber.i("Starting album query...")
 
@@ -505,6 +502,11 @@ class OfflineMusicService : MusicService, KoinComponent {
 
         Timber.i("Returning query.")
         return dir
+    }
+
+    @Throws(OfflineException::class)
+    override fun getAlbum(id: String, name: String?, refresh: Boolean): Album? {
+        return cachedAlbums.get(id)
     }
 
     @Throws(OfflineException::class)
