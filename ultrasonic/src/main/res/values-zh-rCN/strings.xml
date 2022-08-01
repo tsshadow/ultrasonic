@@ -259,7 +259,6 @@
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">搜索记录已清除</string>
     <string name="settings.search_title">搜索设置</string>
-    <string name="settings.server_manage_servers">管理服务器</string>
     <string name="settings.server_address">服务器地址</string>
     <string name="settings.server_name">名称</string>
     <string name="settings.server_password">密码</string>

@@ -247,7 +247,6 @@
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">Keresési előzmények törölve.</string>
     <string name="settings.search_title">Keresés beállításai</string>
-    <string name="settings.server_manage_servers">Kiszolgálók kezelése</string>
     <string name="settings.server_address">Kiszolgáló címe</string>
     <string name="settings.server_name">Név</string>
     <string name="settings.server_password">Jelszó</string>
