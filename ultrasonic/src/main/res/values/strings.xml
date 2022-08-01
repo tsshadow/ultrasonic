@@ -290,7 +290,6 @@
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">Search history cleared</string>
     <string name="settings.search_title">Search Settings</string>
-    <string name="settings.server_manage_servers">Manage Servers</string>
     <string name="settings.server_address">Server Address</string>
     <string name="settings.server_name">Name</string>
     <string name="settings.server_password">Password</string>

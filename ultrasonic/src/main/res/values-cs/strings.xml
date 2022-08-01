@@ -239,7 +239,6 @@
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">Historie hledání vyčištěna</string>
     <string name="settings.search_title">Nastavení vyhledávání</string>
-    <string name="settings.server_manage_servers">Spravovat servery</string>
     <string name="settings.server_address">Adresa serveru</string>
     <string name="settings.server_name">Název</string>
     <string name="settings.server_password">Heslo</string>

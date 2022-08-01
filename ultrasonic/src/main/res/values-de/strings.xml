@@ -279,7 +279,6 @@
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">Suchhistorie gelöscht</string>
     <string name="settings.search_title">Sucheinstellungen</string>
-    <string name="settings.server_manage_servers">Server verwalten</string>
     <string name="settings.server_address">Server Adresse</string>
     <string name="settings.server_name">Name</string>
     <string name="settings.server_password">Kennwort</string>

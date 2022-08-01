@@ -265,7 +265,6 @@
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">История поиска очищена</string>
     <string name="settings.search_title">Настройки поиска</string>
-    <string name="settings.server_manage_servers">Управление серверами</string>
     <string name="settings.server_address">Адрес сервера</string>
     <string name="settings.server_name">Имя</string>
     <string name="settings.server_password">Пароль</string>

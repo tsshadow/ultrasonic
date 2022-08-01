@@ -468,13 +468,24 @@ class MediaPlayerController(
     }
 
     @Synchronized
-    fun clearIncomplete() {
-        reset()
-
+    fun clearDownloads() {
         downloader.clearActiveDownloads()
         downloader.clearBackground()
+    }
 
-        jukeboxMediaPlayer.updatePlaylist()
+    @Synchronized
+    fun removeIncompleteTracksFromPlaylist() {
+        val list = playlist.toList()
+        var removed = 0
+        for ((index, item) in list.withIndex()) {
+            val state = downloader.getDownloadState(item.toTrack())
+
+            // The track is not downloaded, remove it
+            if (state != DownloadStatus.DONE && state != DownloadStatus.PINNED) {
+                removeFromPlaylist(index - removed)
+                removed++
+            }
+        }
     }
 
     @Synchronized

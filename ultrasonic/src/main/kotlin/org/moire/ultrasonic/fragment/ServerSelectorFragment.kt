@@ -14,6 +14,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.ServerRowAdapter
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
 import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.fragment.EditServerFragment.Companion.EDIT_SERVER_INTENT_INDEX
 import org.moire.ultrasonic.model.ServerSettingsModel
@@ -28,9 +29,6 @@ import timber.log.Timber
  * TODO: Manage mode is unused. Remove it...
  */
 class ServerSelectorFragment : Fragment() {
-    companion object {
-        const val SERVER_SELECTOR_MANAGE_MODE = "manageMode"
-    }
 
     private var listView: ListView? = null
     private val serverSettingsModel: ServerSettingsModel by viewModel()
@@ -55,16 +53,7 @@ class ServerSelectorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val manageMode = arguments?.getBoolean(
-            SERVER_SELECTOR_MANAGE_MODE,
-            false
-        ) ?: false
-
-        if (manageMode) {
-            FragmentTitle.setTitle(this, R.string.settings_server_manage_servers)
-        } else {
-            FragmentTitle.setTitle(this, R.string.server_selector_label)
-        }
+        FragmentTitle.setTitle(this, R.string.server_selector_label)
 
         listView = view.findViewById(R.id.server_list)
         serverRowAdapter = ServerRowAdapter(
@@ -72,7 +61,6 @@ class ServerSelectorFragment : Fragment() {
             arrayOf(),
             serverSettingsModel,
             activeServerProvider,
-            manageMode,
             ::deleteServerById,
             ::editServerByIndex
         )
@@ -82,12 +70,8 @@ class ServerSelectorFragment : Fragment() {
         listView?.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
 
             val server = parent.getItemAtPosition(position) as ServerSetting
-            if (manageMode) {
-                editServerByIndex(position + 1)
-            } else {
-                setActiveServerById(server.id)
-                findNavController().popBackStack(R.id.mainFragment, false)
-            }
+            setActiveServerById(server.id)
+            findNavController().popBackStack(R.id.mainFragment, false)
         }
 
         val fab = view.findViewById<FloatingActionButton>(R.id.server_add_fab)
@@ -110,12 +94,20 @@ class ServerSelectorFragment : Fragment() {
      * Sets the active server when a list item is clicked
      */
     private fun setActiveServerById(id: Int) {
+        val oldId = activeServerProvider.getActiveServer().id
 
-        controller.clearIncomplete()
+        // Check if there is a change
+        if (oldId == id)
+            return
 
-        if (activeServerProvider.getActiveServer().id != id) {
-            ActiveServerProvider.setActiveServerById(id)
+        // Remove incomplete tracks if we are going offline, or changing between servers.
+        // If we are coming from offline there is no need to clear downloads etc.
+        if (oldId != OFFLINE_DB_ID) {
+            controller.removeIncompleteTracksFromPlaylist()
+            controller.clearDownloads()
         }
+
+        ActiveServerProvider.setActiveServerById(id)
     }
 
     /**
@@ -132,7 +124,7 @@ class ServerSelectorFragment : Fragment() {
                 val activeServerId = ActiveServerProvider.getActiveServerId()
 
                 // If the currently active server is deleted, go offline
-                if (id == activeServerId) setActiveServerById(ActiveServerProvider.OFFLINE_DB_ID)
+                if (id == activeServerId) setActiveServerById(OFFLINE_DB_ID)
 
                 serverSettingsModel.deleteItemById(id)
 
