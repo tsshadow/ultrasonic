@@ -21,7 +21,11 @@ class VideoPlayer {
             }
             try {
                 val intent = Intent(Intent.ACTION_VIEW)
-                val url = MusicServiceFactory.getMusicService().getVideoUrl(track.id)
+                val url = MusicServiceFactory.getMusicService().getStreamUrl(
+                    track.id,
+                    maxBitRate = null,
+                    format = "raw"
+                )
                 intent.setDataAndType(
                     Uri.parse(url),
                     "video/*"

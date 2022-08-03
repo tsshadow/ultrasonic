@@ -136,7 +136,7 @@ interface MusicService {
     ): Pair<InputStream, Boolean>
 
     @Throws(Exception::class)
-    fun getVideoUrl(id: String): String?
+    fun getStreamUrl(id: String, maxBitRate: Int?, format: String?): String?
 
     @Throws(Exception::class)
     fun updateJukeboxPlaylist(ids: List<String>?): JukeboxStatus

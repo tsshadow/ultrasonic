@@ -467,9 +467,28 @@ open class RESTMusicService(
      * call because that could take a long time.
      */
     @Throws(Exception::class)
-    override fun getVideoUrl(
-        id: String
+    override fun getStreamUrl(
+        id: String,
+        maxBitRate: Int?,
+        format: String?
     ): String {
+        Timber.i("Start")
+
+        // Get the request from Retrofit, but don't execute it!
+        val request = API.stream(id).request()
+
+        // Create a new call with the request, and execute ist on our custom client
+        val response = streamClient.newCall(request).execute()
+
+        // The complete url :)
+        val url = response.request.url
+
+        Timber.i("Done")
+
+        return url.toString()
+    }
+
+    val streamClient by lazy {
         // Create a new modified okhttp client to intercept the URL
         val builder = subsonicAPIClient.okHttpClient.newBuilder()
 
@@ -485,18 +504,7 @@ open class RESTMusicService(
         }
 
         // Create a new Okhttp client
-        val client = builder.build()
-
-        // Get the request from Retrofit, but don't execute it!
-        val request = API.stream(id, format = "raw").request()
-
-        // Create a new call with the request, and execute ist on our custom client
-        val response = client.newCall(request).execute()
-
-        // The complete url :)
-        val url = response.request.url
-
-        return url.toString()
+        builder.build()
     }
 
     @Throws(Exception::class)

@@ -10,7 +10,6 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
-import okhttp3.Protocol
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import org.moire.ultrasonic.api.subsonic.interceptors.PasswordHexInterceptor
@@ -66,8 +65,6 @@ class SubsonicAPIClient(
 
     val okHttpClient: OkHttpClient = baseOkClient.newBuilder()
         // Disable HTTP2 because OkHttp with Exoplayer causes a bug. See https://github.com/square/okhttp/issues/6749
-        // TODO Check if the bug is fixed and try to re-enable HTTP2
-        .protocols(listOf(Protocol.HTTP_1_1))
         .readTimeout(READ_TIMEOUT, MILLISECONDS)
         .apply { if (config.allowSelfSignedCertificate) allowSelfSignedCertificates() }
         .addInterceptor { chain ->
@@ -98,10 +95,12 @@ class SubsonicAPIClient(
         .apply { if (config.debug) addLogging() }
         .build()
 
+    val baseUrl = "${config.baseUrl}/rest/"
+
     // Create the Retrofit instance, and register a special converter factory
     // It will update our protocol version to the correct version, once we made a successful call
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("${config.baseUrl}/rest/")
+        .baseUrl(baseUrl)
         .client(okHttpClient)
         .addConverterFactory(
             VersionAwareJacksonConverterFactory.create(
