@@ -425,8 +425,8 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(OfflineException::class)
-    override fun getVideoUrl(id: String): String? {
-        throw OfflineException("getVideoUrl isn't available in offline mode")
+    override fun getStreamUrl(id: String, maxBitRate: Int?, format: String?): String? {
+        throw OfflineException("getStreamUrl isn't available in offline mode")
     }
 
     @Throws(OfflineException::class)

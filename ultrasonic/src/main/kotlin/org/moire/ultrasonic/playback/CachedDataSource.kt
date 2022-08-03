@@ -80,6 +80,7 @@ class CachedDataSource(
         }
 
         // else forward the call to upstream
+        Timber.d("No cache hit, forwarding call")
         return upstreamDataSource.open(dataSpec)
     }
 

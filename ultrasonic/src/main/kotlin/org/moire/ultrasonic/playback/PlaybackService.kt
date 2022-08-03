@@ -13,18 +13,20 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.C.USAGE_MEDIA
 import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.ResolvingDataSource
+import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import okhttp3.OkHttpClient
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.moire.ultrasonic.activity.NavigationActivity
-import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.Constants
@@ -34,7 +36,6 @@ import timber.log.Timber
 class PlaybackService : MediaLibraryService(), KoinComponent {
     private lateinit var player: ExoPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
-    private lateinit var apiDataSource: APIDataSource.Factory
 
     private lateinit var librarySessionCallback: MediaLibrarySession.Callback
 
@@ -82,17 +83,33 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
         UApp.instance!!.shutdownKoin()
     }
 
-    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    private val resolver: ResolvingDataSource.Resolver = ResolvingDataSource.Resolver {
+        val components = it.uri.toString().split('|')
+        val id = components[0]
+        val bitrate = components[1].toInt()
+        val uri = getMusicService().getStreamUrl(id, bitrate, null)!!
+        // AirSonic doesn't seem to stream correctly with the default
+        // icy-metadata headers set by media3, so remove them.
+        it.buildUpon().setUri(uri).setHttpRequestHeaders(emptyMap()).build()
+    }
+
     private fun initializeSessionAndPlayer() {
         if (isStarted) return
 
         setMediaNotificationProvider(MediaNotificationProvider(UApp.applicationContext()))
 
-        val subsonicAPIClient: SubsonicAPIClient by inject()
+        // Create a new plain OkHttpClient
+        val builder = OkHttpClient.Builder()
+        val client = builder.build()
 
-        // Create a MediaSource which passes calls through our OkHttp Stack
-        apiDataSource = APIDataSource.Factory(subsonicAPIClient)
-        val cacheDataSourceFactory: DataSource.Factory = CachedDataSource.Factory(apiDataSource)
+        // Create the wrapped data sources:
+        // CachedDataSource is the first. If it cannot find a file,
+        // it will forward to ResolvingDataSource, which will create a URL through the resolver
+        // and pass it onto the OkHttpDataSource.
+        val okHttpDataSource = OkHttpDataSource.Factory(client)
+        val resolvingDataSource = ResolvingDataSource.Factory(okHttpDataSource, resolver)
+        val cacheDataSourceFactory: DataSource.Factory =
+            CachedDataSource.Factory(resolvingDataSource)
 
         // Create a renderer with HW rendering support
         val renderer = DefaultRenderersFactory(this)
@@ -125,9 +142,6 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
 
         // Set a listener to update the API client when the active server has changed
         rxBusSubscription += RxBus.activeServerChangeObservable.subscribe {
-            val newClient: SubsonicAPIClient by inject()
-            apiDataSource.setAPIClient(newClient)
-
             // Set the player wake mode
             player.setWakeMode(getWakeModeFlag())
         }
