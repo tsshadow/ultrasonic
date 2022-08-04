@@ -9,7 +9,9 @@
     <ID>ImplicitDefaultLocale:ShareHandler.kt$ShareHandler$String.format("%d:%s", timeSpanAmount, timeSpanType)</ID>
     <ID>LongMethod:EditServerFragment.kt$EditServerFragment$override fun onViewCreated(view: View, savedInstanceState: Bundle?)</ID>
     <ID>LongMethod:NavigationActivity.kt$NavigationActivity$override fun onCreate(savedInstanceState: Bundle?)</ID>
-    <ID>LongMethod:ShareHandler.kt$ShareHandler$private fun showDialog( fragment: Fragment, shareDetails: ShareDetails, swipe: SwipeRefreshLayout?, cancellationToken: CancellationToken )</ID>
+    <ID>LongMethod:PlaylistsFragment.kt$PlaylistsFragment$override fun onContextItemSelected(menuItem: MenuItem): Boolean</ID>
+    <ID>LongMethod:ShareHandler.kt$ShareHandler$private fun showDialog( fragment: Fragment, shareDetails: ShareDetails, swipe: SwipeRefreshLayout?, cancellationToken: CancellationToken, additionalId: String? )</ID>
+    <ID>LongMethod:SharesFragment.kt$SharesFragment$override fun onContextItemSelected(menuItem: MenuItem): Boolean</ID>
     <ID>LongParameterList:ServerRowAdapter.kt$ServerRowAdapter$( private var context: Context, passedData: Array&lt;ServerSetting>, private val model: ServerSettingsModel, private val activeServerProvider: ActiveServerProvider, private val manageMode: Boolean, private val serverDeletedCallback: ((Int) -> Unit), private val serverEditRequestedCallback: ((Int) -> Unit) )</ID>
     <ID>MagicNumber:ActiveServerProvider.kt$ActiveServerProvider$8192</ID>
     <ID>MagicNumber:JukeboxMediaPlayer.kt$JukeboxMediaPlayer$0.05f</ID>
@@ -19,7 +21,6 @@
     <ID>TooGenericExceptionCaught:FileLoggerTree.kt$FileLoggerTree$x: Throwable</ID>
     <ID>TooGenericExceptionCaught:JukeboxMediaPlayer.kt$JukeboxMediaPlayer$x: Throwable</ID>
     <ID>TooGenericExceptionCaught:JukeboxMediaPlayer.kt$JukeboxMediaPlayer.TaskQueue$x: Throwable</ID>
-    <ID>TooGenericExceptionThrown:Downloader.kt$Downloader.DownloadTask$throw RuntimeException( String.format( Locale.ROOT, "Download of '%s' was cancelled", downloadFile.track ) )</ID>
     <ID>TooManyFunctions:RESTMusicService.kt$RESTMusicService : MusicService</ID>
     <ID>UtilityClassWithPublicConstructor:FragmentTitle.kt$FragmentTitle</ID>
   </CurrentIssues>

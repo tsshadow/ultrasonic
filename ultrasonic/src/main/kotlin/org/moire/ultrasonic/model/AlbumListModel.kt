@@ -1,124 +1,104 @@
+/*
+ * AlbumListModel.kt
+ * Copyright (C) 2009-2022 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 package org.moire.ultrasonic.model
 
 import android.app.Application
-import android.os.Bundle
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.domain.Album
-import org.moire.ultrasonic.service.MusicService
-import org.moire.ultrasonic.util.Constants
+import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.util.Settings
 
 class AlbumListModel(application: Application) : GenericListModel(application) {
 
     val list: MutableLiveData<List<Album>> = MutableLiveData()
-    var lastType: String? = null
+    private var lastType: AlbumListType? = null
     private var loadedUntil: Int = 0
 
-    fun getAlbumList(
-        refresh: Boolean,
-        swipe: SwipeRefreshLayout,
-        args: Bundle
-    ): LiveData<List<Album>> {
-        // Don't reload the data if navigating back to the view that was active before.
-        // This way, we keep the scroll position
-        val albumListType = args.getString(Constants.INTENT_ALBUM_LIST_TYPE)!!
-
-        if (refresh || list.value?.isEmpty() != false || albumListType != lastType) {
-            lastType = albumListType
-            backgroundLoadFromServer(refresh, swipe, args)
-        }
-        return list
-    }
-
-    private fun getAlbumsOfArtist(
-        musicService: MusicService,
+    suspend fun getAlbumsOfArtist(
         refresh: Boolean,
         id: String,
         name: String?
     ) {
-        list.postValue(musicService.getAlbumsOfArtist(id, name, refresh))
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            list.postValue(service.getAlbumsOfArtist(id, name, refresh))
+        }
     }
 
-    override fun load(
-        isOffline: Boolean,
-        useId3Tags: Boolean,
-        musicService: MusicService,
-        refresh: Boolean,
-        args: Bundle
+    @Suppress("NAME_SHADOWING")
+    suspend fun getAlbums(
+        albumListType: AlbumListType,
+        size: Int = 0,
+        offset: Int = 0,
+        append: Boolean = false,
+        refresh: Boolean
     ) {
-        super.load(isOffline, useId3Tags, musicService, refresh, args)
-
-        val albumListType = args.getString(Constants.INTENT_ALBUM_LIST_TYPE)!!
-        val size = args.getInt(Constants.INTENT_ALBUM_LIST_SIZE, 0)
-        var offset = args.getInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0)
-        val append = args.getBoolean(Constants.INTENT_APPEND, false)
-
-        val musicDirectory: List<Album>
-        val musicFolderId = if (showSelectFolderHeader(args)) {
-            activeServerProvider.getActiveServer().musicFolderId
-        } else {
-            null
+        // Don't reload the data if navigating back to the view that was active before.
+        // This way, we keep the scroll position
+        if ((!refresh && list.value?.isEmpty() == false && albumListType == lastType)) {
+            return
         }
+        lastType = albumListType
 
-        // If we are refreshing the random list, we want to avoid items moving across the screen,
-        // by clearing the list first
-        if (refresh && !append && albumListType == "random") {
-            list.postValue(listOf())
-        }
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            var offset = offset
 
-        // Handle the logic for endless scrolling:
-        // If appending the existing list, set the offset from where to load
-        if (append) offset += (size + loadedUntil)
+            val musicDirectory: List<Album>
+            val musicFolderId = if (showSelectFolderHeader()) {
+                activeServerProvider.getActiveServer().musicFolderId
+            } else {
+                null
+            }
 
-        if (albumListType == Constants.ALBUMS_OF_ARTIST) {
-            return getAlbumsOfArtist(
-                musicService,
-                refresh,
-                args.getString(Constants.INTENT_ID, ""),
-                args.getString(Constants.INTENT_NAME, "")
-            )
-        }
+            // If we are refreshing the random list, we want to avoid items moving across the screen,
+            // by clearing the list first
+            if (refresh && !append && albumListType == AlbumListType.RANDOM) {
+                list.postValue(listOf())
+            }
 
-        val type = AlbumListType.fromName(albumListType)
+            // Handle the logic for endless scrolling:
+            // If appending the existing list, set the offset from where to load
+            if (append) offset += (size + loadedUntil)
 
-        if (useId3Tags) {
-            musicDirectory =
-                musicService.getAlbumList2(
-                    type, size,
+            musicDirectory = if (Settings.shouldUseId3Tags) {
+                service.getAlbumList2(
+                    albumListType, size,
                     offset, musicFolderId
                 )
-        } else {
-            musicDirectory = musicService.getAlbumList(
-                type, size,
-                offset, musicFolderId
-            )
+            } else {
+                service.getAlbumList(
+                    albumListType, size,
+                    offset, musicFolderId
+                )
+            }
+
+            currentListIsSortable = isCollectionSortable(albumListType)
+
+            if (append && list.value != null) {
+                val newList = ArrayList<Album>()
+                newList.addAll(list.value!!)
+                newList.addAll(musicDirectory)
+                list.postValue(newList)
+            } else {
+                list.postValue(musicDirectory)
+            }
+
+            loadedUntil = offset
         }
-
-        currentListIsSortable = isCollectionSortable(type)
-
-        if (append && list.value != null) {
-            val newList = ArrayList<Album>()
-            newList.addAll(list.value!!)
-            newList.addAll(musicDirectory)
-            list.postValue(newList)
-        } else {
-            list.postValue(musicDirectory)
-        }
-
-        loadedUntil = offset
     }
 
-    override fun showSelectFolderHeader(args: Bundle?): Boolean {
-        if (args == null) return false
-
-        // TODO: Use proper type here
-        val albumListType = args.getString(Constants.INTENT_ALBUM_LIST_TYPE)!!
-
-        val isAlphabetical = (albumListType == AlbumListType.SORTED_BY_NAME.typeName) ||
-            (albumListType == AlbumListType.SORTED_BY_ARTIST.typeName)
+    override fun showSelectFolderHeader(): Boolean {
+        val isAlphabetical = (lastType == AlbumListType.SORTED_BY_NAME) ||
+            (lastType == AlbumListType.SORTED_BY_ARTIST)
 
         return !isOffline() && !Settings.shouldUseId3Tags && isAlphabetical
     }

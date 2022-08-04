@@ -1,3 +1,10 @@
+/*
+ * DownloadHandler.kt
+ * Copyright (C) 2009-2022 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 package org.moire.ultrasonic.subsonic
 
 import android.app.Activity
@@ -11,7 +18,6 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
 import org.moire.ultrasonic.util.ModalBackgroundTask
 import org.moire.ultrasonic.util.Settings
@@ -35,6 +41,7 @@ class DownloadHandler(
         playNext: Boolean,
         shuffle: Boolean,
         songs: List<Track>,
+        playlistName: String?,
     ) {
         val onValid = Runnable {
             // TODO: The logic here is different than in the controller...
@@ -52,9 +59,7 @@ class DownloadHandler(
                 shuffle,
                 insertionMode
             )
-            val playlistName: String? = fragment.arguments?.getString(
-                Constants.INTENT_PLAYLIST_NAME
-            )
+
             if (playlistName != null) {
                 mediaPlayerController.suggestedPlaylistName = playlistName
             }

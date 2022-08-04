@@ -1,6 +1,6 @@
 /*
  * CachedMusicService.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -31,7 +31,6 @@ import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Share
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
-import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.LRUCache
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.TimeLimitedCache
@@ -393,7 +392,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         var result = cachedGenres.get()
         if (result == null) {
             result = musicService.getGenres(refresh)
-            cachedGenres.set(result!!)
+            cachedGenres.set(result)
         }
 
         val sorted = result.toMutableList()
@@ -443,7 +442,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     override fun getVideos(refresh: Boolean): MusicDirectory? {
         checkSettingsChanged()
         var cache =
-            if (refresh) null else cachedMusicDirectories[Constants.INTENT_VIDEOS]
+            if (refresh) null else cachedMusicDirectories[CACHE_KEY_VIDEOS]
         var dir = cache?.get()
         if (dir == null) {
             dir = musicService.getVideos(refresh)
@@ -451,7 +450,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
                 Settings.directoryCacheTime.toLong(), TimeUnit.SECONDS
             )
             cache.set(dir)
-            cachedMusicDirectories.put(Constants.INTENT_VIDEOS, cache)
+            cachedMusicDirectories.put(CACHE_KEY_VIDEOS, cache)
         }
         return dir
     }
@@ -493,6 +492,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
 
     companion object {
         private const val MUSIC_DIR_CACHE_SIZE = 100
+        const val CACHE_KEY_VIDEOS = "VIDEOS"
     }
 
     init {

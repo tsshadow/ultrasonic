@@ -43,6 +43,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.session.SessionResult
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -160,7 +161,7 @@ class PlayerFragment :
     private val hollowStar = R.drawable.ic_star_hollow
     private val fullStar = R.drawable.ic_star_full
 
-    internal val viewAdapter: BaseAdapter<Identifiable> by lazy {
+    private val viewAdapter: BaseAdapter<Identifiable> by lazy {
         BaseAdapter()
     }
 
@@ -205,7 +206,7 @@ class PlayerFragment :
         fiveStar5ImageView = view.findViewById(R.id.song_five_star_5)
     }
 
-    @Suppress("LongMethod")
+    @Suppress("LongMethod", "DEPRECATION")
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         cancellationToken = CancellationToken()
@@ -352,15 +353,6 @@ class PlayerFragment :
         initPlaylistDisplay()
 
         registerForContextMenu(playlistView)
-
-        if (arguments != null && requireArguments().getBoolean(
-                Constants.INTENT_SHUFFLE,
-                false
-            )
-        ) {
-            networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.isShufflePlayEnabled = true
-        }
 
         visualizerViewLayout.isVisible = false
         VisualizerController.get().observe(
@@ -641,11 +633,14 @@ class PlayerFragment :
                 if (track == null) return false
 
                 if (Settings.shouldUseId3Tags) {
+                    PlayerFragmentDirections.playerToSelectAlbum(
+                        id = track.artistId,
+                        name = track.artist,
+                        parentId = track.artistId,
+                        isArtist = true,
+                    )
                     bundle = Bundle()
-                    bundle.putString(Constants.INTENT_ID, track.artistId)
-                    bundle.putString(Constants.INTENT_NAME, track.artist)
-                    bundle.putString(Constants.INTENT_PARENT_ID, track.artistId)
-                    bundle.putBoolean(Constants.INTENT_ARTIST, true)
+
                     Navigation.findNavController(requireView())
                         .navigate(R.id.playerToSelectAlbum, bundle)
                 }
@@ -655,18 +650,19 @@ class PlayerFragment :
                 if (track == null) return false
 
                 val albumId = if (Settings.shouldUseId3Tags) track.albumId else track.parent
-                bundle = Bundle()
-                bundle.putString(Constants.INTENT_ID, albumId)
-                bundle.putString(Constants.INTENT_NAME, track.album)
-                bundle.putString(Constants.INTENT_PARENT_ID, track.parent)
-                bundle.putBoolean(Constants.INTENT_IS_ALBUM, true)
-                Navigation.findNavController(requireView())
-                    .navigate(R.id.playerToSelectAlbum, bundle)
+
+                val action = PlayerFragmentDirections.playerToSelectAlbum(
+                    id = albumId,
+                    name = track.album,
+                    parentId = track.parent,
+                    isAlbum = true
+                )
+
+                findNavController().navigate(action)
                 return true
             }
             R.id.menu_lyrics -> {
                 if (track == null) return false
-
                 bundle = Bundle()
                 bundle.putString(Constants.INTENT_ARTIST, track.artist)
                 bundle.putString(Constants.INTENT_TITLE, track.title)
@@ -815,7 +811,12 @@ class PlayerFragment :
                     val playlistEntry = item.toTrack()
                     tracks.add(playlistEntry)
                 }
-                shareHandler.createShare(this, tracks, null, cancellationToken)
+                shareHandler.createShare(
+                    this,
+                    tracks = tracks,
+                    swipe = null,
+                    cancellationToken = cancellationToken,
+                )
                 return true
             }
             R.id.menu_item_share_song -> {
@@ -824,7 +825,12 @@ class PlayerFragment :
                 val tracks: MutableList<Track?> = ArrayList()
                 tracks.add(currentSong)
 
-                shareHandler.createShare(this, tracks, null, cancellationToken)
+                shareHandler.createShare(
+                    this,
+                    tracks,
+                    swipe = null,
+                    cancellationToken = cancellationToken
+                )
                 return true
             }
             else -> return false

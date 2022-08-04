@@ -1,6 +1,6 @@
 /*
  * Constants.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -15,32 +15,13 @@ object Constants {
     const val REST_PROTOCOL_VERSION = "1.7.0"
     const val REST_CLIENT_ID = "Ultrasonic"
 
-    // Names for intent extras.
-    const val INTENT_ID = "subsonic.id"
-    const val INTENT_NAME = "subsonic.name"
+    // Legacy names for intent extras, in those fragments which don't use SafeArgs yet.
     const val INTENT_ARTIST = "subsonic.artist"
     const val INTENT_TITLE = "subsonic.title"
     const val INTENT_AUTOPLAY = "subsonic.playall"
     const val INTENT_QUERY = "subsonic.query"
-    const val INTENT_PLAYLIST_ID = "subsonic.playlist.id"
-    const val INTENT_PODCAST_CHANNEL_ID = "subsonic.podcastChannel.id"
-    const val INTENT_PARENT_ID = "subsonic.parent.id"
-    const val INTENT_PLAYLIST_NAME = "subsonic.playlist.name"
-    const val INTENT_SHARE_ID = "subsonic.share.id"
-    const val INTENT_SHARE_NAME = "subsonic.share.name"
     const val INTENT_ALBUM_LIST_TYPE = "subsonic.albumlisttype"
-    const val INTENT_ALBUM_LIST_TITLE = "subsonic.albumlisttitle"
-    const val INTENT_ALBUM_LIST_SIZE = "subsonic.albumlistsize"
-    const val INTENT_ALBUM_LIST_OFFSET = "subsonic.albumlistoffset"
-    const val INTENT_SHUFFLE = "subsonic.shuffle"
-    const val INTENT_REFRESH = "subsonic.refresh"
-    const val INTENT_STARRED = "subsonic.starred"
-    const val INTENT_RANDOM = "subsonic.random"
-    const val INTENT_GENRE_NAME = "subsonic.genre"
-    const val INTENT_IS_ALBUM = "subsonic.isalbum"
-    const val INTENT_VIDEOS = "subsonic.videos"
     const val INTENT_SHOW_PLAYER = "subsonic.showplayer"
-    const val INTENT_APPEND = "subsonic.append"
 
     // Names for Intent Actions
     const val CMD_PROCESS_KEYCODE = "org.moire.ultrasonic.CMD_PROCESS_KEYCODE"
@@ -62,8 +43,5 @@ object Constants {
 
     const val FILENAME_PLAYLIST_SER = "downloadstate.ser"
     const val ALBUM_ART_FILE = "folder.jpeg"
-    const val STARRED = "starred"
-    const val ALPHABETICAL_BY_NAME = "alphabeticalByName"
-    const val ALBUMS_OF_ARTIST = "albumsOfArtist"
     const val RESULT_CLOSE_ALL = 1337
 }

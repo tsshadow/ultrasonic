@@ -17,15 +17,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import io.reactivex.rxjava3.disposables.Disposable
 import java.lang.Exception
 import kotlin.math.abs
 import org.koin.android.ext.android.inject
+import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
-import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.Util.getNotificationImageSize
@@ -35,7 +36,6 @@ import timber.log.Timber
 /**
  * Contains the mini-now playing information box displayed at the bottom of the screen
  */
-@Suppress("unused")
 class NowPlayingFragment : Fragment() {
 
     private var downX = 0f
@@ -107,21 +107,13 @@ class NowPlayingFragment : Fragment() {
                 nowPlayingArtist!!.text = artist
 
                 nowPlayingAlbumArtImage!!.setOnClickListener {
-                    val bundle = Bundle()
-
-                    if (Settings.shouldUseId3Tags) {
-                        bundle.putBoolean(Constants.INTENT_IS_ALBUM, true)
-                        bundle.putString(Constants.INTENT_ID, file.albumId)
-                    } else {
-                        bundle.putBoolean(Constants.INTENT_IS_ALBUM, false)
-                        bundle.putString(Constants.INTENT_ID, file.parent)
-                    }
-
-                    bundle.putString(Constants.INTENT_NAME, file.album)
-                    bundle.putString(Constants.INTENT_NAME, file.album)
-
-                    Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                        .navigate(R.id.trackCollectionFragment, bundle)
+                    val id3 = Settings.shouldUseId3Tags
+                    val action = NavigationGraphDirections.toTrackCollection(
+                        isAlbum = id3,
+                        id = if (id3) file.albumId else file.parent,
+                        name = file.album
+                    )
+                    findNavController().navigate(action)
                 }
             }
 

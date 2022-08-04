@@ -1,3 +1,10 @@
+/*
+ * MainFragment.kt
+ * Copyright (C) 2009-2022 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 package org.moire.ultrasonic.fragment
 
 import android.os.Bundle
@@ -7,12 +14,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.databinding.MainBinding
-import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 
@@ -118,7 +125,7 @@ class MainFragment : Fragment(), KoinComponent {
         musicTitle.isVisible = true
         artistsButton.isVisible = true
         albumsButton.isVisible = isOnline || useId3Offline
-        genresButton.isVisible = true
+        genresButton.isVisible = isOnline
 
         // Songs
         songsTitle.isVisible = true
@@ -143,35 +150,35 @@ class MainFragment : Fragment(), KoinComponent {
 
     private fun setupClickListener() {
         albumsNewestButton.setOnClickListener {
-            showAlbumList("newest", R.string.main_albums_newest)
+            showAlbumList(AlbumListType.NEWEST, R.string.main_albums_newest)
         }
 
         albumsRandomButton.setOnClickListener {
-            showAlbumList("random", R.string.main_albums_random)
+            showAlbumList(AlbumListType.RANDOM, R.string.main_albums_random)
         }
 
         albumsHighestButton.setOnClickListener {
-            showAlbumList("highest", R.string.main_albums_highest)
+            showAlbumList(AlbumListType.HIGHEST, R.string.main_albums_highest)
         }
 
         albumsRecentButton.setOnClickListener {
-            showAlbumList("recent", R.string.main_albums_recent)
+            showAlbumList(AlbumListType.RECENT, R.string.main_albums_recent)
         }
 
         albumsFrequentButton.setOnClickListener {
-            showAlbumList("frequent", R.string.main_albums_frequent)
+            showAlbumList(AlbumListType.FREQUENT, R.string.main_albums_frequent)
         }
 
         albumsStarredButton.setOnClickListener {
-            showAlbumList(Constants.STARRED, R.string.main_albums_starred)
+            showAlbumList(AlbumListType.STARRED, R.string.main_albums_starred)
         }
 
         albumsAlphaByNameButton.setOnClickListener {
-            showAlbumList(Constants.ALPHABETICAL_BY_NAME, R.string.main_albums_alphaByName)
+            showAlbumList(AlbumListType.SORTED_BY_NAME, R.string.main_albums_alphaByName)
         }
 
         albumsAlphaByArtistButton.setOnClickListener {
-            showAlbumList("alphabeticalByArtist", R.string.main_albums_alphaByArtist)
+            showAlbumList(AlbumListType.SORTED_BY_ARTIST, R.string.main_albums_alphaByArtist)
         }
 
         songsStarredButton.setOnClickListener {
@@ -183,7 +190,7 @@ class MainFragment : Fragment(), KoinComponent {
         }
 
         albumsButton.setOnClickListener {
-            showAlbumList(Constants.ALPHABETICAL_BY_NAME, R.string.main_albums_title)
+            showAlbumList(AlbumListType.SORTED_BY_NAME, R.string.main_albums_title)
         }
 
         randomSongsButton.setOnClickListener {
@@ -200,45 +207,47 @@ class MainFragment : Fragment(), KoinComponent {
     }
 
     private fun showStarredSongs() {
-        val bundle = Bundle()
-        bundle.putInt(Constants.INTENT_STARRED, 1)
-        Navigation.findNavController(requireView()).navigate(R.id.mainToTrackCollection, bundle)
+        val action = MainFragmentDirections.mainToTrackCollection(
+            getStarred = true,
+        )
+        findNavController().navigate(action)
     }
 
     private fun showRandomSongs() {
-        val bundle = Bundle()
-        bundle.putInt(Constants.INTENT_RANDOM, 1)
-        bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.maxSongs)
-        Navigation.findNavController(requireView()).navigate(R.id.mainToTrackCollection, bundle)
+        val action = MainFragmentDirections.mainToTrackCollection(
+            getRandom = true,
+            size = Settings.maxSongs
+        )
+        findNavController().navigate(action)
     }
 
     private fun showArtists() {
-        val bundle = Bundle()
-        bundle.putString(
-            Constants.INTENT_ALBUM_LIST_TITLE,
-            requireContext().resources.getString(R.string.main_artists_title)
+        val action = MainFragmentDirections.mainToArtistList(
+            title = requireContext().resources.getString(R.string.main_artists_title)
         )
-        Navigation.findNavController(requireView()).navigate(R.id.mainToArtistList, bundle)
+        findNavController().navigate(action)
     }
 
-    private fun showAlbumList(type: String, titleIndex: Int) {
-        val bundle = Bundle()
+    private fun showAlbumList(type: AlbumListType, titleIndex: Int) {
         val title = requireContext().resources.getString(titleIndex, "")
-        bundle.putString(Constants.INTENT_ALBUM_LIST_TYPE, type)
-        bundle.putString(Constants.INTENT_ALBUM_LIST_TITLE, title)
-        bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.maxAlbums)
-        bundle.putInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0)
-        Navigation.findNavController(requireView()).navigate(R.id.mainToAlbumList, bundle)
+        val action = MainFragmentDirections.mainToAlbumList(
+            type = type,
+            title = title,
+            size = Settings.maxAlbums,
+            offset = 0
+        )
+        findNavController().navigate(action)
     }
 
     private fun showGenres() {
-        Navigation.findNavController(requireView()).navigate(R.id.mainToSelectGenre)
+        findNavController().navigate(R.id.mainToSelectGenre)
     }
 
     private fun showVideos() {
-        val bundle = Bundle()
-        bundle.putInt(Constants.INTENT_VIDEOS, 1)
-        Navigation.findNavController(requireView()).navigate(R.id.mainToTrackCollection, bundle)
+        val action = MainFragmentDirections.mainToTrackCollection(
+            getVideos = true,
+        )
+        findNavController().navigate(action)
     }
 
     companion object {

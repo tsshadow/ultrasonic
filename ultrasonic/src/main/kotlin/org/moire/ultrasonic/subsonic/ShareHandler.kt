@@ -1,3 +1,10 @@
+/*
+ * ShareHandler.kt
+ * Copyright (C) 2009-2022 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 package org.moire.ultrasonic.subsonic
 
 import android.app.AlertDialog
@@ -20,7 +27,6 @@ import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.BackgroundTask
 import org.moire.ultrasonic.util.CancellationToken
-import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.FragmentBackgroundTask
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.ShareDetails
@@ -42,31 +48,12 @@ class ShareHandler(val context: Context) {
     private var textViewExpiration: TextView? = null
     private val pattern = Pattern.compile(":")
 
-    fun createShare(
-        fragment: Fragment,
-        tracks: List<Track?>?,
-        swipe: SwipeRefreshLayout?,
-        cancellationToken: CancellationToken
-    ) {
-        val askForDetails = Settings.shouldAskForShareDetails
-        val shareDetails = ShareDetails()
-        shareDetails.Entries = tracks
-        if (askForDetails) {
-            showDialog(fragment, shareDetails, swipe, cancellationToken)
-        } else {
-            shareDetails.Description = Settings.defaultShareDescription
-            shareDetails.Expiration = TimeSpan.getCurrentTime().add(
-                Settings.defaultShareExpirationInMillis
-            ).totalMilliseconds
-            share(fragment, shareDetails, swipe, cancellationToken)
-        }
-    }
-
     fun share(
         fragment: Fragment,
         shareDetails: ShareDetails,
         swipe: SwipeRefreshLayout?,
-        cancellationToken: CancellationToken
+        cancellationToken: CancellationToken,
+        additionalId: String?
     ) {
         val task: BackgroundTask<Share?> = object : FragmentBackgroundTask<Share?>(
             fragment.requireActivity(),
@@ -80,7 +67,7 @@ class ShareHandler(val context: Context) {
 
                 if (!shareDetails.ShareOnServer && shareDetails.Entries.size == 1) return null
                 if (shareDetails.Entries.isEmpty()) {
-                    fragment.arguments?.getString(Constants.INTENT_ID).ifNotNull {
+                    additionalId.ifNotNull {
                         ids.add(it)
                     }
                 } else {
@@ -144,11 +131,33 @@ class ShareHandler(val context: Context) {
         task.execute()
     }
 
+    fun createShare(
+        fragment: Fragment,
+        tracks: List<Track?>?,
+        swipe: SwipeRefreshLayout?,
+        cancellationToken: CancellationToken,
+        additionalId: String? = null
+    ) {
+        val askForDetails = Settings.shouldAskForShareDetails
+        val shareDetails = ShareDetails()
+        shareDetails.Entries = tracks
+        if (askForDetails) {
+            showDialog(fragment, shareDetails, swipe, cancellationToken, additionalId)
+        } else {
+            shareDetails.Description = Settings.defaultShareDescription
+            shareDetails.Expiration = TimeSpan.getCurrentTime().add(
+                Settings.defaultShareExpirationInMillis
+            ).totalMilliseconds
+            share(fragment, shareDetails, swipe, cancellationToken, additionalId)
+        }
+    }
+
     private fun showDialog(
         fragment: Fragment,
         shareDetails: ShareDetails,
         swipe: SwipeRefreshLayout?,
-        cancellationToken: CancellationToken
+        cancellationToken: CancellationToken,
+        additionalId: String?
     ) {
         val layout = LayoutInflater.from(fragment.context).inflate(R.layout.share_details, null)
 
@@ -205,7 +214,7 @@ class ShareHandler(val context: Context) {
                 Settings.shareOnServer = shareDetails.ShareOnServer
             }
 
-            share(fragment, shareDetails, swipe, cancellationToken)
+            share(fragment, shareDetails, swipe, cancellationToken, additionalId)
         }
 
         builder.setNegativeButton(R.string.common_cancel) { dialog, _ ->
@@ -216,9 +225,7 @@ class ShareHandler(val context: Context) {
         builder.setCancelable(true)
 
         timeSpanPicker!!.setTimeSpanDisableText(context.resources.getString(R.string.no_expiration))
-        noExpirationCheckBox!!.setOnCheckedChangeListener {
-            _,
-            b ->
+        noExpirationCheckBox!!.setOnCheckedChangeListener { _, b ->
             timeSpanPicker!!.isEnabled = !b
         }
 

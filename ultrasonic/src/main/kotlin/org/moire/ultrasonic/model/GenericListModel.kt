@@ -1,8 +1,14 @@
+/*
+ * GenericListModel.kt
+ * Copyright (C) 2009-2022 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 package org.moire.ultrasonic.model
 
 import android.app.Application
 import android.content.Context
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
@@ -41,7 +47,7 @@ open class GenericListModel(application: Application) :
 
     val musicFolders: MutableLiveData<List<MusicFolder>> = MutableLiveData(listOf())
 
-    open fun showSelectFolderHeader(args: Bundle?): Boolean {
+    open fun showSelectFolderHeader(): Boolean {
         return false
     }
 
@@ -55,8 +61,8 @@ open class GenericListModel(application: Application) :
     /**
      * Refreshes the cached items from the server
      */
-    fun refresh(swipe: SwipeRefreshLayout, bundle: Bundle?) {
-        backgroundLoadFromServer(true, swipe, bundle ?: Bundle())
+    fun refresh(swipe: SwipeRefreshLayout) {
+        backgroundLoadFromServer(true, swipe)
     }
 
     /**
@@ -64,12 +70,11 @@ open class GenericListModel(application: Application) :
      */
     fun backgroundLoadFromServer(
         refresh: Boolean,
-        swipe: SwipeRefreshLayout,
-        bundle: Bundle = Bundle()
+        swipe: SwipeRefreshLayout
     ) {
         viewModelScope.launch {
             swipe.isRefreshing = true
-            loadFromServer(refresh, swipe, bundle)
+            loadFromServer(refresh, swipe)
             swipe.isRefreshing = false
         }
     }
@@ -77,18 +82,22 @@ open class GenericListModel(application: Application) :
     /**
      * Calls the load() function with error handling
      */
-    suspend fun loadFromServer(refresh: Boolean, swipe: SwipeRefreshLayout, bundle: Bundle) =
+    private suspend fun loadFromServer(
+        refresh: Boolean,
+        swipe: SwipeRefreshLayout
+    ) {
         withContext(Dispatchers.IO) {
             val musicService = MusicServiceFactory.getMusicService()
             val isOffline = ActiveServerProvider.isOffline()
             val useId3Tags = Settings.shouldUseId3Tags
 
             try {
-                load(isOffline, useId3Tags, musicService, refresh, bundle)
+                load(isOffline, useId3Tags, musicService, refresh)
             } catch (all: Exception) {
                 handleException(all, swipe.context)
             }
         }
+    }
 
     private fun handleException(exception: Exception, context: Context) {
         Handler(Looper.getMainLooper()).post {
@@ -103,12 +112,11 @@ open class GenericListModel(application: Application) :
         isOffline: Boolean,
         useId3Tags: Boolean,
         musicService: MusicService,
-        refresh: Boolean,
-        args: Bundle
+        refresh: Boolean
     ) {
         // Update the list of available folders if enabled
         @Suppress("ComplexCondition")
-        if (showSelectFolderHeader(args) && !isOffline && !useId3Tags && refresh) {
+        if (showSelectFolderHeader() && !isOffline && !useId3Tags && refresh) {
             musicFolders.postValue(
                 musicService.getMusicFolders(refresh)
             )

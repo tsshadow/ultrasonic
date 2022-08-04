@@ -8,6 +8,8 @@
 package org.moire.ultrasonic.fragment
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -22,6 +24,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.CoroutineExceptionHandler
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.moire.ultrasonic.R
@@ -32,7 +35,7 @@ import org.moire.ultrasonic.model.GenericListModel
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
-import org.moire.ultrasonic.util.Constants
+import org.moire.ultrasonic.util.CommunicationError
 import org.moire.ultrasonic.util.Util
 
 /**
@@ -67,12 +70,12 @@ abstract class MultiListFragment<T : Identifiable> : Fragment() {
      * The LiveData containing the list provided by the model
      * Implement this as a getter
      */
-    internal lateinit var liveDataItems: LiveData<List<T>>
+    private lateinit var liveDataItems: LiveData<List<T>>
 
     /**
      * The central function to pass a query to the model and return a LiveData object
      */
-    open fun getLiveData(args: Bundle? = null, refresh: Boolean = false): LiveData<List<T>> {
+    open fun getLiveData(refresh: Boolean = false): LiveData<List<T>> {
         return MutableLiveData()
     }
 
@@ -93,6 +96,16 @@ abstract class MultiListFragment<T : Identifiable> : Fragment() {
      * Whether to refresh the data onViewCreated
      */
     open val refreshOnCreation: Boolean = true
+
+    /**
+     * The default Exception Handler for Coroutines
+     */
+    val handler = CoroutineExceptionHandler { _, exception ->
+        Handler(Looper.getMainLooper()).post {
+            CommunicationError.handleError(exception, context)
+        }
+        refreshListView?.isRefreshing = false
+    }
 
     open fun setTitle(title: String?) {
         if (title == null) {
@@ -118,17 +131,14 @@ abstract class MultiListFragment<T : Identifiable> : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set the title if available
-        setTitle(arguments?.getString(Constants.INTENT_ALBUM_LIST_TITLE))
-
         // Setup refresh handler
         refreshListView = view.findViewById(refreshListId)
         refreshListView?.setOnRefreshListener {
-            listModel.refresh(refreshListView!!, arguments)
+            listModel.refresh(refreshListView!!)
         }
 
         // Populate the LiveData. This starts an API request in most cases
-        liveDataItems = getLiveData(arguments, refreshOnCreation)
+        liveDataItems = getLiveData(refreshOnCreation)
 
         // Link view to display text if the list is empty
         emptyView = view.findViewById(emptyViewId)
@@ -165,16 +175,4 @@ abstract class MultiListFragment<T : Identifiable> : Fragment() {
     abstract fun onContextMenuItemSelected(menuItem: MenuItem, item: T): Boolean
 
     abstract fun onItemClick(item: T)
-
-    fun getArgumentsClone(): Bundle {
-        var bundle: Bundle
-
-        try {
-            bundle = arguments?.clone() as Bundle
-        } catch (ignored: Exception) {
-            bundle = Bundle()
-        }
-
-        return bundle
-    }
 }

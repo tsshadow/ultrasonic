@@ -17,6 +17,7 @@ buildscript {
         classpath libs.kotlin
         classpath libs.ktlintGradle
         classpath libs.detekt
+        classpath libs.navigationSafeArgs
     }
 }
 
