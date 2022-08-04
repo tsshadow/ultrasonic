@@ -376,7 +376,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(Exception::class)
-    override fun getGenres(refresh: Boolean): List<Genre>? {
+    override fun getGenres(refresh: Boolean): List<Genre> {
         throw OfflineException("Getting Genres not available in offline mode")
     }
 
@@ -572,7 +572,7 @@ class OfflineMusicService : MusicService, KoinComponent {
         title = name
 
         val albumArt = FileUtil.getAlbumArtFile(this)
-        if (albumArt != null && File(albumArt).exists()) {
+        if (File(albumArt).exists()) {
             coverArt = albumArt
         }
     }
@@ -628,10 +628,11 @@ class OfflineMusicService : MusicService, KoinComponent {
         if (string == null) return null
 
         val slashIndex = string.indexOf('/')
-        if (slashIndex > 0)
-            return string.substring(0, slashIndex).toIntOrNull()
+
+        return if (slashIndex > 0)
+            string.substring(0, slashIndex).toIntOrNull()
         else
-            return string.toIntOrNull()
+            string.toIntOrNull()
     }
 
     /*
@@ -642,10 +643,10 @@ class OfflineMusicService : MusicService, KoinComponent {
 
         val duration: Long? = string.toLongOrNull()
 
-        if (duration != null)
-            return TimeUnit.MILLISECONDS.toSeconds(duration).toInt()
+        return if (duration != null)
+            TimeUnit.MILLISECONDS.toSeconds(duration).toInt()
         else
-            return null
+            null
     }
 
     // TODO: Simplify this deeply nested and complicated function

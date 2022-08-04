@@ -44,6 +44,7 @@ import com.google.android.material.navigation.NavigationView
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
@@ -76,6 +77,9 @@ class NavigationActivity : AppCompatActivity() {
     private var bookmarksMenuItem: MenuItem? = null
     private var sharesMenuItem: MenuItem? = null
     private var podcastsMenuItem: MenuItem? = null
+    private var playlistsMenuItem: MenuItem? = null
+    private var downloadsMenuItem: MenuItem? = null
+
     private var nowPlayingView: FragmentContainerView? = null
     private var nowPlayingHidden = false
     private var navigationView: NavigationView? = null
@@ -274,15 +278,25 @@ class NavigationActivity : AppCompatActivity() {
     private fun setupNavigationMenu(navController: NavController) {
         navigationView?.setupWithNavController(navController)
 
-        // The exit menu is handled here manually
-        val exitItem: MenuItem? = navigationView?.menu?.findItem(R.id.menu_exit)
-        exitItem?.setOnMenuItemClickListener { item ->
-            if (item.itemId == R.id.menu_exit) {
-                setResult(Constants.RESULT_CLOSE_ALL)
-                mediaPlayerController.stopJukeboxService()
-                finish()
-                exit()
+        // The fragments which expect SafeArgs need to be navigated to with SafeArgs (even when
+        // they are empty)!
+        navigationView?.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.mediaLibraryFragment -> {
+                    navController.navigate(NavigationGraphDirections.toMediaLibrary())
+                }
+                R.id.bookmarksFragment -> {
+                    navController.navigate(NavigationGraphDirections.toBookmarks())
+                }
+                R.id.menu_exit -> {
+                    setResult(Constants.RESULT_CLOSE_ALL)
+                    mediaPlayerController.stopJukeboxService()
+                    finish()
+                    exit()
+                }
+                else -> navController.navigate(it.itemId)
             }
+            drawerLayout?.closeDrawer(GravityCompat.START)
             true
         }
 
@@ -290,6 +304,9 @@ class NavigationActivity : AppCompatActivity() {
         bookmarksMenuItem = navigationView?.menu?.findItem(R.id.bookmarksFragment)
         sharesMenuItem = navigationView?.menu?.findItem(R.id.sharesFragment)
         podcastsMenuItem = navigationView?.menu?.findItem(R.id.podcastFragment)
+        playlistsMenuItem = navigationView?.menu?.findItem(R.id.playlistsFragment)
+        downloadsMenuItem = navigationView?.menu?.findItem(R.id.downloadsFragment)
+
         selectServerButton =
             navigationView?.getHeaderView(0)?.findViewById(R.id.header_select_server)
         selectServerButton?.setOnClickListener {
@@ -457,17 +474,17 @@ class NavigationActivity : AppCompatActivity() {
     }
 
     private fun setMenuForServerCapabilities() {
-        if (ActiveServerProvider.isOffline()) {
-            chatMenuItem?.isVisible = false
-            bookmarksMenuItem?.isVisible = false
-            sharesMenuItem?.isVisible = false
-            podcastsMenuItem?.isVisible = false
-            return
-        }
+        val isOnline = !ActiveServerProvider.isOffline()
         val activeServer = activeServerProvider.getActiveServer()
+
+        // Note: Offline capabilities are defined in ActiveServerProvider, OFFLINE_DB.
+        // If you add Offline support for some of these features you need
+        // to switch the boolean to true there.
         chatMenuItem?.isVisible = activeServer.chatSupport != false
         bookmarksMenuItem?.isVisible = activeServer.bookmarkSupport != false
         sharesMenuItem?.isVisible = activeServer.shareSupport != false
         podcastsMenuItem?.isVisible = activeServer.podcastSupport != false
+        playlistsMenuItem?.isVisible = isOnline
+        downloadsMenuItem?.isVisible = isOnline
     }
 }

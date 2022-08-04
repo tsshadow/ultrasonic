@@ -1,6 +1,6 @@
 /*
  * MusicService.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -36,7 +36,7 @@ interface MusicService {
     fun isLicenseValid(): Boolean
 
     @Throws(Exception::class)
-    fun getGenres(refresh: Boolean): List<Genre>?
+    fun getGenres(refresh: Boolean): List<Genre>
 
     @Throws(Exception::class)
     fun star(id: String?, albumId: String?, artistId: String?)

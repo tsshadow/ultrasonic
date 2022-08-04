@@ -1,3 +1,10 @@
+/*
+ * SearchFragment.kt
+ * Copyright (C) 2009-2022 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 package org.moire.ultrasonic.fragment
 
 import android.app.SearchManager
@@ -11,7 +18,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.launch
@@ -24,6 +30,7 @@ import org.moire.ultrasonic.adapters.DividerBinder
 import org.moire.ultrasonic.adapters.MoreButtonBinder
 import org.moire.ultrasonic.adapters.MoreButtonBinder.MoreButton
 import org.moire.ultrasonic.adapters.TrackViewBinder
+import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.ArtistOrIndex
@@ -47,6 +54,8 @@ import timber.log.Timber
 
 /**
  * Initiates a search on the media library and displays the results
+ *
+ * TODO: Move to SafeArgs
  */
 class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     private var searchResult: SearchResult? = null
@@ -266,33 +275,37 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     }
 
     private fun onArtistSelected(item: ArtistOrIndex) {
-        val bundle = Bundle()
-
-        // Common arguments
-        bundle.putString(Constants.INTENT_ID, item.id)
-        bundle.putString(Constants.INTENT_NAME, item.name)
-        bundle.putString(Constants.INTENT_PARENT_ID, item.id)
-        bundle.putBoolean(Constants.INTENT_ARTIST, (item is Artist))
-
-        // Check type
-        if (item is Index) {
-            findNavController().navigate(R.id.searchToTrackCollection, bundle)
+        // Create action based on type
+        val action = if (item is Index) {
+            SearchFragmentDirections.searchToTrackCollection(
+                id = item.id,
+                name = item.name,
+                parentId = item.id,
+                isArtist = (item is Artist)
+            )
         } else {
-            bundle.putString(Constants.INTENT_ALBUM_LIST_TYPE, Constants.ALBUMS_OF_ARTIST)
-            bundle.putString(Constants.INTENT_ALBUM_LIST_TITLE, item.name)
-            bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, 1000)
-            bundle.putInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0)
-            findNavController().navigate(R.id.searchToAlbumsList, bundle)
+            SearchFragmentDirections.searchToAlbumsList(
+                type = AlbumListType.BY_ARTIST,
+                id = item.id,
+                title = item.name,
+                size = 1000,
+                offset = 0
+            )
         }
+
+        // Lets go!
+        findNavController().navigate(action)
     }
 
     private fun onAlbumSelected(album: Album, autoplay: Boolean) {
-        val bundle = Bundle()
-        bundle.putString(Constants.INTENT_ID, album.id)
-        bundle.putString(Constants.INTENT_NAME, album.title)
-        bundle.putBoolean(Constants.INTENT_IS_ALBUM, album.isDirectory)
-        bundle.putBoolean(Constants.INTENT_AUTOPLAY, autoplay)
-        Navigation.findNavController(requireView()).navigate(R.id.searchToTrackCollection, bundle)
+
+        val action = SearchFragmentDirections.searchToTrackCollection(
+            id = album.id,
+            name = album.title,
+            autoPlay = autoplay,
+            isAlbum = true
+        )
+        findNavController().navigate(action)
     }
 
     private fun onSongSelected(song: Track, append: Boolean) {
@@ -366,7 +379,8 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                     autoPlay = true,
                     playNext = false,
                     shuffle = false,
-                    songs = songs
+                    songs = songs,
+                    playlistName = null
                 )
             }
             R.id.song_menu_play_next -> {
@@ -378,7 +392,8 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                     autoPlay = false,
                     playNext = true,
                     shuffle = false,
-                    songs = songs
+                    songs = songs,
+                    playlistName = null
                 )
             }
             R.id.song_menu_play_last -> {
@@ -390,7 +405,8 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                     autoPlay = false,
                     playNext = false,
                     shuffle = false,
-                    songs = songs
+                    songs = songs,
+                    playlistName = null
                 )
             }
             R.id.song_menu_pin -> {
@@ -431,7 +447,13 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             }
             R.id.song_menu_share -> {
                 songs.add(item)
-                shareHandler.createShare(this, songs, searchRefresh, cancellationToken!!)
+                shareHandler.createShare(
+                    fragment = this,
+                    tracks = songs,
+                    swipe = searchRefresh,
+                    cancellationToken = cancellationToken!!,
+                    additionalId = null
+                )
             }
         }
 

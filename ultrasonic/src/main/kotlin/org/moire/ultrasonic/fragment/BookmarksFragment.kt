@@ -37,7 +37,6 @@ class BookmarksFragment : TrackCollectionFragment() {
     }
 
     override fun getLiveData(
-        args: Bundle?,
         refresh: Boolean
     ): LiveData<List<MusicDirectory.Child>> {
         listModel.viewModelScope.launch(handler) {

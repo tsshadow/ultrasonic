@@ -41,7 +41,7 @@ class DownloadsFragment : MultiListFragment<Track>() {
     /**
      * The central function to pass a query to the model and return a LiveData object
      */
-    override fun getLiveData(args: Bundle?, refresh: Boolean): LiveData<List<Track>> {
+    override fun getLiveData(refresh: Boolean): LiveData<List<Track>> {
         return listModel.getList()
     }
 

@@ -7,7 +7,6 @@
 package org.moire.ultrasonic.model
 
 import android.app.Application
-import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -38,10 +37,9 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
         isOffline: Boolean,
         useId3Tags: Boolean,
         musicService: MusicService,
-        refresh: Boolean,
-        args: Bundle
+        refresh: Boolean
     ) {
-        super.load(isOffline, useId3Tags, musicService, refresh, args)
+        super.load(isOffline, useId3Tags, musicService, refresh)
 
         val musicFolderId = activeServer.musicFolderId
 
@@ -54,7 +52,7 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
         artists.postValue(result.toMutableList().sortedWith(comparator))
     }
 
-    override fun showSelectFolderHeader(args: Bundle?): Boolean {
+    override fun showSelectFolderHeader(): Boolean {
         return true
     }
 

@@ -64,6 +64,7 @@ navigationUi            = { module = "androidx.navigation:navigation-ui", versio
 navigationFragmentKtx   = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigationUiKtx         = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
 navigationFeature       = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "navigation" }
+navigationSafeArgs      = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation"}
 preferences             = { module = "androidx.preference:preference", version.ref = "preferences" }
 media                   = { module = "androidx.media:media", version.ref = "media" }
 media3exoplayer         = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }

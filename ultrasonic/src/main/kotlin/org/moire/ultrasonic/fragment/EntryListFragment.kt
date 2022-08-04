@@ -1,3 +1,10 @@
+/*
+ * EntryListFragment.kt
+ * Copyright (C) 2009-2022 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 package org.moire.ultrasonic.fragment
 
 import android.os.Bundle
@@ -13,7 +20,6 @@ import org.moire.ultrasonic.domain.GenericEntry
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.subsonic.DownloadHandler
-import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 
 /**
@@ -26,9 +32,9 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
     /**
      * Whether to show the folder selector
      */
-    fun showFolderHeader(): Boolean {
-        return listModel.showSelectFolderHeader(arguments) &&
-            !listModel.isOffline() && !Settings.shouldUseId3Tags
+    private fun showFolderHeader(): Boolean {
+        return listModel.showSelectFolderHeader() && !listModel.isOffline() &&
+            !Settings.shouldUseId3Tags
     }
 
     override fun onContextMenuItemSelected(menuItem: MenuItem, item: T): Boolean {
@@ -38,12 +44,14 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
     }
 
     override fun onItemClick(item: T) {
-        val bundle = Bundle()
-        bundle.putString(Constants.INTENT_ID, item.id)
-        bundle.putString(Constants.INTENT_NAME, item.name)
-        bundle.putString(Constants.INTENT_PARENT_ID, item.id)
-        bundle.putBoolean(Constants.INTENT_ARTIST, (item is Artist))
-        findNavController().navigate(R.id.trackCollectionFragment, bundle)
+        val action = EntryListFragmentDirections.entryListToTrackCollection(
+            id = item.id,
+            name = item.name,
+            parentId = item.id,
+            isArtist = (item is Artist),
+        )
+
+        findNavController().navigate(action)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,7 +67,7 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
                 currentSetting.musicFolderId = it
                 serverSettingsModel.updateItem(currentSetting)
             }
-            listModel.refresh(refreshListView!!, arguments)
+            listModel.refresh(refreshListView!!)
         }
 
         viewAdapter.register(
@@ -71,7 +79,7 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
      * What to do when the list has changed
      */
     override val defaultObserver: (List<T>) -> Unit = {
-        emptyView.isVisible = it.isEmpty() && !(refreshListView?.isRefreshing?:false)
+        emptyView.isVisible = it.isEmpty() && !(refreshListView?.isRefreshing ?: false)
 
         if (showFolderHeader()) {
             val list = mutableListOf<Identifiable>(folderHeader)
@@ -92,12 +100,11 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
         )
 
         listModel.musicFolders.observe(
-            viewLifecycleOwner,
-            {
-                header.folders = it
-                viewAdapter.notifyItemChanged(0)
-            }
-        )
+            viewLifecycleOwner
+        ) {
+            header.folders = it
+            viewAdapter.notifyItemChanged(0)
+        }
 
         header
     }

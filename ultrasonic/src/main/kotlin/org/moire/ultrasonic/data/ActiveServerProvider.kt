@@ -207,7 +207,11 @@ class ActiveServerProvider(
             allowSelfSignedCertificate = false,
             ldapSupport = false,
             musicFolderId = "",
-            minimumApiVersion = null
+            minimumApiVersion = null,
+            bookmarkSupport = false,
+            podcastSupport = false,
+            shareSupport = false,
+            chatSupport = false
         )
 
         /**

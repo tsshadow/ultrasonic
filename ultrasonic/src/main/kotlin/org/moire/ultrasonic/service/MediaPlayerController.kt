@@ -231,7 +231,7 @@ class MediaPlayerController(
 
     private fun publishPlaybackState() {
         val newState = RxBus.StateWithTrack(
-            track = currentMediaItem?.let { it.toTrack() },
+            track = currentMediaItem?.toTrack(),
             index = currentMediaItemIndex,
             isPlaying = isPlaying,
             state = playbackState

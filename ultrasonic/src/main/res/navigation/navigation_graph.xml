@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/navigation_graph"
     app:startDestination="@id/mainFragment">
 
+    <action android:id="@+id/toTrackCollection"
+        app:destination="@id/trackCollectionFragment"  />
+    <action android:id="@+id/toBookmarks"
+        app:destination="@id/bookmarksFragment"  />
+    <action android:id="@+id/toMediaLibrary"
+        app:destination="@id/mediaLibraryFragment"  />
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="org.moire.ultrasonic.fragment.MainFragment"
@@ -19,6 +26,9 @@
         <action
             android:id="@+id/mainToSelectGenre"
             app:destination="@id/selectGenreFragment" />
+        <action
+            android:id="@+id/toTrackCollection"
+            app:destination="@id/trackCollectionFragment" />
     </fragment>
     <fragment
         android:id="@+id/mediaLibraryFragment"
@@ -32,6 +42,14 @@
             app:destination="@id/trackCollectionFragment" />
     </fragment>
     <fragment
+        android:id="@+id/nowPlayingFragment"
+        android:name="org.moire.ultrasonic.fragment.NowPlayingFragment"
+        android:label="@string/button_bar.now_playing">
+        <action
+            android:id="@+id/toTrackCollection"
+            app:destination="@id/trackCollectionFragment" />
+    </fragment>
+    <fragment
         android:id="@+id/artistListFragment"
         android:name="org.moire.ultrasonic.fragment.ArtistListFragment" >
         <action
@@ -40,21 +58,150 @@
         <action
             android:id="@+id/artistsListToTrackCollection"
             app:destination="@id/trackCollectionFragment" />
+        <argument
+            android:name="refresh"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"
+            />
     </fragment>
     <fragment
         android:id="@+id/trackCollectionFragment"
         android:name="org.moire.ultrasonic.fragment.TrackCollectionFragment" >
         <argument
             android:name="id"
+            app:nullable="true"
+            android:defaultValue="@null"
             app:argType="string" />
         <argument
             android:name="isAlbum"
             app:argType="boolean"
-            android:defaultValue="false" />
+            android:defaultValue="false"/>
+        <argument
+            android:name="isArtist"
+            app:argType="boolean"
+            android:defaultValue="false"/>
+        <argument
+            android:name="getRandom"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="getStarred"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="getVideos"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="autoPlay"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="shuffle"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="refresh"
+            android:defaultValue="true"
+            app:argType="boolean" />
+        <argument android:name="name"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true"/>
+        <argument android:name="parentId"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true"/>
+        <argument android:name="genreName"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true"/>
+        <argument android:name="shareId"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true"/>
+        <argument android:name="playlistId"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true"/>
+        <argument android:name="playlistName"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true"/>
+        <argument android:name="shareName"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true"/>
+        <argument android:name="podcastChannelId"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true"/>
+        <argument
+            android:name="albumListType"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"/>
+        <argument
+            android:name="size"
+            app:argType="integer"
+            android:defaultValue="0"
+            />
+        <argument
+            android:name="offset"
+            app:argType="integer"
+            android:defaultValue="0"
+            />
+        <action
+            android:id="@+id/loadMoreTracks"
+            app:destination="@id/trackCollectionFragment" />
     </fragment>
     <fragment
         android:id="@+id/albumListFragment"
         android:name="org.moire.ultrasonic.fragment.AlbumListFragment" >
+        <argument
+            android:name="type"
+            app:argType="org.moire.ultrasonic.api.subsonic.models.AlbumListType"
+            />
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="size"
+            app:argType="integer"
+        />
+        <argument
+            android:name="offset"
+            app:argType="integer"
+            />
+        <argument
+            android:name="append"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="refresh"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="id"
+            android:defaultValue="@null"
+            app:nullable="true"
+            app:argType="string" />
+        <action
+            android:id="@+id/albumListToTrackCollection"
+            app:destination="@id/trackCollectionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/entryListFragment"
+        android:name="org.moire.ultrasonic.fragment.EntryListFragment" >
+        <action
+            android:id="@+id/entryListToTrackCollection"
+            app:destination="@id/trackCollectionFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -68,9 +215,9 @@
     </fragment>
     <fragment
         android:id="@+id/playlistsFragment"
-        android:name="org.moire.ultrasonic.fragment.PlaylistsFragment" >
+        android:name="org.moire.ultrasonic.fragment.legacy.PlaylistsFragment" >
         <action
-            android:id="@+id/playlistsToSelectAlbum"
+            android:id="@+id/playlistsToTrackCollection"
             app:destination="@id/trackCollectionFragment" />
     </fragment>
     <fragment
@@ -78,9 +225,9 @@
         android:name="org.moire.ultrasonic.fragment.DownloadsFragment" />
     <fragment
         android:id="@+id/sharesFragment"
-        android:name="org.moire.ultrasonic.fragment.SharesFragment" >
+        android:name="org.moire.ultrasonic.fragment.legacy.SharesFragment" >
         <action
-            android:id="@+id/sharesToSelectAlbum"
+            android:id="@+id/sharesToTrackCollection"
             app:destination="@id/trackCollectionFragment" />
     </fragment>
     <fragment
@@ -91,9 +238,9 @@
         android:name="org.moire.ultrasonic.fragment.ChatFragment" />
     <fragment
         android:id="@+id/podcastFragment"
-        android:name="org.moire.ultrasonic.fragment.PodcastFragment" >
+        android:name="org.moire.ultrasonic.fragment.legacy.PodcastFragment" >
         <action
-            android:id="@+id/podcastToSelectAlbum"
+            android:id="@+id/podcastToTrackCollection"
             app:destination="@id/trackCollectionFragment" />
     </fragment>
     <fragment
@@ -105,7 +252,11 @@
         android:name="org.moire.ultrasonic.fragment.AboutFragment" />
     <fragment
         android:id="@+id/selectGenreFragment"
-        android:name="org.moire.ultrasonic.fragment.SelectGenreFragment" />
+        android:name="org.moire.ultrasonic.fragment.legacy.SelectGenreFragment">
+        <action
+            android:id="@+id/selectGenreToTrackCollection"
+            app:destination="@id/trackCollectionFragment" />
+    </fragment>
     <fragment
         android:id="@+id/playerFragment"
         android:name="org.moire.ultrasonic.fragment.PlayerFragment" >
