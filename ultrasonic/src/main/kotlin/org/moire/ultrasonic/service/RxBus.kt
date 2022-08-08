@@ -91,7 +91,7 @@ class RxBus {
     data class TrackDownloadState(
         val id: String,
         val state: DownloadStatus,
-        val progress: Int
+        val progress: Int?
     )
 }
 

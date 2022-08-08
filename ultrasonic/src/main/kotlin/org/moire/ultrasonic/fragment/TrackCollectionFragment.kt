@@ -21,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.Collections
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -39,6 +40,8 @@ import org.moire.ultrasonic.model.TrackCollectionModel
 import org.moire.ultrasonic.service.DownloadStatus
 import org.moire.ultrasonic.service.Downloader
 import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.RxBus
+import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
 import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.subsonic.VideoPlayer
@@ -83,6 +86,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
     internal var cancellationToken: CancellationToken? = null
 
     override val listModel: TrackCollectionModel by viewModels()
+    private val rxBusSubscription: CompositeDisposable = CompositeDisposable()
 
     /**
      * The id of the main layout
@@ -142,6 +146,14 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 imageLoaderProvider.getImageLoader()
             )
         )
+
+        // Change the buttons if the status of any selected track changes
+        rxBusSubscription += RxBus.trackDownloadStateObservable.subscribe {
+            if (it.progress != null) return@subscribe
+            val selectedSongs = getSelectedSongs()
+            if (!selectedSongs.any { song -> song.id == it.id }) return@subscribe
+            enableButtons(selectedSongs)
+        }
 
         enableButtons()
 
@@ -261,6 +273,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
 
     override fun onDestroyView() {
         cancellationToken!!.cancel()
+        rxBusSubscription.dispose()
         super.onDestroyView()
     }
 
@@ -356,10 +369,12 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         }
     }
 
+    @Suppress("ComplexMethod")
     internal open fun enableButtons(selection: List<Track> = getSelectedSongs()) {
         val enabled = selection.isNotEmpty()
         var unpinEnabled = false
         var deleteEnabled = false
+        var downloadEnabled = false
         val multipleSelection = viewAdapter.hasMultipleSelection()
 
         var pinnedCount = 0
@@ -373,6 +388,9 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 pinnedCount++
                 unpinEnabled = true
             }
+            if (state == DownloadStatus.IDLE || state == DownloadStatus.FAILED) {
+                downloadEnabled = true
+            }
         }
 
         playNowButton?.isVisible = enabled
@@ -380,7 +398,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         playLastButton?.isVisible = enabled && multipleSelection
         pinButton?.isVisible = (enabled && !isOffline() && selection.size > pinnedCount)
         unpinButton?.isVisible = (enabled && unpinEnabled)
-        downloadButton?.isVisible = (enabled && !deleteEnabled && !isOffline())
+        downloadButton?.isVisible = (enabled && downloadEnabled && !isOffline())
         deleteButton?.isVisible = (enabled && deleteEnabled)
     }
 

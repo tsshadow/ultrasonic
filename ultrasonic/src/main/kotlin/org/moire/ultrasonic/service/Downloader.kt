@@ -185,7 +185,7 @@ class Downloader(
                 val existingItem = downloadQueue.firstOrNull { it.track.id == track.id }
                 if (existingItem != null) {
                     existingItem.priority = priority + 1
-                    return
+                    continue
                 }
 
                 // Set correct priority (the lower the number, the higher the priority)
@@ -267,7 +267,9 @@ class Downloader(
     fun downloadBackground(tracks: List<Track>, save: Boolean) {
         // By using the counter we ensure that the songs are added in the correct order
         for (track in tracks) {
-            if (downloadQueue.any { t -> t.track.id == track.id }) continue
+            if (downloadQueue.any { t -> t.track.id == track.id } ||
+                activelyDownloading.any { t -> t.key.track.id == track.id }
+            ) continue
             val file = DownloadableTrack(track, save, 0, backgroundPriorityCounter++)
             downloadQueue.add(file)
         }
@@ -281,7 +283,7 @@ class Downloader(
         Storage.delete(track.getPartialFile())
         Storage.delete(track.getCompleteFile())
         Storage.delete(track.getPinnedFile())
-        postState(track, DownloadStatus.IDLE, 0)
+        postState(track, DownloadStatus.IDLE)
         Util.scanMedia(track.getPinnedFile())
     }
 
@@ -295,7 +297,7 @@ class Downloader(
         if (!Storage.isPathExists(pinnedFile)) return
         val file = Storage.getFromPath(track.getPinnedFile()) ?: return
         Storage.rename(file, track.getCompleteFile())
-        postState(track, DownloadStatus.DONE, 100)
+        postState(track, DownloadStatus.DONE)
     }
 
     @Suppress("ReturnCount")
@@ -318,7 +320,7 @@ class Downloader(
         const val REFRESH_INTERVAL = 100
     }
 
-    private fun postState(track: Track, state: DownloadStatus, progress: Int) {
+    private fun postState(track: Track, state: DownloadStatus, progress: Int? = null) {
         RxBus.trackDownloadStatePublisher.onNext(
             RxBus.TrackDownloadState(
                 track.id,
@@ -340,7 +342,7 @@ class Downloader(
             try {
                 if (Storage.isPathExists(item.pinnedFile)) {
                     Timber.i("%s already exists. Skipping.", item.pinnedFile)
-                    postState(item.track, DownloadStatus.PINNED, 100)
+                    postState(item.track, DownloadStatus.PINNED)
                     return
                 }
 
@@ -365,11 +367,11 @@ class Downloader(
                     } catch (ignore: Exception) {
                         Timber.w(ignore)
                     }
-                    postState(item.track, newStatus, 100)
+                    postState(item.track, newStatus)
                     return
                 }
 
-                postState(item.track, DownloadStatus.DOWNLOADING, 0)
+                postState(item.track, DownloadStatus.DOWNLOADING)
 
                 // Some devices seem to throw error on partial file which doesn't exist
                 val needsDownloading: Boolean
@@ -415,7 +417,7 @@ class Downloader(
                     outputStream.close()
 
                     if (isCancelled) {
-                        postState(item.track, DownloadStatus.CANCELLED, 0)
+                        postState(item.track, DownloadStatus.CANCELLED)
                         throw RuntimeException(
                             String.format(
                                 Locale.ROOT, "Download of '%s' was cancelled",
@@ -436,14 +438,14 @@ class Downloader(
                         item.partialFile,
                         item.pinnedFile
                     )
-                    postState(item.track, DownloadStatus.PINNED, 100)
+                    postState(item.track, DownloadStatus.PINNED)
                     Util.scanMedia(item.pinnedFile)
                 } else {
                     Storage.rename(
                         item.partialFile,
                         item.completeFile
                     )
-                    postState(item.track, DownloadStatus.DONE, 100)
+                    postState(item.track, DownloadStatus.DONE)
                 }
             } catch (all: Exception) {
                 outputStream.safeClose()
@@ -451,12 +453,12 @@ class Downloader(
                 Storage.delete(item.pinnedFile)
                 if (!isCancelled) {
                     if (item.tryCount < MAX_RETRIES) {
-                        postState(item.track, DownloadStatus.RETRYING, 0)
+                        postState(item.track, DownloadStatus.RETRYING)
                         item.tryCount++
                         activelyDownloading.remove(item)
                         downloadQueue.add(item)
                     } else {
-                        postState(item.track, DownloadStatus.FAILED, 0)
+                        postState(item.track, DownloadStatus.FAILED)
                         activelyDownloading.remove(item)
                         downloadQueue.remove(item)
                         failedList.add(item)

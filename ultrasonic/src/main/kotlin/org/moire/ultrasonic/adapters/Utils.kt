@@ -39,7 +39,7 @@ object Utils {
         lateinit var errorImage: Drawable
         lateinit var pinImage: Drawable
         lateinit var downloadedImage: Drawable
-        lateinit var downloadingImage: Drawable
+        lateinit var downloadingImage: List<Drawable>
         lateinit var playingImage: Drawable
         var theme: String
 
@@ -63,7 +63,15 @@ object Utils {
             downloadedImage =
                 ContextCompat.getDrawable(context, R.drawable.stat_sys_download_anim_0)!!
             errorImage = ContextCompat.getDrawable(context, R.drawable.ic_baseline_error)!!
-            downloadingImage = ContextCompat.getDrawable(context, R.drawable.stat_sys_download)!!
+            downloadingImage = listOf(
+                ContextCompat.getDrawable(context, R.drawable.stat_sys_download_anim_1)!!,
+                ContextCompat.getDrawable(context, R.drawable.stat_sys_download_anim_2)!!,
+                ContextCompat.getDrawable(context, R.drawable.stat_sys_download_anim_3)!!,
+                ContextCompat.getDrawable(context, R.drawable.stat_sys_download_anim_4)!!,
+                ContextCompat.getDrawable(context, R.drawable.stat_sys_download_anim_5)!!,
+                ContextCompat.getDrawable(context, R.drawable.stat_sys_download_anim_6)!!,
+                ContextCompat.getDrawable(context, R.drawable.stat_sys_download_anim_7)!!,
+            )
             playingImage = ContextCompat.getDrawable(context, R.drawable.ic_stat_play)!!
         }
     }
