@@ -1,6 +1,5 @@
 package org.moire.ultrasonic.adapters
 
-import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.Checkable
@@ -94,8 +93,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
             setupStarButtons(song, useFiveStarRating)
         }
 
-        updateStatus(downloader.getDownloadState(song))
-        updateProgress(0)
+        updateStatus(downloader.getDownloadState(song), null)
 
         if (useFiveStarRating) {
             setFiveStars(entry?.userRating ?: 0)
@@ -116,8 +114,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
 
         rxBusSubscription!! += RxBus.trackDownloadStateObservable.subscribe {
             if (it.id != song.id) return@subscribe
-            updateStatus(it.state)
-            updateProgress(it.progress)
+            updateStatus(it.state, it.progress)
         }
     }
 
@@ -207,52 +204,49 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         }
     }
 
-    private fun updateStatus(status: DownloadStatus) {
-        if (status == cachedStatus) return
-        cachedStatus = status
+    private fun updateStatus(status: DownloadStatus, p: Int?) {
+        if (status != cachedStatus) {
+            cachedStatus = status
 
-        when (status) {
-            DownloadStatus.DONE -> {
-                statusImage = imageHelper.downloadedImage
-                progress.text = null
+            when (status) {
+                DownloadStatus.DONE -> {
+                    statusImage = imageHelper.downloadedImage
+                    progress.text = null
+                }
+                DownloadStatus.PINNED -> {
+                    statusImage = imageHelper.pinImage
+                    progress.text = null
+                }
+                DownloadStatus.FAILED,
+                DownloadStatus.CANCELLED -> {
+                    statusImage = imageHelper.errorImage
+                    progress.text = null
+                }
+                DownloadStatus.DOWNLOADING -> {
+                    statusImage = imageHelper.downloadingImage[0]
+                }
+                else -> {
+                    statusImage = null
+                }
             }
-            DownloadStatus.PINNED -> {
-                statusImage = imageHelper.pinImage
-                progress.text = null
-            }
-            DownloadStatus.FAILED,
-            DownloadStatus.CANCELLED -> {
-                statusImage = imageHelper.errorImage
-                progress.text = null
-            }
-            DownloadStatus.DOWNLOADING -> {
-                statusImage = imageHelper.downloadingImage
-            }
-            else -> {
-                statusImage = null
-            }
+        }
+
+        if (cachedStatus == DownloadStatus.DOWNLOADING && p != null) {
+            progress.text = Util.formatPercentage(p)
+            statusImage =
+                imageHelper.downloadingImage[(imageHelper.downloadingImage.size / 100F * p).toInt()]
+        } else {
+            progress.text = null
         }
 
         updateImages()
     }
 
-    private fun updateProgress(p: Int) {
-        if (cachedStatus == DownloadStatus.DOWNLOADING) {
-            progress.text = Util.formatPercentage(p)
-        } else {
-            progress.text = null
-        }
-    }
-
     private fun updateImages() {
-        progress.setCompoundDrawablesWithIntrinsicBounds(
-            null, null, statusImage, null
-        )
-
-        if (statusImage === imageHelper.downloadingImage) {
-            val frameAnimation = statusImage as AnimationDrawable?
-            frameAnimation?.setVisible(true, true)
-            frameAnimation?.start()
+        progress.post {
+            progress.setCompoundDrawablesWithIntrinsicBounds(
+                null, null, statusImage, null
+            )
         }
     }
 
