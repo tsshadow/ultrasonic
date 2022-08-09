@@ -1,0 +1,37 @@
+Notas de la versión
+Ultrasonic 4.0.0 trae consigo una revisión completa de cómo se reproducen los medios. Hemos cambiado a una biblioteca moderna para manejar la reproducción y hemos corregido algunos errores en el proceso.
+Además, el modo Offline soporta ahora la navegación basada en las etiquetas ID3. Esto requiere metadatos adicionales que faltarán para las pistas descargadas con versiones anteriores. Si activas esta opción, la aplicación sólo mostrará la música que hayas descargado con la versión 4.0.0 o posterior.
+
+Corrección de errores
+- #621: Las notificaciones vacías no deberían ser visibles.
+- #664: Comportamiento extraño y caída del sistema.
+- #680: La lista de reproducción debería poder distinguir los elementos duplicados.
+- #696: Ultrasonic se activan con BT incluso cuando todas las funciones de reproducción de medios están desactivadas.
+- #697: No hay sonido después de una pista.
+- #717: Insertar después de la canción actual no funciona del todo.
+- #735: Ya no se muestran los datos de las pistas por bluetooth.
+- #738: La aplicación ya no aparece como en ejecución o en las notificaciones al reanudar la reproducción.
+- #742: La música anclada/descargada se borra al salir e iniciar.
+- #759: Se bloquea la navegación por carpetas (desmarcando la navegación por etiquetas ID3 en la configuración).
+- #767: La configuración de la reproducción aleatoria no persiste después de reiniciar/reanudar.
+- #768: La carátula del álbum no aparece en la notificación de medios.
+- #769: El ajuste "settings.show_artist_picture" no hace nada.
+- #776: Comportamiento extraño en la rotación del dispositivo.
+- #785: Los botones debajo de la lista de canciones ya no se actualizan.
+- #787: La flecha hacia abajo ya no se anima cuando se descargan nuevas pistas.
+
+Mejoras
+- #426: Iniciar el servicio sólo cuando la reproducción es iniciada por el usuario.
+- #432: Las notificaciones de Ultrasonic deberían poder desactivarse al deslizar el dedo.
+- #553: La duración de las pistas no se lee de los metadatos.
+- #581: Bluetooth ya no actualiza la información de Reproduciendo ahora.
+- #718: Añadir soporte de ID3 cuando se está desconectado.
+- #727: Desactivar LoggingInterceptor para las llamadas de Streaming.
+- #739: Añadir más valores de precarga.
+- #752: Apuntar al SDK 31.
+- #756: Android Auto necesita trabajo.
+- #775: Usar Picasso para cargar imágenes para la notificación.
+
+Otros
+- #751: Eliminar Jacoco.
+- #786: Actualizar a MediaBeta02.

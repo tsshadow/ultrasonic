@@ -1,0 +1,37 @@
+Release notes
+Ultrasonic 4.0.0 brings along a complete overhaul of how media is being played back. We have switched to a modern library to handle the playback and fixed wuite a few bugs in the process.
+Additionally the Offline mode now supports browsing based on ID3 tags. This requires additional metadata which will be missing for tracks downloaded with previous versions. If you enable this setting, the app will therefore show only the music that you have downloaded with 4.0.0 or later.
+
+Bug fixes
+- #621: Empty notification shouldn't be visible.
+- #664: Weird behaviour and system crash.
+- #680: Now playing list should be able to distinguish duplicate items.
+- #696: Ultrasonic is activated with BT even when all media play functions are disabled.
+- #697: No sound after one track.
+- #717: Insert after current song not fully working.
+- #735: No longer showing any track data via bluetooth.
+- #738: App no longer appears as running or in notifications when resuming playback after wake.
+- #742: Pinned/downloaded music gets wiped/deleted on exit & start.
+- #759: Crash browsing by folder (unchecking browsing by ID3 label in config).
+- #767: Shuffle setting does not persist after reboot/resume.
+- #768: Album art doesn't appear in the media notification.
+- #769: The setting "settings.show_artist_picture" do nothing.
+- #776: Strange behavior in device rotation.
+- #785: Buttons below track list don't update anymore
+- #787: The down arrow is no longer animated when downloading new tracks.
+
+Enhancements
+- #426: Start service only when playback is started by the user.
+- #432: Ultrasonic notification should be dismissible by swipe.
+- #553: Duration not read from metadata.
+- #581: Bluetooth not updating Now Playing information anymore.
+- #718: Add ID3 support when offline.
+- #727: Disable LoggingInterceptor for Streaming calls.
+- #739: Add more preload values.
+- #752: Target SDK 31.
+- #756: Android Auto needs work.
+- #775: Use Picasso to load images for the notification.
+
+Others
+- #751: Remove Jacoco.
+- #786: Update to MediaBeta02.
