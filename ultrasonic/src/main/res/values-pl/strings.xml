@@ -181,7 +181,6 @@
     <string name="settings.hide_media_summary">Ukrywa pliki muzyczne przed innymi aplikacjami.</string>
     <string name="settings.hide_media_title">Ukryj pliki</string>
     <string name="settings.hide_media_toast">Efekt widoczny będzie po następnym skanowaniu muzyki przez system Android</string>
-    <string name="settings.increment_time">Skok przewijania</string>
     <string name="settings.invalid_url">Proszę wprowadzić prawidłowy URL</string>
     <string name="settings.max_albums">Maksymalna ilość wyników - albumy</string>
     <string name="settings.max_artists">Maksymalna ilość wyników - artyści</string>
@@ -214,6 +213,13 @@
     <string name="settings.network_title">Sieć</string>
     <string name="settings.other_title">Inne ustawienia</string>
     <string name="settings.playback_control_title">Ustawienia sterowania odtwarzaniem</string>
+    <string name="settings.playback.resume_on_bluetooth_device">Resume when a Bluetooth device is connected</string>
+    <string name="settings.playback.pause_on_bluetooth_device">Pause when a Bluetooth device is disconnected</string>
+    <string name="settings.playback.bluetooth_all">All Bluetooth devices</string>
+    <string name="settings.playback.bluetooth_a2dp">Only audio (A2DP) devices</string>
+    <string name="settings.playback.bluetooth_disabled">Wyłączone</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.title">Wznawiaj po podłączeniu słuchawek</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.summary">Aplikacja wznowi zatrzymane odtwarzanie po podpięciu słuchawek.</string>
     <string name="settings.preload">Ilość wstępnie ładowanych utworów</string>
     <string name="settings.preload_1">1 utwór</string>
     <string name="settings.preload_10">10 utworów</string>
@@ -221,8 +227,6 @@
     <string name="settings.preload_3">3 utwory</string>
     <string name="settings.preload_5">5 utworów</string>
     <string name="settings.preload_unlimited">Bez limitu</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.title">Wznawiaj po podłączeniu słuchawek</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.summary">Aplikacja wznowi zatrzymane odtwarzanie po podpięciu słuchawek.</string>
     <string name="settings.search_1">1</string>
     <string name="settings.search_10">10</string>
     <string name="settings.search_100">100</string>
@@ -307,11 +311,6 @@
     <string name="download.menu_show_artist">Wyświetlaj artystę</string>
     <string name="albumArt">Okładka</string>
     <string name="common_multiple_years">Z różnych lat</string>
-    <string name="settings.playback.resume_on_bluetooth_device">Resume when a Bluetooth device is connected</string>
-    <string name="settings.playback.pause_on_bluetooth_device">Pause when a Bluetooth device is disconnected</string>
-    <string name="settings.playback.bluetooth_all">All Bluetooth devices</string>
-    <string name="settings.playback.bluetooth_a2dp">Only audio (A2DP) devices</string>
-    <string name="settings.playback.bluetooth_disabled">Wyłączone</string>
     <string name="server_selector.label">Configured servers</string>
     <string name="server_selector.delete_confirmation">Are you sure you want to delete the server?</string>
     <string name="server_editor.label">Editing server</string>
@@ -330,7 +329,6 @@
         <item quantity="many">%d utworów</item>
         <item quantity="other">%d utworów</item>
     </plurals>
-
     <!-- Subsonic api errors -->
     <string name="api.subsonic.generic">Ogólny błąd interfejsu API: %1$s</string>
     <string name="api.subsonic.generic.no.message">brak wiadomości zwróconej przez serwer</string>

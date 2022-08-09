@@ -50,6 +50,8 @@
     <string name="common.select_all">Alle auswählen</string>
     <string name="common.title">Titel</string>
     <string name="common.unpin">Lösen</string>
+    <string name="common.delete_selection_confirmation">Möchtest du wirklich die momentane Auswahl löschen?</string>
+    <string name="common.unpin_selection_confirmation">Möchtest du wirklich die momentane Auswahl lösen?</string>
     <string name="common.various_artists">Mehrere Künstler*innen</string>
     <string name="delete_playlist">Möchtest du %1$s löschen</string>
     <string name="download.bookmark_removed" formatted="false">Lesezeichen entfernt</string>
@@ -72,7 +74,10 @@
     <string name="download.menu_screen_on">Bildschirm an</string>
     <string name="download.menu_show_album">Album anzeigen</string>
     <string name="download.menu_shuffle">Mischen</string>
+    <string name="download.menu_shuffle_on">Zufalls-Modus aktiviert</string>
+    <string name="download.menu_shuffle_off">Zufalls-Modus deaktiviert</string>
     <string name="download.menu_visualizer">Grafik</string>
+    <string name="download.playerstate_loading">Laden …</string>
     <string name="download.playerstate_playing_shuffle">Wiedergabeliste mischen</string>
     <string name="download.playlist_done">Die Wiedergabeliste wurde gespeichert</string>
     <string name="download.playlist_error">Konnte die Wiedergabeliste nicht speichern, bitte später erneut versuchen.</string>
@@ -217,7 +222,7 @@
     <string name="settings.hide_media_summary">Musikdateien vor anderen Apps verbergen</string>
     <string name="settings.hide_media_title">Vor anderen verbergen</string>
     <string name="settings.hide_media_toast">Wird beim nächsten Durchsuchen nach Musik durch Android wirksam.</string>
-    <string name="settings.increment_time">Sprunglänge</string>
+    <string name="settings.increment_time">Suchintervall</string>
     <string name="settings.invalid_url">Bitte eine gültige URL angeben.</string>
     <string name="settings.max_albums">Max. Anzahl der Alben</string>
     <string name="settings.max_artists">Max. Anzahl der Künstler*innen</string>
@@ -252,15 +257,21 @@
     <string name="settings.override_language">Sprache ändern</string>
     <string name="settings.override_language_summary">Nach dem Ändern der Sprache muss die App muss neu startet werden</string>
     <string name="settings.playback_control_title">Wiedergabe Einstellungen</string>
+    <string name="settings.playback.resume_on_bluetooth_device">Wiedergabe fortsetzen, wenn ein Bluetooth Gerät verbunden wurde</string>
+    <string name="settings.playback.pause_on_bluetooth_device">Wiedergabe pausieren, wenn ein Bluetooth Gerät getrennt wurde</string>
+    <string name="settings.playback.bluetooth_all">Alle Bluetooth Geräte</string>
+    <string name="settings.playback.bluetooth_a2dp">Nur Audio (A2DP) Geräte</string>
+    <string name="settings.playback.bluetooth_disabled">Deaktiviert</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.title">Fortsetzen mit Kopfhörer</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.summary">Die App setzt eine pausierte Wiedergabe beim Anschließen der Kopfhörer fort.</string>
     <string name="settings.preload">Im Voraus zu ladende Titel</string>
+    <string name="settings.parallel_downloads">Wie viele Lieder pa­r­al­lel heruntergeladen werden sollen</string>
     <string name="settings.preload_1">1 Titel</string>
     <string name="settings.preload_10">10 Titel</string>
     <string name="settings.preload_2">2 Titel</string>
     <string name="settings.preload_3">3 Titel</string>
     <string name="settings.preload_5">5 Titel</string>
     <string name="settings.preload_unlimited">Unbegrenzt</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.title">Fortsetzen mit Kopfhörer</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.summary">Die App setzt eine pausierte Wiedergabe beim Anschließen der Kopfhörer fort.</string>
     <string name="settings.scrobble_summary">Benutzername und Passwort des Scrobble Service(s) müssen im Server gesetzt sein</string>
     <string name="settings.scrobble_title">Gespielte Musik scrobbeln</string>
     <string name="settings.search_1">1</string>
@@ -306,6 +317,9 @@
     <string name="settings.show_now_playing_details">Zeige Details in der Wiedergabe</string>
     <string name="settings.use_id3">Durchsuchen von ID3-Tags</string>
     <string name="settings.use_id3_summary">Nutze ID3 Tag Methode anstatt Dateisystem-Methode</string>
+    <string name="settings.use_id3_offline">ID3 Methode auch offline nutzen</string>
+    <string name="settings.use_id3_offline_warning">Experimentell: Falls aktiviert, werden nur Lieder angezeigt die mit Ultrasonic 4.0 oder höher heruntergeladen wurden.</string>
+    <string name="settings.use_id3_offline_summary">Ältere Downloads haben nicht unbedingt die notwendigen Metadaten heruntergeladen. Du kannst zwischen dem Anheft- und Downloadmodus wechseln um die fehlenden Metadaten herunter zu laden.</string>
     <string name="settings.show_artist_picture">Zeige Bilder in der Liste der Künstler*innen an.</string>
     <string name="settings.show_artist_picture_summary">Wenn Künstler*innen Bilder zugeordnet sind werden diese in der Liste angezeigt</string>
     <string name="main.video" tools:ignore="UnusedResources">Film</string>
@@ -360,11 +374,8 @@
     <string name="download.menu_show_artist">Künstler*in anzeigen</string>
     <string name="albumArt">Album Cover</string>
     <string name="common_multiple_years">Mehrere Jahre</string>
-    <string name="settings.playback.resume_on_bluetooth_device">Wiedergabe fortsetzen, wenn ein Bluetooth Gerät verbunden wurde</string>
-    <string name="settings.playback.pause_on_bluetooth_device">Wiedergabe pausieren, wenn ein Bluetooth Gerät getrennt wurde</string>
-    <string name="settings.playback.bluetooth_all">Alle Bluetooth Geräte</string>
-    <string name="settings.playback.bluetooth_a2dp">Nur Audio (A2DP) Geräte</string>
-    <string name="settings.playback.bluetooth_disabled">Deaktiviert</string>
+    <string name="settings.show_confirmation_dialog">Zeige Bestätigungsdialog</string>
+    <string name="settings.show_confirmation_dialog_summary">Zeigt einen Bestätigungsdialog vor dem Lösen oder Löschen von Liedern</string>
     <string name="settings.debug.title">Debug Optionen</string>
     <string name="settings.debug.log_to_file">Schreibe Debug Log in Datei</string>
     <string name="settings.debug.log_path">Die Log Dateien sind unter %1$s/%2$s verfügbar</string>
@@ -389,6 +400,8 @@
     <string name="server_editor.disabled_feature">Einer oder mehrere Funktionen wurden deaktiviert, da der Server diese nicht unterstützt.\nDu kannst diesen Test jederzeit nochmals ausführen.</string>
     <string name="server_menu.demo">Demo Server</string>
 
+    <string name="about.webpage">Website besuchen</string>
+    <string name="about.report">Melde einen Fehler</string>
     <plurals name="select_album_n_songs">
         <item quantity="one">%d Titel</item>
         <item quantity="other">%d Titel</item>
@@ -434,4 +447,4 @@
     <string name="settings.five_star_rating_title">Fünf-Stern Bewertung</string>
     <string name="settings.five_star_rating_description">Benutze Bewertungssystem mit fünf Sternen, anstatt Lieder mit nur mit einem Stern zu markieren.</string>
 
-</resources>
+    </resources>

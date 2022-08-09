@@ -126,10 +126,10 @@
     <string name="settings.increment_time_10">10 secondi</string>
     <string name="settings.increment_time_12">12 secondi</string>
     <string name="settings.increment_time_120">2 minuti</string>
-    <string name="settings.increment_time_15">15 secondi</string>
+    <string name="settings.increment_time_15">15 seconds</string>
     <string name="settings.increment_time_2">2 secondi</string>
     <string name="settings.increment_time_20">20 secondi</string>
-    <string name="settings.increment_time_30">30 secondi</string>
+    <string name="settings.increment_time_30">30 seconds</string>
     <string name="settings.increment_time_5">5 secondi</string>
     <string name="settings.increment_time_60">1 minuto</string>
     <string name="settings.increment_time_8">8 secondi</string>
@@ -209,6 +209,8 @@
     <string name="settings.network_title">Rete</string>
     <string name="settings.other_title">Altre Impostazioni</string>
     <string name="settings.playback_control_title">Impostazioni Controllo Riproduzione</string>
+    <string name="settings.playback.bluetooth_disabled">Disabilitato</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.title">Riprendi all\'inserimento delle cuffie</string>
     <string name="settings.preload">Canzoni Da Precaricare</string>
     <string name="settings.preload_1">1 canzone</string>
     <string name="settings.preload_10">10 canzoni</string>
@@ -216,7 +218,6 @@
     <string name="settings.preload_3">3 canzoni</string>
     <string name="settings.preload_5">5 canzoni</string>
     <string name="settings.preload_unlimited">Illimitato</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.title">Riprendi all\'inserimento delle cuffie</string>
     <string name="settings.search_1">1</string>
     <string name="settings.search_10">10</string>
     <string name="settings.search_100">100</string>
@@ -278,7 +279,6 @@
     <string name="share_comment">Commenta</string>
     <string name="download_song_removed">\"%s\" è stato rimosso dalla playlist</string>
     <string name="share_via">Condividi canzoni via</string>
-    <string name="settings.playback.bluetooth_disabled">Disabilitato</string>
     <string name="server_menu.delete">Elimina</string>
     <string name="api.subsonic.trial_period_is_over">Il periodo di prova è terminato.</string>
     </resources>

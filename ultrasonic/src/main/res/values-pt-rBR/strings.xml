@@ -47,12 +47,14 @@
     <string name="common.play_shuffled">Tocar Aleatoriamente</string>
     <string name="common.public">Público</string>
     <string name="common.save">Salvar</string>
+    <string name="common.select_all">Selecionar tudo</string>
     <string name="common.title">Título</string>
     <string name="common.unpin">Desafixar</string>
     <string name="common.various_artists">Vários Artistas</string>
     <string name="delete_playlist">Você quer excluir %1$s</string>
     <string name="download.bookmark_removed" formatted="false">Favorito removido.</string>
     <string name="download.bookmark_set_at_position" formatted="false">Favorito marcado em %s.</string>
+    <string name="download.empty">Nada está baixando</string>
     <string name="playlist.empty">Playlist está vazia</string>
     <string name="download.jukebox_not_authorized">Controle remoto não está permitido. Habilite o modo jukebox em <b>Usuário &gt; Configurações</b> no seu servidor Subsonic.</string>
     <string name="download.jukebox_off">Controle remoto desligado. Música tocada no celular.</string>
@@ -88,6 +90,21 @@
     <string name="error.label">Erro</string>
     <string name="jukebox.is_default">Jukebox por padrão</string>
     <string name="lyrics.nomatch">Nenhuma letra encontrada</string>
+    <string name="language.default">Padrão do sistema</string>
+    <string name="language.zh_CN">Chinês (China)</string>
+    <string name="language.zh_TW">Chinês (Taiwan)</string>
+    <string name="language.cs">Tcheco</string>
+    <string name="language.nl">Holandês</string>
+    <string name="language.en">Inglês</string>
+    <string name="language.fr">Francês</string>
+    <string name="language.de">Alemão</string>
+    <string name="language.hu">Húngaro</string>
+    <string name="language.it">Italiano</string>
+    <string name="language.es">Espanhol</string>
+    <string name="language.pl">Polonês</string>
+    <string name="language.pt">Português</string>
+    <string name="language.pt_BR">Português (Brasil)</string>
+    <string name="language.ru">Russo</string>
     <string name="main.albums_alphaByArtist">Por Artista</string>
     <string name="main.albums_alphaByName">Por Nome</string>
     <string name="main.albums_frequent">Mais Tocados</string>
@@ -101,6 +118,7 @@
     <string name="main.genres_title">Gêneros</string>
     <string name="main.music">Música</string>
     <string name="main.offline">Offline</string>
+    <string name="main.setup_server">%s - Configurar Servidor</string>
     <string name="main.songs_random">Aleatórias</string>
     <string name="main.songs_starred">Favoritas</string>
     <string name="main.songs_title">Músicas</string>
@@ -130,6 +148,8 @@
     <string name="search.songs">Músicas</string>
     <string name="search.title">Pesquisar</string>
     <string name="select_album.empty">Nenhuma mídia encontrada</string>
+    <string name="select_album.n_selected">%d trilhas selecionadas</string>
+    <string name="select_album.no_network">Atenção: Nenhuma rede encontrada.\nSe você está usando dados móveis, deve permitir downloads em conexões deste tipo, nas configurações.</string>
     <string name="select_album.no_sdcard">Erro: Nenhum cartão SD disponível.</string>
     <string name="select_album.play_all">Tocar Tudo</string>
     <string name="select_artist.all_folders">Todas as Pastas</string>
@@ -149,6 +169,7 @@
     <string name="settings.increment_time_5">5 segundos</string>
     <string name="settings.increment_time_60">1 minuto</string>
     <string name="settings.increment_time_8">8 segundos</string>
+    <string name="settings.custom_cache_location">Usar Localização Personalizada do Cache</string>
     <string name="settings.cache_location">Localização do Cache</string>
     <string name="settings.cache_location_error">Localização do cache inválida. Usando o padrão.</string>
     <string name="settings.cache_size">Tamanho do Cache</string>
@@ -189,12 +210,13 @@
     <string name="settings.directory_cache_time_60">1 hora</string>
     <string name="settings.disc_sort">Classificar Músicas por Álbum</string>
     <string name="settings.disc_sort_summary">Classificar músicas pelo número do álbum e faixas</string>
-    <string name="settings.display_bitrate">Mostrar Bitrate se Sufixo do Arquivo</string>
+    <string name="settings.display_bitrate">Mostrar Taxa de Bits e Sufixo de Arquivo</string>
     <string name="settings.display_bitrate_summary">Adicionar o nome do artista com a taxa de bits e sufixo do arquivo</string>
+    <string name="settings.download_transition">Mostrar Agora Tocando ao Reproduzir</string>
+    <string name="settings.download_transition_summary">Alternar para Tocando Agora após iniciar o playback na visualização de mídia </string>
     <string name="settings.hide_media_summary">Esconder arquivos de músicas de outros aplicativos</string>
     <string name="settings.hide_media_title">Esconder de Outros</string>
     <string name="settings.hide_media_toast">Será efetivado na próxima vez que o Android procurar por músicas em seu celular.</string>
-    <string name="settings.increment_time">Intervalo de Salto</string>
     <string name="settings.invalid_url">Especifique uma URL válida.</string>
     <string name="settings.max_albums">Máximo de Álbuns</string>
     <string name="settings.max_artists">Máximo de Artistas</string>
@@ -226,7 +248,16 @@
     <string name="settings.notifications_title">Notificações</string>
     <string name="settings.network_title">Rede</string>
     <string name="settings.other_title">Outras Configurações</string>
+    <string name="settings.override_language">Sobrescrever o idioma</string>
+    <string name="settings.override_language_summary">Você precisa reiniciar o aplicativo após alterar o idioma</string>
     <string name="settings.playback_control_title">Configurações de Controle de Reprodução</string>
+    <string name="settings.playback.resume_on_bluetooth_device">Retomar ao Conectar Dispositivo Bluetooth</string>
+    <string name="settings.playback.pause_on_bluetooth_device">Pausar ao Desconectar Dispositivo Bluetooth</string>
+    <string name="settings.playback.bluetooth_all">Todos os dispositivos Bluetooth</string>
+    <string name="settings.playback.bluetooth_a2dp">Somente dispositivos de áudio (A2DP)</string>
+    <string name="settings.playback.bluetooth_disabled">Desativado</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.title">Retomar ao Inserir Fone de Ouvido</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.summary">O aplicativo retomará a reprodução em pausa na inserção dos fones de ouvido no dispositivo</string>
     <string name="settings.preload">Músicas a Pré-carregar</string>
     <string name="settings.preload_1">1 música</string>
     <string name="settings.preload_10">10 músicas</string>
@@ -234,8 +265,6 @@
     <string name="settings.preload_3">3 músicas</string>
     <string name="settings.preload_5">5 músicas</string>
     <string name="settings.preload_unlimited">Ilimitado</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.title">Retomar ao Inserir Fone de Ouvido</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.summary">O aplicativo retomará a reprodução em pausa na inserção dos fones de ouvido no dispositivo</string>
     <string name="settings.scrobble_summary">Lembre-se de configurar usuário e senha nos serviços Scrobble do servidor</string>
     <string name="settings.scrobble_title">Registrar Minhas Músicas</string>
     <string name="settings.search_1">1</string>
@@ -260,10 +289,11 @@
     <string name="settings.server_scaling_summary">Baixar imagens reduzidas do servidor ao invés do tamanho completo (economiza banda)</string>
     <string name="settings.server_scaling_title">Reduzir Arte dos Álbuns</string>
     <string name="settings.server_username">Login</string>
+    <string name="settings.server_color">Cor do servidor</string>
     <string name="settings.show_now_playing">Mostrar Reprodução Atual</string>
     <string name="settings.show_now_playing_summary">Mostrar a faixa tocada atualmente em todas as atividades</string>
     <string name="settings.show_track_number">Mostrar o Número da Faixa</string>
-    <string name="settings.show_track_number_summary">Incluir o número da faixa quando mostrando uma música</string>
+    <string name="settings.show_track_number_summary">Incluir o número da faixa ao mostrar uma música</string>
     <string name="settings.test_connection_title">Teste de Conexão</string>
     <string name="settings.testing_ok">Conexão OK</string>
     <string name="settings.testing_unlicensed">Conexão OK. Servidor não licenciado.</string>
@@ -271,15 +301,20 @@
     <string name="settings.theme_dark">Escuro</string>
     <string name="settings.theme_black">Negro</string>
     <string name="settings.theme_title">Tema</string>
-    <string name="settings.title.allow_self_signed_certificate">Permitir o certificado HTTPS auto-assinado</string>
+    <string name="settings.title.allow_self_signed_certificate">Permitir certificado HTTPS auto-assinado</string>
     <string name="settings.title.enable_ldap_users_support">Forçar autenticação não criptografada</string>
+    <string name="settings.summary.enable_ldap_users_support">Isso força o aplicativo a enviar a senha sem criptografia. É útil se o servidor Subsonic não suporta a nova API de autenticação de usuários.</string>
     <string name="settings.use_folder_for_album_artist">Usar Pasta para Nome do Artista</string>
     <string name="settings.use_folder_for_album_artist_summary">Assumir que a pasta mais acima é o nome do artista</string>
+    <string name="settings.show_now_playing_details_summary">Mostrar mais detalhes da música no Tocando Agora (gênero, ano, bitrate)</string>
+    <string name="settings.show_now_playing_details">Mostrar detalhes em Tocando Agora</string>
     <string name="settings.use_id3">Navegar Usando Etiquetas ID3</string>
     <string name="settings.use_id3_summary">Usar as etiquetas ID3 ao invés do sistema de arquivos</string>
     <string name="settings.show_artist_picture">Mostrar Foto do Artista na Lista</string>
     <string name="settings.show_artist_picture_summary">Mostrar a imagem do artista na lista de artistas, se disponível</string>
     <string name="main.video" tools:ignore="UnusedResources">Vídeo</string>
+    <string name="settings.wifi_required_summary">Baixar mídia somente em conexões não medidas</string>
+    <string name="settings.wifi_required_title">Download somente via Wi-Fi</string>
     <string name="song_details.kbps">%d kbps</string>
     <string name="util.bytes_format.byte">0 B</string>
     <string name="util.bytes_format.gigabyte">0.00 GB</string>
@@ -329,11 +364,6 @@
     <string name="download.menu_show_artist">Mostrar Artista</string>
     <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Anos Múltiplos</string>
-    <string name="settings.playback.resume_on_bluetooth_device">Retomar ao Conectar Dispositivo Bluetooth</string>
-    <string name="settings.playback.pause_on_bluetooth_device">Pausar ao Desconectar Dispositivo Bluetooth</string>
-    <string name="settings.playback.bluetooth_all">Todos os dispositivos Bluetooth</string>
-    <string name="settings.playback.bluetooth_a2dp">Somente dispositivos de áudio (A2DP)</string>
-    <string name="settings.playback.bluetooth_disabled">Desativado</string>
     <string name="settings.debug.title">Opções de Depuração</string>
     <string name="settings.debug.log_to_file">Log de Depuração em Arquivo</string>
     <string name="settings.debug.log_path">Os arquivos com log estão disponíveis em %1$s/%2$s</string>
@@ -358,9 +388,43 @@
     <string name="server_editor.disabled_feature">Um ou mais recursos foram desativados porque o servidor não os suporta.\nVocê pode rodar este teste novamente a qualquer momento.</string>
     <string name="server_menu.demo">Servidor Demonstração</string>
 
+    <string name="about.webpage">Visitar a página web</string>
+    <string name="about.report">Reportar um erro</string>
+    <string name="about.text"><b>Ultrasonic</b> é um cliente gratuito e open-source para Android de streaming de música para API de servidores compatíveis com Subsonic (version 1.7.0 ou maior).\n\nCom <b>Ultrasonic</b> você pode facilmente reproduzir online ou baixar música de seu computador doméstico para seu telefone Android usando um servidor de mídia compatível com Subsonic. O software do servidor Subsonic necessita uma configuração independente do Ultrasonic.\n\nPor padrão, o servidor Ultrasonic não é configurado. Uma vez que você configurou seu próprio servidor, altere a configuração no Ultrasonic para poder conectá-lo.</string>
     <plurals name="select_album_n_songs">
         <item quantity="one">%d música</item>
+        <item quantity="many">%d músicas</item>
         <item quantity="other">%d músicas</item>
+    </plurals>
+    <plurals name="select_album_n_songs_pinned">
+        <item quantity="one">%d música selecionada para ser fixada</item>
+        <item quantity="many">%d músicas selecionadas para serem fixadas</item>
+        <item quantity="other">%d músicas selecionadas para serem fixadas</item>
+    </plurals>
+    <plurals name="select_album_n_songs_downloaded">
+        <item quantity="one">%d música selecionada para ser baixada</item>
+        <item quantity="many">%d músicas selecionadas para serem baixadas</item>
+        <item quantity="other">%d músicas selecionadas para serem baixadas</item>
+    </plurals>
+    <plurals name="select_album_n_songs_unpinned">
+        <item quantity="one">%d música desfixada</item>
+        <item quantity="many">%d músicas desfixadas</item>
+        <item quantity="other">%d músicas desfixadas</item>
+    </plurals>
+    <plurals name="select_album_n_songs_deleted">
+        <item quantity="one">%d música excluída</item>
+        <item quantity="many">%d músicas excluídas</item>
+        <item quantity="other">%d músicas excluídas</item>
+    </plurals>
+    <plurals name="select_album_n_songs_added">
+        <item quantity="one">%d música adicionada ao final da playlist</item>
+        <item quantity="many">%d músicas adicionadas ao final da playlist</item>
+        <item quantity="other">%d músicas adicionadas ao final da playlist</item>
+    </plurals>
+    <plurals name="select_album_n_songs_play_next">
+        <item quantity="one">%d música adicionada após a atual</item>
+        <item quantity="many">%d músicas adicionadas após a atual</item>
+        <item quantity="other">%d músicas adicionadas após a atual</item>
     </plurals>
 
     <!-- Subsonic api errors -->
@@ -376,5 +440,7 @@
     <string name="api.subsonic.upgrade_server">Versões incompativeis. Atualize o servidor Ultrasonic.</string>
 
     <!-- Subsonic features  -->
-    <string name="settings.five_star_rating_title">Usar Classif. 5 Estrelas para Músicas</string>
+    <string name="settings.five_star_rating_title">Avaliar Músicas com Estrelas</string>
+    <string name="settings.five_star_rating_description">Usar o sistema de classificação de 5 estrelas em vez de estrelar/não estrelar itens.</string>
+
     </resources>

@@ -50,6 +50,8 @@
     <string name="common.select_all">Alles selecteren</string>
     <string name="common.title">Titel</string>
     <string name="common.unpin">Losmaken</string>
+    <string name="common.delete_selection_confirmation">Weet je zeker dat je huidige selectie wilt verwijderen?</string>
+    <string name="common.unpin_selection_confirmation">Weet je zeker dat je huidige selectie wilt losmaken?</string>
     <string name="common.various_artists">Verschillende artiesten</string>
     <string name="delete_playlist">Wil je %1$s verwijderen?</string>
     <string name="download.bookmark_removed" formatted="false">Bladwijzer verwijderd.</string>
@@ -72,7 +74,10 @@
     <string name="download.menu_screen_on">Scherm aan</string>
     <string name="download.menu_show_album">Album tonen</string>
     <string name="download.menu_shuffle">Willekeurig</string>
+    <string name="download.menu_shuffle_on">Willekeurige modus is ingeschakeld</string>
+    <string name="download.menu_shuffle_off">Willekeurige modus is uitgeschakeld</string>
     <string name="download.menu_visualizer">Visualisatie</string>
+    <string name="download.playerstate_loading">Bezig met bufferen…</string>
     <string name="download.playerstate_playing_shuffle">Bezig met willekeurig afspelen</string>
     <string name="download.playlist_done">Afspeellijst is opgeslagen.</string>
     <string name="download.playlist_error">Afspeellijst kan niet worden opgeslagen. Probeer het later opnieuw.</string>
@@ -217,7 +222,7 @@
     <string name="settings.hide_media_summary">Muziekbestanden verbergen voor andere apps.</string>
     <string name="settings.hide_media_title">Verbergen voor andere apps</string>
     <string name="settings.hide_media_toast">Dit wordt toegepast bij de volgende keer dat Android je muziek doorzoekt.</string>
-    <string name="settings.increment_time">Overslaantussenpoos</string>
+    <string name="settings.increment_time">Spoeltussenpoos</string>
     <string name="settings.invalid_url">Geef een geldige URL op.</string>
     <string name="settings.max_albums">Max. aantal albums</string>
     <string name="settings.max_artists">Max. aantal artiesten</string>
@@ -252,15 +257,21 @@
     <string name="settings.override_language">Taal afdwingen</string>
     <string name="settings.override_language_summary">Herstart de app om de wijziging toe te passen</string>
     <string name="settings.playback_control_title">Afspeelbedieningsinstellingen</string>
+    <string name="settings.playback.resume_on_bluetooth_device">Hervatten bij verbinding met bluetoothapparaat</string>
+    <string name="settings.playback.pause_on_bluetooth_device">Pauzeren als verbinding met bluetoothapparaat verbroken is</string>
+    <string name="settings.playback.bluetooth_all">Alle bluetoothapparaten</string>
+    <string name="settings.playback.bluetooth_a2dp">Alleen audio-apparaten (AD2P)</string>
+    <string name="settings.playback.bluetooth_disabled">Uitgeschakeld</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.title">Hervatten bij aansluiten van hoofdtelefoon</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.summary">Het afspelen wordt hervat zodra er een hoofdtelefoon wordt aangesloten.</string>
     <string name="settings.preload">Aantal voor te laden nummers</string>
+    <string name="settings.parallel_downloads">Hoeveel nummers er tegelijk mogen worden gedownload</string>
     <string name="settings.preload_1">1 nummer</string>
     <string name="settings.preload_10">10 nummers</string>
     <string name="settings.preload_2">2 nummers</string>
     <string name="settings.preload_3">3 nummers</string>
     <string name="settings.preload_5">5 nummers</string>
     <string name="settings.preload_unlimited">Ongelimiteerd</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.title">Hervatten bij aansluiten van hoofdtelefoon</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.summary">Het afspelen wordt hervat zodra er een hoofdtelefoon wordt aangesloten.</string>
     <string name="settings.scrobble_summary">Let op: stel je gebruikersnaam en wachtwoord van je scrobble-dienst(en) in op je Subsonic-server</string>
     <string name="settings.scrobble_title">Scrobbelen</string>
     <string name="settings.search_1">1</string>
@@ -306,6 +317,9 @@
     <string name="settings.show_now_playing_details">Details tonen op ‘Nu aan het afspelen’</string>
     <string name="settings.use_id3">Navigeren met behulp van ID3-labels</string>
     <string name="settings.use_id3_summary">ID3-labels gebruiken in plaats van systeemlabels</string>
+    <string name="settings.use_id3_offline">ID3-methoe ook in offline-modus gebruiken</string>
+    <string name="settings.use_id3_offline_warning">Experimenteel: als je deze instelling inschakelt, dan wordt er alleen muziek getoond die gedownload is met versie 4.0 of hoger.</string>
+    <string name="settings.use_id3_offline_summary">Oudere downloads beschikken niet over de benodigde metagegevens. Je kunt tussen modi schakelen om de ontbrekende metagegevens op te halen.</string>
     <string name="settings.show_artist_picture">Artiestfoto tonen op artiestenlijst</string>
     <string name="settings.show_artist_picture_summary">Toont de artiestfoto op de artiestenlijst (indien beschikbaar)</string>
     <string name="main.video" tools:ignore="UnusedResources">Video</string>
@@ -360,11 +374,8 @@
     <string name="download.menu_show_artist">Artiest tonen</string>
     <string name="albumArt">Albumhoes</string>
     <string name="common_multiple_years">Meerdere jaren</string>
-    <string name="settings.playback.resume_on_bluetooth_device">Hervatten bij verbinding met bluetoothapparaat</string>
-    <string name="settings.playback.pause_on_bluetooth_device">Pauzeren als verbinding met bluetoothapparaat verbroken is</string>
-    <string name="settings.playback.bluetooth_all">Alle bluetoothapparaten</string>
-    <string name="settings.playback.bluetooth_a2dp">Alleen audio-apparaten (AD2P)</string>
-    <string name="settings.playback.bluetooth_disabled">Uitgeschakeld</string>
+    <string name="settings.show_confirmation_dialog">Bevestingsvensters tonen</string>
+    <string name="settings.show_confirmation_dialog_summary">Toon bevestigingsvensters alvorens nummers te verwijderen of los te maken</string>
     <string name="settings.debug.title">Foutopsporingsopties</string>
     <string name="settings.debug.log_to_file">Foutopsporingslogboek bijhouden</string>
     <string name="settings.debug.log_path">De logboeken worden opgeslagen in %1$s/%2$s</string>
@@ -436,5 +447,8 @@
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Vijf sterren gebruiken voor nummers</string>
     <string name="settings.five_star_rating_description">Toon vijf sterren om nummers te beoordelen in plaats van items toe te voegen aan of te verwijderen uit de favorieten.</string>
+
+    <string name="settings.use_hw_offload_title">Hardwarematig afspelen (experimenteel)</string>
+    <string name="settings.use_hw_offload_description">Probeer media af te spelen met behulp van de mediadecoder op je telefoon. Let op: hierdoor kan het accuverbruik toenemen.</string>
 
 </resources>

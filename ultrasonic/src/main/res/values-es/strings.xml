@@ -50,6 +50,8 @@
     <string name="common.select_all">Seleccionar todo</string>
     <string name="common.title">Título</string>
     <string name="common.unpin">Desanclar</string>
+    <string name="common.delete_selection_confirmation">¿Realmente quieres borrar la selección actual?</string>
+    <string name="common.unpin_selection_confirmation">¿Realmente quieres desanclar la selección actual?</string>
     <string name="common.various_artists">Varios artistas</string>
     <string name="delete_playlist">Quieres eliminar %1$s</string>
     <string name="download.bookmark_removed" formatted="false">Marcador eliminado.</string>
@@ -72,7 +74,10 @@
     <string name="download.menu_screen_on">Pantalla encendida</string>
     <string name="download.menu_show_album">Mostrar Álbum</string>
     <string name="download.menu_shuffle">Aleatorio</string>
+    <string name="download.menu_shuffle_on">Modo aleatorio activado</string>
+    <string name="download.menu_shuffle_off">Modo aleatorio desactivado</string>
     <string name="download.menu_visualizer">Visualizador</string>
+    <string name="download.playerstate_loading">Almacenando en el buffer …</string>
     <string name="download.playerstate_playing_shuffle">Reproduciendo en modo aleatorio</string>
     <string name="download.playlist_done">Lista de reproducción guardada con éxito.</string>
     <string name="download.playlist_error">Fallo al guardar la lista de reproducción, por favor reinténtalo mas tarde.</string>
@@ -217,7 +222,7 @@
     <string name="settings.hide_media_summary">Oculta los archivos de música desde otras aplicaciones.</string>
     <string name="settings.hide_media_title">Ocultar desde otras</string>
     <string name="settings.hide_media_toast">Tiene efecto la próxima vez que Android escanee la música de tu dispositivo.</string>
-    <string name="settings.increment_time">Intervalo de salto</string>
+    <string name="settings.increment_time">Intervalo de búsqueda</string>
     <string name="settings.invalid_url">Por favor especifica una URL válida.</string>
     <string name="settings.max_albums">Máximo de Álbumes</string>
     <string name="settings.max_artists">Máximo de Artistas</string>
@@ -252,15 +257,21 @@
     <string name="settings.override_language">Cambiar el idioma</string>
     <string name="settings.override_language_summary">Es necesario reiniciar la aplicación después de cambiar el idioma</string>
     <string name="settings.playback_control_title">Configuración del control de reproducción</string>
+    <string name="settings.playback.resume_on_bluetooth_device">Reanudar al conectar un dispositivo Bluetooth</string>
+    <string name="settings.playback.pause_on_bluetooth_device">Pausar al desconectar un dispositivo Bluetooth</string>
+    <string name="settings.playback.bluetooth_all">Todos los dispositivos Bluetooth</string>
+    <string name="settings.playback.bluetooth_a2dp">Solo dispositivos de audio (A2DP)</string>
+    <string name="settings.playback.bluetooth_disabled">Deshabilitado</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.title">Reanudar al insertar los auriculares</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.summary">La aplicación reanudará la reproducción en pausa al insertar los auriculares en el dispositivo.</string>
     <string name="settings.preload">Canciones a precargar</string>
+    <string name="settings.parallel_downloads">¿Cuántas canciones se pueden descargar en paralelo?</string>
     <string name="settings.preload_1">1 canción</string>
     <string name="settings.preload_10">10 canciónes</string>
     <string name="settings.preload_2">2 canciónes</string>
     <string name="settings.preload_3">3 canciónes</string>
     <string name="settings.preload_5">5 canciónes</string>
     <string name="settings.preload_unlimited">Ilimitado</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.title">Reanudar al insertar los auriculares</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.summary">La aplicación reanudará la reproducción en pausa al insertar los auriculares en el dispositivo.</string>
     <string name="settings.scrobble_summary">Recuerda configurar tu nombre de usuario y contraseña en los servicios de Scrobble en el servidor</string>
     <string name="settings.scrobble_title">Hacer Scrobble de mis reproducciones</string>
     <string name="settings.search_1">1</string>
@@ -306,6 +317,9 @@
     <string name="settings.show_now_playing_details">Mostrar detalles en reproduciendo ahora</string>
     <string name="settings.use_id3">Navegar usando las etiquetas ID3</string>
     <string name="settings.use_id3_summary">Usar el método de etiquetas ID3 en lugar del método basado en el sistema de ficheros</string>
+    <string name="settings.use_id3_offline">Utilizar etiquetas ID3 también cuando se está fuera de línea</string>
+    <string name="settings.use_id3_offline_warning">Experimental: Si activas este ajuste sólo se mostrará la música que hayas descargado con Ultrasonic 4.0 o posterior.</string>
+    <string name="settings.use_id3_offline_summary">Las descargas anteriores no tienen los metadatos necesarios descargados. Puedes alternar entre el modo anclar y guardar para activar la descarga de los metadatos que faltan.</string>
     <string name="settings.show_artist_picture">Mostrar la imagen del artista en la lista de artistas</string>
     <string name="settings.show_artist_picture_summary">Muestra la imagen del artista en la lista de artistas si está disponible</string>
     <string name="main.video" tools:ignore="UnusedResources">Vídeo</string>
@@ -360,11 +374,8 @@
     <string name="download.menu_show_artist">Mostrar artista</string>
     <string name="albumArt">Caratula del Álbum</string>
     <string name="common_multiple_years">Múltiples años</string>
-    <string name="settings.playback.resume_on_bluetooth_device">Reanudar al conectar un dispositivo Bluetooth</string>
-    <string name="settings.playback.pause_on_bluetooth_device">Pausar al desconectar un dispositivo Bluetooth</string>
-    <string name="settings.playback.bluetooth_all">Todos los dispositivos Bluetooth</string>
-    <string name="settings.playback.bluetooth_a2dp">Solo dispositivos de audio (A2DP)</string>
-    <string name="settings.playback.bluetooth_disabled">Deshabilitado</string>
+    <string name="settings.show_confirmation_dialog">Mostrar diálogo de confirmación</string>
+    <string name="settings.show_confirmation_dialog_summary">Muestra un cuadro de diálogo de confirmación antes de eliminar o desanclar las canciones</string>
     <string name="settings.debug.title">Opciones de depuración</string>
     <string name="settings.debug.log_to_file">Escribir registro de depuración en un archivo</string>
     <string name="settings.debug.log_path">Los archivos de registro están disponibles en %1$s/%2$s</string>
@@ -394,30 +405,37 @@
     <string name="about.text"><b>Ultrasonic</b> es un cliente Android de streaming de música gratuito y de código abierto para servidores compatibles con la API de Subsonic (versión 1.7.0 o superior).\n\nCon <b>Ultrasonic</b> puede transmitir o descargar fácilmente música desde su ordenador de casa a su teléfono Android utilizando su servidor multimedia compatible con Subsonic. El software del servidor Subsonic requiere una configuración adicional aparte de Ultrasonic.\n\nPor defecto, Ultrasonic no está configurado. Una vez que hayas configurado tu propio servidor, cambia la configuración del servidor para que se conecte a tu propio ordenador.</string>
     <plurals name="select_album_n_songs">
         <item quantity="one">%d canción</item>
+        <item quantity="many">%d canciones</item>
         <item quantity="other">%d canciones</item>
     </plurals>
     <plurals name="select_album_n_songs_pinned">
         <item quantity="one">%d canción seleccionada para ser anclada</item>
+        <item quantity="many">%d canciones seleccionadas para ser ancladas</item>
         <item quantity="other">%d canciones seleccionadas para ser ancladas</item>
     </plurals>
     <plurals name="select_album_n_songs_downloaded">
         <item quantity="one">%d canción seleccionada para ser descargada</item>
+        <item quantity="many">%d canciones seleccionadas para ser descargadas</item>
         <item quantity="other">%d canciones seleccionadas para ser descargadas</item>
     </plurals>
     <plurals name="select_album_n_songs_unpinned">
         <item quantity="one">%d canción desanclada</item>
+        <item quantity="many">%d canciones desancladas</item>
         <item quantity="other">%d canciones desancladas</item>
     </plurals>
     <plurals name="select_album_n_songs_deleted">
         <item quantity="one">%d canción eliminada</item>
+        <item quantity="many">%d canciones eliminadas</item>
         <item quantity="other">%d canciones eliminadas</item>
     </plurals>
     <plurals name="select_album_n_songs_added">
         <item quantity="one">%d canción añadida al final de la cola de reproducción</item>
+        <item quantity="many">%d canciones añadidas al final de la cola de reproducción</item>
         <item quantity="other">%d canciones añadidas al final de la cola de reproducción</item>
     </plurals>
     <plurals name="select_album_n_songs_play_next">
         <item quantity="one">%d canción insertada después de la canción actual</item>
+        <item quantity="many">%d canciones insertadas después de la canción actual.</item>
         <item quantity="other">%d canciones insertadas después de la canción actual.</item>
     </plurals>
 
@@ -436,5 +454,8 @@
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Use cinco estrellas para las canciones</string>
     <string name="settings.five_star_rating_description">Utilice el sistema de calificación de cinco estrellas para canciones en lugar de simplemente marcar / desmarcar elementos.</string>
+
+    <string name="settings.use_hw_offload_title">Utilizar la reproducción por hardware (experimental)</string>
+    <string name="settings.use_hw_offload_description">Intenta reproducir los medios utilizando el chip decodificador de medios de tu teléfono. Esto puede mejorar el uso de la batería.</string>
 
 </resources>

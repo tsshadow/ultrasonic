@@ -149,7 +149,7 @@
     <string name="select_genre.empty">Жанры не найдены</string>
     <string name="select_playlist.empty">Нет сохраненных плейлистов на сервере</string>
     <string name="settings.appearance_title">Появление</string>
-    <string name="settings.increment_time_0">Отключить</string>
+    <string name="settings.increment_time_0">Отключено</string>
     <string name="settings.increment_time_1">1 секунда</string>
     <string name="settings.increment_time_10">10 секунд</string>
     <string name="settings.increment_time_12">12 секунд</string>
@@ -205,7 +205,6 @@
     <string name="settings.hide_media_summary">Включить воспроизведение без паузы</string>
     <string name="settings.hide_media_title">Скрыть от других</string>
     <string name="settings.hide_media_toast">Вступает в силу в следующий раз, Android сканирует ваш телефон на предмет музыки</string>
-    <string name="settings.increment_time">Пропустить интервал</string>
     <string name="settings.invalid_url">Пожалуйста, укажите действительный URL.</string>
     <string name="settings.max_albums">Максимум альбомов</string>
     <string name="settings.max_artists">Максимум исполнителей</string>
@@ -238,6 +237,13 @@
     <string name="settings.network_title">Сеть</string>
     <string name="settings.other_title">Другие настройки</string>
     <string name="settings.playback_control_title">Настройки управления воспроизведением</string>
+    <string name="settings.playback.resume_on_bluetooth_device">Возобновить при подключении устройства Bluetooth</string>
+    <string name="settings.playback.pause_on_bluetooth_device">Пауза при отключении устройства Bluetooth</string>
+    <string name="settings.playback.bluetooth_all">Все устройства Bluetooth</string>
+    <string name="settings.playback.bluetooth_a2dp">Только аудио (A2DP) устройства</string>
+    <string name="settings.playback.bluetooth_disabled">Отключено</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.title">Возобновить подключение наушников</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.summary">Приложение возобновит приостановленное воспроизведение после того, как в устройство будут вставлены проводные наушники.</string>
     <string name="settings.preload">Песни для предварительной загрузки</string>
     <string name="settings.preload_1">1 песня</string>
     <string name="settings.preload_10">10 песен</string>
@@ -245,8 +251,6 @@
     <string name="settings.preload_3">3 песни</string>
     <string name="settings.preload_5">5 песен</string>
     <string name="settings.preload_unlimited">Неограниченный</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.title">Возобновить подключение наушников</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.summary">Приложение возобновит приостановленное воспроизведение после того, как в устройство будут вставлены проводные наушники.</string>
     <string name="settings.scrobble_summary">Не забудьте установить своего пользователя и пароль в Скроббл сервисах на сервере.</string>
     <string name="settings.scrobble_title">Скробблить мои воспроизведения</string>
     <string name="settings.search_1">1</string>
@@ -336,11 +340,6 @@
     <string name="download.menu_show_artist">Показать исполнителей</string>
     <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Несколько лет</string>
-    <string name="settings.playback.resume_on_bluetooth_device">Возобновить при подключении устройства Bluetooth</string>
-    <string name="settings.playback.pause_on_bluetooth_device">Пауза при отключении устройства Bluetooth</string>
-    <string name="settings.playback.bluetooth_all">Все устройства Bluetooth</string>
-    <string name="settings.playback.bluetooth_a2dp">Только аудио (A2DP) устройства</string>
-    <string name="settings.playback.bluetooth_disabled">Отключено</string>
     <string name="settings.debug.title">Настройки отладки</string>
     <string name="settings.debug.log_to_file">Записать журнал отладки в файл</string>
     <string name="settings.debug.log_path">Файлы журнала доступны по адресу %1$s/%2$s</string>
@@ -369,7 +368,6 @@
         <item quantity="many">%d песен</item>
         <item quantity="other">%d песен</item>
     </plurals>
-
     <!-- Subsonic api errors -->
     <string name="api.subsonic.generic">Общая ошибка API: %1$s</string>
     <string name="api.subsonic.generic.no.message">нет сообщений от сервера</string>

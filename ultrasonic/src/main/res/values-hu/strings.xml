@@ -131,7 +131,7 @@
     <string name="select_genre.empty">Műfajok nem találhatók!</string>
     <string name="select_playlist.empty">Nincs mentett lejátszási lista a kiszolgálón.</string>
     <string name="settings.appearance_title">Megjelenés</string>
-    <string name="settings.increment_time_0">Letiltva</string>
+    <string name="settings.increment_time_0">Kikapcsolva</string>
     <string name="settings.increment_time_1">1 másodperc</string>
     <string name="settings.increment_time_10">10 másodperc</string>
     <string name="settings.increment_time_12">12 másodperc</string>
@@ -187,7 +187,6 @@
     <string name="settings.hide_media_summary">Zenefájlok elrejtése egyéb alkalmazások elől.</string>
     <string name="settings.hide_media_title">Elrejtés</string>
     <string name="settings.hide_media_toast">A következő alkalomtól lép életbe, amikor az Android zenefájlokat keres a telefonon.</string>
-    <string name="settings.increment_time">Ugrás időintervalluma</string>
     <string name="settings.invalid_url">Adjon meg egy érvényes URL-t!</string>
     <string name="settings.max_albums">Albumok max. találati száma</string>
     <string name="settings.max_artists">Előadók max. találati száma</string>
@@ -220,6 +219,13 @@
     <string name="settings.network_title">Hálózat</string>
     <string name="settings.other_title">Egyéb beállítások</string>
     <string name="settings.playback_control_title">Lejátszás-vezérlés beállításai</string>
+    <string name="settings.playback.resume_on_bluetooth_device">Folytatás Bluetooth eszköz csatlakozásakor</string>
+    <string name="settings.playback.pause_on_bluetooth_device">Szünet Bluetooth eszköz kikapcsolásakor</string>
+    <string name="settings.playback.bluetooth_all">Minden Bluetooth eszköz</string>
+    <string name="settings.playback.bluetooth_a2dp">Csak audio (A2DP) eszközök</string>
+    <string name="settings.playback.bluetooth_disabled">Kikapcsolva</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.title">Folytatás a fejhallgató behelyezésekor</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.summary">Az alkalmazás folytatja a szüneteltetett lejátszást a fejhallgató behelyezésekor a készülékbe.</string>
     <string name="settings.preload">Dalok előolvasása</string>
     <string name="settings.preload_1">1 dal</string>
     <string name="settings.preload_10">10 dal</string>
@@ -227,8 +233,6 @@
     <string name="settings.preload_3">3 dal</string>
     <string name="settings.preload_5">5 dal</string>
     <string name="settings.preload_unlimited">Korlátlan</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.title">Folytatás a fejhallgató behelyezésekor</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.summary">Az alkalmazás folytatja a szüneteltetett lejátszást a fejhallgató behelyezésekor a készülékbe.</string>
     <string name="settings.scrobble_summary">Ne felejtsd el beállítani a Scrobble szolgáltatónál használt felhasználóneved és jelszavad a szervereden</string>
     <string name="settings.scrobble_title">Scrobble engedélyezése</string>
     <string name="settings.search_1">1</string>
@@ -318,11 +322,6 @@
     <string name="download.menu_show_artist">Ugrás az előadóhoz</string>
     <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Több év</string>
-    <string name="settings.playback.resume_on_bluetooth_device">Folytatás Bluetooth eszköz csatlakozásakor</string>
-    <string name="settings.playback.pause_on_bluetooth_device">Szünet Bluetooth eszköz kikapcsolásakor</string>
-    <string name="settings.playback.bluetooth_all">Minden Bluetooth eszköz</string>
-    <string name="settings.playback.bluetooth_a2dp">Csak audio (A2DP) eszközök</string>
-    <string name="settings.playback.bluetooth_disabled">Kikapcsolva</string>
     <string name="settings.debug.title">Hibakeresési lehetőségek</string>
     <string name="settings.debug.log_to_file">Hibakeresési napló írása fájlba</string>
     <string name="settings.debug.log_path">A naplófájlok elérhetőek a következő helyen: %1$s/%2$s</string>
@@ -346,7 +345,6 @@
         <item quantity="one">%d dal</item>
         <item quantity="other">%d dal</item>
     </plurals>
-
     <!-- Subsonic api errors -->
     <string name="api.subsonic.generic">Általános api hiba: %1$s</string>
     <string name="api.subsonic.generic.no.message">nincs üzenet a szerverről</string>
