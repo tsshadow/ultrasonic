@@ -1,9 +1,9 @@
 [versions]
 # You need to run ./gradlew wrapper after updating the version
-gradle                 = "7.3.3"
+gradle                 = "7.5.1"
 
 navigation             = "2.3.5"
-gradlePlugin           = "7.2.1"
+gradlePlugin           = "7.2.2"
 androidxcore           = "1.6.0"
 ktlint                 = "0.43.2"
 ktlintGradle           = "10.2.0"
@@ -26,7 +26,7 @@ viewModelKtx           = "2.4.1"
 retrofit               = "2.9.0"
 jackson                = "2.10.1"
 okhttp                 = "4.10.0"
-koin                   = "3.0.2"
+koin                   = "3.2.0"
 picasso                = "2.71828"
 
 junit4                 = "4.13.2"

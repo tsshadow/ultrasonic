@@ -76,7 +76,6 @@
     <string name="download.menu_shuffle">Aleatorio</string>
     <string name="download.menu_shuffle_on">Modo aleatorio activado</string>
     <string name="download.menu_shuffle_off">Modo aleatorio desactivado</string>
-    <string name="download.menu_visualizer">Visualizador</string>
     <string name="download.playerstate_loading">Almacenando en el buffer …</string>
     <string name="download.playerstate_playing_shuffle">Reproduciendo en modo aleatorio</string>
     <string name="download.playlist_done">Lista de reproducción guardada con éxito.</string>
@@ -87,8 +86,6 @@
     <string name="download.repeat_all">Repetir todo</string>
     <string name="download.repeat_off">No repetir</string>
     <string name="download.repeat_single">Repetir canción</string>
-    <string name="download.visualizer_off">Visualizador apagado.</string>
-    <string name="download.visualizer_on">Visualizador encendido.</string>
     <string name="equalizer.enabled">Activado</string>
     <string name="equalizer.label">Ecualizador</string>
     <string name="equalizer.preset">Seleccionar preajuste</string>

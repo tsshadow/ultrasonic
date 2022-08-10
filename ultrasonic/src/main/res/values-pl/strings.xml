@@ -61,7 +61,6 @@
     <string name="download.menu_screen_on">Ekran włączony</string>
     <string name="download.menu_show_album">Wyświetl album</string>
     <string name="download.menu_shuffle">Wymieszaj</string>
-    <string name="download.menu_visualizer">Efekt wizualny</string>
     <string name="download.playerstate_playing_shuffle">Odtwarzanie losowe</string>
     <string name="download.playlist_done">Playlista została zapisana.</string>
     <string name="download.playlist_error">Błąd zapisu playlisty. Proszę spróbować później.</string>
@@ -71,8 +70,6 @@
     <string name="download.repeat_all">Powtarzaj wszystko</string>
     <string name="download.repeat_off">Powtarzanie wyłączone</string>
     <string name="download.repeat_single">Powtarzaj utwór</string>
-    <string name="download.visualizer_off">Efekt wizualny wyłączony.</string>
-    <string name="download.visualizer_on">Efekt wizualny włączony.</string>
     <string name="equalizer.enabled">Włączony</string>
     <string name="equalizer.label">Korektor dźwięku</string>
     <string name="equalizer.preset">Wybierz preset</string>

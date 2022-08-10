@@ -58,7 +58,6 @@
     <string name="download.menu_screen_on">Schermo acceso</string>
     <string name="download.menu_show_album">Visualizza Album</string>
     <string name="download.menu_shuffle">Casuale</string>
-    <string name="download.menu_visualizer">Visualizzatore</string>
     <string name="download.playerstate_playing_shuffle">Riproduzione casuale</string>
     <string name="download.playlist_done">Playlist salvata con successo </string>
     <string name="download.playlist_error">Impossibile salvare la playlist, riprovare più tardi.</string>
@@ -68,8 +67,6 @@
     <string name="download.repeat_all">Ripeti tutto</string>
     <string name="download.repeat_off">Ripetizione spenta</string>
     <string name="download.repeat_single">Ripeti canzone</string>
-    <string name="download.visualizer_off">Visualizzatore disattivato.</string>
-    <string name="download.visualizer_on">Visualizzatore attivato.</string>
     <string name="equalizer.enabled">Abilitato</string>
     <string name="equalizer.label">Equalizzatore</string>
     <string name="equalizer.preset">Selezione Preset</string>

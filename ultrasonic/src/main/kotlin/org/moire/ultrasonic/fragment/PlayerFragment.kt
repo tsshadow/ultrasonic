@@ -72,7 +72,6 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.adapters.TrackViewBinder
 import org.moire.ultrasonic.audiofx.EqualizerController
-import org.moire.ultrasonic.audiofx.VisualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.Track
@@ -91,7 +90,6 @@ import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.toTrack
 import org.moire.ultrasonic.view.AutoRepeatButton
-import org.moire.ultrasonic.view.VisualizerView
 import timber.log.Timber
 
 /**
@@ -111,7 +109,6 @@ class PlayerFragment :
     private var jukeboxAvailable = false
     private var useFiveStarRating = false
     private var isEqualizerAvailable = false
-    private var isVisualizerAvailable = false
 
     // Detectors & Callbacks
     private lateinit var gestureScanner: GestureDetector
@@ -130,8 +127,6 @@ class PlayerFragment :
     private var ioScope = CoroutineScope(Dispatchers.IO)
 
     // Views and UI Elements
-    private lateinit var visualizerViewLayout: LinearLayout
-    private lateinit var visualizerView: VisualizerView
     private lateinit var playlistNameView: EditText
     private lateinit var starMenuItem: MenuItem
     private lateinit var fiveStar1ImageView: ImageView
@@ -198,7 +193,6 @@ class PlayerFragment :
         stopButton = view.findViewById(R.id.button_stop)
         playButton = view.findViewById(R.id.button_start)
         repeatButton = view.findViewById(R.id.button_repeat)
-        visualizerViewLayout = view.findViewById(R.id.current_playing_visualizer_layout)
         fiveStar1ImageView = view.findViewById(R.id.song_five_star_1)
         fiveStar2ImageView = view.findViewById(R.id.song_five_star_2)
         fiveStar3ImageView = view.findViewById(R.id.song_five_star_3)
@@ -354,36 +348,6 @@ class PlayerFragment :
 
         registerForContextMenu(playlistView)
 
-        visualizerViewLayout.isVisible = false
-        VisualizerController.get().observe(
-            requireActivity()
-        ) { visualizerController ->
-            if (visualizerController != null) {
-                Timber.d("VisualizerController Observer.onChanged received controller")
-                visualizerView = VisualizerView(context)
-                visualizerViewLayout.addView(
-                    visualizerView,
-                    LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT
-                    )
-                )
-
-                visualizerViewLayout.isVisible = visualizerView.isActive
-
-                visualizerView.setOnTouchListener { _, _ ->
-                    visualizerView.isActive = !visualizerView.isActive
-                    mediaPlayerController.showVisualization = visualizerView.isActive
-                    true
-                }
-                isVisualizerAvailable = true
-            } else {
-                Timber.d("VisualizerController Observer.onChanged has no controller")
-                visualizerViewLayout.isVisible = false
-                isVisualizerAvailable = false
-            }
-        }
-
         EqualizerController.get().observe(
             requireActivity()
         ) { equalizerController ->
@@ -489,10 +453,6 @@ class PlayerFragment :
             requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
-        if (::visualizerView.isInitialized) {
-            visualizerView.isActive = mediaPlayerController.showVisualization
-        }
-
         requireActivity().invalidateOptionsMenu()
     }
 
@@ -510,9 +470,6 @@ class PlayerFragment :
     override fun onPause() {
         super.onPause()
         executorService.shutdown()
-        if (::visualizerView.isInitialized) {
-            visualizerView.isActive = mediaPlayerController.showVisualization
-        }
     }
 
     override fun onDestroyView() {
@@ -533,7 +490,6 @@ class PlayerFragment :
         val screenOption = menu.findItem(R.id.menu_item_screen_on_off)
         val jukeboxOption = menu.findItem(R.id.menu_item_jukebox)
         val equalizerMenuItem = menu.findItem(R.id.menu_item_equalizer)
-        val visualizerMenuItem = menu.findItem(R.id.menu_item_visualizer)
         val shareMenuItem = menu.findItem(R.id.menu_item_share)
         val shareSongMenuItem = menu.findItem(R.id.menu_item_share_song)
         starMenuItem = menu.findItem(R.id.menu_item_star)
@@ -555,10 +511,6 @@ class PlayerFragment :
         if (equalizerMenuItem != null) {
             equalizerMenuItem.isEnabled = isEqualizerAvailable
             equalizerMenuItem.isVisible = isEqualizerAvailable
-        }
-        if (visualizerMenuItem != null) {
-            visualizerMenuItem.isEnabled = isVisualizerAvailable
-            visualizerMenuItem.isVisible = isVisualizerAvailable
         }
         val mediaPlayerController = mediaPlayerController
         val track = mediaPlayerController.currentMediaItem?.toTrack()
@@ -690,20 +642,6 @@ class PlayerFragment :
             }
             R.id.menu_item_equalizer -> {
                 Navigation.findNavController(requireView()).navigate(R.id.playerToEqualizer)
-                return true
-            }
-            R.id.menu_item_visualizer -> {
-                val active = !visualizerView.isActive
-                visualizerView.isActive = active
-
-                visualizerViewLayout.isVisible = visualizerView.isActive
-
-                mediaPlayerController.showVisualization = visualizerView.isActive
-                Util.toast(
-                    context,
-                    if (active) R.string.download_visualizer_on
-                    else R.string.download_visualizer_off
-                )
                 return true
             }
             R.id.menu_item_jukebox -> {

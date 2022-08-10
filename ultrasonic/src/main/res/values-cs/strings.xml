@@ -61,7 +61,6 @@
     <string name="download.menu_screen_on">Obrazovka zapnuta</string>
     <string name="download.menu_show_album">Zobrazit album</string>
     <string name="download.menu_shuffle">Náhodně</string>
-    <string name="download.menu_visualizer">Vizualizér</string>
     <string name="download.playerstate_playing_shuffle">Přehrávám mix</string>
     <string name="download.playlist_done">Playlist úspěšně uložen.</string>
     <string name="download.playlist_error">Chyba ukládání playlistu, zkuste později.</string>
@@ -71,8 +70,6 @@
     <string name="download.repeat_all">Opakovat vše</string>
     <string name="download.repeat_off">Opakování vypnuto</string>
     <string name="download.repeat_single">Opakovat skladbu</string>
-    <string name="download.visualizer_off">Vizualizér vypnut.</string>
-    <string name="download.visualizer_on">Vizualizér zapnut.</string>
     <string name="equalizer.enabled">Zapnut</string>
     <string name="equalizer.label">Ekvalizér</string>
     <string name="equalizer.preset">Vybrat předvolbu</string>

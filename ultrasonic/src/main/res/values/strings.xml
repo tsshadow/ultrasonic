@@ -76,7 +76,6 @@
     <string name="download.menu_shuffle">Shuffle</string>
     <string name="download.menu_shuffle_on">Shuffle mode enabled</string>
     <string name="download.menu_shuffle_off">Shuffle mode disabled</string>
-    <string name="download.menu_visualizer">Visualizer</string>
     <string name="download.playerstate_loading">Buffering …</string>
     <string name="download.playerstate_playing_shuffle">Playing shuffle</string>
     <string name="download.playlist_done">Playlist was successfully saved.</string>
@@ -87,8 +86,6 @@
     <string name="download.repeat_all">Repeat All</string>
     <string name="download.repeat_off">Repeat Off</string>
     <string name="download.repeat_single">Repeat Song</string>
-    <string name="download.visualizer_off">Turned off visualizer.</string>
-    <string name="download.visualizer_on">Turned on visualizer.</string>
     <string name="equalizer.enabled">Enabled</string>
     <string name="equalizer.label">Equalizer</string>
     <string name="equalizer.preset">Select Preset</string>
