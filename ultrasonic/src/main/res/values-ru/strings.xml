@@ -72,7 +72,6 @@
     <string name="download.menu_screen_on">Включение дисплея</string>
     <string name="download.menu_show_album">Показать альбом</string>
     <string name="download.menu_shuffle">Случайное воспроизведение</string>
-    <string name="download.menu_visualizer">Визуализатор</string>
     <string name="download.playerstate_playing_shuffle">Игра в случайном порядке</string>
     <string name="download.playlist_done">Плейлист был успешно сохранен.</string>
     <string name="download.playlist_error">Не удалось сохранить плейлист, попробуйте позже.</string>
@@ -82,8 +81,6 @@
     <string name="download.repeat_all">Повторить все</string>
     <string name="download.repeat_off">Выключить повтор</string>
     <string name="download.repeat_single">Повторить песню</string>
-    <string name="download.visualizer_off">Выключить визуализатор.</string>
-    <string name="download.visualizer_on">Включить визуализатор.</string>
     <string name="equalizer.enabled">Включено</string>
     <string name="equalizer.label">Эквалайзер</string>
     <string name="equalizer.preset">Выберите предустановку</string>

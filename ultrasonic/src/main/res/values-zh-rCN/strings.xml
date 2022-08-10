@@ -72,7 +72,6 @@
     <string name="download.menu_screen_on">开启屏幕常亮</string>
     <string name="download.menu_show_album">显示专辑</string>
     <string name="download.menu_shuffle">随机</string>
-    <string name="download.menu_visualizer">可视化</string>
     <string name="download.playerstate_playing_shuffle">随机播放</string>
     <string name="download.playlist_done">已成功保存播放列表。</string>
     <string name="download.playlist_error">保存播放列表失败，请重试。</string>
@@ -82,8 +81,6 @@
     <string name="download.repeat_all">循环播放所有</string>
     <string name="download.repeat_off">关闭循环播放</string>
     <string name="download.repeat_single">循环播放</string>
-    <string name="download.visualizer_off">关闭可视化</string>
-    <string name="download.visualizer_on">打开可视化</string>
     <string name="equalizer.enabled">开启</string>
     <string name="equalizer.label">均衡器</string>
     <string name="equalizer.preset">选择预设</string>

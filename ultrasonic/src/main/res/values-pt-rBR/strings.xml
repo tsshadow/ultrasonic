@@ -72,7 +72,6 @@
     <string name="download.menu_screen_on">Tela Ligada</string>
     <string name="download.menu_show_album">Mostrar Álbum</string>
     <string name="download.menu_shuffle">Misturar</string>
-    <string name="download.menu_visualizer">Visualizador</string>
     <string name="download.playerstate_playing_shuffle">Tocando misturado</string>
     <string name="download.playlist_done">Playlist salva com sucesso.</string>
     <string name="download.playlist_error">Falha ao salvar a playlist, Tente mais tarde.</string>
@@ -82,8 +81,6 @@
     <string name="download.repeat_all">Repetir Tudo</string>
     <string name="download.repeat_off">Repetição Desligada</string>
     <string name="download.repeat_single">Repetir Música</string>
-    <string name="download.visualizer_off">Visualizador Desligado.</string>
-    <string name="download.visualizer_on">Visualizador Ligado.</string>
     <string name="equalizer.enabled">Habilitado</string>
     <string name="equalizer.label">Equalizador</string>
     <string name="equalizer.preset">Selecionar Configuração Prévia</string>

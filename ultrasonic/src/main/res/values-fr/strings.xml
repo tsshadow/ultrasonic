@@ -72,7 +72,6 @@
     <string name="download.menu_screen_on">Sur l\'écran</string>
     <string name="download.menu_show_album">Afficher l\'album</string>
     <string name="download.menu_shuffle">Aléatoire</string>
-    <string name="download.menu_visualizer">Visualiseur</string>
     <string name="download.playerstate_playing_shuffle">En lecture aléatoire</string>
     <string name="download.playlist_done">Playlist enregistrée avec succès !</string>
     <string name="download.playlist_error">Échec de l\'enregistrement de la playlist, veuillez réessayer plus tard.</string>
@@ -82,8 +81,6 @@
     <string name="download.repeat_all">Tout répéter</string>
     <string name="download.repeat_off">Répétition désactivée</string>
     <string name="download.repeat_single">Répéter le morceau</string>
-    <string name="download.visualizer_off">Visualiseur désactivé</string>
-    <string name="download.visualizer_on">Visualiseur activé</string>
     <string name="equalizer.enabled">Activé</string>
     <string name="equalizer.label">Égaliseur</string>
     <string name="equalizer.preset">Sélection prédéfinie</string>

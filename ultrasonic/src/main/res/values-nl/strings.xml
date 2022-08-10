@@ -76,7 +76,6 @@
     <string name="download.menu_shuffle">Willekeurig</string>
     <string name="download.menu_shuffle_on">Willekeurige modus is ingeschakeld</string>
     <string name="download.menu_shuffle_off">Willekeurige modus is uitgeschakeld</string>
-    <string name="download.menu_visualizer">Visualisatie</string>
     <string name="download.playerstate_loading">Bezig met bufferen…</string>
     <string name="download.playerstate_playing_shuffle">Bezig met willekeurig afspelen</string>
     <string name="download.playlist_done">Afspeellijst is opgeslagen.</string>
@@ -87,8 +86,6 @@
     <string name="download.repeat_all">Alles herhalen</string>
     <string name="download.repeat_off">Herhalen uitgeschakeld</string>
     <string name="download.repeat_single">Nummer herhalen</string>
-    <string name="download.visualizer_off">Visualisatie uitgeschakeld.</string>
-    <string name="download.visualizer_on">Visualisatie ingeschakeld.</string>
     <string name="equalizer.enabled">Ingeschakeld</string>
     <string name="equalizer.label">Equalizer</string>
     <string name="equalizer.preset">Kies een voorinstelling</string>

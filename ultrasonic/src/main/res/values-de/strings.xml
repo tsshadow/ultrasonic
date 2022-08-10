@@ -76,7 +76,6 @@
     <string name="download.menu_shuffle">Mischen</string>
     <string name="download.menu_shuffle_on">Zufalls-Modus aktiviert</string>
     <string name="download.menu_shuffle_off">Zufalls-Modus deaktiviert</string>
-    <string name="download.menu_visualizer">Grafik</string>
     <string name="download.playerstate_loading">Laden …</string>
     <string name="download.playerstate_playing_shuffle">Wiedergabeliste mischen</string>
     <string name="download.playlist_done">Die Wiedergabeliste wurde gespeichert</string>
@@ -87,8 +86,6 @@
     <string name="download.repeat_all">Alles wiederholen</string>
     <string name="download.repeat_off">Wiederholen aus</string>
     <string name="download.repeat_single">Titel wiederholen</string>
-    <string name="download.visualizer_off">Grafik ausgeschaltet</string>
-    <string name="download.visualizer_on">Grafik eingeschaltet</string>
     <string name="equalizer.enabled">Aktiviert</string>
     <string name="equalizer.label">Equalizer</string>
     <string name="equalizer.preset">Voreinstellung wählen</string>

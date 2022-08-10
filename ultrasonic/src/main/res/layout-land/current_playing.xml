@@ -112,16 +112,6 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    a:id="@+id/current_playing_visualizer_layout"
-                    a:layout_width="fill_parent"
-                    a:layout_height="60dip"
-                    a:layout_gravity="bottom|center_horizontal"
-                    a:layout_marginStart="60dip"
-                    a:layout_marginEnd="60dip"
-                    a:background="@color/translucent"
-                    a:orientation="vertical" />
-
                 <include layout="@layout/player_slider" />
 
                 <include layout="@layout/media_buttons" />

@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import org.koin.core.logger.Level
 import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.di.appPermanentStorage
 import org.moire.ultrasonic.di.applicationModule
@@ -61,12 +60,14 @@ class UApp : MultiDexApplication() {
     internal fun startKoin() {
         initiated = true
         startKoin {
-            // TODO Currently there is a bug in Koin which makes necessary to set the log level to ERROR
-            logger(TimberKoinLogger(Level.ERROR))
-            // logger(TimberKoinLogger(Level.INFO))
+            // Sometimes Koin breaks when Kotlin version is upgraded,
+            // you can normally fix it by changing to logger(TimberKoinLogger(Level.ERROR))
+            // See https://github.com/InsertKoinIO/koin/issues/1188
+            logger(TimberKoinLogger())
 
             // declare Android context
             androidContext(this@UApp)
+
             // declare modules to use
             modules(
                 applicationModule,
