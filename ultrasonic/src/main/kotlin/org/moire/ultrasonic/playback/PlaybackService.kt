@@ -25,6 +25,7 @@ import okhttp3.OkHttpClient
 import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.app.UApp
+import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
@@ -36,6 +37,7 @@ import timber.log.Timber
 class PlaybackService : MediaLibraryService(), KoinComponent {
     private lateinit var player: ExoPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
+    private var equalizer: EqualizerController? = null
 
     private lateinit var librarySessionCallback: MediaLibrarySession.Callback
 
@@ -127,6 +129,8 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
             .setSeekBackIncrementMs(Settings.seekInterval.toLong())
             .setSeekForwardIncrementMs(Settings.seekInterval.toLong())
             .build()
+
+        equalizer = EqualizerController.create(player.audioSessionId)
 
         // Enable audio offload
         if (Settings.useHwOffload)
