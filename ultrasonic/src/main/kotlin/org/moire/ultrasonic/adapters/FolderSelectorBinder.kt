@@ -109,7 +109,7 @@ class FolderSelectorBinder(context: Context) :
             menuItem.isChecked = true
             folderName.text = musicFolderName
 
-            RxBus.musicFolderChangedEventPublisher.onNext(selectedFolderId)
+            RxBus.musicFolderChangedEventPublisher.onNext(RxBus.Folder(selectedFolderId))
 
             return true
         }

@@ -16,6 +16,7 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputLayout
 import com.skydoves.colorpickerview.ColorPickerDialog
@@ -56,9 +57,6 @@ private const val DIALOG_PADDING = 12
  * Displays a form where server settings can be created / edited
  */
 class EditServerFragment : Fragment(), OnBackPressedHandler {
-    companion object {
-        const val EDIT_SERVER_INTENT_INDEX = "index"
-    }
 
     private val serverSettingsModel: ServerSettingsModel by viewModel()
     private val activeServerProvider: ActiveServerProvider by inject()
@@ -78,6 +76,8 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
     private var isInstanceStateSaved: Boolean = false
     private var currentColor: Int = 0
     private var selectedColor: Int? = null
+
+    private val navArgs by navArgs<EditServerFragmentArgs>()
 
     @Override
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,15 +107,10 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
         saveButton = view.findViewById(R.id.edit_save)
         testButton = view.findViewById(R.id.edit_test)
 
-        val index = arguments?.getInt(
-            EDIT_SERVER_INTENT_INDEX,
-            -1
-        ) ?: -1
-
-        if (index != -1) {
+        if (navArgs.index != -1) {
             // Editing an existing server
             FragmentTitle.setTitle(this, R.string.server_editor_label)
-            val serverSetting = serverSettingsModel.getServerSetting(index)
+            val serverSetting = serverSettingsModel.getServerSetting(navArgs.index)
             serverSetting.observe(
                 viewLifecycleOwner
             ) { t ->

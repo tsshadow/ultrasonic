@@ -16,7 +16,6 @@ import org.moire.ultrasonic.adapters.ServerRowAdapter
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
 import org.moire.ultrasonic.data.ServerSetting
-import org.moire.ultrasonic.fragment.EditServerFragment.Companion.EDIT_SERVER_INTENT_INDEX
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.util.ErrorDialog
@@ -25,8 +24,6 @@ import timber.log.Timber
 
 /**
  * Displays the list of configured servers, they can be selected or edited
- *
- * TODO: Manage mode is unused. Remove it...
  */
 class ServerSelectorFragment : Fragment() {
 
@@ -143,8 +140,7 @@ class ServerSelectorFragment : Fragment() {
      * Starts the Edit Server Fragment to edit the details of a server
      */
     private fun editServerByIndex(index: Int) {
-        val bundle = Bundle()
-        bundle.putInt(EDIT_SERVER_INTENT_INDEX, index)
-        findNavController().navigate(R.id.serverSelectorToEditServer, bundle)
+        val action = ServerSelectorFragmentDirections.toEditServer(index)
+        findNavController().navigate(action)
     }
 }

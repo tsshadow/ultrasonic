@@ -28,9 +28,6 @@ import timber.log.Timber
 
 /**
  * This class is responsible for handling received events for the Media Player implementation
- *
- * TODO: Remove this class. Each component should listen to the lifecycleEvents and act on them
- * independently
  */
 class MediaPlayerLifecycleSupport : KoinComponent {
     private val playbackStateSerializer by inject<PlaybackStateSerializer>()

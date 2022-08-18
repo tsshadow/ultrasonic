@@ -14,8 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.ContextMenu
-import android.view.ContextMenu.ContextMenuInfo
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.Menu
@@ -26,10 +24,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
-import android.widget.AdapterView.AdapterContextMenuInfo
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
@@ -71,9 +69,11 @@ import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.adapters.TrackViewBinder
+import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Identifiable
+import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.service.MediaPlayerController
@@ -85,7 +85,6 @@ import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
 import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.CommunicationError
-import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.toTrack
@@ -346,8 +345,6 @@ class PlayerFragment :
 
         initPlaylistDisplay()
 
-        registerForContextMenu(playlistView)
-
         EqualizerController.get().observe(
             requireActivity()
         ) { equalizerController ->
@@ -546,55 +543,54 @@ class PlayerFragment :
         }
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenuInfo?) {
-        super.onCreateContextMenu(menu, view, menuInfo)
-        if (view === playlistView) {
-            val info = menuInfo as AdapterContextMenuInfo?
-            val track = viewAdapter.getCurrentList()[info!!.position] as Track
-            val menuInflater = requireActivity().menuInflater
-            menuInflater.inflate(R.menu.nowplaying_context, menu)
+    private fun onCreateContextMenu(view: View, track: Track): PopupMenu {
+        val popup = PopupMenu(view.context, view)
+        val inflater: MenuInflater = popup.menuInflater
+        inflater.inflate(R.menu.nowplaying_context, popup.menu)
 
-            if (track.parent == null) {
-                val menuItem = menu.findItem(R.id.menu_show_album)
-                if (menuItem != null) {
-                    menuItem.isVisible = false
-                }
-            }
-
-            if (isOffline() || !Settings.shouldUseId3Tags) {
-                menu.findItem(R.id.menu_show_artist)?.isVisible = false
-            }
-
-            if (isOffline()) {
-                menu.findItem(R.id.menu_lyrics)?.isVisible = false
+        if (track.parent == null) {
+            val menuItem = popup.menu.findItem(R.id.menu_show_album)
+            if (menuItem != null) {
+                menuItem.isVisible = false
             }
         }
+
+        if (isOffline() || !Settings.shouldUseId3Tags) {
+            popup.menu.findItem(R.id.menu_show_artist)?.isVisible = false
+        }
+
+        popup.menu.findItem(R.id.menu_lyrics)?.isVisible = !isOffline()
+        popup.show()
+        return popup
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // TODO Why is Track null?
-        return menuItemSelected(item.itemId, null) || super.onOptionsItemSelected(item)
+        return menuItemSelected(item.itemId, currentSong) || super.onOptionsItemSelected(item)
+    }
+
+    private fun onContextMenuItemSelected(
+        menuItem: MenuItem,
+        item: MusicDirectory.Child
+    ): Boolean {
+        if (item !is Track) return false
+        return menuItemSelected(menuItem.itemId, item)
     }
 
     @Suppress("ComplexMethod", "LongMethod", "ReturnCount")
     private fun menuItemSelected(menuItemId: Int, track: Track?): Boolean {
-        val bundle: Bundle
-
         when (menuItemId) {
             R.id.menu_show_artist -> {
                 if (track == null) return false
 
                 if (Settings.shouldUseId3Tags) {
-                    PlayerFragmentDirections.playerToSelectAlbum(
+                    val action = PlayerFragmentDirections.playerToAlbumsList(
+                        type = AlbumListType.BY_ARTIST,
                         id = track.artistId,
-                        name = track.artist,
-                        parentId = track.artistId,
-                        isArtist = true,
+                        title = track.artist,
+                        offset = 0,
+                        size = 1000
                     )
-                    bundle = Bundle()
-
-                    Navigation.findNavController(requireView())
-                        .navigate(R.id.playerToSelectAlbum, bundle)
+                    findNavController().navigate(action)
                 }
                 return true
             }
@@ -614,11 +610,9 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_lyrics -> {
-                if (track == null) return false
-                bundle = Bundle()
-                bundle.putString(Constants.INTENT_ARTIST, track.artist)
-                bundle.putString(Constants.INTENT_TITLE, track.title)
-                Navigation.findNavController(requireView()).navigate(R.id.playerToLyrics, bundle)
+                if (track?.artist == null || track.title == null) return false
+                val action = PlayerFragmentDirections.playerToLyrics(track.artist!!, track.title!!)
+                Navigation.findNavController(requireView()).navigate(action)
                 return true
             }
             R.id.menu_remove -> {
@@ -672,9 +666,9 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_item_star -> {
-                if (currentSong == null) return true
+                if (track == null) return true
 
-                val isStarred = currentSong!!.starred
+                val isStarred = track.starred
 
                 mediaPlayerController.controller?.setRating(
                     HeartRating(!isStarred)
@@ -685,10 +679,10 @@ class PlayerFragment :
                             override fun onSuccess(result: SessionResult?) {
                                 if (isStarred) {
                                     starMenuItem.setIcon(hollowStar)
-                                    currentSong!!.starred = false
+                                    track.starred = false
                                 } else {
                                     starMenuItem.setIcon(fullStar)
-                                    currentSong!!.starred = true
+                                    track.starred = true
                                 }
                             }
 
@@ -704,11 +698,11 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_item_bookmark_set -> {
-                if (currentSong == null) return true
+                if (track == null) return true
 
-                val songId = currentSong!!.id
+                val songId = track.id
                 val playerPosition = mediaPlayerController.playerPosition
-                currentSong!!.bookmarkPosition = playerPosition
+                track.bookmarkPosition = playerPosition
                 val bookmarkTime = Util.formatTotalDuration(playerPosition.toLong(), true)
                 Thread {
                     val musicService = getMusicService()
@@ -726,10 +720,10 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_item_bookmark_delete -> {
-                if (currentSong == null) return true
+                if (track == null) return true
 
-                val bookmarkSongId = currentSong!!.id
-                currentSong!!.bookmarkPosition = 0
+                val bookmarkSongId = track.id
+                track.bookmarkPosition = 0
                 Thread {
                     val musicService = getMusicService()
                     try {
@@ -758,10 +752,10 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_item_share_song -> {
-                if (currentSong == null) return true
+                if (track == null) return true
 
                 val tracks: MutableList<Track?> = ArrayList()
-                tracks.add(currentSong)
+                tracks.add(track)
 
                 shareHandler.createShare(
                     this,
@@ -856,6 +850,8 @@ class PlayerFragment :
                 draggable = true,
                 context = requireContext(),
                 lifecycleOwner = viewLifecycleOwner,
+                createContextMenu = { view, track -> onCreateContextMenu(view, track) },
+                onContextMenuClick = { menu, id -> onContextMenuItemSelected(menu, id) },
             ).apply {
                 this.startDrag = { holder ->
                     dragTouchHelper.startDrag(holder)

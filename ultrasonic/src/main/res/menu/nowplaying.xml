@@ -36,6 +36,11 @@
         app:showAsAction="ifRoom|withText"
         a:title="@string/download.menu_clear_playlist"/>
     <item
+        a:id="@+id/menu_lyrics"
+        a:icon="@drawable/ic_library"
+        app:showAsAction="ifRoom|withText"
+        a:title="@string/download.menu_lyrics"/>
+    <item
         a:id="@+id/menu_item_bookmark_set"
         a:icon="@drawable/ic_menu_bookmark"
         app:showAsAction="ifRoom|withText"

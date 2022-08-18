@@ -25,9 +25,9 @@ class RxBus {
         val themeChangedEventObservable: Observable<Unit> =
             themeChangedEventPublisher.observeOn(mainThread())
 
-        val musicFolderChangedEventPublisher: PublishSubject<String> =
+        val musicFolderChangedEventPublisher: PublishSubject<Folder> =
             PublishSubject.create()
-        val musicFolderChangedEventObservable: Observable<String> =
+        val musicFolderChangedEventObservable: Observable<Folder> =
             musicFolderChangedEventPublisher.observeOn(mainThread())
 
         val playerStatePublisher: PublishSubject<StateWithTrack> =
@@ -92,6 +92,10 @@ class RxBus {
         val id: String,
         val state: DownloadStatus,
         val progress: Int?
+    )
+
+    data class Folder(
+        val id: String?
     )
 }
 
