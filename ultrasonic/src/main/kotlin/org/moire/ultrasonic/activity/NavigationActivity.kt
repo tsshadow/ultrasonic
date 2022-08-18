@@ -49,6 +49,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ServerSettingDao
+import org.moire.ultrasonic.fragment.MainFragmentDirections
 import org.moire.ultrasonic.fragment.OnBackPressedHandler
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.provider.SearchSuggestionProvider
@@ -377,10 +378,8 @@ class NavigationActivity : AppCompatActivity() {
             )
             suggestions.saveRecentQuery(query, null)
 
-            val bundle = Bundle()
-            bundle.putString(Constants.INTENT_QUERY, query)
-            bundle.putBoolean(Constants.INTENT_AUTOPLAY, autoPlay)
-            findNavController(R.id.nav_host_fragment).navigate(R.id.searchFragment, bundle)
+            val action = MainFragmentDirections.toSearchFragment(query, autoPlay)
+            findNavController(R.id.nav_host_fragment).navigate(action)
         }
     }
 

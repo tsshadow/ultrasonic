@@ -64,7 +64,7 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
         RxBus.musicFolderChangedEventObservable.subscribe {
             if (!listModel.isOffline()) {
                 val currentSetting = listModel.activeServer
-                currentSetting.musicFolderId = it
+                currentSetting.musicFolderId = it.id
                 serverSettingsModel.updateItem(currentSetting)
             }
             listModel.refresh(refreshListView!!)

@@ -19,6 +19,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -46,7 +47,6 @@ import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.subsonic.VideoPlayer.Companion.playVideo
 import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.CommunicationError
-import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.toast
@@ -54,8 +54,6 @@ import timber.log.Timber
 
 /**
  * Initiates a search on the media library and displays the results
- *
- * TODO: Move to SafeArgs
  */
 class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     private var searchResult: SearchResult? = null
@@ -68,6 +66,8 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     private val networkAndStorageChecker: NetworkAndStorageChecker by inject()
 
     private var cancellationToken: CancellationToken? = null
+
+    private val navArgs by navArgs<SearchFragmentArgs>()
 
     override val listModel: SearchListModel by viewModels()
 
@@ -133,14 +133,10 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             MoreButtonBinder()
         )
 
-        // Fragment was started with a query (e.g. from voice search), try to execute search right away
-        val arguments = arguments
-        if (arguments != null) {
-            val query = arguments.getString(Constants.INTENT_QUERY)
-            val autoPlay = arguments.getBoolean(Constants.INTENT_AUTOPLAY, false)
-            if (query != null) {
-                return search(query, autoPlay)
-            }
+        // If the fragment was started with a query (e.g. from voice search),
+        // try to execute search right away
+        if (navArgs.query != null) {
+            return search(navArgs.query!!, navArgs.autoplay)
         }
     }
 
@@ -156,10 +152,8 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         val searchableInfo = searchManager.getSearchableInfo(requireActivity().componentName)
         searchView!!.setSearchableInfo(searchableInfo)
 
-        val arguments = arguments
-        val autoPlay = arguments != null &&
-            arguments.getBoolean(Constants.INTENT_AUTOPLAY, false)
-        val query = arguments?.getString(Constants.INTENT_QUERY)
+        val autoPlay = navArgs.autoplay
+        val query = navArgs.query
 
         // If started with a query, enter it to the searchView
         if (query != null) {

@@ -5,7 +5,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.lifecycle.LifecycleOwner
 import com.drakeet.multitype.ItemViewBinder
 import org.koin.core.component.KoinComponent
@@ -13,6 +15,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.Track
 
+@Suppress("LongParameterList")
 class TrackViewBinder(
     val onItemClick: (Track, Int) -> Unit,
     val onContextMenuClick: ((MenuItem, Track) -> Boolean)? = null,
@@ -20,13 +23,18 @@ class TrackViewBinder(
     val draggable: Boolean,
     context: Context,
     val lifecycleOwner: LifecycleOwner,
+    val createContextMenu: (View, Track) -> PopupMenu = { view, _ ->
+        Utils.createPopupMenu(
+            view,
+            R.menu.context_menu_track
+        )
+    }
 ) : ItemViewBinder<Identifiable, TrackViewHolder>(), KoinComponent {
 
     var startDrag: ((TrackViewHolder) -> Unit)? = null
 
     // Set our layout files
     val layout = R.layout.list_item_track
-    private val contextMenuLayout = R.menu.context_menu_track
 
     private val imageHelper: Utils.ImageHelper = Utils.ImageHelper(context)
 
@@ -62,7 +70,7 @@ class TrackViewBinder(
 
         holder.itemView.setOnLongClickListener {
             if (onContextMenuClick != null) {
-                val popup = Utils.createPopupMenu(holder.itemView, contextMenuLayout)
+                val popup = createContextMenu(holder.itemView, track)
 
                 popup.setOnMenuItemClickListener { menuItem ->
                     onContextMenuClick.invoke(menuItem, track)

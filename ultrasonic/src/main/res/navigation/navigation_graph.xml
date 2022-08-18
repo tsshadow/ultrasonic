@@ -212,6 +212,15 @@
         <action
             android:id="@+id/searchToAlbumsList"
             app:destination="@id/albumListFragment" />
+        <argument
+            android:name="query"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="autoplay"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/playlistsFragment"
@@ -264,6 +273,9 @@
             android:id="@+id/playerToSelectAlbum"
             app:destination="@id/trackCollectionFragment" />
         <action
+            android:id="@+id/playerToAlbumsList"
+            app:destination="@id/albumListFragment" />
+        <action
             android:id="@+id/playerToLyrics"
             app:destination="@id/lyricsFragment" />
         <action
@@ -272,7 +284,14 @@
     </fragment>
     <fragment
         android:id="@+id/lyricsFragment"
-        android:name="org.moire.ultrasonic.fragment.LyricsFragment" />
+        android:name="org.moire.ultrasonic.fragment.legacy.LyricsFragment" >
+        <argument
+            android:name="artist"
+            app:argType="string" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+    </fragment>
     <fragment
         android:id="@+id/equalizerFragment"
         android:name="org.moire.ultrasonic.fragment.EqualizerFragment" />
@@ -280,10 +299,18 @@
         android:id="@+id/serverSelectorFragment"
         android:name="org.moire.ultrasonic.fragment.ServerSelectorFragment" >
         <action
-            android:id="@+id/serverSelectorToEditServer"
+            android:id="@+id/toEditServer"
             app:destination="@id/editServerFragment" />
     </fragment>
     <fragment
         android:id="@+id/editServerFragment"
-        android:name="org.moire.ultrasonic.fragment.EditServerFragment" />
+        android:name="org.moire.ultrasonic.fragment.EditServerFragment" >
+        <argument
+            android:name="index"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+    <action
+        android:id="@+id/toSearchFragment"
+        app:destination="@id/searchFragment" />
 </navigation>

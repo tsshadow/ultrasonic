@@ -15,14 +15,6 @@ object Constants {
     const val REST_PROTOCOL_VERSION = "1.7.0"
     const val REST_CLIENT_ID = "Ultrasonic"
 
-    // Legacy names for intent extras, in those fragments which don't use SafeArgs yet.
-    const val INTENT_ARTIST = "subsonic.artist"
-    const val INTENT_TITLE = "subsonic.title"
-    const val INTENT_AUTOPLAY = "subsonic.playall"
-    const val INTENT_QUERY = "subsonic.query"
-    const val INTENT_ALBUM_LIST_TYPE = "subsonic.albumlisttype"
-    const val INTENT_SHOW_PLAYER = "subsonic.showplayer"
-
     // Names for Intent Actions
     const val CMD_PROCESS_KEYCODE = "org.moire.ultrasonic.CMD_PROCESS_KEYCODE"
     const val CMD_PLAY = "org.moire.ultrasonic.CMD_PLAY"
@@ -32,6 +24,7 @@ object Constants {
     const val CMD_STOP = "org.moire.ultrasonic.CMD_STOP"
     const val CMD_PREVIOUS = "org.moire.ultrasonic.CMD_PREVIOUS"
     const val CMD_NEXT = "org.moire.ultrasonic.CMD_NEXT"
+    const val INTENT_SHOW_PLAYER = "org.moire.ultrasonic.SHOW_PLAYER"
 
     // Legacy Preferences keys
     // Warning: Don't add any new here!
