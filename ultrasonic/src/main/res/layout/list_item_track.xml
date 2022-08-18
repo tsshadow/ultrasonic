@@ -97,19 +97,28 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:text="Artist" />
 
-        <TextView
-            a:id="@+id/song_status"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:drawablePadding="6dip"
-            a:paddingEnd="12dip"
-            a:textAlignment="textEnd"
-            app:layout_constraintBottom_toTopOf="@+id/song_duration"
+        <ImageView
+            a:id="@+id/song_status_image"
+            a:layout_width="25dp"
+            a:layout_height="0dp"
+            a:layout_marginEnd="10dip"
+            app:layout_constraintTop_toTopOf="@id/song_details"
+            app:layout_constraintBottom_toTopOf="@id/song_duration"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/song_duration"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="100%" />
+            a:importantForAccessibility="no" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            a:id="@+id/song_status_progress"
+            a:layout_width="wrap_content"
+            a:layout_height="0dp"
+            a:layout_marginEnd="10dip"
+            app:indicatorSize="20dp"
+            app:indicatorColor="?attr/color_menu_selected"
+            app:trackColor="?attr/color_selected"
+            app:layout_constraintTop_toTopOf="@id/song_details"
+            app:layout_constraintBottom_toTopOf="@id/song_duration"
+            app:layout_constraintEnd_toEndOf="parent"
+            a:indeterminate="true" />
 
         <TextView
             a:id="@+id/song_duration"
@@ -128,7 +137,7 @@
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
             app:barrierDirection="left"
-            app:constraint_referenced_ids="song_status,song_duration" />
+            app:constraint_referenced_ids="song_duration" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

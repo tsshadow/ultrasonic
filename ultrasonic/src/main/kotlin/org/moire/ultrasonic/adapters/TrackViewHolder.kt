@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -25,6 +26,9 @@ import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import timber.log.Timber
 
+const val INDICATOR_THICKNESS_INDEFINITE = 5
+const val INDICATOR_THICKNESS_DEFINITE = 10
+
 /**
  * Used to display songs and videos in a `ListView`.
  */
@@ -32,34 +36,35 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
 
     private val downloader: Downloader by inject()
 
+    var entry: Track? = null
+        private set
     var check: CheckedTextView = view.findViewById(R.id.song_check)
+    var drag: ImageView = view.findViewById(R.id.song_drag)
+    var observableChecked = MutableLiveData(false)
+    lateinit var imageHelper: Utils.ImageHelper
+
     private var rating: LinearLayout = view.findViewById(R.id.song_five_star)
     private var fiveStar1: ImageView = view.findViewById(R.id.song_five_star_1)
     private var fiveStar2: ImageView = view.findViewById(R.id.song_five_star_2)
     private var fiveStar3: ImageView = view.findViewById(R.id.song_five_star_3)
     private var fiveStar4: ImageView = view.findViewById(R.id.song_five_star_4)
     private var fiveStar5: ImageView = view.findViewById(R.id.song_five_star_5)
-    var star: ImageView = view.findViewById(R.id.song_star)
-    var drag: ImageView = view.findViewById(R.id.song_drag)
-    var track: TextView = view.findViewById(R.id.song_track)
-    var title: TextView = view.findViewById(R.id.song_title)
-    var artist: TextView = view.findViewById(R.id.song_artist)
-    var duration: TextView = view.findViewById(R.id.song_duration)
-    var progress: TextView = view.findViewById(R.id.song_status)
-
-    var entry: Track? = null
-        private set
+    private var star: ImageView = view.findViewById(R.id.song_star)
+    private var track: TextView = view.findViewById(R.id.song_track)
+    private var title: TextView = view.findViewById(R.id.song_title)
+    private var artist: TextView = view.findViewById(R.id.song_artist)
+    private var duration: TextView = view.findViewById(R.id.song_duration)
+    private var statusImage: ImageView = view.findViewById(R.id.song_status_image)
+    private var progressIndicator: CircularProgressIndicator =
+        view.findViewById<CircularProgressIndicator?>(R.id.song_status_progress).apply {
+            this.max = 100
+        }
 
     private var isMaximized = false
     private var cachedStatus = DownloadStatus.UNKNOWN
-    private var statusImage: Drawable? = null
     private var isPlayingCached = false
 
     private var rxBusSubscription: CompositeDisposable? = null
-
-    var observableChecked = MutableLiveData(false)
-
-    lateinit var imageHelper: Utils.ImageHelper
 
     fun setSong(
         song: Track,
@@ -103,7 +108,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
 
         if (song.isVideo) {
             artist.isVisible = false
-            progress.isVisible = false
+            progressIndicator.isVisible = false
         }
 
         // Create new Disposable for the new Subscriptions
@@ -204,50 +209,58 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         }
     }
 
-    private fun updateStatus(status: DownloadStatus, p: Int?) {
-        if (status != cachedStatus) {
-            cachedStatus = status
+    private fun updateStatus(status: DownloadStatus, progress: Int?) {
+        progressIndicator.progress = progress ?: 0
 
-            when (status) {
-                DownloadStatus.DONE -> {
-                    statusImage = imageHelper.downloadedImage
-                    progress.text = null
-                }
-                DownloadStatus.PINNED -> {
-                    statusImage = imageHelper.pinImage
-                    progress.text = null
-                }
-                DownloadStatus.FAILED,
-                DownloadStatus.CANCELLED -> {
-                    statusImage = imageHelper.errorImage
-                    progress.text = null
-                }
-                DownloadStatus.DOWNLOADING -> {
-                    statusImage = imageHelper.downloadingImage[0]
-                }
-                else -> {
-                    statusImage = null
-                }
+        if (status == cachedStatus) return
+        cachedStatus = status
+
+        when (status) {
+            DownloadStatus.DONE -> {
+                showStatusImage(imageHelper.downloadedImage)
+            }
+            DownloadStatus.PINNED -> {
+                showStatusImage(imageHelper.pinImage)
+            }
+            DownloadStatus.FAILED,
+            DownloadStatus.CANCELLED -> {
+                showStatusImage(imageHelper.errorImage)
+            }
+            DownloadStatus.DOWNLOADING -> {
+                showProgress()
+            }
+            DownloadStatus.RETRYING,
+            DownloadStatus.QUEUED -> {
+                showIndefiniteProgress()
+            }
+            else -> {
+                showStatusImage(null)
             }
         }
-
-        if (cachedStatus == DownloadStatus.DOWNLOADING && p != null) {
-            progress.text = Util.formatPercentage(p)
-            statusImage =
-                imageHelper.downloadingImage[(imageHelper.downloadingImage.size / 100F * p).toInt()]
-        } else {
-            progress.text = null
-        }
-
-        updateImages()
     }
 
-    private fun updateImages() {
-        progress.post {
-            progress.setCompoundDrawablesWithIntrinsicBounds(
-                null, null, statusImage, null
-            )
-        }
+    private fun showStatusImage(image: Drawable?) {
+        progressIndicator.isVisible = false
+        statusImage.isVisible = true
+        statusImage.setImageDrawable(image)
+    }
+
+    private fun showIndefiniteProgress() {
+        statusImage.isVisible = false
+        progressIndicator.isVisible = true
+        progressIndicator.isIndeterminate = true
+        progressIndicator.indicatorDirection =
+            CircularProgressIndicator.INDICATOR_DIRECTION_COUNTERCLOCKWISE
+        progressIndicator.trackThickness = INDICATOR_THICKNESS_INDEFINITE
+    }
+
+    private fun showProgress() {
+        statusImage.isVisible = false
+        progressIndicator.isVisible = true
+        progressIndicator.isIndeterminate = false
+        progressIndicator.indicatorDirection =
+            CircularProgressIndicator.INDICATOR_DIRECTION_CLOCKWISE
+        progressIndicator.trackThickness = INDICATOR_THICKNESS_DEFINITE
     }
 
     /*

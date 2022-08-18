@@ -141,21 +141,6 @@ object Util {
     }
 
     /**
-     * Formats an Int to a percentage string
-     * For instance:
-     *
-     *  * `format(99)` returns *"99 %"*.
-     *
-     *
-     * @param percent The percent as a range from 0 - 100
-     * @return The formatted string.
-     */
-    @Synchronized
-    fun formatPercentage(percent: Int): String {
-        return min(max(percent, 0), 100).toString() + " %"
-    }
-
-    /**
      * Converts a byte-count to a formatted string suitable for display to the user.
      * For instance:
      *
