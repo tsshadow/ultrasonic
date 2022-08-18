@@ -375,31 +375,42 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         var unpinEnabled = false
         var deleteEnabled = false
         var downloadEnabled = false
+        var isNotInProgress = true
         val multipleSelection = viewAdapter.hasMultipleSelection()
 
         var pinnedCount = 0
 
         for (song in selection) {
             val state = downloader.getDownloadState(song)
-            if (state == DownloadStatus.DONE || state == DownloadStatus.PINNED) {
-                deleteEnabled = true
-            }
-            if (state == DownloadStatus.PINNED) {
-                pinnedCount++
-                unpinEnabled = true
-            }
-            if (state == DownloadStatus.IDLE || state == DownloadStatus.FAILED) {
-                downloadEnabled = true
+            when (state) {
+                DownloadStatus.DONE -> {
+                    deleteEnabled = true
+                }
+                DownloadStatus.PINNED -> {
+                    deleteEnabled = true
+                    pinnedCount++
+                    unpinEnabled = true
+                }
+                DownloadStatus.IDLE, DownloadStatus.FAILED -> {
+                    downloadEnabled = true
+                }
+                DownloadStatus.DOWNLOADING,
+                DownloadStatus.QUEUED,
+                DownloadStatus.RETRYING -> {
+                    isNotInProgress = false
+                }
+                else -> {}
             }
         }
 
         playNowButton?.isVisible = enabled
         playNextButton?.isVisible = enabled && multipleSelection
         playLastButton?.isVisible = enabled && multipleSelection
-        pinButton?.isVisible = (enabled && !isOffline() && selection.size > pinnedCount)
-        unpinButton?.isVisible = (enabled && unpinEnabled)
-        downloadButton?.isVisible = (enabled && downloadEnabled && !isOffline())
-        deleteButton?.isVisible = (enabled && deleteEnabled)
+        pinButton?.isVisible =
+            isNotInProgress && enabled && !isOffline() && selection.size > pinnedCount
+        unpinButton?.isVisible = isNotInProgress && enabled && unpinEnabled
+        downloadButton?.isVisible = isNotInProgress && enabled && downloadEnabled && !isOffline()
+        deleteButton?.isVisible = isNotInProgress && enabled && deleteEnabled
     }
 
     private fun downloadBackground(save: Boolean) {

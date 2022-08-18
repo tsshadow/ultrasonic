@@ -190,6 +190,7 @@ class Downloader(
 
                 // Set correct priority (the lower the number, the higher the priority)
                 downloadQueue.add(DownloadableTrack(track, item.shouldBePinned(), 0, priority++))
+                postState(track, DownloadStatus.QUEUED)
             }
         }
 
@@ -240,7 +241,9 @@ class Downloader(
     @Synchronized
     fun clearBackground() {
         // Clear the pending queue
-        downloadQueue.clear()
+        while (!downloadQueue.isEmpty()) {
+            postState(downloadQueue.remove().track, DownloadStatus.IDLE)
+        }
 
         // Cancel all active downloads with a low priority
         for (key in activelyDownloading.keys) {
@@ -272,6 +275,7 @@ class Downloader(
             ) continue
             val file = DownloadableTrack(track, save, 0, backgroundPriorityCounter++)
             downloadQueue.add(file)
+            postState(track, DownloadStatus.QUEUED)
         }
 
         Timber.v("downloadBackground Checking Downloads")
@@ -288,7 +292,7 @@ class Downloader(
     }
 
     private fun cancelDownload(track: Track) {
-        val key = activelyDownloading.keys.singleOrNull { t -> t.track.id == track.id } ?: return
+        val key = activelyDownloading.keys.singleOrNull { it.track.id == track.id } ?: return
         activelyDownloading[key]?.cancel()
     }
 
@@ -304,20 +308,21 @@ class Downloader(
     fun getDownloadState(track: Track): DownloadStatus {
         if (Storage.isPathExists(track.getCompleteFile())) return DownloadStatus.DONE
         if (Storage.isPathExists(track.getPinnedFile())) return DownloadStatus.PINNED
+        if (downloads.any { it.id == track.id }) return DownloadStatus.QUEUED
 
-        val key = activelyDownloading.keys.firstOrNull { k -> k.track.id == track.id }
+        val key = activelyDownloading.keys.firstOrNull { it.track.id == track.id }
         if (key != null) {
             if (key.tryCount > 0) return DownloadStatus.RETRYING
             return DownloadStatus.DOWNLOADING
         }
-        if (failedList.any { t -> t.track.id == track.id }) return DownloadStatus.FAILED
+        if (failedList.any { it.track.id == track.id }) return DownloadStatus.FAILED
         return DownloadStatus.IDLE
     }
 
     companion object {
         const val CHECK_INTERVAL = 5000L
         const val MAX_RETRIES = 5
-        const val REFRESH_INTERVAL = 100
+        const val REFRESH_INTERVAL = 50
     }
 
     private fun postState(track: Track, state: DownloadStatus, progress: Int? = null) {
@@ -579,5 +584,5 @@ class Downloader(
 }
 
 enum class DownloadStatus {
-    IDLE, DOWNLOADING, RETRYING, FAILED, CANCELLED, DONE, PINNED, UNKNOWN
+    IDLE, QUEUED, DOWNLOADING, RETRYING, FAILED, CANCELLED, DONE, PINNED, UNKNOWN
 }

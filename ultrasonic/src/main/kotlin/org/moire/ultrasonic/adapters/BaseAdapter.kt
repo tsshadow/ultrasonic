@@ -147,7 +147,10 @@ class BaseAdapter<T : Identifiable> : MultiTypeAdapter(), FastScrollRecyclerView
      * @see .getCurrentList
      */
     fun onCurrentListChanged(previousList: List<T>, currentList: List<T>) {
-        // Void
+        previousList.minus(currentList.toSet()).map {
+            selectedSet.remove(it.longId)
+        }
+        selectionRevision.postValue(selectionRevision.value!! + 1)
     }
 
     fun notifySelected(id: Long) {
