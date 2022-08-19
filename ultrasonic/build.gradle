@@ -37,16 +37,17 @@ android {
             applicationIdSuffix ".debug"
         }
     }
+
     sourceSets {
         main.java.srcDirs += "${projectDir}/src/main/kotlin"
         test.java.srcDirs += "${projectDir}/src/test/kotlin"
     }
+
     packagingOptions {
         resources {
             excludes += ['META-INF/LICENSE']
         }
     }
-
 
     kotlinOptions {
         jvmTarget = "1.8"
@@ -67,6 +68,7 @@ android {
             arg("room.schemaLocation", "$rootDir/ultrasonic/schemas".toString())
         }
     }
+
     lint {
         baseline = file("lint-baseline.xml")
         abortOnError true
@@ -135,4 +137,6 @@ dependencies {
     testImplementation libs.robolectric
 
     implementation libs.timber
+
 }
+
