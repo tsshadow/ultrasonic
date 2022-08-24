@@ -78,7 +78,7 @@
                 a:layout_width="0dip"
                 a:layout_height="fill_parent"
                 a:layout_weight="1"
-                a:background="@color/transparent"
+                a:background="@color/appwidget_button_background"
                 a:scaleType="fitCenter"
                 a:src="@drawable/media_backward_normal" />
 
@@ -87,7 +87,7 @@
                 a:layout_width="0dip"
                 a:layout_height="fill_parent"
                 a:layout_weight="1"
-                a:background="@color/transparent"
+                a:background="@color/appwidget_button_background"
                 a:scaleType="fitCenter"
                 a:src="@drawable/media_start_normal" />
 
@@ -96,7 +96,7 @@
                 a:layout_width="0dip"
                 a:layout_height="fill_parent"
                 a:layout_weight="1"
-                a:background="@color/transparent"
+                a:background="@color/appwidget_button_background"
                 a:scaleType="fitCenter"
                 a:src="@drawable/media_forward_normal" />
         </LinearLayout>

@@ -245,8 +245,8 @@ class MediaPlayerController(
 
         UltrasonicAppWidgetProvider4X1.instance?.notifyChange(context, song, isPlaying, false)
         UltrasonicAppWidgetProvider4X2.instance?.notifyChange(context, song, isPlaying, true)
-        UltrasonicAppWidgetProvider4X3.instance?.notifyChange(context, song, isPlaying, false)
-        UltrasonicAppWidgetProvider4X4.instance?.notifyChange(context, song, isPlaying, false)
+        UltrasonicAppWidgetProvider4X3.instance?.notifyChange(context, song, isPlaying, true)
+        UltrasonicAppWidgetProvider4X4.instance?.notifyChange(context, song, isPlaying, true)
     }
 
     fun onDestroy() {

@@ -23,7 +23,7 @@
             a:layout_height="wrap_content"
             a:text="@string/share_comment"
             a:textAllCaps="true"
-            a:textColor="@color/cyan"
+            a:textColor="?attr/colorPrimary"
             a:id="@+id/textViewComment"
             a:layout_gravity="center_horizontal"/>
 
@@ -41,7 +41,7 @@
             a:layout_height="wrap_content"
             a:text="@string/settings.share_expiration"
             a:textAllCaps="true"
-            a:textColor="@color/cyan"
+            a:textColor="?attr/colorPrimary"
             a:id="@+id/textViewExpiration"
             a:layout_gravity="center_horizontal"/>
 

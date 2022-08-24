@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     a:layout_width="fill_parent"
     a:layout_height="wrap_content"
@@ -7,8 +8,9 @@
     a:layout_marginStart="12dp"
     a:layout_marginEnd="12dp" >
 
-    <ImageView
+    <Button
         a:id="@+id/button_shuffle"
+        style="@style/Widget.Material3.Button.IconButton"
         a:layout_width="0dip"
         a:layout_height="26dp"
         a:layout_gravity="center"
@@ -16,70 +18,87 @@
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="@drawable/media_shuffle_normal"
-        a:contentDescription="@string/buttons.shuffle" />
+        a:contentDescription="@string/buttons.shuffle"
+        app:icon="@drawable/media_shuffle_normal"
+        app:iconGravity="textTop" />
 
     <org.moire.ultrasonic.view.AutoRepeatButton
         a:id="@+id/button_previous"
+        style="@style/Widget.Material3.Button.IconButton"
         a:layout_width="0dip"
-        a:layout_height="42dp"
+        a:layout_height="48dp"
         a:layout_gravity="center"
         a:layout_weight="2"
         a:adjustViewBounds="true"
+        a:contentDescription="@string/buttons.previous"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="@drawable/media_backward_normal"
-        a:contentDescription="@string/buttons.previous" />
+        app:icon="@drawable/media_backward_normal"
+        app:iconGravity="textTop"
+        app:iconSize="32dp" />
 
-    <ImageView
+    <Button
         a:id="@+id/button_start"
+        style="@style/Widget.Material3.Button.IconButton"
         a:layout_width="0dip"
         a:layout_height="74dp"
         a:layout_weight="2"
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="@drawable/media_start_normal"
         tools:visibility="gone"
-        a:contentDescription="@string/buttons.play" />
+        a:contentDescription="@string/buttons.play"
+        app:icon="@drawable/media_start_normal"
+        app:iconGravity="textTop"
+        app:iconSize="48dp" />
 
-    <ImageView
+    <Button
         a:id="@+id/button_pause"
+        style="@style/Widget.Material3.Button.IconButton"
         a:layout_width="0dip"
         a:layout_height="74dp"
         a:layout_weight="2"
         a:adjustViewBounds="true"
+        a:contentDescription="@string/buttons.pause"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="@drawable/media_pause_normal"
-        a:contentDescription="@string/buttons.pause" />
+        app:icon="@drawable/media_pause_normal"
+        app:iconGravity="textTop"
+        app:iconSize="48dp" />
 
-    <ImageView
+    <Button
         a:id="@+id/button_stop"
+        style="@style/Widget.Material3.Button.IconButton"
         a:layout_width="0dip"
         a:layout_height="74dp"
         a:layout_weight="2"
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="@drawable/media_stop_normal"
         tools:visibility="gone"
-        a:contentDescription="@string/buttons.stop" />
+        a:contentDescription="@string/buttons.stop"
+        app:icon="@drawable/media_stop_normal"
+        app:iconGravity="textTop"
+        app:iconSize="48dp" />
 
     <org.moire.ultrasonic.view.AutoRepeatButton
         a:id="@+id/button_next"
+        style="@style/Widget.Material3.Button.IconButton"
         a:layout_width="0dip"
-        a:layout_height="42dp"
+        a:layout_height="48dp"
         a:layout_gravity="center"
         a:layout_weight="2"
         a:adjustViewBounds="true"
+        a:contentDescription="@string/buttons.next"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="@drawable/media_forward_normal"
-        a:contentDescription="@string/buttons.next"/>
+        app:icon="@drawable/media_forward_normal"
+        app:iconGravity="textTop"
+        app:iconSize="32dp" />
 
-    <ImageView
+    <Button
         a:id="@+id/button_repeat"
+        style="@style/Widget.Material3.Button.IconButton"
         a:layout_width="0dip"
         a:layout_height="26dp"
         a:layout_gravity="center"
@@ -87,7 +106,8 @@
         a:adjustViewBounds="true"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:src="@drawable/media_repeat_off"
-        a:contentDescription="@string/buttons.repeat" />
+        a:contentDescription="@string/buttons.repeat"
+        app:icon="@drawable/media_repeat_off"
+        app:iconGravity="textTop" />
 
     </LinearLayout>

@@ -1,99 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/menu_album"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="6dp" >
 
-    <ImageView
+    <Button
         android:id="@+id/select_album_select"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/ic_menu_select_all"
         android:visibility="gone"
-        android:contentDescription="@string/common.select_all" />
+        android:contentDescription="@string/common.select_all"
+        app:icon="@drawable/ic_menu_select_all"
+        app:iconGravity="textTop"
+        app:iconSize="26dp" />
 
-    <ImageView
+    <Button
         android:id="@+id/select_album_play_now"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/media_start_normal"
         android:visibility="gone"
-        android:contentDescription="@string/common.play_now" />
+        android:contentDescription="@string/common.play_now"
+        app:icon="@drawable/media_start_normal"
+        app:iconGravity="textTop"
+        app:iconSize="26dp" />
     
-    <ImageView
+    <Button
         android:id="@+id/select_album_play_next"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/ic_play_next"
         android:visibility="gone"
-        android:contentDescription="@string/common.play_next" />
+        android:contentDescription="@string/common.play_next"
+        app:icon="@drawable/ic_play_next"
+        app:iconGravity="textTop"
+        app:iconSize="26dp" />
 
-    <ImageView
+    <Button
         android:id="@+id/select_album_play_last"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/ic_play_last"
         android:visibility="gone"
-        android:contentDescription="@string/common.play_last" />
+        android:contentDescription="@string/common.play_last"
+        app:icon="@drawable/ic_play_last"
+        app:iconGravity="textTop"
+        app:iconSize="26dp" />
 
-    <ImageView
+    <Button
         android:id="@+id/select_album_pin"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/ic_menu_pin"
         android:visibility="gone"
-        android:contentDescription="@string/common.pin" />
+        android:contentDescription="@string/common.pin"
+        app:icon="@drawable/ic_menu_pin"
+        app:iconGravity="textTop"
+        app:iconSize="26dp" />
 
-    <ImageView
+    <Button
         android:id="@+id/select_album_unpin"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/ic_menu_unpin"
         android:visibility="gone"
-        android:contentDescription="@string/common.unpin" />
+        android:contentDescription="@string/common.unpin"
+        app:icon="@drawable/ic_menu_unpin"
+        app:iconGravity="textTop"
+        app:iconSize="26dp" />
     
-    <ImageView
+    <Button
         android:id="@+id/select_album_download"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/ic_menu_download"
         android:visibility="gone"
-        android:contentDescription="@string/common.download" />
+        android:contentDescription="@string/common.download"
+        app:icon="@drawable/ic_menu_download"
+        app:iconGravity="textTop"
+        app:iconSize="26dp" />
 
-    <ImageView
+    <Button
         android:id="@+id/select_album_delete"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/ic_menu_close"
         android:visibility="gone"
-        android:contentDescription="@string/common.delete" />
+        android:contentDescription="@string/common.delete"
+        app:icon="@drawable/ic_menu_close"
+        app:iconGravity="textTop"
+        app:iconSize="26dp" />
 
-    <ImageView
+    <Button
         android:id="@+id/select_album_more"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/media_forward_normal"
         android:visibility="gone"
-        android:contentDescription="@string/search.more" />
+        android:contentDescription="@string/search.more"
+        app:icon="@drawable/media_forward_normal"
+        app:iconGravity="textTop"
+        app:iconSize="26dp" />
 
 </LinearLayout>

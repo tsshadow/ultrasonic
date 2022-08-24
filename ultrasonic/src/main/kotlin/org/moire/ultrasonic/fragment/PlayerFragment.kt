@@ -47,6 +47,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -150,7 +151,7 @@ class PlayerFragment :
     private lateinit var stopButton: View
     private lateinit var playButton: View
     private lateinit var shuffleButton: View
-    private lateinit var repeatButton: ImageView
+    private lateinit var repeatButton: MaterialButton
     private lateinit var progressBar: SeekBar
     private val hollowStar = R.drawable.ic_star_hollow
     private val fullStar = R.drawable.ic_star_full
@@ -401,15 +402,15 @@ class PlayerFragment :
     private fun updateRepeatButtonState(repeatMode: Int) {
         when (repeatMode) {
             0 -> {
-                repeatButton.setImageResource(R.drawable.media_repeat_off)
+                repeatButton.setIconResource(R.drawable.media_repeat_off)
                 repeatButton.alpha = ALPHA_DEACTIVATED
             }
             1 -> {
-                repeatButton.setImageResource(R.drawable.media_repeat_one)
+                repeatButton.setIconResource(R.drawable.media_repeat_one)
                 repeatButton.alpha = ALPHA_ACTIVATED
             }
             2 -> {
-                repeatButton.setImageResource(R.drawable.media_repeat_all)
+                repeatButton.setIconResource(R.drawable.media_repeat_all)
                 repeatButton.alpha = ALPHA_ACTIVATED
             }
             else -> {

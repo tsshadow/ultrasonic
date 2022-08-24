@@ -12,6 +12,6 @@
         android:paddingStart="22dp"
         android:paddingEnd="22dp" />
 
-    <solid android:color="@color/selected_color_dark" />
+    <solid android:color="?attr/colorPrimary" />
 
 </shape>
