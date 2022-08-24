@@ -205,7 +205,7 @@ class ActiveServerProvider(
             password = "",
             jukeboxByDefault = false,
             allowSelfSignedCertificate = false,
-            ldapSupport = false,
+            forcePlainTextPassword = false,
             musicFolderId = "",
             minimumApiVersion = null,
             bookmarkSupport = false,

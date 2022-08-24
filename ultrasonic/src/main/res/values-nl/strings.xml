@@ -306,8 +306,7 @@
     <string name="settings.theme_black">Zwart</string>
     <string name="settings.theme_title">Thema</string>
     <string name="settings.title.allow_self_signed_certificate">Zelf-gesigneerd HTTPS-certificaat toestaan</string>
-    <string name="settings.title.enable_ldap_users_support">Ondersteuning voor LDAP-gebruikers inschakelen</string>
-    <string name="settings.summary.enable_ldap_users_support">Dit dwingt de app om het wachtwoord altijd op de ouderwetse manier te versturen, als de Subsonic-server geen ondersteuning biedt voor het autoriseren via de nieuwe api.</string>
+    <string name="settings.summary.force_plain_text_password">Dit dwingt de app om het wachtwoord altijd op de ouderwetse manier te versturen, als de Subsonic-server geen ondersteuning biedt voor het autoriseren via de nieuwe api.</string>
     <string name="settings.use_folder_for_album_artist">Mappen gebruiken voor artiestennaam</string>
     <string name="settings.use_folder_for_album_artist_summary">Aannemen dat de naam van de bovenliggende map de naam van de albumartiest is</string>
     <string name="settings.show_now_playing_details_summary">Toon meer nummerinformatie op het afspeelscherm (genre, jaar, bitsnelheid)</string>

@@ -35,8 +35,8 @@ enum class SubsonicAPIVersions(val subsonicVersions: String, val restApiVersion:
         @JvmStatic @Throws(IllegalArgumentException::class)
         fun getClosestKnownClientApiVersion(apiVersion: String): SubsonicAPIVersions {
             val versionComponents = apiVersion.split(".")
-            if (versionComponents.size < 2)
-                throw IllegalArgumentException("Unknown api version $apiVersion")
+
+            require(versionComponents.size >= 2) { "Unknown api version $apiVersion" }
 
             try {
                 val majorVersion = versionComponents[0].toInt()

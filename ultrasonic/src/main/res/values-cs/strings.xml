@@ -258,7 +258,7 @@
     <string name="settings.theme_black">Černý</string>
     <string name="settings.theme_title">Vzhled</string>
     <string name="settings.title.allow_self_signed_certificate">Povolit HTTPS certifikáty podepsané samé sebou</string>
-    <string name="settings.title.enable_ldap_users_support">Vynutit ověření nešifrovaným heslem</string>
+    <string name="settings.title.force_plain_text_password">Vynutit ověření nešifrovaným heslem</string>
     <string name="settings.use_folder_for_album_artist">Jména adresářů jako jména umělců</string>
     <string name="settings.use_folder_for_album_artist_summary">Očekává jména hlavních adresářů obsahující jména umělců</string>
     <string name="settings.use_id3">Procházet za použití ID3 tagů</string>

@@ -306,8 +306,8 @@
     <string name="settings.theme_black">Schwarz</string>
     <string name="settings.theme_title">Thema</string>
     <string name="settings.title.allow_self_signed_certificate">Selbst-signierte HTTPS Zertifikate erlauben</string>
-    <string name="settings.title.enable_ldap_users_support">LDAP Benutzeranmeldung aktivieren</string>
-    <string name="settings.summary.enable_ldap_users_support">Dies zwingt die App, das Kennwort immer unverschlüsselt zu senden. Hilfreich wenn der Subsonic Server keine Autorisierungs-API unterstützt.</string>
+    <string name="settings.title.force_plain_text_password">Passwort als Klartext senden</string>
+    <string name="settings.summary.force_plain_text_password">Dies zwingt die App, das Kennwort immer unverschlüsselt zu senden. Hilfreich wenn der Subsonic Server keine Autorisierungs-API unterstützt.</string>
     <string name="settings.use_folder_for_album_artist">Nutze den Ordnernamen als Namen der Künstler*in</string>
     <string name="settings.use_folder_for_album_artist_summary">Annehmen, dass der Ordner nach der Künstler*in benannt ist.</string>
     <string name="settings.show_now_playing_details_summary">Zeige mehr Song Details in der Wiedergabe (Genre, Jahr, Bitrate)</string>

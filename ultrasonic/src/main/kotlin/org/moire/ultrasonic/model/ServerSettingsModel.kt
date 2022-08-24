@@ -198,7 +198,7 @@ class ServerSettingsModel(
             password = "W7DumQ3ZUR89Se3",
             jukeboxByDefault = false,
             allowSelfSignedCertificate = false,
-            ldapSupport = false,
+            forcePlainTextPassword = false,
             musicFolderId = null,
             minimumApiVersion = "1.13.0",
             chatSupport = true,

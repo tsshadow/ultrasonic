@@ -54,7 +54,7 @@ val musicServiceModule = module {
             ),
             clientID = Constants.REST_CLIENT_ID,
             allowSelfSignedCertificate = server.allowSelfSignedCertificate,
-            enableLdapUserSupport = server.ldapSupport,
+            forcePlainTextPassword = server.forcePlainTextPassword,
             debug = BuildConfig.DEBUG,
             isRealProtocolVersion = server.minimumApiVersion != null
         )

@@ -14,8 +14,11 @@ import androidx.room.PrimaryKey
  * @param password: The Password of the User
  * @param jukeboxByDefault: True if the JukeBox mode should be turned on for the server
  * @param allowSelfSignedCertificate: True if the server uses self-signed certificate
- * @param ldapSupport: True if the server authenticates the user using old Ldap-like way
+ * @param forcePlainTextPassword: True if the server authenticates the user using old Ldap-like way
  * @param musicFolderId: The Id of the MusicFolder to be used with the server
+ *
+ * TODO: forcePlainTextPassword is still using the old column name.
+ * Could be updated on the next significant change to the DB scheme
  */
 @Entity
 data class ServerSetting(
@@ -29,7 +32,7 @@ data class ServerSetting(
     @ColumnInfo(name = "password") var password: String,
     @ColumnInfo(name = "jukeboxByDefault") var jukeboxByDefault: Boolean,
     @ColumnInfo(name = "allowSelfSignedCertificate") var allowSelfSignedCertificate: Boolean,
-    @ColumnInfo(name = "ldapSupport") var ldapSupport: Boolean,
+    @ColumnInfo(name = "ldapSupport") var forcePlainTextPassword: Boolean,
     @ColumnInfo(name = "musicFolderId") var musicFolderId: String?,
     @ColumnInfo(name = "minimumApiVersion") var minimumApiVersion: String?,
     @ColumnInfo(name = "chatSupport") var chatSupport: Boolean? = null,
