@@ -1,19 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="dividerColor">#555555</color>
     <color name="appwidget_text">#FFFFFF</color>
-    <color name="transparent">#00000000</color>
-    <color name="cyan">#0099cc</color>
-    <color name="navigation_header_light">#6200EE</color>
-    <color name="navigation_header_dark">#BB86FC</color>
-    <color name="background_color_dark">#000000</color>
-    <color name="background_color_grey">#333333</color>
-    <color name="background_color_light">#ffffff</color>
-    <color name="selected_color_dark">#424242</color>
-    <color name="selected_color_light">#B6B6B6</color>
+    <color name="appwidget_button_background">#00000000</color>
+    <color name="background_color_black">#000000</color>
     <color name="selected_menu_dark">#F3F3F3</color>
     <color name="selected_menu_light">#000000</color>
-    <color name="selected_menu_background_dark">#333333</color>
-    <color name="selected_menu_background_black">#111111</color>
-    <color name="selected_menu_background_light">#f3f3f3</color>
 </resources>

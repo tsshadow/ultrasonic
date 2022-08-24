@@ -28,6 +28,7 @@
     <string name="button_bar.playlists">Playlists</string>
     <string name="button_bar.search">Search</string>
     <string name="chat.send_a_message">Send a message</string>
+    <string name="chat.send_button">Send</string>
     <string name="common.album">Album</string>
     <string name="common.appname">Ultrasonic</string>
     <string name="common.artist">Artist</string>

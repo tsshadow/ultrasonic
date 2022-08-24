@@ -18,6 +18,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.button.MaterialButton
 import io.reactivex.rxjava3.disposables.Disposable
 import java.lang.Exception
 import kotlin.math.abs
@@ -41,7 +42,7 @@ class NowPlayingFragment : Fragment() {
     private var downX = 0f
     private var downY = 0f
 
-    private var playButton: ImageView? = null
+    private var playButton: MaterialButton? = null
     private var nowPlayingAlbumArtImage: ImageView? = null
     private var nowPlayingTrack: TextView? = null
     private var nowPlayingArtist: TextView? = null
@@ -85,9 +86,9 @@ class NowPlayingFragment : Fragment() {
     private fun update() {
         try {
             if (mediaPlayerController.isPlaying) {
-                playButton!!.setImageResource(R.drawable.media_pause_normal)
+                playButton!!.setIconResource(R.drawable.media_pause_normal)
             } else {
-                playButton!!.setImageResource(R.drawable.media_start_normal)
+                playButton!!.setIconResource(R.drawable.media_start_normal)
             }
 
             val file = mediaPlayerController.currentMediaItem?.toTrack()

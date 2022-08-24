@@ -69,6 +69,23 @@
             	a:gravity="center"
                 a:textColor="@color/appwidget_text"
                 a:textSize="12sp" />
+
+           <TextView
+               a:id="@+id/album"
+               a:layout_width="fill_parent"
+               a:layout_height="wrap_content"
+               a:ellipsize="none"
+               a:fadingEdge="horizontal"
+               a:fadingEdgeLength="10dip"
+               a:minHeight="12sp"
+               a:paddingBottom="2dip"
+               a:paddingStart="5dip"
+               a:singleLine="true"
+               a:text="Album"
+               a:layout_gravity="center_horizontal"
+               a:gravity="center"
+               a:textColor="@color/appwidget_text"
+               a:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -85,7 +102,7 @@
                 a:layout_width="0dip"
                 a:layout_height="32dp"
                 a:layout_weight="1"
-                a:background="@color/transparent"
+                a:background="@color/appwidget_button_background"
                 a:scaleType="fitCenter"
                 a:src="@drawable/media_backward_normal" />
 
@@ -94,7 +111,7 @@
                 a:layout_width="0dip"
                 a:layout_height="32dp"
                 a:layout_weight="1"
-                a:background="@color/transparent"
+                a:background="@color/appwidget_button_background"
                 a:scaleType="fitCenter"
                 a:src="@drawable/media_start_normal" />
 
@@ -103,7 +120,7 @@
                 a:layout_width="0dip"
                 a:layout_height="32dp"
                 a:layout_weight="1"
-                a:background="@color/transparent"
+                a:background="@color/appwidget_button_background"
                 a:scaleType="fitCenter"
                 a:src="@drawable/media_forward_normal" />
         </LinearLayout>

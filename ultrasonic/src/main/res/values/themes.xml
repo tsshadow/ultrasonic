@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="UltrasonicTheme.Black" parent="Theme.MaterialComponents">
+    <style name="UltrasonicTheme.Black" parent="Theme.Material3.Dark">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="color_background">@color/background_color_dark</item>
-        <item name="color_selected">@color/selected_color_dark</item>
-        <item name="color_menu_selected">@color/selected_menu_dark</item>
-        <item name="color_menu_background">@color/selected_menu_background_black</item>
-        <item name="color_navigation_header_background">@color/navigation_header_dark</item>
-        <item name="colorControlNormal">@color/selected_menu_background_light</item>
+        <item name="colorPrimaryDark">?attr/backgroundColor</item>
+        <item name="android:colorBackground">@color/background_color_black</item>
+        <item name="color_background">?attr/colorSurface</item>
+        <item name="color_selected">?attr/colorPrimaryContainer</item>
+        <item name="color_menu_background">?attr/colorSurface</item>
+        <item name="color_menu_selected">?attr/colorOnSurface</item>
+        <item name="colorControlNormal">?attr/colorOnSurface</item>
     </style>
 
-    <style name="UltrasonicTheme.Dark" parent="Theme.MaterialComponents">
+    <style name="UltrasonicTheme.Dark" parent="Theme.Material3.DynamicColors.Dark">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="color_background">@color/background_color_grey</item>
-        <item name="android:colorBackground">@color/background_color_grey</item>
-        <item name="color_selected">@color/selected_color_dark</item>
-        <item name="color_menu_selected">@color/selected_menu_dark</item>
-        <item name="color_menu_background">@color/selected_menu_background_dark</item>
-        <item name="color_navigation_header_background">@color/navigation_header_dark</item>
-        <item name="colorControlNormal">@color/selected_menu_background_light</item>
+        <item name="colorPrimaryDark">?attr/backgroundColor</item>
+        <item name="color_background">?attr/colorSurface</item>
+        <item name="color_selected">?attr/colorPrimaryContainer</item>
+        <item name="color_menu_background">?attr/colorSurface</item>
+        <item name="color_menu_selected">?attr/colorOnSurface</item>
+        <item name="colorControlNormal">?attr/colorOnSurface</item>
     </style>
 
-    <style name="UltrasonicTheme.Light" parent="Theme.MaterialComponents.Light">
+    <style name="UltrasonicTheme.Light" parent="Theme.Material3.DynamicColors.Light">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="color_background">@color/background_color_light</item>
-        <item name="color_selected">@color/selected_color_light</item>
-        <item name="color_menu_selected">@color/selected_menu_light</item>
-        <item name="color_menu_background">@color/selected_menu_background_light</item>
-        <item name="color_navigation_header_background">@color/navigation_header_light</item>
-        <item name="colorControlNormal">@color/selected_menu_background_dark</item>
+        <item name="color_background">?attr/colorSurface</item>
+        <item name="color_selected">?attr/colorPrimaryContainer</item>
+        <item name="color_menu_background">?attr/colorSurface</item>
+        <item name="color_menu_selected">?attr/colorOnSurface</item>
+        <item name="colorControlNormal">?attr/colorOnSurface</item>
     </style>
 </resources>

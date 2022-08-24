@@ -11,7 +11,7 @@
 
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/transparent" />
+            <solid android:color="?attr/backgroundColor" />
         </shape>
     </item>
 </ripple>

@@ -19,7 +19,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="153"
+            line="154"
             column="5"/>
     </issue>
 
@@ -330,7 +330,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/res/layout/chat.xml"
-            line="27"
+            line="33"
             column="10"/>
     </issue>
 
@@ -387,17 +387,6 @@
             file="src/main/res/layout/update_playlist.xml"
             line="40"
             column="4"/>
-    </issue>
-
-    <issue
-        id="ClickableViewAccessibility"
-        message="Custom view ``AutoRepeatButton`` has `setOnTouchListener` called on it but does not override `performClick`"
-        errorLine1="  this.setOnTouchListener(new OnTouchListener()"
-        errorLine2="  ^">
-        <location
-            file="src/main/java/org/moire/ultrasonic/view/AutoRepeatButton.java"
-            line="36"
-            column="3"/>
     </issue>
 
     <issue
@@ -506,7 +495,7 @@
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/res/layout/appwidget4x3.xml"
-            line="82"
+            line="99"
             column="14"/>
     </issue>
 
@@ -517,7 +506,7 @@
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/res/layout/appwidget4x3.xml"
-            line="91"
+            line="108"
             column="14"/>
     </issue>
 
@@ -528,7 +517,7 @@
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/res/layout/appwidget4x3.xml"
-            line="100"
+            line="117"
             column="14"/>
     </issue>
 
@@ -550,7 +539,7 @@
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/res/layout/appwidget4x4.xml"
-            line="83"
+            line="100"
             column="14"/>
     </issue>
 
@@ -561,7 +550,7 @@
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/res/layout/appwidget4x4.xml"
-            line="92"
+            line="109"
             column="14"/>
     </issue>
 
@@ -572,19 +561,8 @@
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/res/layout/appwidget4x4.xml"
-            line="101"
+            line="118"
             column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageButton"
-        errorLine2="         ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/chat.xml"
-            line="38"
-            column="10"/>
     </issue>
 
     <issue
@@ -721,6 +699,17 @@
 
     <issue
         id="HardcodedText"
+        message="Hardcoded string &quot;Album&quot;, should use `@string` resource"
+        errorLine1="                a:text=&quot;Album&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/appwidget4x3.xml"
+            line="83"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
         message="Hardcoded string &quot;Title&quot;, should use `@string` resource"
         errorLine1="                a:text=&quot;Title&quot;"
         errorLine2="                ~~~~~~~~~~~~~~">
@@ -739,6 +728,17 @@
             file="src/main/res/layout/appwidget4x4.xml"
             line="67"
             column="17"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Album&quot;, should use `@string` resource"
+        errorLine1="               a:text=&quot;Album&quot;"
+        errorLine2="               ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/appwidget4x4.xml"
+            line="84"
+            column="16"/>
     </issue>
 
     <issue

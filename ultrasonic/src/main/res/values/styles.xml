@@ -11,7 +11,7 @@
 
     <style name="MenuDrawer.Widget.Category">
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/cyan</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:gravity">center_vertical</item>
@@ -37,8 +37,7 @@
 
     <attr name="color_background" format="reference"/>
     <attr name="color_selected" format="reference"/>
-    <attr name="color_menu_selected" format="reference"/>
     <attr name="color_menu_background" format="reference"/>
-    <attr name="color_navigation_header_background" format="reference"/>
+    <attr name="color_menu_selected" format="reference"/>
 </resources>
 

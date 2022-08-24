@@ -12,7 +12,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
@@ -21,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.Collections
 import kotlinx.coroutines.launch
@@ -65,15 +65,15 @@ import timber.log.Timber
 open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
 
     private var albumButtons: View? = null
-    private var selectButton: ImageView? = null
-    internal var playNowButton: ImageView? = null
-    private var playNextButton: ImageView? = null
-    private var playLastButton: ImageView? = null
-    private var pinButton: ImageView? = null
-    private var unpinButton: ImageView? = null
-    private var downloadButton: ImageView? = null
-    private var deleteButton: ImageView? = null
-    private var moreButton: ImageView? = null
+    private var selectButton: MaterialButton? = null
+    internal var playNowButton: MaterialButton? = null
+    private var playNextButton: MaterialButton? = null
+    private var playLastButton: MaterialButton? = null
+    private var pinButton: MaterialButton? = null
+    private var unpinButton: MaterialButton? = null
+    private var downloadButton: MaterialButton? = null
+    private var deleteButton: MaterialButton? = null
+    private var moreButton: MaterialButton? = null
     private var playAllButtonVisible = false
     private var shareButtonVisible = false
     private var playAllButton: MenuItem? = null

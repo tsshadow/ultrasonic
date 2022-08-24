@@ -21,7 +21,7 @@
 
     <Button
         a:id="@+id/header_select_server"
-        style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+        style="@style/Widget.Material3.Button.TextButton.Icon"
         a:layout_width="match_parent"
         a:layout_height="wrap_content"
         a:layout_marginTop="0dp"

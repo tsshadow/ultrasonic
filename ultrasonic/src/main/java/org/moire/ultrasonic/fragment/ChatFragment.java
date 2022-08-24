@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -44,6 +43,8 @@ import kotlin.Lazy;
 
 import static org.koin.java.KoinJavaComponent.inject;
 
+import com.google.android.material.button.MaterialButton;
+
 /**
  * Provides online chat functionality
  */
@@ -51,7 +52,7 @@ public class ChatFragment extends Fragment {
 
     private ListView chatListView;
     private EditText messageEditText;
-    private ImageButton sendButton;
+    private MaterialButton sendButton;
     private Timer timer;
     private volatile static Long lastChatMessageTime = (long) 0;
     private static final ArrayList<ChatMessage> messageList = new ArrayList<>();
