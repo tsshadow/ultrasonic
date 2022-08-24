@@ -44,7 +44,7 @@ class SubsonicAPIClient(
         config.minimalProtocolVersion,
         PasswordHexInterceptor(config.password),
         PasswordMD5Interceptor(config.password),
-        config.enableLdapUserSupport
+        config.forcePlainTextPassword
     )
 
     var onProtocolChange: (SubsonicAPIVersions) -> Unit = {}

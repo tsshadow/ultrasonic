@@ -306,8 +306,8 @@
     <string name="settings.theme_black">Negro</string>
     <string name="settings.theme_title">Tema</string>
     <string name="settings.title.allow_self_signed_certificate">Permir certificado HTTPS autofirmado</string>
-    <string name="settings.title.enable_ldap_users_support">Forzar autenticación de contraseña plana</string>
-    <string name="settings.summary.enable_ldap_users_support">Esto obliga a la aplicación a enviar siempre la contraseña sin cifrar. Útil si el servidor Subsonic no admite la nueva API de autenticación para los usuarios.</string>
+    <string name="settings.title.force_plain_text_password">Forzar autenticación de contraseña plana</string>
+    <string name="settings.summary.force_plain_text_password">Esto obliga a la aplicación a enviar siempre la contraseña sin cifrar. Útil si el servidor Subsonic no admite la nueva API de autenticación para los usuarios.</string>
     <string name="settings.use_folder_for_album_artist">Usar carpetas para el nombre del artista</string>
     <string name="settings.use_folder_for_album_artist_summary">Se asume que la carpeta en el nivel mal alto es el nombre del artista del álbum</string>
     <string name="settings.show_now_playing_details_summary">Mostrar más detalles de la canción en reproduciendo ahora (género, año, bitrate)</string>

@@ -156,7 +156,7 @@
         a:layout_width="0dp"
         a:layout_height="wrap_content"
         a:layout_marginStart="5dp"
-        a:text="@string/settings.title.enable_ldap_users_support"
+        a:text="@string/settings.title.force_plain_text_password"
         app:layout_constraintBottom_toTopOf="@id/edit_ldap_description"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/edit_self_signed" />
@@ -167,7 +167,7 @@
         a:layout_width="0dp"
         a:layout_height="wrap_content"
         a:layout_marginStart="5dp"
-        a:text="@string/settings.summary.enable_ldap_users_support"
+        a:text="@string/settings.summary.force_plain_text_password"
         app:layout_constraintBottom_toTopOf="@id/edit_jukebox"
         app:layout_constraintEnd_toStartOf="@id/edit_ldap"
         app:layout_constraintStart_toStartOf="parent"

@@ -257,7 +257,6 @@
     <string name="settings.theme_dark">Ciemny</string>
     <string name="settings.theme_title">Motyw</string>
     <string name="settings.title.allow_self_signed_certificate">Zezwalaj na własne certyfikaty HTTPS</string>
-    <string name="settings.title.enable_ldap_users_support">Włącz wsparcie dla użytkowników LDAP</string>
     <string name="settings.use_folder_for_album_artist">Używaj folderów jako nazw artystów</string>
     <string name="settings.use_folder_for_album_artist_summary">Zakłada, że folder najwyższego poziomu jest nazwą artysty albumu</string>
     <string name="settings.use_id3">Przeglądaj używając tagów ID3</string>

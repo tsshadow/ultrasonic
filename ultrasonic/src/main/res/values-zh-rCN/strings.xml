@@ -279,7 +279,7 @@
     <string name="settings.theme_black">Black</string>
     <string name="settings.theme_title">主题</string>
     <string name="settings.title.allow_self_signed_certificate">允许自签名 HTTPS 证书</string>
-    <string name="settings.title.enable_ldap_users_support">强制原始密码认证</string>
+    <string name="settings.title.force_plain_text_password">强制原始密码认证</string>
     <string name="settings.use_folder_for_album_artist">将艺术家名称作为文件夹</string>
     <string name="settings.use_folder_for_album_artist_summary">将艺术家名称作为顶层文件夹名</string>
     <string name="settings.use_id3">使用 ID3 标签浏览</string>

@@ -277,7 +277,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
         userNameEditText!!.editText?.setText(currentServerSetting!!.userName)
         passwordEditText!!.editText?.setText(currentServerSetting!!.password)
         selfSignedSwitch!!.isChecked = currentServerSetting!!.allowSelfSignedCertificate
-        ldapSwitch!!.isChecked = currentServerSetting!!.ldapSupport
+        ldapSwitch!!.isChecked = currentServerSetting!!.forcePlainTextPassword
         jukeboxSwitch!!.isChecked = currentServerSetting!!.jukeboxByDefault
         updateColor(currentServerSetting!!.color)
     }
@@ -331,7 +331,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
             currentServerSetting!!.userName = userNameEditText!!.editText?.text.toString()
             currentServerSetting!!.password = passwordEditText!!.editText?.text.toString()
             currentServerSetting!!.allowSelfSignedCertificate = selfSignedSwitch!!.isChecked
-            currentServerSetting!!.ldapSupport = ldapSwitch!!.isChecked
+            currentServerSetting!!.forcePlainTextPassword = ldapSwitch!!.isChecked
             currentServerSetting!!.jukeboxByDefault = jukeboxSwitch!!.isChecked
         }
 
@@ -354,7 +354,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
             currentServerSetting!!.userName != userNameEditText!!.editText?.text.toString() ||
             currentServerSetting!!.password != passwordEditText!!.editText?.text.toString() ||
             currentServerSetting!!.allowSelfSignedCertificate != selfSignedSwitch!!.isChecked ||
-            currentServerSetting!!.ldapSupport != ldapSwitch!!.isChecked ||
+            currentServerSetting!!.forcePlainTextPassword != ldapSwitch!!.isChecked ||
             currentServerSetting!!.jukeboxByDefault != jukeboxSwitch!!.isChecked
     }
 
@@ -406,7 +406,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
                     ),
                     Constants.REST_CLIENT_ID,
                     currentServerSetting!!.allowSelfSignedCertificate,
-                    currentServerSetting!!.ldapSupport,
+                    currentServerSetting!!.forcePlainTextPassword,
                     BuildConfig.DEBUG
                 )
                 val subsonicApiClient = SubsonicAPIClient(configuration)
