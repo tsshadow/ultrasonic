@@ -24,7 +24,7 @@ class AutoRepeatButton : MaterialButton {
     }
 
     private fun commonConstructorCode() {
-        setOnTouchListener { v, event ->
+        setOnTouchListener { _, event ->
             val action = event.action
             if (action == MotionEvent.ACTION_DOWN) {
                 doClick = true
