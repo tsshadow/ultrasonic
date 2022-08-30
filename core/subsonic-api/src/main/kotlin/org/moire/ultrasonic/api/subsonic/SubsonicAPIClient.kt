@@ -160,6 +160,6 @@ class SubsonicAPIClient(
             .configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
-            .registerModule(KotlinModule())
+            .registerModule(KotlinModule.Builder().build())
     }
 }
