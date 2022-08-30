@@ -14,6 +14,7 @@ import androidx.media3.common.C
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
 import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
@@ -127,6 +128,10 @@ class MediaPlayerController(
 
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     clearBookmark()
+                    // TRANSITION_REASON_AUTO means that the previous track finished playing and a new one has started.
+                    if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO && cachedMediaItem != null) {
+                        scrobbler.scrobble(cachedMediaItem?.toTrack(), true)
+                    }
                     cachedMediaItem = mediaItem
                     publishPlaybackState()
                 }
@@ -196,7 +201,6 @@ class MediaPlayerController(
     }
 
     private fun playerStateChangedHandler() {
-
         val currentPlaying = controller?.currentMediaItem?.toTrack() ?: return
 
         when (playbackState) {
@@ -205,6 +209,7 @@ class MediaPlayerController(
                     scrobbler.scrobble(currentPlaying, false)
                 }
             }
+            // STATE_ENDED is only signaled if the whole playlist completes. Scrobble the last song.
             Player.STATE_ENDED -> {
                 scrobbler.scrobble(currentPlaying, true)
             }
