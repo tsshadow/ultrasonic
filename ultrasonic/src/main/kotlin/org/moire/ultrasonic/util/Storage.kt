@@ -72,6 +72,7 @@ object Storage {
 
     private fun getRoot(): AbstractFile? {
         return if (Settings.customCacheLocation) {
+            if (Settings.cacheLocationUri.isBlank()) return null
             val documentFile = DocumentFile.fromTreeUri(
                 UApp.applicationContext(),
                 Uri.parse(Settings.cacheLocationUri)
