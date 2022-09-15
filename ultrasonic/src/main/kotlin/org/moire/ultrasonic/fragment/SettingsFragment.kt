@@ -46,7 +46,6 @@ import org.moire.ultrasonic.util.FileUtil.ultrasonicDirectory
 import org.moire.ultrasonic.util.InfoDialog
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Settings.preferences
-import org.moire.ultrasonic.util.Settings.shareGreeting
 import org.moire.ultrasonic.util.Settings.shouldUseId3Tags
 import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.TimeSpanPreference
@@ -63,27 +62,9 @@ class SettingsFragment :
     OnSharedPreferenceChangeListener,
     KoinComponent {
     private var theme: ListPreference? = null
-    private var maxBitrateWifi: ListPreference? = null
-    private var maxBitrateMobile: ListPreference? = null
-    private var cacheSize: ListPreference? = null
     private var cacheLocation: Preference? = null
-    private var preloadCount: ListPreference? = null
-    private var incrementTime: ListPreference? = null
-    private var networkTimeout: ListPreference? = null
-    private var maxAlbums: ListPreference? = null
-    private var maxSongs: ListPreference? = null
-    private var maxArtists: ListPreference? = null
-    private var defaultAlbums: ListPreference? = null
-    private var defaultSongs: ListPreference? = null
-    private var defaultArtists: ListPreference? = null
-    private var chatRefreshInterval: ListPreference? = null
-    private var directoryCacheTime: ListPreference? = null
-    private var mediaButtonsEnabled: CheckBoxPreference? = null
     private var showArtistPicture: CheckBoxPreference? = null
     private var useId3TagsOffline: CheckBoxPreference? = null
-    private var sharingDefaultDescription: EditTextPreference? = null
-    private var sharingDefaultGreeting: EditTextPreference? = null
-    private var sharingDefaultExpiration: TimeSpanPreference? = null
     private var resumeOnBluetoothDevice: Preference? = null
     private var pauseOnBluetoothDevice: Preference? = null
     private var debugLogToFile: CheckBoxPreference? = null
@@ -99,28 +80,6 @@ class SettingsFragment :
         super.onViewCreated(view, savedInstanceState)
         setTitle(this, R.string.menu_settings)
         theme = findPreference(getString(R.string.setting_key_theme))
-        maxBitrateWifi = findPreference(getString(R.string.setting_key_max_bitrate_wifi))
-        maxBitrateMobile = findPreference(getString(R.string.setting_key_max_bitrate_mobile))
-        cacheSize = findPreference(getString(R.string.setting_key_cache_size))
-        cacheLocation = findPreference(getString(R.string.setting_key_cache_location))
-        preloadCount = findPreference(getString(R.string.setting_key_preload_count))
-        incrementTime = findPreference(getString(R.string.setting_key_increment_time))
-        networkTimeout = findPreference(getString(R.string.setting_key_network_timeout))
-        maxAlbums = findPreference(getString(R.string.setting_key_max_albums))
-        maxSongs = findPreference(getString(R.string.setting_key_max_songs))
-        maxArtists = findPreference(getString(R.string.setting_key_max_artists))
-        defaultArtists = findPreference(getString(R.string.setting_key_default_artists))
-        defaultSongs = findPreference(getString(R.string.setting_key_default_songs))
-        defaultAlbums = findPreference(getString(R.string.setting_key_default_albums))
-        chatRefreshInterval = findPreference(getString(R.string.setting_key_chat_refresh_interval))
-        directoryCacheTime = findPreference(getString(R.string.setting_key_directory_cache_time))
-        mediaButtonsEnabled = findPreference(getString(R.string.setting_key_media_buttons))
-        sharingDefaultDescription =
-            findPreference(getString(R.string.setting_key_default_share_description))
-        sharingDefaultGreeting =
-            findPreference(getString(R.string.setting_key_default_share_greeting))
-        sharingDefaultExpiration =
-            findPreference(getString(R.string.setting_key_default_share_expiration))
         resumeOnBluetoothDevice =
             findPreference(getString(R.string.setting_key_resume_on_bluetooth_device))
         pauseOnBluetoothDevice =
@@ -129,8 +88,7 @@ class SettingsFragment :
         showArtistPicture = findPreference(getString(R.string.setting_key_show_artist_picture))
         useId3TagsOffline = findPreference(getString(R.string.setting_key_id3_tags_offline))
         customCacheLocation = findPreference(getString(R.string.setting_key_custom_cache_location))
-
-        sharingDefaultGreeting?.text = shareGreeting
+        cacheLocation = findPreference(getString(R.string.setting_key_cache_location))
 
         setupTextColors()
         setupClearSearchPreference()
@@ -160,14 +118,29 @@ class SettingsFragment :
         useId3TagsOffline?.summary = warning
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        update()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Get all setting keys and populate the summaries
+        Settings.getAllKeys().forEach {
+            updatePreferenceSummaries(it)
+        }
+
+        updateCustomPreferences()
     }
 
     /**
      * This function will be called when we return from the file picker
      * with a new custom cache location
+     *
+     * TODO: This method has been deprecated in favor of using the Activity Result API
+     * which brings increased type safety via an ActivityResultContract and the prebuilt
+     * contracts for common intents available in
+     * androidx.activity.result.contract.ActivityResultContracts,
+     * provides hooks for testing, and allow receiving results in separate,
+     * testable classes independent from your fragment.
+     * Use registerForActivityResult(ActivityResultContract, ActivityResultCallback) with the
+     * appropriate ActivityResultContract and handling the result in the callback.
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         if (
@@ -218,7 +191,10 @@ class SettingsFragment :
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         Timber.d("Preference changed: %s", key)
-        update()
+        updateCustomPreferences()
+
+        updatePreferenceSummaries(key)
+
         when (key) {
             getString(R.string.setting_key_hide_media) -> {
                 setHideMedia(sharedPreferences.getBoolean(key, false))
@@ -243,6 +219,30 @@ class SettingsFragment :
                     setupCacheLocationPreference()
                 }
             }
+        }
+    }
+
+    /**
+     * Update preference summaries to reflect the current select item (or entered text) in the UI
+     *
+     * @param key: The key of the preference to update
+     */
+    private fun updatePreferenceSummaries(key: String) {
+        try {
+            when (val pref: Preference? = findPreference(key)) {
+                is ListPreference -> {
+                    pref.summary = pref.entry
+                }
+                is EditTextPreference -> {
+                    pref.summary = pref.text
+                }
+                is TimeSpanPreference -> {
+                    pref.summary = pref.text
+                }
+            }
+        } catch (ignored: Exception) {
+            // If we have updated a ListPreferences possible values, and the user has now an
+            // impossible value, getEntry() will throw an Exception.
         }
     }
 
@@ -376,26 +376,7 @@ class SettingsFragment :
         }
     }
 
-    private fun update() {
-        theme!!.summary = theme!!.entry
-        maxBitrateWifi!!.summary = maxBitrateWifi!!.entry
-        maxBitrateMobile!!.summary = maxBitrateMobile!!.entry
-        cacheSize!!.summary = cacheSize!!.entry
-        preloadCount!!.summary = preloadCount!!.entry
-        incrementTime!!.summary = incrementTime!!.entry
-        networkTimeout!!.summary = networkTimeout!!.entry
-        maxAlbums!!.summary = maxAlbums!!.entry
-        maxArtists!!.summary = maxArtists!!.entry
-        maxSongs!!.summary = maxSongs!!.entry
-        defaultAlbums!!.summary = defaultAlbums!!.entry
-        defaultArtists!!.summary = defaultArtists!!.entry
-        defaultSongs!!.summary = defaultSongs!!.entry
-        chatRefreshInterval!!.summary = chatRefreshInterval!!.entry
-        directoryCacheTime!!.summary = directoryCacheTime!!.entry
-        sharingDefaultExpiration!!.summary = sharingDefaultExpiration!!.text
-        sharingDefaultDescription!!.summary = sharingDefaultDescription!!.text
-        sharingDefaultGreeting!!.summary = sharingDefaultGreeting!!.text
-
+    private fun updateCustomPreferences() {
         if (debugLogToFile?.isChecked == true) {
             debugLogToFile?.summary = getString(
                 R.string.settings_debug_log_path,
@@ -404,6 +385,7 @@ class SettingsFragment :
         } else {
             debugLogToFile?.summary = ""
         }
+
         showArtistPicture?.isEnabled = shouldUseId3Tags
         useId3TagsOffline?.isEnabled = shouldUseId3Tags
     }

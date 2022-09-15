@@ -285,6 +285,11 @@ object Settings {
         return appContext.getString(key)
     }
 
+    fun getAllKeys(): List<String> {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(UApp.applicationContext())
+        return prefs.all.keys.toList()
+    }
+
     private val appContext: Context
         get() = UApp.applicationContext()
 }
