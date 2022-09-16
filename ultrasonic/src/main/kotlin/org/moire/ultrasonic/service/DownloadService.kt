@@ -10,7 +10,6 @@ package org.moire.ultrasonic.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.Build
@@ -22,10 +21,9 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import org.koin.android.ext.android.inject
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.app.UApp
-import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.SimpleServiceBinder
+import org.moire.ultrasonic.util.Util
 import timber.log.Timber
 
 /**
@@ -116,7 +114,7 @@ class DownloadService : Service() {
             .setWhen(System.currentTimeMillis())
             .setShowWhen(false)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setContentIntent(getPendingIntentForContent())
+            .setContentIntent(Util.getPendingIntentToShowPlayer(this))
             .setPriority(NotificationCompat.PRIORITY_LOW)
     }
 
@@ -154,18 +152,6 @@ class DownloadService : Service() {
         }
 
         return notificationBuilder.build()
-    }
-
-    private fun getPendingIntentForContent(): PendingIntent {
-        val intent = Intent(this, NavigationActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        var flags = PendingIntent.FLAG_UPDATE_CURRENT
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // needed starting Android 12 (S = 31)
-            flags = flags or PendingIntent.FLAG_IMMUTABLE
-        }
-        intent.putExtra(Constants.INTENT_SHOW_PLAYER, true)
-        return PendingIntent.getActivity(this, 0, intent, flags)
     }
 
     @Suppress("MagicNumber")

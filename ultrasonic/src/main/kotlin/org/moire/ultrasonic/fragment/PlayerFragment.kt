@@ -35,10 +35,8 @@ import android.widget.Toast
 import android.widget.ViewFlipper
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.Timeline
 import androidx.media3.session.SessionResult
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
@@ -363,6 +361,7 @@ class PlayerFragment :
             // Use launch to ensure running it in the main thread
             launch {
                 onPlaylistChanged()
+                onSliderProgressChanged()
             }
         }
 
@@ -372,12 +371,6 @@ class PlayerFragment :
                 update()
             }
         }
-
-        mediaPlayerController.controller?.addListener(object : Player.Listener {
-            override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-                onSliderProgressChanged()
-            }
-        })
 
         // Query the Jukebox state in an IO Context
         ioScope.launch(CommunicationError.getHandler(context)) {
@@ -671,9 +664,7 @@ class PlayerFragment :
 
                 val isStarred = track.starred
 
-                mediaPlayerController.controller?.setRating(
-                    HeartRating(!isStarred)
-                )?.let {
+                mediaPlayerController.toggleSongStarred()?.let {
                     Futures.addCallback(
                         it,
                         object : FutureCallback<SessionResult> {
@@ -882,7 +873,7 @@ class PlayerFragment :
             @SuppressLint("NotifyDataSetChanged")
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val pos = viewHolder.bindingAdapterPosition
-                val item = mediaPlayerController.controller?.getMediaItemAt(pos)
+                val item = mediaPlayerController.getMediaItemAt(pos)
                 mediaPlayerController.removeFromPlaylist(pos)
 
                 val songRemoved = String.format(
@@ -1073,9 +1064,9 @@ class PlayerFragment :
     private fun seek(forward: Boolean) {
         launch(CommunicationError.getHandler(context)) {
             if (forward) {
-                mediaPlayerController.controller?.seekForward()
+                mediaPlayerController.seekForward()
             } else {
-                mediaPlayerController.controller?.seekBack()
+                mediaPlayerController.seekBack()
             }
         }
     }

@@ -270,7 +270,7 @@ class NavigationActivity : AppCompatActivity() {
         val isVolumeAdjust = isVolumeDown || isVolumeUp
         val isJukebox = mediaPlayerController.isJukeboxEnabled
         if (isVolumeAdjust && isJukebox) {
-            mediaPlayerController.adjustJukeboxVolume(isVolumeUp)
+            mediaPlayerController.adjustVolume(isVolumeUp)
             return true
         }
         return super.onKeyDown(keyCode, event)
@@ -291,7 +291,7 @@ class NavigationActivity : AppCompatActivity() {
                 }
                 R.id.menu_exit -> {
                     setResult(Constants.RESULT_CLOSE_ALL)
-                    mediaPlayerController.stopJukeboxService()
+                    mediaPlayerController.onDestroy()
                     finish()
                     exit()
                 }
