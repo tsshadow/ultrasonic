@@ -55,7 +55,6 @@ class Downloader(
     private val imageLoaderProvider: ImageLoaderProvider by inject()
     private val activeServerProvider: ActiveServerProvider by inject()
     private val mediaController: MediaPlayerController by inject()
-    private val jukeboxMediaPlayer: JukeboxMediaPlayer by inject()
 
     var started: Boolean = false
     var shouldStop: Boolean = false
@@ -163,7 +162,7 @@ class Downloader(
             return
         }
 
-        if (jukeboxMediaPlayer.isEnabled || !Util.isNetworkConnected()) {
+        if (JukeboxMediaPlayer.running.get() || !Util.isNetworkConnected()) {
             return
         }
 

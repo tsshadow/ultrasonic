@@ -6,14 +6,44 @@
  */
 package org.moire.ultrasonic.service
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
 import android.view.Gravity
+import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_MEDIA_NEXT
+import android.view.KeyEvent.KEYCODE_MEDIA_PAUSE
+import android.view.KeyEvent.KEYCODE_MEDIA_PLAY
+import android.view.KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+import android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS
+import android.view.KeyEvent.KEYCODE_MEDIA_STOP
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.core.app.NotificationManagerCompat
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.DeviceInfo
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Player
+import androidx.media3.common.Timeline
+import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.common.VideoSize
+import androidx.media3.common.text.CueGroup
+import androidx.media3.common.util.Util
+import androidx.media3.session.MediaSession
+import com.google.common.collect.ImmutableList
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.SettableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ScheduledFuture
@@ -21,60 +51,397 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.roundToInt
-import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.api.subsonic.SubsonicRESTException
 import org.moire.ultrasonic.app.UApp.Companion.applicationContext
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.JukeboxStatus
+import org.moire.ultrasonic.playback.MediaNotificationProvider
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.util.Util.getPendingIntentToShowPlayer
 import org.moire.ultrasonic.util.Util.sleepQuietly
-import org.moire.ultrasonic.util.Util.toast
 import timber.log.Timber
+
+private const val STATUS_UPDATE_INTERVAL_SECONDS = 5L
+private const val SEEK_INCREMENT_SECONDS = 5L
+private const val SEEK_START_AFTER_SECONDS = 5
 
 /**
  * Provides an asynchronous interface to the remote jukebox on the Subsonic server.
  *
  * TODO: Report warning if queue fills up.
- * TODO: Create shutdown method?
  * TODO: Disable repeat.
  * TODO: Persist RC state?
  * TODO: Minimize status updates.
  */
-class JukeboxMediaPlayer {
+@Suppress("TooManyFunctions")
+class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
     private val tasks = TaskQueue()
     private val executorService = Executors.newSingleThreadScheduledExecutor()
     private var statusUpdateFuture: ScheduledFuture<*>? = null
     private val timeOfLastUpdate = AtomicLong()
     private var jukeboxStatus: JukeboxStatus? = null
+    private var previousJukeboxStatus: JukeboxStatus? = null
     private var gain = 0.5f
     private var volumeToast: VolumeToast? = null
-    private val running = AtomicBoolean()
     private var serviceThread: Thread? = null
-    private var enabled = false
 
-    // TODO: These create circular references, try to refactor
-    private val mediaPlayerControllerLazy = inject<MediaPlayerController>(
-        MediaPlayerController::class.java
-    )
+    private var listeners: MutableList<Player.Listener> = mutableListOf()
+    private val playlist: MutableList<MediaItem> = mutableListOf()
+    private var currentIndex: Int = 0
+    private val notificationProvider = MediaNotificationProvider(applicationContext())
+    private lateinit var mediaSession: MediaSession
+    private lateinit var notificationManagerCompat: NotificationManagerCompat
 
-    fun startJukeboxService() {
-        if (running.get()) {
-            return
-        }
+    @Suppress("MagicNumber")
+    override fun onCreate() {
+        super.onCreate()
+        if (running.get()) return
         running.set(true)
+
+        tasks.clear()
+        updatePlaylist()
+        stop()
+
+        startFuture?.set(this)
+
         startProcessTasks()
+
+        notificationManagerCompat = NotificationManagerCompat.from(this)
+        mediaSession = MediaSession.Builder(applicationContext(), this)
+            .setId("jukebox")
+            .setSessionActivity(getPendingIntentToShowPlayer(this))
+            .build()
+        val notification = notificationProvider.createNotification(
+            mediaSession,
+            ImmutableList.of(),
+            JukeboxNotificationActionFactory()
+        ) {}
+
+        if (Util.SDK_INT >= 29) {
+            startForeground(
+                notification.notificationId,
+                notification.notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+            )
+        } else {
+            startForeground(
+                notification.notificationId, notification.notification
+            )
+        }
+
         Timber.d("Started Jukebox Service")
     }
 
-    fun stopJukeboxService() {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        if (Intent.ACTION_MEDIA_BUTTON != intent?.action) return START_STICKY
+
+        val extras = intent.extras
+        if ((extras != null) && extras.containsKey(Intent.EXTRA_KEY_EVENT)) {
+            val event = extras.getParcelable<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+            when (event?.keyCode) {
+                KEYCODE_MEDIA_PLAY -> play()
+                KEYCODE_MEDIA_PAUSE -> stop()
+                KEYCODE_MEDIA_STOP -> stop()
+                KEYCODE_MEDIA_PLAY_PAUSE -> if (isPlaying) stop() else play()
+                KEYCODE_MEDIA_PREVIOUS -> seekToPrevious()
+                KEYCODE_MEDIA_NEXT -> seekToNext()
+            }
+        }
+        return START_STICKY
+    }
+
+    override fun onDestroy() {
+        if (!running.get()) return
         running.set(false)
+
         sleepQuietly(1000)
         if (serviceThread != null) {
             serviceThread!!.interrupt()
         }
+
+        tasks.clear()
+        stop()
+        stopForeground(true)
+        mediaSession.release()
+
+        super.onDestroy()
         Timber.d("Stopped Jukebox Service")
+    }
+
+    override fun onBind(p0: Intent?): IBinder? {
+        return null
+    }
+
+    fun requestStop() {
+        stopSelf()
+    }
+
+    private fun updateNotification() {
+        val notification = notificationProvider.createNotification(
+            mediaSession,
+            ImmutableList.of(),
+            JukeboxNotificationActionFactory()
+        ) {}
+        notificationManagerCompat.notify(notification.notificationId, notification.notification)
+    }
+
+    companion object {
+        val running = AtomicBoolean()
+        private var startFuture: SettableFuture<JukeboxMediaPlayer>? = null
+
+        @JvmStatic
+        fun requestStart(): ListenableFuture<JukeboxMediaPlayer>? {
+            if (running.get()) return null
+            startFuture = SettableFuture.create()
+            val context = applicationContext()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(
+                    Intent(context, JukeboxMediaPlayer::class.java)
+                )
+            } else {
+                context.startService(Intent(context, JukeboxMediaPlayer::class.java))
+            }
+            Timber.i("JukeboxMediaPlayer starting...")
+            return startFuture
+        }
+    }
+
+    override fun addListener(listener: Player.Listener) {
+        listeners.add(listener)
+    }
+
+    override fun removeListener(listener: Player.Listener) {
+        listeners.remove(listener)
+    }
+
+    override fun getCurrentMediaItem(): MediaItem? {
+        if (playlist.isEmpty()) return null
+        if (currentIndex < 0 || currentIndex >= playlist.size) return null
+        return playlist[currentIndex]
+    }
+
+    override fun getCurrentMediaItemIndex(): Int {
+        return currentIndex
+    }
+
+    override fun getCurrentPeriodIndex(): Int {
+        return currentIndex
+    }
+
+    override fun getContentPosition(): Long {
+        return currentPosition
+    }
+
+    override fun play() {
+        tasks.remove(Stop::class.java)
+        tasks.remove(Start::class.java)
+        startStatusUpdate()
+        tasks.add(Start())
+    }
+
+    override fun seekTo(positionMs: Long) {
+        seekTo(currentIndex, positionMs)
+    }
+
+    override fun seekTo(mediaItemIndex: Int, positionMs: Long) {
+        tasks.remove(Skip::class.java)
+        tasks.remove(Stop::class.java)
+        tasks.remove(Start::class.java)
+        startStatusUpdate()
+        val positionSeconds = (positionMs / 1000).toInt()
+        if (jukeboxStatus != null) {
+            jukeboxStatus!!.positionSeconds = positionSeconds
+        }
+        tasks.add(Skip(mediaItemIndex, positionSeconds))
+        currentIndex = mediaItemIndex
+    }
+
+    override fun seekBack() {
+        seekTo(0L.coerceAtMost((jukeboxStatus?.positionSeconds ?: 0) - SEEK_INCREMENT_SECONDS))
+    }
+
+    override fun seekForward() {
+        seekTo((jukeboxStatus?.positionSeconds ?: 0) + SEEK_INCREMENT_SECONDS)
+    }
+
+    override fun prepare() {}
+
+    override fun isPlaying(): Boolean {
+        return jukeboxStatus?.isPlaying ?: false
+    }
+
+    override fun getPlaybackState(): Int {
+        return when (jukeboxStatus?.isPlaying) {
+            true -> Player.STATE_READY
+            null, false -> Player.STATE_IDLE
+        }
+    }
+
+    override fun getAvailableCommands(): Player.Commands {
+        val commandsBuilder = Player.Commands.Builder().addAll(
+            Player.COMMAND_SET_VOLUME,
+            Player.COMMAND_GET_VOLUME
+        )
+        if (isPlaying) commandsBuilder.add(Player.COMMAND_STOP)
+        if (playlist.isNotEmpty()) {
+            commandsBuilder.addAll(
+                Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
+                Player.COMMAND_GET_MEDIA_ITEMS_METADATA,
+                Player.COMMAND_PLAY_PAUSE,
+                Player.COMMAND_PREPARE,
+                Player.COMMAND_SEEK_BACK,
+                Player.COMMAND_SEEK_FORWARD,
+                Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
+                Player.COMMAND_SEEK_TO_MEDIA_ITEM,
+            )
+            if (currentIndex > 0) commandsBuilder.addAll(
+                Player.COMMAND_SEEK_TO_PREVIOUS,
+                Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM
+            )
+            if (currentIndex < playlist.size - 1) commandsBuilder.addAll(
+                Player.COMMAND_SEEK_TO_NEXT,
+                Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM,
+            )
+        }
+        return commandsBuilder.build()
+    }
+
+    override fun isCommandAvailable(command: Int): Boolean {
+        return availableCommands.contains(command)
+    }
+
+    override fun getPlayWhenReady(): Boolean {
+        return isPlaying
+    }
+
+    override fun pause() {
+        stop()
+    }
+
+    override fun stop() {
+        tasks.remove(Stop::class.java)
+        tasks.remove(Start::class.java)
+        stopStatusUpdate()
+        tasks.add(Stop())
+    }
+
+    override fun getCurrentTimeline(): Timeline {
+        return PlaylistTimeline(playlist)
+    }
+
+    override fun getMediaItemCount(): Int {
+        return playlist.size
+    }
+
+    override fun getMediaItemAt(index: Int): MediaItem {
+        if (playlist.size == 0) return MediaItem.EMPTY
+        if (index < 0 || index >= playlist.size) return MediaItem.EMPTY
+        return playlist[index]
+    }
+
+    override fun getShuffleModeEnabled(): Boolean {
+        return false
+    }
+
+    override fun setShuffleModeEnabled(shuffleModeEnabled: Boolean) {}
+
+    override fun setVolume(volume: Float) {
+        gain = volume
+        tasks.remove(SetGain::class.java)
+        tasks.add(SetGain(volume))
+        val context = applicationContext()
+        if (volumeToast == null) volumeToast = VolumeToast(context)
+        volumeToast!!.setVolume(volume)
+    }
+
+    override fun getVolume(): Float {
+        return gain
+    }
+
+    override fun getDeviceVolume(): Int {
+        return (gain * 100).toInt()
+    }
+
+    override fun addMediaItems(index: Int, mediaItems: MutableList<MediaItem>) {
+        playlist.addAll(index, mediaItems)
+        updatePlaylist()
+    }
+
+    override fun getBufferedPercentage(): Int {
+        return 0
+    }
+
+    override fun moveMediaItem(currentIndex: Int, newIndex: Int) {
+        if (playlist.size == 0) return
+        if (currentIndex < 0 || currentIndex >= playlist.size) return
+        if (newIndex < 0 || newIndex >= playlist.size) return
+
+        val insertIndex = if (newIndex < currentIndex) newIndex else newIndex - 1
+        val item = playlist.removeAt(currentIndex)
+        playlist.add(insertIndex, item)
+        updatePlaylist()
+    }
+
+    override fun removeMediaItem(index: Int) {
+        if (playlist.size == 0) return
+        if (index < 0 || index >= playlist.size) return
+        playlist.removeAt(index)
+        updatePlaylist()
+    }
+
+    override fun clearMediaItems() {
+        playlist.clear()
+        currentIndex = 0
+        updatePlaylist()
+    }
+
+    override fun getRepeatMode(): Int {
+        return Player.REPEAT_MODE_OFF
+    }
+
+    override fun setRepeatMode(repeatMode: Int) {}
+
+    override fun getCurrentPosition(): Long {
+        return positionSeconds * 1000L
+    }
+
+    override fun getDuration(): Long {
+        if (playlist.isEmpty()) return 0
+        if (currentIndex < 0 || currentIndex >= playlist.size) return 0
+
+        return (
+            playlist[currentIndex].mediaMetadata.extras?.getInt("duration") ?: 0
+            ).toLong() * 1000
+    }
+
+    override fun getContentDuration(): Long {
+        return duration
+    }
+
+    override fun getMediaMetadata(): MediaMetadata {
+        if (playlist.isEmpty()) return MediaMetadata.EMPTY
+        if (currentIndex < 0 || currentIndex >= playlist.size) return MediaMetadata.EMPTY
+
+        return playlist[currentIndex].mediaMetadata
+    }
+
+    override fun seekToNext() {
+        if (currentIndex < 0 || currentIndex >= playlist.size) return
+        currentIndex++
+        seekTo(currentIndex, 0)
+    }
+
+    override fun seekToPrevious() {
+        if ((jukeboxStatus?.positionSeconds ?: 0) > SEEK_START_AFTER_SECONDS) {
+            seekTo(currentIndex, 0)
+            return
+        }
+        if (currentIndex <= 0) return
+        currentIndex--
+        seekTo(currentIndex, 0)
     }
 
     private fun startProcessTasks() {
@@ -111,6 +478,8 @@ class JukeboxMediaPlayer {
 
     private fun processTasks() {
         while (running.get()) {
+            // Sleep a bit to spare processor time if we loop a lot
+            sleepQuietly(10)
             var task: JukeboxTask? = null
             try {
                 if (!isOffline()) {
@@ -122,88 +491,110 @@ class JukeboxMediaPlayer {
             } catch (x: Throwable) {
                 onError(task, x)
             }
-            sleepQuietly(1)
         }
     }
 
     private fun onStatusUpdate(jukeboxStatus: JukeboxStatus) {
         timeOfLastUpdate.set(System.currentTimeMillis())
+        previousJukeboxStatus = this.jukeboxStatus
         this.jukeboxStatus = jukeboxStatus
+        currentIndex = jukeboxStatus.currentPlayingIndex ?: currentIndex
+
+        if (jukeboxStatus.isPlaying != previousJukeboxStatus?.isPlaying) {
+            Handler(Looper.getMainLooper()).post {
+                listeners.forEach {
+                    it.onPlaybackStateChanged(
+                        if (jukeboxStatus.isPlaying) Player.STATE_READY else Player.STATE_IDLE
+                    )
+                    it.onIsPlayingChanged(jukeboxStatus.isPlaying)
+                }
+            }
+        }
+
+        if (jukeboxStatus.currentPlayingIndex != previousJukeboxStatus?.currentPlayingIndex) {
+            currentIndex = jukeboxStatus.currentPlayingIndex ?: 0
+            val currentMedia =
+                if (currentIndex > 0 && currentIndex < playlist.size) playlist[currentIndex]
+                else MediaItem.EMPTY
+            Handler(Looper.getMainLooper()).post {
+                listeners.forEach {
+                    it.onMediaItemTransition(
+                        currentMedia,
+                        Player.MEDIA_ITEM_TRANSITION_REASON_SEEK
+                    )
+                }
+            }
+        }
+
+        updateNotification()
     }
 
     private fun onError(task: JukeboxTask?, x: Throwable) {
         if (x is ApiNotSupportedException && task !is Stop) {
-            disableJukeboxOnError(x, R.string.download_jukebox_server_too_old)
+            Handler(Looper.getMainLooper()).post {
+                listeners.forEach {
+                    it.onPlayerError(
+                        PlaybackException(
+                            "Jukebox server too old",
+                            null,
+                            R.string.download_jukebox_server_too_old
+                        )
+                    )
+                }
+            }
         } else if (x is OfflineException && task !is Stop) {
-            disableJukeboxOnError(x, R.string.download_jukebox_offline)
+            Handler(Looper.getMainLooper()).post {
+                listeners.forEach {
+                    it.onPlayerError(
+                        PlaybackException(
+                            "Jukebox offline",
+                            null,
+                            R.string.download_jukebox_offline
+                        )
+                    )
+                }
+            }
         } else if (x is SubsonicRESTException && x.code == 50 && task !is Stop) {
-            disableJukeboxOnError(x, R.string.download_jukebox_not_authorized)
+            Handler(Looper.getMainLooper()).post {
+                listeners.forEach {
+                    it.onPlayerError(
+                        PlaybackException(
+                            "Jukebox not authorized",
+                            null,
+                            R.string.download_jukebox_not_authorized
+                        )
+                    )
+                }
+            }
         } else {
             Timber.e(x, "Failed to process jukebox task")
         }
     }
 
-    private fun disableJukeboxOnError(x: Throwable, resourceId: Int) {
-        Timber.w(x.toString())
-        val context = applicationContext()
-        Handler(Looper.getMainLooper()).post { toast(context, resourceId, false) }
-        mediaPlayerControllerLazy.value.isJukeboxEnabled = false
-    }
-
-    fun updatePlaylist() {
-        if (!enabled) return
+    private fun updatePlaylist() {
+        if (!running.get()) return
         tasks.remove(Skip::class.java)
         tasks.remove(Stop::class.java)
         tasks.remove(Start::class.java)
         val ids: MutableList<String> = ArrayList()
-        for (item in mediaPlayerControllerLazy.value.playlist) {
+        for (item in playlist) {
             ids.add(item.mediaId)
         }
         tasks.add(SetPlaylist(ids))
-    }
-
-    fun skip(index: Int, offsetSeconds: Int) {
-        tasks.remove(Skip::class.java)
-        tasks.remove(Stop::class.java)
-        tasks.remove(Start::class.java)
-        startStatusUpdate()
-        if (jukeboxStatus != null) {
-            jukeboxStatus!!.positionSeconds = offsetSeconds
+        Handler(Looper.getMainLooper()).post {
+            listeners.forEach {
+                it.onTimelineChanged(
+                    PlaylistTimeline(playlist),
+                    Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED
+                )
+            }
         }
-        tasks.add(Skip(index, offsetSeconds))
-    }
-
-    fun stop() {
-        tasks.remove(Stop::class.java)
-        tasks.remove(Start::class.java)
-        stopStatusUpdate()
-        tasks.add(Stop())
-    }
-
-    fun start() {
-        tasks.remove(Stop::class.java)
-        tasks.remove(Start::class.java)
-        startStatusUpdate()
-        tasks.add(Start())
-    }
-
-    @Synchronized
-    fun adjustVolume(up: Boolean) {
-        val delta = if (up) 0.05f else -0.05f
-        gain += delta
-        gain = gain.coerceAtLeast(0.0f)
-        gain = gain.coerceAtMost(1.0f)
-        tasks.remove(SetGain::class.java)
-        tasks.add(SetGain(gain))
-        val context = applicationContext()
-        if (volumeToast == null) volumeToast = VolumeToast(context)
-        volumeToast!!.setVolume(gain)
     }
 
     private val musicService: MusicService
         get() = getMusicService()
 
-    val positionSeconds: Int
+    private val positionSeconds: Int
         get() {
             if (jukeboxStatus == null ||
                 jukeboxStatus!!.positionSeconds == null ||
@@ -217,20 +608,6 @@ class JukeboxMediaPlayer {
                 return jukeboxStatus!!.positionSeconds!! + secondsSinceLastUpdate
             }
             return jukeboxStatus!!.positionSeconds!!
-        }
-
-    var isEnabled: Boolean
-        set(enabled) {
-            Timber.d("Jukebox Service setting enabled to %b", enabled)
-            this.enabled = enabled
-            tasks.clear()
-            if (enabled) {
-                updatePlaylist()
-            }
-            stop()
-        }
-        get() {
-            return enabled
         }
 
     private class TaskQueue {
@@ -317,6 +694,7 @@ class JukeboxMediaPlayer {
         }
     }
 
+    @SuppressLint("InflateParams")
     private class VolumeToast(context: Context) : Toast(context) {
         private val progressBar: ProgressBar
         fun setVolume(volume: Float) {
@@ -335,7 +713,100 @@ class JukeboxMediaPlayer {
         }
     }
 
-    companion object {
-        private const val STATUS_UPDATE_INTERVAL_SECONDS = 5L
+    // The constants below are necessary so a MediaSession can be built from the Jukebox Service
+    override fun isCurrentMediaItemDynamic(): Boolean {
+        return false
+    }
+
+    override fun getTrackSelectionParameters(): TrackSelectionParameters {
+        return TrackSelectionParameters.DEFAULT_WITHOUT_CONTEXT
+    }
+
+    override fun getMaxSeekToPreviousPosition(): Long {
+        return SEEK_START_AFTER_SECONDS * 1000L
+    }
+
+    override fun getSeekBackIncrement(): Long {
+        return SEEK_INCREMENT_SECONDS * 1000L
+    }
+
+    override fun getSeekForwardIncrement(): Long {
+        return SEEK_INCREMENT_SECONDS * 1000L
+    }
+
+    override fun isLoading(): Boolean {
+        return false
+    }
+
+    override fun getPlaybackSuppressionReason(): Int {
+        return Player.PLAYBACK_SUPPRESSION_REASON_NONE
+    }
+
+    override fun isDeviceMuted(): Boolean {
+        return false
+    }
+
+    override fun getCurrentCues(): CueGroup {
+        return CueGroup.EMPTY
+    }
+
+    override fun getAudioAttributes(): AudioAttributes {
+        return AudioAttributes.DEFAULT
+    }
+
+    override fun getVideoSize(): VideoSize {
+        return VideoSize(0, 0)
+    }
+
+    override fun getContentBufferedPosition(): Long {
+        return bufferedPosition
+    }
+
+    override fun getCurrentLiveOffset(): Long {
+        return C.TIME_UNSET
+    }
+
+    override fun getTotalBufferedDuration(): Long {
+        return 0
+    }
+
+    override fun isPlayingAd(): Boolean {
+        return false
+    }
+
+    override fun getCurrentAdIndexInAdGroup(): Int {
+        return C.INDEX_UNSET
+    }
+
+    override fun getCurrentAdGroupIndex(): Int {
+        return C.INDEX_UNSET
+    }
+
+    override fun canAdvertiseSession(): Boolean {
+        return true
+    }
+
+    override fun getApplicationLooper(): Looper {
+        return applicationContext().mainLooper
+    }
+
+    override fun getPlaylistMetadata(): MediaMetadata {
+        return MediaMetadata.EMPTY
+    }
+
+    override fun getDeviceInfo(): DeviceInfo {
+        return DeviceInfo(DeviceInfo.PLAYBACK_TYPE_REMOTE, 0, 1)
+    }
+
+    override fun getPlayerError(): PlaybackException? {
+        return null
+    }
+
+    override fun getPlaybackParameters(): PlaybackParameters {
+        return PlaybackParameters(1F, 1F)
+    }
+
+    override fun getBufferedPosition(): Long {
+        return 0
     }
 }

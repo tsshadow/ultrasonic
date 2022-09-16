@@ -9,10 +9,13 @@ package org.moire.ultrasonic.service
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.media3.common.C
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
 import androidx.media3.common.Player.REPEAT_MODE_OFF
@@ -22,6 +25,7 @@ import androidx.media3.session.SessionResult
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
@@ -40,10 +44,14 @@ import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider4X4
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.MainThreadExecutor
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.setPin
 import org.moire.ultrasonic.util.toMediaItem
 import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
+
+private const val CONTROLLER_SWITCH_DELAY = 500L
+private const val VOLUME_DELTA = 0.05f
 
 /**
  * The implementation of the Media Player Controller.
@@ -57,17 +65,14 @@ class MediaPlayerController(
     private val downloader: Downloader,
     val context: Context
 ) : KoinComponent {
+    private val activeServerProvider: ActiveServerProvider by inject()
 
     private var created = false
     var suggestedPlaylistName: String? = null
     var keepScreenOn = false
-    var showVisualization = false
     private var autoPlayStart = false
 
     private val scrobbler = Scrobbler()
-
-    private val jukeboxMediaPlayer: JukeboxMediaPlayer by inject()
-    private val activeServerProvider: ActiveServerProvider by inject()
 
     private val rxBusSubscription: CompositeDisposable = CompositeDisposable()
 
@@ -76,89 +81,89 @@ class MediaPlayerController(
     private var sessionToken =
         SessionToken(context, ComponentName(context, PlaybackService::class.java))
 
-    private var mediaControllerFuture = MediaController.Builder(
-        context,
-        sessionToken
-    ).buildAsync()
+    private var mediaControllerFuture: ListenableFuture<MediaController>? = null
 
-    var controller: MediaController? = null
+    private var controller: Player? = null
 
-    private lateinit var listeners: Player.Listener
+    private var listeners: Player.Listener = object : Player.Listener {
+
+        /*
+         * Log all events
+         */
+        override fun onEvents(player: Player, events: Player.Events) {
+            for (i in 0 until events.size()) {
+                Timber.i("Media3 Event, event type: %s", events[i])
+            }
+        }
+
+        /*
+         * This will be called everytime the playlist has changed.
+         * We run the event through RxBus in order to throttle them
+         */
+        override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+            RxBus.playlistPublisher.onNext(playlist.map(MediaItem::toTrack))
+        }
+
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            playerStateChangedHandler()
+            publishPlaybackState()
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            playerStateChangedHandler()
+            publishPlaybackState()
+        }
+
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            clearBookmark()
+            // TRANSITION_REASON_AUTO means that the previous track finished playing and a new one has started.
+            if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO && cachedMediaItem != null) {
+                scrobbler.scrobble(cachedMediaItem?.toTrack(), true)
+            }
+            cachedMediaItem = mediaItem
+            publishPlaybackState()
+        }
+
+        /*
+         * If the same item is contained in a playlist multiple times directly after each
+         * other, Media3 on emits a PositionDiscontinuity event.
+         * Can be removed if https://github.com/androidx/media/issues/68 is fixed.
+         */
+        override fun onPositionDiscontinuity(
+            oldPosition: Player.PositionInfo,
+            newPosition: Player.PositionInfo,
+            reason: Int
+        ) {
+            playerStateChangedHandler()
+            publishPlaybackState()
+        }
+
+        override fun onPlayerError(error: PlaybackException) {
+            Timber.w(error.toString())
+            if (!isJukeboxEnabled) return
+
+            val context = UApp.applicationContext()
+            mainScope.launch {
+                Util.toast(
+                    context,
+                    error.errorCode,
+                    false
+                )
+            }
+            isJukeboxEnabled = false
+        }
+    }
 
     private var cachedMediaItem: MediaItem? = null
 
     fun onCreate(onCreated: () -> Unit) {
         if (created) return
         externalStorageMonitor.onCreate { reset() }
-        isJukeboxEnabled = activeServerProvider.getActiveServer().jukeboxByDefault
-
-        mediaControllerFuture.addListener({
-            controller = mediaControllerFuture.get()
-
-            Timber.i("MediaController Instance received")
-
-            listeners = object : Player.Listener {
-
-                /*
-                 * Log all events
-                 */
-                override fun onEvents(player: Player, events: Player.Events) {
-                    for (i in 0 until events.size()) {
-                        Timber.i("Media3 Event, event type: %s", events[i])
-                    }
-                }
-
-                /*
-                 * This will be called everytime the playlist has changed.
-                 * We run the event through RxBus in order to throttle them
-                 */
-                override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-                    RxBus.playlistPublisher.onNext(playlist.map(MediaItem::toTrack))
-                }
-
-                override fun onPlaybackStateChanged(playbackState: Int) {
-                    playerStateChangedHandler()
-                    publishPlaybackState()
-                }
-
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    playerStateChangedHandler()
-                    publishPlaybackState()
-                }
-
-                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                    clearBookmark()
-                    // TRANSITION_REASON_AUTO means that the previous track finished playing and a new one has started.
-                    if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO && cachedMediaItem != null) {
-                        scrobbler.scrobble(cachedMediaItem?.toTrack(), true)
-                    }
-                    cachedMediaItem = mediaItem
-                    publishPlaybackState()
-                }
-
-                /*
-                 * If the same item is contained in a playlist multiple times directly after each
-                 * other, Media3 on emits a PositionDiscontinuity event.
-                 * Can be removed if https://github.com/androidx/media/issues/68 is fixed.
-                 */
-                override fun onPositionDiscontinuity(
-                    oldPosition: Player.PositionInfo,
-                    newPosition: Player.PositionInfo,
-                    reason: Int
-                ) {
-                    playerStateChangedHandler()
-                    publishPlaybackState()
-                }
-            }
-
-            controller?.addListener(listeners)
-
-            onCreated()
-
-            Timber.i("MediaPlayerController creation complete")
-
-            // controller?.play()
-        }, MoreExecutors.directExecutor())
+        if (activeServerProvider.getActiveServer().jukeboxByDefault) {
+            switchToJukebox(onCreated)
+        } else {
+            switchToLocalPlayer(onCreated)
+        }
 
         rxBusSubscription += RxBus.activeServerChangeObservable.subscribe {
             // Update the Jukebox state when the active server has changed
@@ -198,6 +203,23 @@ class MediaPlayerController(
 
         created = true
         Timber.i("MediaPlayerController started")
+    }
+
+    fun onDestroy() {
+        if (!created) return
+
+        // First stop listening to events
+        rxBusSubscription.dispose()
+        controller?.removeListener(listeners)
+        releaseController()
+
+        // Shutdown the rest
+        val context = UApp.applicationContext()
+        externalStorageMonitor.onDestroy()
+        context.stopService(Intent(context, DownloadService::class.java))
+        downloader.onDestroy()
+        created = false
+        Timber.i("MediaPlayerController destroyed")
     }
 
     private fun playerStateChangedHandler() {
@@ -254,22 +276,6 @@ class MediaPlayerController(
         UltrasonicAppWidgetProvider4X4.instance?.notifyChange(context, song, isPlaying, true)
     }
 
-    fun onDestroy() {
-        if (!created) return
-
-        // First stop listening to events
-        rxBusSubscription.dispose()
-        controller?.removeListener(listeners)
-
-        // Shutdown the rest
-        val context = UApp.applicationContext()
-        externalStorageMonitor.onDestroy()
-        context.stopService(Intent(context, DownloadService::class.java))
-        downloader.onDestroy()
-        created = false
-        Timber.i("MediaPlayerController destroyed")
-    }
-
     @Synchronized
     fun restore(
         state: PlaybackState,
@@ -291,15 +297,7 @@ class MediaPlayerController(
         isShufflePlayEnabled = state.shufflePlay
 
         if (state.currentPlayingIndex != -1) {
-            if (jukeboxMediaPlayer.isEnabled) {
-                jukeboxMediaPlayer.skip(
-                    state.currentPlayingIndex,
-                    state.currentPlayingPosition / 1000
-                )
-            } else {
-                seekTo(state.currentPlayingIndex, state.currentPlayingPosition)
-            }
-
+            seekTo(state.currentPlayingIndex, state.currentPlayingPosition)
             prepare()
 
             if (autoPlay) {
@@ -318,12 +316,8 @@ class MediaPlayerController(
 
     @Synchronized
     fun play() {
-        if (jukeboxMediaPlayer.isEnabled) {
-            jukeboxMediaPlayer.start()
-        } else {
-            controller?.prepare()
-            controller?.play()
-        }
+        controller?.prepare()
+        controller?.play()
     }
 
     @Synchronized
@@ -359,26 +353,27 @@ class MediaPlayerController(
         if (controller?.currentTimeline?.isEmpty != false ||
             index >= controller!!.currentTimeline.windowCount
         ) return
+
         Timber.i("SeekTo: %s %s", index, position)
         controller?.seekTo(index, position.toLong())
     }
 
+    fun seekForward() {
+        controller?.seekForward()
+    }
+
+    fun seekBack() {
+        controller?.seekBack()
+    }
+
     @Synchronized
     fun pause() {
-        if (jukeboxMediaPlayer.isEnabled) {
-            jukeboxMediaPlayer.stop()
-        } else {
-            controller?.pause()
-        }
+        controller?.pause()
     }
 
     @Synchronized
     fun stop() {
-        if (jukeboxMediaPlayer.isEnabled) {
-            jukeboxMediaPlayer.stop()
-        } else {
-            controller?.stop()
-        }
+        controller?.stop()
     }
 
     @Synchronized
@@ -405,8 +400,6 @@ class MediaPlayerController(
 
         controller?.addMediaItems(insertAt, mediaItems)
 
-        jukeboxMediaPlayer.updatePlaylist()
-
         if (shuffle) isShufflePlayEnabled = true
 
         prepare()
@@ -421,10 +414,6 @@ class MediaPlayerController(
         if (songs == null) return
         val filteredSongs = songs.filterNotNull()
         downloader.downloadBackground(filteredSongs, save)
-    }
-
-    fun stopJukeboxService() {
-        jukeboxMediaPlayer.stopJukeboxService()
     }
 
     @set:Synchronized
@@ -468,8 +457,6 @@ class MediaPlayerController(
                 listOf(), -1, 0, isShufflePlayEnabled, repeatMode
             )
         }
-
-        jukeboxMediaPlayer.updatePlaylist()
     }
 
     @Synchronized
@@ -495,10 +482,7 @@ class MediaPlayerController(
 
     @Synchronized
     fun removeFromPlaylist(position: Int) {
-
         controller?.removeMediaItem(position)
-
-        jukeboxMediaPlayer.updatePlaylist()
     }
 
     @Synchronized
@@ -549,17 +533,17 @@ class MediaPlayerController(
     @get:Synchronized
     val playerPosition: Int
         get() {
-            return if (jukeboxMediaPlayer.isEnabled) {
-                jukeboxMediaPlayer.positionSeconds * 1000
-            } else {
-                controller?.currentPosition?.toInt() ?: 0
-            }
+            return controller?.currentPosition?.toInt() ?: 0
         }
 
     @get:Synchronized
     val playerDuration: Int
         get() {
-            return controller?.duration?.toInt() ?: return 0
+            // Media3 will only report a duration when the file is prepared
+            val reportedDuration = controller?.duration ?: C.TIME_UNSET
+            if (reportedDuration != C.TIME_UNSET) return reportedDuration.toInt()
+            // If Media3 doesn't know the duration yet, use the duration in the metadata
+            return (currentMediaItem?.mediaMetadata?.extras?.getInt("duration") ?: 0) * 1000
         }
 
     val playbackState: Int
@@ -570,20 +554,102 @@ class MediaPlayerController(
 
     @set:Synchronized
     var isJukeboxEnabled: Boolean
-        get() = jukeboxMediaPlayer.isEnabled
+        get() = controller is JukeboxMediaPlayer
         set(jukeboxEnabled) {
-            jukeboxMediaPlayer.isEnabled = jukeboxEnabled
-
             if (jukeboxEnabled) {
-                jukeboxMediaPlayer.startJukeboxService()
-                reset()
-
-                // Cancel current downloads
-                downloader.clearActiveDownloads()
+                switchToJukebox {}
             } else {
-                jukeboxMediaPlayer.stopJukeboxService()
+                switchToLocalPlayer {}
             }
         }
+
+    private fun switchToJukebox(onCreated: () -> Unit) {
+        if (JukeboxMediaPlayer.running.get()) return
+        val currentPlaylist = playlist
+        val currentIndex = controller?.currentMediaItemIndex ?: 0
+        val currentPosition = controller?.currentPosition ?: 0
+        downloader.clearActiveDownloads()
+        controller?.pause()
+        controller?.stop()
+        val oldController = controller
+        controller = null // While we switch, the controller shouldn't be available
+
+        // Stop() won't work if we don't give it time to be processed
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (oldController != null) releaseLocalPlayer(oldController)
+            setupJukebox {
+                controller?.addMediaItems(0, currentPlaylist)
+                controller?.seekTo(currentIndex, currentPosition)
+                onCreated()
+            }
+        }, CONTROLLER_SWITCH_DELAY)
+    }
+
+    private fun switchToLocalPlayer(onCreated: () -> Unit) {
+        val currentPlaylist = playlist
+        val currentIndex = controller?.currentMediaItemIndex ?: 0
+        val currentPosition = controller?.currentPosition ?: 0
+        controller?.stop()
+        val oldController = controller
+        controller = null // While we switch, the controller shouldn't be available
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (oldController != null) releaseJukebox(oldController)
+            setupLocalPlayer {
+                controller?.addMediaItems(0, currentPlaylist)
+                controller?.seekTo(currentIndex, currentPosition)
+                onCreated()
+            }
+        }, CONTROLLER_SWITCH_DELAY)
+    }
+
+    private fun releaseController() {
+        when (controller) {
+            null -> return
+            is JukeboxMediaPlayer -> releaseJukebox(controller)
+            is MediaController -> releaseLocalPlayer(controller)
+        }
+    }
+
+    private fun setupLocalPlayer(onCreated: () -> Unit) {
+        mediaControllerFuture = MediaController.Builder(
+            context,
+            sessionToken
+        ).buildAsync()
+
+        mediaControllerFuture?.addListener({
+            controller = mediaControllerFuture?.get()
+
+            Timber.i("MediaController Instance received")
+            controller?.addListener(listeners)
+            onCreated()
+            Timber.i("MediaPlayerController creation complete")
+        }, MoreExecutors.directExecutor())
+    }
+
+    private fun releaseLocalPlayer(player: Player?) {
+        player?.removeListener(listeners)
+        player?.release()
+        if (mediaControllerFuture != null) MediaController.releaseFuture(mediaControllerFuture!!)
+        Timber.i("MediaPlayerController released")
+    }
+
+    private fun setupJukebox(onCreated: () -> Unit) {
+        val jukeboxFuture = JukeboxMediaPlayer.requestStart()
+        jukeboxFuture?.addListener({
+            controller = jukeboxFuture.get()
+            onCreated()
+            controller?.addListener(listeners)
+            Timber.i("JukeboxService creation complete")
+        }, MoreExecutors.directExecutor())
+    }
+
+    private fun releaseJukebox(player: Player?) {
+        val jukebox = player as JukeboxMediaPlayer?
+        jukebox?.removeListener(listeners)
+        jukebox?.requestStop()
+        Timber.i("JukeboxService released")
+    }
 
     /**
      * This function calls the music service directly and
@@ -600,21 +666,26 @@ class MediaPlayerController(
             return false
         }
 
-    fun adjustJukeboxVolume(up: Boolean) {
-        jukeboxMediaPlayer.adjustVolume(up)
+    fun adjustVolume(up: Boolean) {
+        val delta = if (up) VOLUME_DELTA else -VOLUME_DELTA
+        var gain = controller?.volume ?: return
+        gain += delta
+        gain = gain.coerceAtLeast(0.0f)
+        gain = gain.coerceAtMost(1.0f)
+        controller?.volume = gain
     }
 
     fun setVolume(volume: Float) {
         controller?.volume = volume
     }
 
-    fun toggleSongStarred() {
-        if (currentMediaItem == null) return
+    fun toggleSongStarred(): ListenableFuture<SessionResult>? {
+        if (currentMediaItem == null) return null
         val song = currentMediaItem!!.toTrack()
 
-        controller?.setRating(
+        return (controller as? MediaController)?.setRating(
             HeartRating(!song.starred)
-        ).let {
+        )?.let {
             Futures.addCallback(
                 it,
                 object : FutureCallback<SessionResult> {
@@ -635,6 +706,7 @@ class MediaPlayerController(
                 },
                 MainThreadExecutor()
             )
+            it
         }
     }
 
@@ -671,6 +743,10 @@ class MediaPlayerController(
         get() {
             return getPlayList(false)
         }
+
+    fun getMediaItemAt(index: Int): MediaItem? {
+        return controller?.getMediaItemAt(index)
+    }
 
     val playlistInPlayOrder: List<MediaItem>
         get() {

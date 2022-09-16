@@ -80,9 +80,6 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
         isStarted = false
         stopForeground(true)
         stopSelf()
-
-        // Clear Koin
-        UApp.instance!!.shutdownKoin()
     }
 
     private val resolver: ResolvingDataSource.Resolver = ResolvingDataSource.Resolver {

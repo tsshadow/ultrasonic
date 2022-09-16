@@ -9,8 +9,10 @@ package org.moire.ultrasonic.util
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -40,6 +42,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.app.UApp.Companion.applicationContext
 import org.moire.ultrasonic.domain.Bookmark
 import org.moire.ultrasonic.domain.MusicDirectory
@@ -650,6 +653,18 @@ object Util {
             bitrate = bitRate,
             fileFormat = fileFormat,
         )
+    }
+
+    fun getPendingIntentToShowPlayer(context: Context): PendingIntent {
+        val intent = Intent(context, NavigationActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        var flags = PendingIntent.FLAG_UPDATE_CURRENT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // needed starting Android 12 (S = 31)
+            flags = flags or PendingIntent.FLAG_IMMUTABLE
+        }
+        intent.putExtra(Constants.INTENT_SHOW_PLAYER, true)
+        return PendingIntent.getActivity(context, 0, intent, flags)
     }
 
     private val connectivityManager: ConnectivityManager

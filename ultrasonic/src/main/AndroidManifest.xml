@@ -64,6 +64,13 @@
             android:exported="false">
         </service>
 
+        <service
+            android:name=".service.JukeboxMediaPlayer"
+            android:label="Ultrasonic Jukebox Media Player Service"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false">
+        </service>
+
         <!-- Needs to be exported: https://android.googlesource.com/platform/developers/build/+/4de32d4/prebuilts/gradle/MediaBrowserService/README.md -->
         <service android:name=".playback.PlaybackService"
             android:label="@string/common.appname"
