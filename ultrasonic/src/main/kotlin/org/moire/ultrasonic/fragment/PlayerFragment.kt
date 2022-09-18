@@ -9,6 +9,8 @@ package org.moire.ultrasonic.fragment
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.graphics.Canvas
+import android.graphics.Color.argb
 import android.graphics.Point
 import android.os.Build
 import android.os.Bundle
@@ -33,6 +35,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ViewFlipper
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.media3.common.MediaItem
@@ -42,10 +45,12 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
+import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_IDLE
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.internal.ViewUtils.dpToPx
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -89,6 +94,8 @@ import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.toTrack
 import org.moire.ultrasonic.view.AutoRepeatButton
 import timber.log.Timber
+import java.util.Collections
+import kotlin.math.min
 
 /**
  * Contains the Music Player screen of Ultrasonic with playback controls and the playlist
@@ -358,18 +365,12 @@ class PlayerFragment :
 
         // Observe playlist changes and update the UI
         rxBusSubscription += RxBus.playlistObservable.subscribe {
-            // Use launch to ensure running it in the main thread
-            launch {
-                onPlaylistChanged()
-                onSliderProgressChanged()
-            }
+            onPlaylistChanged()
+            onSliderProgressChanged()
         }
 
         rxBusSubscription += RxBus.playerStateObservable.subscribe {
-            // Use launch to ensure running it in the main thread
-            launch {
-                update()
-            }
+            update()
         }
 
         // Query the Jukebox state in an IO Context
@@ -855,6 +856,11 @@ class PlayerFragment :
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
+
+            var dragging = false
+            var startPosition = 0
+            var endPosition = 0
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -864,8 +870,18 @@ class PlayerFragment :
                 val from = viewHolder.bindingAdapterPosition
                 val to = target.bindingAdapterPosition
 
-                // Move it in the data set
-                mediaPlayerController.moveItemInPlaylist(from, to)
+                Timber.i("MOVING from %d to %d", from, to)
+                val newList = viewAdapter.getCurrentList().toMutableList()
+                Collections.swap(newList, from, to)
+                viewAdapter.submitList(newList)
+                endPosition = to
+
+                // When the user moves an item, onMove may be called many times quickly,
+                // especially while scrolling. We only update the playlist when the item
+                // is released (see onSelectedChanged)
+
+
+                // It was moved, so return true
                 return true
             }
 
@@ -892,6 +908,15 @@ class PlayerFragment :
 
                 if (actionState == ACTION_STATE_DRAG) {
                     viewHolder?.itemView?.alpha = ALPHA_DEACTIVATED
+                    dragging = true
+                    startPosition = viewHolder!!.bindingAdapterPosition
+                }
+
+                // We only move the item in the playlist when the user finished dragging
+                if (actionState == ACTION_STATE_IDLE && dragging) {
+                    dragging = false
+                    // Move the item in the playlist separately
+                    mediaPlayerController.moveItemInPlaylist(startPosition, endPosition)
                 }
             }
 
@@ -907,6 +932,61 @@ class PlayerFragment :
             override fun isLongPressDragEnabled(): Boolean {
                 return false
             }
+
+            override fun onChildDraw(
+                canvas: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    val itemView = viewHolder.itemView
+                    val drawable = ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.ic_menu_remove_all,
+                        null
+                    )
+                    val iconSize = dpToPx(context!!, ICON_SIZE).toInt()
+                    val swipeRatio = abs(dX) / viewHolder.itemView.width.toFloat()
+                    val itemAlpha = ALPHA_FULL - swipeRatio
+                    val backgroundAlpha = min(ALPHA_HALF + swipeRatio, ALPHA_FULL)
+                    val backgroundColor = argb((backgroundAlpha * 255).toInt(), 255, 0, 0)
+
+                    if (dX > 0) {
+                        canvas.clipRect(
+                            itemView.left.toFloat(), itemView.top.toFloat(),
+                            dX, itemView.bottom.toFloat()
+                        )
+                        canvas.drawColor(backgroundColor)
+                        val left = itemView.left + dpToPx(context!!,16).toInt()
+                        val top = itemView.top + (itemView.bottom - itemView.top - iconSize) / 2
+                        drawable?.setBounds(left, top, left + iconSize, top + iconSize)
+                        drawable?.draw(canvas)
+                    } else {
+                        canvas.clipRect(
+                            itemView.right.toFloat() + dX, itemView.top.toFloat(),
+                            itemView.right.toFloat(), itemView.bottom.toFloat(),
+                        )
+                        canvas.drawColor(backgroundColor)
+                        val left = itemView.right - dpToPx(context!!,16).toInt() - iconSize
+                        val top = itemView.top + (itemView.bottom - itemView.top - iconSize) / 2
+                        drawable?.setBounds(left, top, left + iconSize, top + iconSize)
+                        drawable?.draw(canvas)
+                    }
+
+                    // Fade out the view as it is swiped out of the parent's bounds
+                    viewHolder.itemView.alpha = itemAlpha
+                    viewHolder.itemView.translationX = dX
+                } else {
+                    super.onChildDraw(
+                        canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive
+                    )
+                }
+            }
+
         }
 
         dragTouchHelper = ItemTouchHelper(callback)
@@ -1193,5 +1273,8 @@ class PlayerFragment :
         private const val PERCENTAGE_OF_SCREEN_FOR_SWIPE = 5
         private const val ALPHA_ACTIVATED = 1f
         private const val ALPHA_DEACTIVATED = 0.4f
+        private const val ALPHA_FULL = 1.0f
+        private const val ALPHA_HALF = 0.5f
+        private const val ICON_SIZE = 32
     }
 }
