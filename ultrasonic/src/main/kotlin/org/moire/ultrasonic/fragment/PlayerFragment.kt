@@ -50,12 +50,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.internal.ViewUtils.dpToPx
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.Collections
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
@@ -64,6 +64,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -94,8 +95,6 @@ import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.toTrack
 import org.moire.ultrasonic.view.AutoRepeatButton
 import timber.log.Timber
-import java.util.Collections
-import kotlin.math.min
 
 /**
  * Contains the Music Player screen of Ultrasonic with playback controls and the playlist
@@ -387,7 +386,7 @@ class PlayerFragment :
 
     private fun updateShuffleButtonState(isEnabled: Boolean) {
         if (isEnabled) {
-            shuffleButton.alpha = ALPHA_ACTIVATED
+            shuffleButton.alpha = ALPHA_FULL
         } else {
             shuffleButton.alpha = ALPHA_DEACTIVATED
         }
@@ -401,11 +400,11 @@ class PlayerFragment :
             }
             1 -> {
                 repeatButton.setIconResource(R.drawable.media_repeat_one)
-                repeatButton.alpha = ALPHA_ACTIVATED
+                repeatButton.alpha = ALPHA_FULL
             }
             2 -> {
                 repeatButton.setIconResource(R.drawable.media_repeat_all)
-                repeatButton.alpha = ALPHA_ACTIVATED
+                repeatButton.alpha = ALPHA_FULL
             }
             else -> {
             }
@@ -872,14 +871,21 @@ class PlayerFragment :
 
                 Timber.i("MOVING from %d to %d", from, to)
                 val newList = viewAdapter.getCurrentList().toMutableList()
-                Collections.swap(newList, from, to)
+                if (from < to) {
+                    for (i in from until to) {
+                        Collections.swap(newList, i, i + 1)
+                    }
+                } else {
+                    for (i in from downTo to + 1) {
+                        Collections.swap(newList, i, i - 1)
+                    }
+                }
                 viewAdapter.submitList(newList)
                 endPosition = to
 
                 // When the user moves an item, onMove may be called many times quickly,
                 // especially while scrolling. We only update the playlist when the item
                 // is released (see onSelectedChanged)
-
 
                 // It was moved, so return true
                 return true
@@ -949,7 +955,7 @@ class PlayerFragment :
                         R.drawable.ic_menu_remove_all,
                         null
                     )
-                    val iconSize = dpToPx(context!!, ICON_SIZE).toInt()
+                    val iconSize = Util.dpToPx(ICON_SIZE, activity!!)
                     val swipeRatio = abs(dX) / viewHolder.itemView.width.toFloat()
                     val itemAlpha = ALPHA_FULL - swipeRatio
                     val backgroundAlpha = min(ALPHA_HALF + swipeRatio, ALPHA_FULL)
@@ -961,7 +967,7 @@ class PlayerFragment :
                             dX, itemView.bottom.toFloat()
                         )
                         canvas.drawColor(backgroundColor)
-                        val left = itemView.left + dpToPx(context!!,16).toInt()
+                        val left = itemView.left + Util.dpToPx(16, activity!!)
                         val top = itemView.top + (itemView.bottom - itemView.top - iconSize) / 2
                         drawable?.setBounds(left, top, left + iconSize, top + iconSize)
                         drawable?.draw(canvas)
@@ -971,7 +977,7 @@ class PlayerFragment :
                             itemView.right.toFloat(), itemView.bottom.toFloat(),
                         )
                         canvas.drawColor(backgroundColor)
-                        val left = itemView.right - dpToPx(context!!,16).toInt() - iconSize
+                        val left = itemView.right - Util.dpToPx(16, activity!!) - iconSize
                         val top = itemView.top + (itemView.bottom - itemView.top - iconSize) / 2
                         drawable?.setBounds(left, top, left + iconSize, top + iconSize)
                         drawable?.draw(canvas)
@@ -986,7 +992,6 @@ class PlayerFragment :
                     )
                 }
             }
-
         }
 
         dragTouchHelper = ItemTouchHelper(callback)
@@ -1271,10 +1276,9 @@ class PlayerFragment :
 
     companion object {
         private const val PERCENTAGE_OF_SCREEN_FOR_SWIPE = 5
-        private const val ALPHA_ACTIVATED = 1f
-        private const val ALPHA_DEACTIVATED = 0.4f
-        private const val ALPHA_FULL = 1.0f
+        private const val ALPHA_FULL = 1f
         private const val ALPHA_HALF = 0.5f
+        private const val ALPHA_DEACTIVATED = 0.4f
         private const val ICON_SIZE = 32
     }
 }
