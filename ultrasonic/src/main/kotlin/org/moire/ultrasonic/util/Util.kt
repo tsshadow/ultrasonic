@@ -27,6 +27,7 @@ import android.net.wifi.WifiManager.WifiLock
 import android.os.Build
 import android.os.Environment
 import android.text.TextUtils
+import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.inputmethod.InputMethodManager
@@ -665,6 +666,11 @@ object Util {
         }
         intent.putExtra(Constants.INTENT_SHOW_PLAYER, true)
         return PendingIntent.getActivity(context, 0, intent, flags)
+    }
+
+    fun dpToPx(dp: Int, activity: Activity): Int {
+        return (dp * (activity.resources.displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT))
+            .roundToInt()
     }
 
     private val connectivityManager: ConnectivityManager
