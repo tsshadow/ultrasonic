@@ -19,6 +19,8 @@ class FileLoggerTree : Timber.DebugTree() {
 
     /**
      * Writes a log entry to file
+     *
+     * TODO: This seems to be writing in the main thread. Should be done in background...
      */
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         var writer: FileWriter? = null
@@ -34,9 +36,9 @@ class FileLoggerTree : Timber.DebugTree() {
                 )
                 writer.flush()
             }
-        } catch (x: Throwable) {
+        } catch (all: Throwable) {
             // Using base class DebugTree here, we don't want to try to log this into file
-            super.log(6, TAG, String.format("Failed to write log to %s", file), x)
+            super.log(6, TAG, String.format("Failed to write log to %s", file), all)
         } finally {
             writer.safeClose()
         }
@@ -113,7 +115,9 @@ class FileLoggerTree : Timber.DebugTree() {
 
     companion object {
         val TAG = FileLoggerTree::class.simpleName
-        @Volatile private var file: File? = null
+
+        @Volatile
+        private var file: File? = null
         const val FILENAME = "ultrasonic.*.log"
         private val fileNameRegex = Regex(
             FILENAME.replace(".", "\\.").replace("*", "\\d*")

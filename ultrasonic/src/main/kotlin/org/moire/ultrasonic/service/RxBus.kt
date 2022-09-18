@@ -11,6 +11,11 @@ import org.moire.ultrasonic.domain.Track
 
 class RxBus {
 
+    /*
+    * TODO: mainThread() seems to be not equal to the "normal" main Thread, so it causes
+    * a lot of often unnecessary thread switching. It looks like observeOn can actually
+    * be removed in many cases
+    */
     companion object {
 
         private fun mainThread() = AndroidSchedulers.from(Looper.getMainLooper())
@@ -33,11 +38,11 @@ class RxBus {
         val playerStatePublisher: PublishSubject<StateWithTrack> =
             PublishSubject.create()
         val playerStateObservable: Observable<StateWithTrack> =
-            playerStatePublisher.observeOn(mainThread())
+            playerStatePublisher
                 .replay(1)
                 .autoConnect(0)
         val throttledPlayerStateObservable: Observable<StateWithTrack> =
-            playerStatePublisher.observeOn(mainThread())
+            playerStatePublisher
                 .replay(1)
                 .autoConnect(0)
                 .throttleLatest(300, TimeUnit.MILLISECONDS)
@@ -45,11 +50,11 @@ class RxBus {
         val playlistPublisher: PublishSubject<List<Track>> =
             PublishSubject.create()
         val playlistObservable: Observable<List<Track>> =
-            playlistPublisher.observeOn(mainThread())
+            playlistPublisher
                 .replay(1)
                 .autoConnect(0)
         val throttledPlaylistObservable: Observable<List<Track>> =
-            playlistPublisher.observeOn(mainThread())
+            playlistPublisher
                 .replay(1)
                 .autoConnect(0)
                 .throttleLatest(300, TimeUnit.MILLISECONDS)

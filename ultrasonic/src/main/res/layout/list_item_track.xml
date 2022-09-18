@@ -28,119 +28,104 @@
         a:layout_width="wrap_content"
         a:layout_height="0dp"
         a:layout_marginStart="4dp"
-        a:layout_marginEnd="4dp"
         a:checkMark="@drawable/btn_check_custom"
         a:gravity="center_vertical"
         a:paddingEnd="4dip"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/song_details"
         app:layout_constraintStart_toEndOf="@+id/song_drag"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        a:id="@+id/song_details"
+
+    <TextView
+        a:id="@+id/song_track"
+        a:layout_width="wrap_content"
+        a:layout_height="wrap_content"
+        a:layout_marginTop="8dp"
+        a:paddingEnd="6dip"
+        a:textAppearance="?android:attr/textAppearanceMedium"
+        a:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@+id/song_title"
+        app:layout_constraintStart_toEndOf="@+id/song_check"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Track"
+        tools:visibility="visible" />
+
+    <TextView
+        a:id="@+id/song_title"
         a:layout_width="0dp"
         a:layout_height="wrap_content"
-        a:layout_gravity="center_vertical"
-        a:layout_marginStart="4dp"
-        a:layout_marginEnd="4dp"
-        a:layout_weight="1"
+        a:layout_marginTop="8dp"
+        a:drawablePadding="4dip"
+        a:ellipsize="end"
+        a:paddingEnd="4dip"
+        a:singleLine="true"
+        a:textAppearance="?android:attr/textAppearanceMedium"
+        app:layout_constraintEnd_toStartOf="@id/barrier"
+        app:layout_constraintStart_toEndOf="@+id/song_track"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Title" />
+
+    <TextView
+        a:id="@+id/song_artist"
+        a:layout_width="0dp"
+        a:layout_height="wrap_content"
+        a:layout_marginBottom="10dp"
+        a:ellipsize="middle"
+        a:paddingStart="1dip"
+        a:paddingEnd="4dip"
+        a:singleLine="true"
+        a:textAppearance="?android:attr/textAppearanceSmall"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/barrier"
+        app:layout_constraintStart_toEndOf="@+id/song_check"
+        tools:text="Artist" />
+
+    <ImageView
+        a:id="@+id/song_status_image"
+        a:layout_width="25dp"
+        a:layout_height="0dp"
+        a:layout_marginTop="8dp"
+        a:layout_marginEnd="10dip"
+        a:importantForAccessibility="no"
+        app:layout_constraintBottom_toTopOf="@id/song_duration"
+        app:layout_constraintEnd_toEndOf="@id/star_barrier"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        a:id="@+id/song_status_progress"
+        a:layout_width="wrap_content"
+        a:layout_height="0dp"
+        a:layout_marginTop="8dp"
+        a:layout_marginEnd="10dip"
+        a:indeterminate="true"
+        app:indicatorColor="?attr/color_menu_selected"
+        app:indicatorSize="20dp"
+        app:layout_constraintBottom_toTopOf="@id/song_duration"
+        app:layout_constraintEnd_toEndOf="@id/star_barrier"
+        app:layout_constraintTop_toTopOf="parent"
+        app:trackColor="?attr/color_selected" />
+
+    <TextView
+        a:id="@+id/song_duration"
+        a:layout_width="wrap_content"
+        a:layout_height="wrap_content"
+        a:layout_marginBottom="10dp"
+        a:paddingStart="3dip"
+        a:paddingEnd="9dip"
+        a:singleLine="true"
+        a:textAppearance="?android:attr/textAppearanceSmall"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/star_barrier"
-        app:layout_constraintStart_toEndOf="@+id/song_check"
-        app:layout_constraintTop_toTopOf="parent">
+        tools:text="Duration" />
 
+    <androidx.constraintlayout.widget.Barrier
+        a:id="@+id/barrier"
+        a:layout_width="wrap_content"
+        a:layout_height="wrap_content"
+        app:barrierDirection="left"
+        app:constraint_referenced_ids="song_duration"
+        tools:layout_editor_absoluteX="289dp" />
 
-        <TextView
-            a:id="@+id/song_track"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:paddingEnd="6dip"
-            a:textAppearance="?android:attr/textAppearanceMedium"
-            a:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@+id/song_artist"
-            app:layout_constraintEnd_toStartOf="@+id/song_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:text="Track"
-            tools:visibility="visible" />
-
-        <TextView
-            a:id="@+id/song_title"
-            a:layout_width="0dp"
-            a:layout_height="wrap_content"
-            a:drawablePadding="4dip"
-            a:ellipsize="end"
-            a:paddingEnd="4dip"
-            a:singleLine="true"
-            a:textAppearance="?android:attr/textAppearanceMedium"
-            app:layout_constraintBottom_toTopOf="@+id/song_artist"
-            app:layout_constraintEnd_toStartOf="@+id/barrier"
-            app:layout_constraintStart_toEndOf="@+id/song_track"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:text="Title" />
-
-        <TextView
-            a:id="@+id/song_artist"
-            a:layout_width="0dp"
-            a:layout_height="wrap_content"
-            a:ellipsize="middle"
-            a:paddingStart="1dip"
-            a:paddingEnd="4dip"
-            a:singleLine="true"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/barrier"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="Artist" />
-
-        <ImageView
-            a:id="@+id/song_status_image"
-            a:layout_width="25dp"
-            a:layout_height="0dp"
-            a:layout_marginEnd="10dip"
-            app:layout_constraintTop_toTopOf="@id/song_details"
-            app:layout_constraintBottom_toTopOf="@id/song_duration"
-            app:layout_constraintEnd_toEndOf="parent"
-            a:importantForAccessibility="no" />
-
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            a:id="@+id/song_status_progress"
-            a:layout_width="wrap_content"
-            a:layout_height="0dp"
-            a:layout_marginEnd="10dip"
-            app:indicatorSize="20dp"
-            app:indicatorColor="?attr/color_menu_selected"
-            app:trackColor="?attr/color_selected"
-            app:layout_constraintTop_toTopOf="@id/song_details"
-            app:layout_constraintBottom_toTopOf="@id/song_duration"
-            app:layout_constraintEnd_toEndOf="parent"
-            a:indeterminate="true" />
-
-        <TextView
-            a:id="@+id/song_duration"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:paddingStart="3dip"
-            a:paddingEnd="9dip"
-            a:singleLine="true"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="Duration" />
-
-        <androidx.constraintlayout.widget.Barrier
-            a:id="@+id/barrier"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            app:barrierDirection="left"
-            app:constraint_referenced_ids="song_duration" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.Barrier
         a:id="@+id/star_barrier"
