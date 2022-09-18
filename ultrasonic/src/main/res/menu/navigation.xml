@@ -18,7 +18,7 @@
         <item
             a:id="@+id/searchFragment"
             a:checkable="true"
-            a:icon="@drawable/ic_menu_search_holo"
+            a:icon="@drawable/ic_menu_search"
             a:title="@string/button_bar.search" />
         <item
             a:id="@+id/playlistsFragment"

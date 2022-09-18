@@ -32,8 +32,8 @@
             android:layout_gravity="start"
             android:ellipsize="marquee"
             android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold" />
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            />
 
         <TextView
             android:id="@+id/now_playing_artist"
@@ -43,7 +43,7 @@
             android:ellipsize="end"
             android:scrollHorizontally="true"
             android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
     </LinearLayout>
 
     <Button
@@ -60,6 +60,6 @@
             android:scaleType="fitCenter"
             app:icon="@drawable/media_pause_normal"
             app:iconGravity="textTop"
-            app:iconSize="38dp" />
+            app:iconSize="42dp" />
 
 </LinearLayout>

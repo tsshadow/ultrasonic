@@ -45,7 +45,6 @@
         a:layout_gravity="start"
         a:fitsSystemWindows="true"
         a:background="?attr/color_menu_background"
-        a:theme="@style/ThemeOverlay.AppCompat.navTheme"
         app:headerLayout="@layout/navigation_header"
         app:menu="@menu/navigation" />
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-        Do not forget to match string ressources with constants
+        Do not forget to match string resources with constants
     -->
     <string translatable="false" name="preferences_key_theme_light">light</string>
     <string translatable="false" name="preferences_key_theme_dark">dark</string>
