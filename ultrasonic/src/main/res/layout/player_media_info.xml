@@ -1,102 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:a="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:a="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     a:id="@+id/download_button_bar_flipper"
     a:layout_width="fill_parent"
     a:layout_height="wrap_content"
-    a:layout_marginTop="10dp"
     a:layout_marginStart="12dp"
-    a:layout_marginEnd="12dp" >
+    a:layout_marginTop="10dp"
+    a:layout_marginEnd="12dp">
 
-    <LinearLayout
+
+    <TextView
+        a:id="@+id/current_playing_song"
         a:layout_width="wrap_content"
         a:layout_height="wrap_content"
-        a:layout_alignParentLeft="true"
-        a:orientation="vertical">
+        a:ellipsize="marquee"
+        a:gravity="left"
+        a:paddingRight="30dip"
+        a:singleLine="true"
+        a:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Title" />
 
-        <TextView
-            a:id="@+id/current_playing_song"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:layout_marginEnd="10dip"
-            a:ellipsize="marquee"
-            a:gravity="left"
-            a:paddingRight="30dip"
-            a:singleLine="true"
-            a:textAppearance="?android:attr/textAppearanceLarge"
-            a:textStyle="bold"
-            tools:text="Title" />
-
-        <TextView
-            a:id="@+id/current_playing_artist"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:ellipsize="marquee"
-            a:gravity="left"
-            a:singleLine="true"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            tools:text="Artist" />
-
-        <TextView
-            a:id="@+id/current_playing_album"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:ellipsize="start"
-            a:gravity="right"
-            a:singleLine="true"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            tools:text="Album" />
-
-        <TextView
-            a:id="@+id/current_playing_genre"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:ellipsize="start"
-            a:gravity="right"
-            a:singleLine="true"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            tools:text="Genre" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <TextView
+        a:id="@+id/current_playing_artist"
         a:layout_width="wrap_content"
         a:layout_height="wrap_content"
-        a:layout_alignParentRight="true"
-        a:layout_centerVertical="true"
+        a:ellipsize="marquee"
+        a:gravity="left"
+        a:singleLine="true"
+        a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/current_playing_song"
+        tools:text="Artist" />
+
+    <TextView
+        a:id="@+id/current_playing_album"
+        a:layout_width="wrap_content"
+        a:layout_height="wrap_content"
+        a:ellipsize="start"
         a:gravity="right"
-        a:orientation="vertical"
-        tools:ignore="RelativeOverlap">
+        a:singleLine="true"
+        a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        app:layout_constraintStart_toStartOf="@+id/current_playing_artist"
+        app:layout_constraintTop_toBottomOf="@+id/current_playing_artist"
+        tools:text="Album" />
 
-        <TextView
-            a:id="@+id/current_playing_track"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:ellipsize="start"
-            a:gravity="right"
-            a:text="0 / 0"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            tools:ignore="HardcodedText" />
+    <TextView
+        a:id="@+id/current_playing_genre"
+        a:layout_width="wrap_content"
+        a:layout_height="wrap_content"
+        a:ellipsize="start"
+        a:gravity="right"
+        a:singleLine="true"
+        a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        app:layout_constraintStart_toStartOf="@+id/current_playing_album"
+        app:layout_constraintTop_toBottomOf="@+id/current_playing_album"
+        tools:text="Genre" />
 
-        <TextView
-            a:id="@+id/current_total_duration"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:ellipsize="start"
-            a:gravity="right"
-            a:text="@string/util.no_time"
-            a:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            a:id="@+id/current_playing_bitrate_format"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:ellipsize="start"
-            a:gravity="right"
-            a:singleLine="true"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            tools:text="Details" />
+    <TextView
+        a:id="@+id/current_playing_track"
+        a:layout_width="wrap_content"
+        a:layout_height="wrap_content"
+        a:ellipsize="start"
+        a:gravity="right"
+        a:text="0 / 0"
+        a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/current_playing_song"
+        tools:ignore="HardcodedText" />
 
-    </LinearLayout>
+    <TextView
+        a:id="@+id/current_total_duration"
+        a:layout_width="wrap_content"
+        a:layout_height="wrap_content"
+        a:ellipsize="start"
+        a:gravity="right"
+        a:text="@string/util.no_time"
+        a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/current_playing_track" />
 
-</RelativeLayout>
+    <TextView
+        a:id="@+id/current_playing_bitrate_format"
+        a:layout_width="wrap_content"
+        a:layout_height="wrap_content"
+        a:ellipsize="start"
+        a:gravity="right"
+        a:singleLine="true"
+        a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/current_total_duration"
+        tools:text="Details" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

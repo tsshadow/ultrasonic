@@ -9,12 +9,11 @@
         a:text="@string/search.artists"
         a:layout_width="fill_parent"
         a:layout_height="wrap_content"
-        a:textAppearance="?android:attr/textAppearanceSmall"
-        a:textColor="#EFEFEF"
-        a:textStyle="bold"
-        a:background="#ff555555"
         a:gravity="center_vertical"
-        a:paddingStart="4dp"/>
-
+        a:paddingStart="6dp"
+        a:textAllCaps="true"
+        a:textAppearance="?android:attr/textAppearanceSmall"
+        a:textColor="?attr/colorPrimary"
+        a:textStyle="bold" />
 </LinearLayout>
 

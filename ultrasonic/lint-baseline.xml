@@ -2,17 +2,6 @@
 <issues format="6" by="lint 7.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.2)" variant="all" version="7.2.2">
 
     <issue
-        id="InflateParams"
-        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
-        errorLine1="            val view = inflater.inflate(R.layout.jukebox_volume, null)"
-        errorLine2="                                                                 ~~~~">
-        <location
-            file="src/main/kotlin/org/moire/ultrasonic/service/JukeboxMediaPlayer.kt"
-            line="331"
-            column="66"/>
-    </issue>
-
-    <issue
         id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;tracks&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;select_album.n_selected&quot;>%d tracks selected&lt;/string>"
@@ -55,7 +44,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="155"
+            line="164"
             column="10"/>
     </issue>
 
@@ -66,7 +55,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="160"
+            line="169"
             column="10"/>
     </issue>
 
@@ -77,7 +66,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="79"
+            line="88"
             column="10"/>
     </issue>
 
@@ -88,7 +77,7 @@
         errorLine2="         ~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="68"
+            line="77"
             column="10"/>
     </issue>
 
@@ -116,7 +105,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/NoActionBar`)"
+        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/Theme.Material3.DynamicColors.Dark`)"
         errorLine1="    a:background=&quot;@drawable/appwidget_dark_bg_trans&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -127,7 +116,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/NoActionBar`)"
+        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/Theme.Material3.DynamicColors.Dark`)"
         errorLine1="    a:background=&quot;@drawable/appwidget_dark_bg_trans&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -138,7 +127,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/NoActionBar`)"
+        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/Theme.Material3.DynamicColors.Dark`)"
         errorLine1="    a:background=&quot;@drawable/appwidget_dark_bg_trans&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -149,7 +138,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/NoActionBar`)"
+        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/Theme.Material3.DynamicColors.Dark`)"
         errorLine1="    a:background=&quot;@drawable/appwidget_dark_bg_trans&quot; >"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location

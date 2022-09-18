@@ -43,16 +43,6 @@ object Utils {
         lateinit var playingImage: Drawable
         var theme: String
 
-        fun rebuild(context: Context, force: Boolean = false) {
-            val currentTheme = Settings.theme
-            val themesMatch = theme == currentTheme
-            if (!themesMatch) theme = currentTheme
-
-            if (!themesMatch || force) {
-                getDrawables(context)
-            }
-        }
-
         init {
             theme = Settings.theme
             getDrawables(context)
