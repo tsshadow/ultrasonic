@@ -11,13 +11,12 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.AsyncDifferConfig
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.AsyncListDiffer.ListListener
 import androidx.recyclerview.widget.DiffUtil
 import com.drakeet.multitype.MultiTypeAdapter
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.util.BoundedTreeSet
+import org.moire.ultrasonic.util.SettableAsyncListDiffer
 import timber.log.Timber
 
 /**
@@ -59,21 +58,31 @@ class BaseAdapter<T : Identifiable> : MultiTypeAdapter(), FastScrollRecyclerView
             throw IllegalAccessException("You must use submitList() to add data to the Adapter")
         }
 
-    private var mDiffer: AsyncListDiffer<T> = AsyncListDiffer(
+    private var mDiffer: SettableAsyncListDiffer<T> = SettableAsyncListDiffer(
         AdapterListUpdateCallback(this),
         AsyncDifferConfig.Builder(diffCallback).build()
     )
 
-    private val mListener =
-        ListListener<T> { previousList, currentList ->
-            this@BaseAdapter.onCurrentListChanged(
-                previousList,
-                currentList
-            )
+    private val mListener: SettableAsyncListDiffer.ListListener<T> =
+        object : SettableAsyncListDiffer.ListListener<T> {
+            override fun onCurrentListChanged(previousList: List<T>, currentList: List<T>) {
+                this@BaseAdapter.onCurrentListChanged(
+                    previousList,
+                    currentList
+                )
+            }
         }
 
     init {
         mDiffer.addListListener(mListener)
+    }
+
+    /**
+     * Sets the List to a new value without invoking the diffing
+     */
+    fun setList(newList: List<T>) {
+        Timber.v("SetList updated list in differ, size %s", newList.size)
+        mDiffer.setList(newList)
     }
 
     /**
