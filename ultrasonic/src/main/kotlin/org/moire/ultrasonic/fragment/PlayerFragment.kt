@@ -869,18 +869,21 @@ class PlayerFragment :
                 val from = viewHolder.bindingAdapterPosition
                 val to = target.bindingAdapterPosition
 
-                Timber.i("MOVING from %d to %d", from, to)
-                val newList = viewAdapter.getCurrentList().toMutableList()
+                // The item must be moved manually in the viewAdapter, because it must be
+                // moved synchronously, before this function returns. AsyncListDiffer would execute
+                // the move too late
+                val items = viewAdapter.getCurrentList().toMutableList()
                 if (from < to) {
                     for (i in from until to) {
-                        Collections.swap(newList, i, i + 1)
+                        Collections.swap(items, i, i + 1)
                     }
                 } else {
                     for (i in from downTo to + 1) {
-                        Collections.swap(newList, i, i - 1)
+                        Collections.swap(items, i, i - 1)
                     }
                 }
-                viewAdapter.submitList(newList)
+                viewAdapter.setList(items)
+                viewAdapter.notifyItemMoved(from, to)
                 endPosition = to
 
                 // When the user moves an item, onMove may be called many times quickly,
@@ -896,7 +899,12 @@ class PlayerFragment :
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val pos = viewHolder.bindingAdapterPosition
                 val item = mediaPlayerController.getMediaItemAt(pos)
-                mediaPlayerController.removeFromPlaylist(pos)
+
+                // Remove the item from the list quickly
+                val items = viewAdapter.getCurrentList().toMutableList()
+                items.removeAt(pos)
+                viewAdapter.setList(items)
+                viewAdapter.notifyItemRemoved(pos)
 
                 val songRemoved = String.format(
                     resources.getString(R.string.download_song_removed),
@@ -904,6 +912,9 @@ class PlayerFragment :
                 )
 
                 Util.toast(context, songRemoved)
+
+                // Remove the item from the playlist
+                mediaPlayerController.removeFromPlaylist(pos)
             }
 
             override fun onSelectedChanged(
