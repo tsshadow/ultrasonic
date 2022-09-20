@@ -37,8 +37,8 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.TrackCollectionModel
-import org.moire.ultrasonic.service.DownloadStatus
-import org.moire.ultrasonic.service.Downloader
+import org.moire.ultrasonic.service.DownloadService
+import org.moire.ultrasonic.service.DownloadState
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
@@ -80,7 +80,6 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
     private var shareButton: MenuItem? = null
 
     internal val mediaPlayerController: MediaPlayerController by inject()
-    internal val downloader: Downloader by inject()
     private val networkAndStorageChecker: NetworkAndStorageChecker by inject()
     private val shareHandler: ShareHandler by inject()
     internal var cancellationToken: CancellationToken? = null
@@ -375,29 +374,23 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         var unpinEnabled = false
         var deleteEnabled = false
         var downloadEnabled = false
-        var isNotInProgress = true
         val multipleSelection = viewAdapter.hasMultipleSelection()
 
         var pinnedCount = 0
 
         for (song in selection) {
-            val state = downloader.getDownloadState(song)
+            val state = DownloadService.getDownloadState(song)
             when (state) {
-                DownloadStatus.DONE -> {
+                DownloadState.DONE -> {
                     deleteEnabled = true
                 }
-                DownloadStatus.PINNED -> {
+                DownloadState.PINNED -> {
                     deleteEnabled = true
                     pinnedCount++
                     unpinEnabled = true
                 }
-                DownloadStatus.IDLE, DownloadStatus.FAILED -> {
+                DownloadState.IDLE, DownloadState.FAILED -> {
                     downloadEnabled = true
-                }
-                DownloadStatus.DOWNLOADING,
-                DownloadStatus.QUEUED,
-                DownloadStatus.RETRYING -> {
-                    isNotInProgress = false
                 }
                 else -> {}
             }
@@ -406,11 +399,10 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         playNowButton?.isVisible = enabled
         playNextButton?.isVisible = enabled && multipleSelection
         playLastButton?.isVisible = enabled && multipleSelection
-        pinButton?.isVisible =
-            isNotInProgress && enabled && !isOffline() && selection.size > pinnedCount
-        unpinButton?.isVisible = isNotInProgress && enabled && unpinEnabled
-        downloadButton?.isVisible = isNotInProgress && enabled && downloadEnabled && !isOffline()
-        deleteButton?.isVisible = isNotInProgress && enabled && deleteEnabled
+        pinButton?.isVisible = enabled && !isOffline() && selection.size > pinnedCount
+        unpinButton?.isVisible = enabled && unpinEnabled
+        downloadButton?.isVisible = enabled && downloadEnabled && !isOffline()
+        deleteButton?.isVisible = enabled && deleteEnabled
     }
 
     private fun downloadBackground(save: Boolean) {

@@ -14,12 +14,11 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
-import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.TrackViewBinder
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.model.GenericListModel
-import org.moire.ultrasonic.service.Downloader
+import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.util.Util
 
 /**
@@ -82,9 +81,7 @@ class DownloadsFragment : MultiListFragment<Track>() {
 }
 
 class DownloadListModel(application: Application) : GenericListModel(application) {
-    private val downloader by inject<Downloader>()
-
     fun getList(): LiveData<List<Track>> {
-        return downloader.observableDownloads
+        return DownloadService.observableDownloads
     }
 }

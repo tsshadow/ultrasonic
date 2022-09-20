@@ -13,12 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.service.DownloadStatus
-import org.moire.ultrasonic.service.Downloader
+import org.moire.ultrasonic.service.DownloadService
+import org.moire.ultrasonic.service.DownloadState
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
@@ -33,8 +32,6 @@ const val INDICATOR_THICKNESS_DEFINITE = 10
  * Used to display songs and videos in a `ListView`.
  */
 class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable, KoinComponent {
-
-    private val downloader: Downloader by inject()
 
     var entry: Track? = null
         private set
@@ -61,7 +58,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         }
 
     private var isMaximized = false
-    private var cachedStatus = DownloadStatus.UNKNOWN
+    private var cachedStatus = DownloadState.UNKNOWN
     private var isPlayingCached = false
 
     private var rxBusSubscription: CompositeDisposable? = null
@@ -98,7 +95,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
             setupStarButtons(song, useFiveStarRating)
         }
 
-        updateStatus(downloader.getDownloadState(song), null)
+        updateStatus(DownloadService.getDownloadState(song), null)
 
         if (useFiveStarRating) {
             setFiveStars(entry?.userRating ?: 0)
@@ -209,31 +206,32 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         }
     }
 
-    private fun updateStatus(status: DownloadStatus, progress: Int?) {
+    private fun updateStatus(status: DownloadState, progress: Int?) {
         progressIndicator.progress = progress ?: 0
 
         if (status == cachedStatus) return
         cachedStatus = status
 
         when (status) {
-            DownloadStatus.DONE -> {
+            DownloadState.DONE -> {
                 showStatusImage(imageHelper.downloadedImage)
             }
-            DownloadStatus.PINNED -> {
+            DownloadState.PINNED -> {
                 showStatusImage(imageHelper.pinImage)
             }
-            DownloadStatus.FAILED,
-            DownloadStatus.CANCELLED -> {
+            DownloadState.FAILED -> {
                 showStatusImage(imageHelper.errorImage)
             }
-            DownloadStatus.DOWNLOADING -> {
+            DownloadState.DOWNLOADING -> {
                 showProgress()
             }
-            DownloadStatus.RETRYING,
-            DownloadStatus.QUEUED -> {
+            DownloadState.RETRYING,
+            DownloadState.QUEUED -> {
                 showIndefiniteProgress()
             }
             else -> {
+                // This handles CANCELLED too.
+                // Usually it means no error, just that the track wasn't downloaded
                 showStatusImage(null)
             }
         }

@@ -33,6 +33,10 @@ import android.view.Gravity
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.AnyRes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import java.io.Closeable
 import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
@@ -654,6 +658,27 @@ object Util {
             bitrate = bitRate,
             fileFormat = fileFormat,
         )
+    }
+
+    fun getPlayListFromTimeline(
+        timeline: Timeline?,
+        shuffle: Boolean,
+        firstIndex: Int? = null,
+        count: Int? = null
+    ): List<MediaItem> {
+        if (timeline == null) return emptyList()
+        if (timeline.windowCount < 1) return emptyList()
+
+        val playlist: MutableList<MediaItem> = mutableListOf()
+        var i = firstIndex ?: timeline.getFirstWindowIndex(false)
+        if (i == C.INDEX_UNSET) return emptyList()
+
+        while (i != C.INDEX_UNSET && (count != playlist.count())) {
+            val window = timeline.getWindow(i, Timeline.Window())
+            playlist.add(window.mediaItem)
+            i = timeline.getNextWindowIndex(i, Player.REPEAT_MODE_OFF, shuffle)
+        }
+        return playlist
     }
 
     fun getPendingIntentToShowPlayer(context: Context): PendingIntent {

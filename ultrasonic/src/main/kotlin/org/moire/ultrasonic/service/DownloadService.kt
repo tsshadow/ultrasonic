@@ -12,19 +12,39 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.net.wifi.WifiManager
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
-import android.support.v4.media.session.MediaSessionCompat
+import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import java.util.concurrent.Semaphore
-import java.util.concurrent.TimeUnit
-import org.koin.android.ext.android.inject
+import androidx.lifecycle.MutableLiveData
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
+import com.google.common.util.concurrent.SettableFuture
+import java.util.PriorityQueue
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
+import org.moire.ultrasonic.domain.Track
+import org.moire.ultrasonic.service.DownloadState.Companion.isFinalState
+import org.moire.ultrasonic.util.FileUtil
+import org.moire.ultrasonic.util.FileUtil.getCompleteFile
+import org.moire.ultrasonic.util.FileUtil.getPartialFile
+import org.moire.ultrasonic.util.FileUtil.getPinnedFile
+import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.SimpleServiceBinder
+import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.Util
 import timber.log.Timber
+
+private const val NOTIFICATION_CHANNEL_ID = "org.moire.ultrasonic"
+private const val NOTIFICATION_CHANNEL_NAME = "Ultrasonic background service"
+private const val NOTIFICATION_ID = 3033
+
+private const val CHECK_INTERVAL = 5000L
 
 /**
  * Android Foreground service which is used to download tracks even when the app is not visible
@@ -34,14 +54,14 @@ import timber.log.Timber
  *
  * TODO: Migrate this to use the Media3 DownloadHelper
  */
-class DownloadService : Service() {
+class DownloadService : Service(), KoinComponent {
+    private val storageMonitor: ExternalStorageMonitor by inject()
     private val binder: IBinder = SimpleServiceBinder(this)
 
-    private val downloader by inject<Downloader>()
-
-    private var mediaSession: MediaSessionCompat? = null
-
     private var isInForeground = false
+    private var wifiLock: WifiManager.WifiLock? = null
+    private var isShuttingDown = false
+    private var retrying = false
 
     override fun onBind(intent: Intent): IBinder {
         return binder
@@ -54,9 +74,13 @@ class DownloadService : Service() {
         createNotificationChannel()
         updateNotification()
 
-        instance = this
-        startedSemaphore.release()
-        Timber.i("DownloadService initiated")
+        if (wifiLock == null) {
+            wifiLock = Util.createWifiLock(toString())
+            wifiLock?.acquire()
+        }
+
+        startFuture?.set(this)
+        Timber.i("DownloadService created")
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -66,22 +90,116 @@ class DownloadService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        instance = null
-        try {
-            downloader.stop()
+        startFuture = null
 
-            mediaSession?.release()
-            mediaSession = null
-        } catch (ignored: Throwable) {
-        }
+        isShuttingDown = true
+        isInForeground = false
+        stopForeground(true)
+
+        wifiLock?.release()
+        wifiLock = null
+
+        clearDownloads()
+        observableDownloads.value = listOf()
+
         Timber.i("DownloadService destroyed")
     }
 
-    fun notifyDownloaderStopped() {
-        Timber.i("DownloadService stopped")
-        isInForeground = false
-        stopForeground(true)
-        stopSelf()
+    fun addTracks(tracks: List<DownloadableTrack>) {
+        downloadQueue.addAll(tracks)
+        tracks.forEach { postState(it.track, DownloadState.QUEUED) }
+        processNextTracks()
+    }
+
+    private fun processNextTracks() {
+        retrying = false
+        if (
+            !Util.isNetworkConnected() ||
+            !Util.isExternalStoragePresent() ||
+            !storageMonitor.isExternalStorageAvailable
+        ) {
+            retryProcessNextTracks()
+            return
+        }
+
+        Timber.v("DownloadService processNextTracks checking downloads")
+        var listChanged = false
+
+        // Fill up active List with waiting tasks
+        while (activelyDownloading.size < Settings.parallelDownloads && downloadQueue.size > 0) {
+            val task = downloadQueue.remove()
+            val downloadTask = DownloadTask(task) { downloadableTrack, downloadState, progress ->
+                downloadStateChangedCallback(downloadableTrack, downloadState, progress)
+            }
+            activelyDownloading[task] = downloadTask
+            FileUtil.createDirectoryForParent(task.pinnedFile)
+            activelyDownloading[task]?.start()
+
+            listChanged = true
+        }
+
+        // Stop Executor service when done downloading
+        if (activelyDownloading.isEmpty()) {
+            stopSelf()
+        }
+
+        if (listChanged) {
+            updateLiveData()
+        }
+    }
+
+    private fun retryProcessNextTracks() {
+        if (isShuttingDown || retrying) return
+        retrying = true
+        Handler(Looper.getMainLooper()).postDelayed(
+            { if (retrying) processNextTracks() },
+            CHECK_INTERVAL
+        )
+    }
+
+    private fun downloadStateChangedCallback(
+        item: DownloadableTrack,
+        downloadState: DownloadState,
+        progress: Int?
+    ) {
+        postState(item.track, downloadState, progress)
+
+        if (downloadState.isFinalState()) {
+            activelyDownloading.remove(item)
+            processNextTracks()
+        }
+
+        when (downloadState) {
+            DownloadState.FAILED -> {
+                downloadQueue.remove(item)
+                failedList.add(item)
+            }
+            DownloadState.RETRYING -> {
+                item.tryCount++
+                downloadQueue.add(item)
+            }
+            else -> {}
+        }
+    }
+
+    private fun updateLiveData() {
+        val temp: MutableList<Track> = ArrayList()
+        temp.addAll(activelyDownloading.keys.map { x -> x.track })
+        temp.addAll(downloadQueue.map { x -> x.track })
+        observableDownloads.postValue(temp.distinct().sorted())
+    }
+
+    private fun clearDownloads() {
+        // Clear the pending queue
+        while (!downloadQueue.isEmpty()) {
+            postState(downloadQueue.remove().track, DownloadState.IDLE)
+        }
+        // Cancel all active downloads
+        for (download in activelyDownloading) {
+            download.value.cancel()
+        }
+        activelyDownloading.clear()
+        updateLiveData()
     }
 
     private fun createNotificationChannel() {
@@ -143,75 +261,170 @@ class DownloadService : Service() {
      */
     @Suppress("SpreadOperator")
     private fun buildForegroundNotification(): Notification {
-
-        if (downloader.started) {
-            // No song is playing, but Ultrasonic is downloading files
-            notificationBuilder.setContentTitle(
-                getString(R.string.notification_downloading_title)
-            )
-        }
-
+        notificationBuilder.setContentTitle(getString(R.string.notification_downloading_title))
         return notificationBuilder.build()
     }
 
     @Suppress("MagicNumber")
     companion object {
 
-        private const val NOTIFICATION_CHANNEL_ID = "org.moire.ultrasonic"
-        private const val NOTIFICATION_CHANNEL_NAME = "Ultrasonic background service"
-        private const val NOTIFICATION_ID = 3033
+        private var startFuture: SettableFuture<DownloadService>? = null
 
-        @Volatile
-        private var instance: DownloadService? = null
-        private val instanceLock = Any()
-        private val startedSemaphore: Semaphore = Semaphore(0)
+        private val downloadQueue = PriorityQueue<DownloadableTrack>()
+        private val activelyDownloading = mutableMapOf<DownloadableTrack, DownloadTask>()
+        private val failedList = mutableListOf<DownloadableTrack>()
 
-        @JvmStatic
-        fun getInstance(): DownloadService? {
-            val context = UApp.applicationContext()
-            if (instance != null) return instance
-            synchronized(instanceLock) {
-                if (instance != null) return instance
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(
-                        Intent(context, DownloadService::class.java)
-                    )
-                } else {
-                    context.startService(Intent(context, DownloadService::class.java))
-                }
-                Timber.i("DownloadService starting...")
-                if (startedSemaphore.tryAcquire(10, TimeUnit.SECONDS)) {
-                    Timber.i("DownloadService started")
-                    return instance
-                }
-                Timber.w("DownloadService failed to start!")
-                return null
-            }
-        }
+        // The generic list models expect a LiveData, so even though we are using Rx for many events
+        // surrounding playback the list of Downloads is published as LiveData.
+        val observableDownloads = MutableLiveData<List<Track>>()
 
-        @JvmStatic
-        val runningInstance: DownloadService?
-            get() {
-                synchronized(instanceLock) { return instance }
-            }
+        private var backgroundPriorityCounter = 100
 
-        @JvmStatic
-        fun executeOnStartedDownloadService(
-            taskToExecute: (DownloadService) -> Unit
+        fun download(
+            tracks: List<Track>,
+            save: Boolean,
+            isHighPriority: Boolean = false
         ) {
-
-            val t: Thread = object : Thread() {
-                override fun run() {
-                    val instance = getInstance()
-                    if (instance == null) {
-                        Timber.e("ExecuteOnStarted.. failed to get a DownloadService instance!")
-                        return
-                    } else {
-                        taskToExecute(instance)
+            // First handle and filter out those tracks that are already completed
+            var filteredTracks: List<Track>
+            if (save) {
+                tracks.filter { Storage.isPathExists(it.getCompleteFile()) }.forEach { track ->
+                    Storage.getFromPath(track.getCompleteFile())?.let {
+                        Storage.rename(it, track.getPinnedFile())
+                        postState(track, DownloadState.PINNED)
                     }
                 }
+                filteredTracks = tracks.filter { !Storage.isPathExists(it.getPinnedFile()) }
+            } else {
+                tracks.filter { Storage.isPathExists(it.getPinnedFile()) }.forEach { track ->
+                    Storage.getFromPath(track.getPinnedFile())?.let {
+                        Storage.rename(it, track.getCompleteFile())
+                        postState(track, DownloadState.DONE)
+                    }
+                }
+                filteredTracks = tracks.filter { !Storage.isPathExists(it.getCompleteFile()) }
             }
-            t.start()
+
+            // Update Pinned flag of items in progress
+            downloadQueue.filter { item -> tracks.any { it.id == item.id } }
+                .forEach { it.pinned = save }
+            activelyDownloading.filter { item -> tracks.any { it.id == item.key.id } }
+                .forEach { it.key.pinned = save }
+            failedList.filter { item -> tracks.any { it.id == item.id } }
+                .forEach { it.pinned = save }
+
+            filteredTracks = filteredTracks.filter {
+                !downloadQueue.any { t ->
+                    t.track.id == it.id
+                } && !activelyDownloading.any { t ->
+                    t.key.track.id == it.id
+                }
+            }
+
+            // The remainder tracks should be added to the download queue
+            // By using the counter we ensure that the songs are added in the correct order
+            var priority = 0
+            val tracksToDownload =
+                filteredTracks.map {
+                    DownloadableTrack(
+                        it,
+                        save,
+                        0,
+                        if (isHighPriority) priority++ else backgroundPriorityCounter++
+                    )
+                }
+
+            if (tracksToDownload.isNotEmpty()) addTracks(tracksToDownload)
+        }
+
+        fun requestStop() {
+            val context = UApp.applicationContext()
+            val intent = Intent(context, DownloadService::class.java)
+            context.stopService(intent)
+            failedList.clear()
+        }
+
+        fun delete(track: Track) {
+
+            downloadQueue.singleOrNull { it.id == track.id }?.let { downloadQueue.remove(it) }
+            failedList.singleOrNull { it.id == track.id }?.let { downloadQueue.remove(it) }
+            cancelDownload(track)
+
+            Storage.delete(track.getPartialFile())
+            Storage.delete(track.getCompleteFile())
+            Storage.delete(track.getPinnedFile())
+            postState(track, DownloadState.IDLE)
+            Util.scanMedia(track.getPinnedFile())
+        }
+
+        fun unpin(track: Track) {
+            // Update Pinned flag of items in progress
+            downloadQueue.singleOrNull { it.id == track.id }?.pinned = false
+            activelyDownloading.keys.singleOrNull { it.id == track.id }?.pinned = false
+            failedList.singleOrNull { it.id == track.id }?.pinned = false
+
+            val pinnedFile = track.getPinnedFile()
+            if (!Storage.isPathExists(pinnedFile)) return
+            val file = Storage.getFromPath(track.getPinnedFile()) ?: return
+            Storage.rename(file, track.getCompleteFile())
+            postState(track, DownloadState.DONE)
+        }
+
+        @Suppress("ReturnCount")
+        fun getDownloadState(track: Track): DownloadState {
+            if (Storage.isPathExists(track.getCompleteFile())) return DownloadState.DONE
+            if (Storage.isPathExists(track.getPinnedFile())) return DownloadState.PINNED
+            if (activelyDownloading.any { it.key.id == track.id }) return DownloadState.QUEUED
+            if (downloadQueue.any { it.id == track.id }) return DownloadState.QUEUED
+
+            val key = activelyDownloading.keys.firstOrNull { it.track.id == track.id }
+            if (key != null) {
+                if (key.tryCount > 0) return DownloadState.RETRYING
+                return DownloadState.DOWNLOADING
+            }
+            if (failedList.any { it.track.id == track.id }) return DownloadState.FAILED
+            return DownloadState.IDLE
+        }
+
+        private fun addTracks(tracks: List<DownloadableTrack>) {
+            val serviceFuture = startFuture ?: requestStart()
+            serviceFuture.addListener({
+                val service = serviceFuture.get()
+                service.addTracks(tracks)
+                Timber.i("Added tracks to DownloadService")
+            }, MoreExecutors.directExecutor())
+        }
+
+        private fun cancelDownload(track: Track) {
+            val key = activelyDownloading.keys.singleOrNull { it.track.id == track.id } ?: return
+            activelyDownloading[key]?.cancel()
+        }
+
+        private fun postState(track: Track, state: DownloadState, progress: Int? = null) {
+            RxBus.trackDownloadStatePublisher.onNext(
+                RxBus.TrackDownloadState(
+                    track.id,
+                    state,
+                    progress
+                )
+            )
+        }
+
+        private fun requestStart(): ListenableFuture<DownloadService> {
+            val future = SettableFuture.create<DownloadService>()
+            startFuture = future
+            startService()
+            return future
+        }
+
+        private fun startService() {
+            val context = UApp.applicationContext()
+            val intent = Intent(context, DownloadService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
         }
     }
 }
