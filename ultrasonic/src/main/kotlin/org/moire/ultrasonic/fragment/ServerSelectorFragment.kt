@@ -17,6 +17,7 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
 import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.model.ServerSettingsModel
+import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.util.ErrorDialog
 import org.moire.ultrasonic.util.Util
@@ -101,7 +102,7 @@ class ServerSelectorFragment : Fragment() {
         // If we are coming from offline there is no need to clear downloads etc.
         if (oldId != OFFLINE_DB_ID) {
             controller.removeIncompleteTracksFromPlaylist()
-            controller.clearDownloads()
+            DownloadService.requestStop()
         }
 
         ActiveServerProvider.setActiveServerById(id)

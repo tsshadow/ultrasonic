@@ -8,7 +8,6 @@ package org.moire.ultrasonic.service
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
@@ -18,7 +17,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
-import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionResult
@@ -62,7 +60,6 @@ private const val VOLUME_DELTA = 0.05f
 class MediaPlayerController(
     private val playbackStateSerializer: PlaybackStateSerializer,
     private val externalStorageMonitor: ExternalStorageMonitor,
-    private val downloader: Downloader,
     val context: Context
 ) : KoinComponent {
     private val activeServerProvider: ActiveServerProvider by inject()
@@ -205,23 +202,6 @@ class MediaPlayerController(
         Timber.i("MediaPlayerController started")
     }
 
-    fun onDestroy() {
-        if (!created) return
-
-        // First stop listening to events
-        rxBusSubscription.dispose()
-        controller?.removeListener(listeners)
-        releaseController()
-
-        // Shutdown the rest
-        val context = UApp.applicationContext()
-        externalStorageMonitor.onDestroy()
-        context.stopService(Intent(context, DownloadService::class.java))
-        downloader.onDestroy()
-        created = false
-        Timber.i("MediaPlayerController destroyed")
-    }
-
     private fun playerStateChangedHandler() {
         val currentPlaying = controller?.currentMediaItem?.toTrack() ?: return
 
@@ -274,6 +254,20 @@ class MediaPlayerController(
         UltrasonicAppWidgetProvider4X2.instance?.notifyChange(context, song, isPlaying, true)
         UltrasonicAppWidgetProvider4X3.instance?.notifyChange(context, song, isPlaying, true)
         UltrasonicAppWidgetProvider4X4.instance?.notifyChange(context, song, isPlaying, true)
+    }
+
+    fun onDestroy() {
+        if (!created) return
+
+        // First stop listening to events
+        rxBusSubscription.dispose()
+        releaseController()
+
+        // Shutdown the rest
+        externalStorageMonitor.onDestroy()
+        DownloadService.requestStop()
+        created = false
+        Timber.i("MediaPlayerController destroyed")
     }
 
     @Synchronized
@@ -413,7 +407,7 @@ class MediaPlayerController(
     fun downloadBackground(songs: List<Track?>?, save: Boolean) {
         if (songs == null) return
         val filteredSongs = songs.filterNotNull()
-        downloader.downloadBackground(filteredSongs, save)
+        DownloadService.download(filteredSongs, save)
     }
 
     @set:Synchronized
@@ -421,8 +415,6 @@ class MediaPlayerController(
         get() = controller?.shuffleModeEnabled == true
         set(enabled) {
             controller?.shuffleModeEnabled = enabled
-            // Changing Shuffle may change the playlist, so the next tracks may need to be downloaded
-            downloader.checkDownloads()
         }
 
     @Synchronized
@@ -460,20 +452,14 @@ class MediaPlayerController(
     }
 
     @Synchronized
-    fun clearDownloads() {
-        downloader.clearActiveDownloads()
-        downloader.clearBackground()
-    }
-
-    @Synchronized
     fun removeIncompleteTracksFromPlaylist() {
         val list = playlist.toList()
         var removed = 0
         for ((index, item) in list.withIndex()) {
-            val state = downloader.getDownloadState(item.toTrack())
+            val state = DownloadService.getDownloadState(item.toTrack())
 
             // The track is not downloaded, remove it
-            if (state != DownloadStatus.DONE && state != DownloadStatus.PINNED) {
+            if (state != DownloadState.DONE && state != DownloadState.PINNED) {
                 removeFromPlaylist(index - removed)
                 removed++
             }
@@ -503,7 +489,7 @@ class MediaPlayerController(
     // TODO: Make it require not null
     fun delete(tracks: List<Track?>) {
         for (track in tracks.filterNotNull()) {
-            downloader.delete(track)
+            DownloadService.delete(track)
         }
     }
 
@@ -511,7 +497,7 @@ class MediaPlayerController(
     // TODO: Make it require not null
     fun unpin(tracks: List<Track?>) {
         for (track in tracks.filterNotNull()) {
-            downloader.unpin(track)
+            DownloadService.unpin(track)
         }
     }
 
@@ -568,7 +554,7 @@ class MediaPlayerController(
         val currentPlaylist = playlist
         val currentIndex = controller?.currentMediaItemIndex ?: 0
         val currentPosition = controller?.currentPosition ?: 0
-        downloader.clearActiveDownloads()
+        DownloadService.requestStop()
         controller?.pause()
         controller?.stop()
         val oldController = controller
@@ -741,7 +727,7 @@ class MediaPlayerController(
 
     val playlist: List<MediaItem>
         get() {
-            return getPlayList(false)
+            return Util.getPlayListFromTimeline(controller?.currentTimeline, false)
         }
 
     fun getMediaItemAt(index: Int): MediaItem? {
@@ -750,37 +736,11 @@ class MediaPlayerController(
 
     val playlistInPlayOrder: List<MediaItem>
         get() {
-            return getPlayList(controller?.shuffleModeEnabled ?: false)
+            return Util.getPlayListFromTimeline(
+                controller?.currentTimeline,
+                controller?.shuffleModeEnabled ?: false
+            )
         }
-
-    fun getNextPlaylistItemsInPlayOrder(count: Int? = null): List<MediaItem> {
-        return getPlayList(
-            controller?.shuffleModeEnabled ?: false,
-            controller?.currentMediaItemIndex,
-            count
-        )
-    }
-
-    private fun getPlayList(
-        shuffle: Boolean,
-        firstIndex: Int? = null,
-        count: Int? = null
-    ): List<MediaItem> {
-        if (controller?.currentTimeline == null) return emptyList()
-        if (controller!!.currentTimeline.windowCount < 1) return emptyList()
-        val timeline = controller!!.currentTimeline
-
-        val playlist: MutableList<MediaItem> = mutableListOf()
-        var i = firstIndex ?: timeline.getFirstWindowIndex(false)
-        if (i == C.INDEX_UNSET) return emptyList()
-
-        while (i != C.INDEX_UNSET && (count != playlist.count())) {
-            val window = timeline.getWindow(i, Timeline.Window())
-            playlist.add(window.mediaItem)
-            i = timeline.getNextWindowIndex(i, REPEAT_MODE_OFF, shuffle)
-        }
-        return playlist
-    }
 
     val playListDuration: Long
         get() = playlist.fold(0) { i, file ->

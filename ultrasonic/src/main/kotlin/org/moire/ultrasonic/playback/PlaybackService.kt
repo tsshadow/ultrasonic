@@ -12,6 +12,8 @@ import android.os.Build
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.C.USAGE_MEDIA
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.ResolvingDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
@@ -27,11 +29,14 @@ import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
 
 class PlaybackService : MediaLibraryService(), KoinComponent {
@@ -74,6 +79,7 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
         // Broadcast that the service is being shutdown
         RxBus.stopServiceCommandPublisher.onNext(Unit)
 
+        player.removeListener(listener)
         player.release()
         mediaLibrarySession.release()
         rxBusSubscription.dispose()
@@ -153,7 +159,29 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
             onDestroy()
         }
 
+        player.addListener(listener)
         isStarted = true
+    }
+
+    private val listener: Player.Listener = object : Player.Listener {
+        override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+            cacheNextSongs()
+        }
+
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            cacheNextSongs()
+        }
+    }
+
+    private fun cacheNextSongs() {
+        Timber.d("PlaybackService caching the next songs")
+        val nextSongs = Util.getPlayListFromTimeline(
+            player.currentTimeline,
+            player.shuffleModeEnabled,
+            player.currentMediaItemIndex,
+            Settings.preloadCount
+        ).map { it.toTrack() }
+        DownloadService.download(nextSongs, save = false, isHighPriority = true)
     }
 
     private fun getPendingIntentForContent(): PendingIntent {
