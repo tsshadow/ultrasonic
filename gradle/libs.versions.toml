@@ -26,7 +26,7 @@ viewModelKtx           = "2.5.1"
 retrofit               = "2.9.0"
 jackson                = "2.13.4"
 okhttp                 = "4.10.0"
-koin                   = "3.2.0"
+koin                   = "3.2.2"
 picasso                = "2.8"
 
 junit4                 = "4.13.2"
