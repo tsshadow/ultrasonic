@@ -159,16 +159,15 @@ class CachedDataSource(
                 bytesTransferred(read)
             }
             return
-        } catch (e: IOException) {
-            if (e is HttpDataSourceException) {
-                throw e
-            } else {
-                throw HttpDataSourceException(
-                    dataSpec,
-                    PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
-                    HttpDataSourceException.TYPE_OPEN
-                )
-            }
+
+        } catch (e: HttpDataSourceException) {
+            throw e
+        } catch (ignored: IOException) {
+            throw HttpDataSourceException(
+                dataSpec,
+                PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
+                HttpDataSourceException.TYPE_OPEN
+            )
         }
     }
 

@@ -19,7 +19,6 @@ import org.moire.ultrasonic.app.UApp
  */
 object Settings {
 
-
     @JvmStatic
     var theme by StringSetting(
         getKey(R.string.setting_key_theme),

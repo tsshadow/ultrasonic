@@ -2,7 +2,6 @@ build:
   maxIssues: 0
   weights:
     complexity: 2
-    formatting: 1
     LongParameterList: 1
     comments: 1
 
@@ -49,18 +48,13 @@ complexity:
   LabeledExpression:
     active: false
 
-
-formatting:
-  autoCorrect: true
-  active: false
-
 style:
   active: true
   NewLineAtEndOfFile:
     active: true
   ForbiddenComment:
     active: true
-    values: 'FIXME:,STOPSHIP:'
+    values: ['FIXME:', 'STOPSHIP:']
   WildcardImport:
     active: true
   MaxLineLength:

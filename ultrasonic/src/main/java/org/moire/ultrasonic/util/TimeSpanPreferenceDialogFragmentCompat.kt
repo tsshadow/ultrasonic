@@ -9,11 +9,11 @@ package org.moire.ultrasonic.util
 
 import android.content.Context
 import android.view.View
-import androidx.preference.PreferenceDialogFragmentCompat
 import androidx.preference.DialogPreference.TargetFragment
 import androidx.preference.Preference
-import org.moire.ultrasonic.R
+import androidx.preference.PreferenceDialogFragmentCompat
 import java.util.Locale
+import org.moire.ultrasonic.R
 
 class TimeSpanPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat(), TargetFragment {
     var picker: TimeSpanPicker? = null

@@ -241,6 +241,7 @@ class DownloadHandler(
                 return songs
             }
 
+            @Suppress("DestructuringDeclarationWithTooManyEntries")
             @Throws(Exception::class)
             private fun getSongsRecursively(
                 parent: MusicDirectory,
