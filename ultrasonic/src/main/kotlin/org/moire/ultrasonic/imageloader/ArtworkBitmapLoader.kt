@@ -11,7 +11,6 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.BitmapLoader
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.ListeningExecutorService
@@ -54,7 +53,8 @@ class ArtworkBitmapLoader : BitmapLoader, KoinComponent {
     @Throws(IOException::class)
     private fun load(uri: Uri): Bitmap {
         val parts = uri.path?.trim('/')?.split('|')
-        if (parts?.count() != 2) throw IllegalArgumentException("Invalid bitmap Uri")
+
+        require(parts!!.count() == 2) { "Invalid bitmap Uri" }
         return imageLoader.getImage(parts[0], parts[1], false, 0)
     }
 }

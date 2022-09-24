@@ -272,19 +272,19 @@ class SharesFragment : Fragment() {
                   Entry Count: ${share.getEntries().size}
                   Visit Count: ${share.visitCount}
             """.trimIndent() +
-                    (
-                            if (share.created == null) "" else """
+                (
+                    if (share.created == null) "" else """
      
      Creation Date: ${share.created!!.replace('T', ' ')}
                     """.trimIndent()
-                            ) +
-                    (
-                            if (share.lastVisited == null) "" else """
+                    ) +
+                (
+                    if (share.lastVisited == null) "" else """
      
      Last Visited Date: ${share.lastVisited!!.replace('T', ' ')}
                     """.trimIndent()
-                            ) +
-                    if (share.expires == null) "" else """
+                    ) +
+                if (share.expires == null) "" else """
      
      Expiration Date: ${share.expires!!.replace('T', ' ')}
                 """.trimIndent()

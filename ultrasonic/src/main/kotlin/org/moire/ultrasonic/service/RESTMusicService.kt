@@ -280,9 +280,7 @@ open class RESTMusicService(
         name: String?,
         tracks: List<Track>
     ) {
-        if (id == null && name == null)
-            throw IllegalArgumentException("Either id or name is required.")
-
+        require(id != null || name != null) { "Either id or name is required." }
         val pSongIds: MutableList<String> = ArrayList(tracks.size)
 
         for ((id1) in tracks) {
@@ -488,7 +486,7 @@ open class RESTMusicService(
         return url.toString()
     }
 
-    val streamClient by lazy {
+    private val streamClient by lazy {
         // Create a new modified okhttp client to intercept the URL
         val builder = subsonicAPIClient.okHttpClient.newBuilder()
 

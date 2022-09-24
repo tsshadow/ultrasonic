@@ -28,7 +28,6 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.util.Util.applyTheme
-import org.w3c.dom.Text
 import timber.log.Timber
 
 /**
