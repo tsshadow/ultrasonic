@@ -12,9 +12,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
+import android.os.Build
 import android.view.KeyEvent
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.app.UApp
@@ -110,7 +110,12 @@ class MediaPlayerLifecycleSupport : KoinComponent {
 
         if (intentAction == Constants.CMD_PROCESS_KEYCODE) {
             if (intent.extras != null) {
-                val event = intent.extras!![Intent.EXTRA_KEY_EVENT] as KeyEvent?
+                val event = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.extras!!.getParcelable(Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.extras!![Intent.EXTRA_KEY_EVENT] as KeyEvent?
+                }
                 event.ifNotNull { handleKeyEvent(it) }
             }
         } else {
@@ -130,7 +135,7 @@ class MediaPlayerLifecycleSupport : KoinComponent {
             override fun onReceive(context: Context, intent: Intent) {
                 val extras = intent.extras ?: return
 
-                Timber.i("Headset event for: %s", extras["name"])
+                Timber.i("Headset event for: %s", extras.getString("name"))
 
                 val state = extras.getInt("state")
 
