@@ -38,6 +38,7 @@ import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.SimpleServiceBinder
 import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.Util.stopForegroundRemoveNotification
 import timber.log.Timber
 
 private const val NOTIFICATION_CHANNEL_ID = "org.moire.ultrasonic"
@@ -94,7 +95,7 @@ class DownloadService : Service(), KoinComponent {
 
         isShuttingDown = true
         isInForeground = false
-        stopForeground(true)
+        stopForegroundRemoveNotification()
 
         wifiLock?.release()
         wifiLock = null

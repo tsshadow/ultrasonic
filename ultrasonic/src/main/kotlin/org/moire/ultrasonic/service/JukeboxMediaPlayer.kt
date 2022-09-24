@@ -60,11 +60,13 @@ import org.moire.ultrasonic.playback.MediaNotificationProvider
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.Util.getPendingIntentToShowPlayer
 import org.moire.ultrasonic.util.Util.sleepQuietly
+import org.moire.ultrasonic.util.Util.stopForegroundRemoveNotification
 import timber.log.Timber
 
 private const val STATUS_UPDATE_INTERVAL_SECONDS = 5L
 private const val SEEK_INCREMENT_SECONDS = 5L
 private const val SEEK_START_AFTER_SECONDS = 5
+private const val QUEUE_POLL_INTERVAL_SECONDS = 1L
 
 /**
  * Provides an asynchronous interface to the remote jukebox on the Subsonic server.
@@ -159,17 +161,15 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
     }
 
     override fun onDestroy() {
+        tasks.clear()
+        stop()
+
         if (!running.get()) return
         running.set(false)
 
-        sleepQuietly(1000)
-        if (serviceThread != null) {
-            serviceThread!!.interrupt()
-        }
+        serviceThread!!.join()
 
-        tasks.clear()
-        stop()
-        stopForeground(true)
+        stopForegroundRemoveNotification()
         mediaSession.release()
 
         super.onDestroy()
@@ -417,9 +417,8 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         if (playlist.isEmpty()) return 0
         if (currentIndex < 0 || currentIndex >= playlist.size) return 0
 
-        return (
-            playlist[currentIndex].mediaMetadata.extras?.getInt("duration") ?: 0
-            ).toLong() * 1000
+        return (playlist[currentIndex].mediaMetadata.extras?.getInt("duration") ?: 0)
+            .toLong() * 1000
     }
 
     override fun getContentDuration(): Long {
@@ -447,6 +446,17 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         if (currentIndex <= 0) return
         currentIndex--
         seekTo(currentIndex, 0)
+    }
+
+    override fun setMediaItems(
+        mediaItems: MutableList<MediaItem>,
+        startIndex: Int,
+        startPositionMs: Long
+    ) {
+        playlist.clear()
+        playlist.addAll(mediaItems)
+        updatePlaylist()
+        seekTo(startIndex, startPositionMs)
     }
 
     private fun startProcessTasks() {
@@ -481,22 +491,28 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         }
     }
 
+    @Suppress("LoopWithTooManyJumpStatements")
     private fun processTasks() {
-        while (running.get()) {
+        Timber.d("JukeboxMediaPlayer processTasks starting")
+        while (true) {
             // Sleep a bit to spare processor time if we loop a lot
             sleepQuietly(10)
+            // This is only necessary if Ultrasonic goes offline sooner than the thread stops
+            if (isOffline()) continue
             var task: JukeboxTask? = null
             try {
-                if (!isOffline()) {
-                    task = tasks.take()
-                    val status = task.execute()
-                    onStatusUpdate(status)
-                }
-            } catch (ignored: InterruptedException) {
+                task = tasks.poll()
+                // If running is false, exit when the queue is empty
+                if (task == null && !running.get()) break
+                if (task == null) continue
+                Timber.v("JukeBoxMediaPlayer processTasks processes Task %s", task::class)
+                val status = task.execute()
+                onStatusUpdate(status)
             } catch (x: Throwable) {
                 onError(task, x)
             }
         }
+        Timber.d("JukeboxMediaPlayer processTasks stopped")
     }
 
     private fun onStatusUpdate(jukeboxStatus: JukeboxStatus) {
@@ -621,9 +637,8 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
             queue.add(jukeboxTask)
         }
 
-        @Throws(InterruptedException::class)
-        fun take(): JukeboxTask {
-            return queue.take()
+        fun poll(): JukeboxTask? {
+            return queue.poll(QUEUE_POLL_INTERVAL_SECONDS, TimeUnit.SECONDS)
         }
 
         fun remove(taskClass: Class<out JukeboxTask?>) {

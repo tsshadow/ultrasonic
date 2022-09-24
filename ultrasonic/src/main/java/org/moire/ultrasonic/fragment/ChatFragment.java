@@ -83,15 +83,7 @@ public class ChatFragment extends Fragment {
         messageEditText = view.findViewById(R.id.chat_edittext);
         sendButton = view.findViewById(R.id.chat_send);
 
-        sendButton.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View view)
-            {
-                sendMessage();
-            }
-        });
+        sendButton.setOnClickListener(view1 -> sendMessage());
 
         chatListView = view.findViewById(R.id.chat_entries_list);
         chatListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
@@ -125,20 +117,14 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        messageEditText.setOnEditorActionListener(new TextView.OnEditorActionListener()
-        {
-
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
+        messageEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE || (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_DOWN))
             {
-                if (actionId == EditorInfo.IME_ACTION_DONE || (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_DOWN))
-                {
-                    sendMessage();
-                    return true;
-                }
-
-                return false;
+                sendMessage();
+                return true;
             }
+
+            return false;
         });
 
         load();
@@ -215,14 +201,7 @@ public class ChatFragment extends Fragment {
                 @Override
                 public void run()
                 {
-                    getActivity().runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            load();
-                        }
-                    });
+                    getActivity().runOnUiThread(() -> load());
                 }
             }, refreshInterval, refreshInterval);
         }

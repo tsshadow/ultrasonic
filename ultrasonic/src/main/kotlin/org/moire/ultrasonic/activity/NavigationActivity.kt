@@ -211,7 +211,7 @@ class NavigationActivity : AppCompatActivity() {
             recreate()
         }
 
-        rxBusSubscription += RxBus.activeServerChangeObservable.subscribe {
+        rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
             updateNavigationHeaderForServer()
         }
 

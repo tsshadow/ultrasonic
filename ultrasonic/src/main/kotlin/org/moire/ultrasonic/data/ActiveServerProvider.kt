@@ -7,6 +7,8 @@
 
 package org.moire.ultrasonic.data
 
+import android.os.Handler
+import android.os.Looper
 import androidx.room.Room
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -234,12 +236,22 @@ class ActiveServerProvider(
          * @param serverId: The id of the desired server
          */
         fun setActiveServerById(serverId: Int) {
-            resetMusicService()
+            val oldServerId = Settings.activeServer
+            if (oldServerId == serverId) return
 
-            Settings.activeServer = serverId
+            // Notify components about the change before actually resetting the MusicService
+            // so they can react by e.g. stopping playback on the old server
+            RxBus.activeServerChangingPublisher.onNext(oldServerId)
 
-            Timber.i("setActiveServerById done, new id: %s", serverId)
-            RxBus.activeServerChangePublisher.onNext(serverId)
+            // Post the server change to the end of the message queue,
+            // so the cleanup have time to finish
+            Handler(Looper.getMainLooper()).post {
+                resetMusicService()
+                Settings.activeServer = serverId
+
+                RxBus.activeServerChangedPublisher.onNext(serverId)
+                Timber.i("setActiveServerById done, new id: %s", serverId)
+            }
         }
 
         /**
