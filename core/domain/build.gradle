@@ -6,3 +6,7 @@ dependencies {
     implementation libs.roomKtx
     kapt libs.room
 }
+
+android {
+    namespace 'org.moire.ultrasonic.subsonic.domain'
+}

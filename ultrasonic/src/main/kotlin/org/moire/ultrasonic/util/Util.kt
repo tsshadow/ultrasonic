@@ -509,6 +509,7 @@ object Util {
     }
 
     @JvmStatic
+    @Suppress("DEPRECATION")
     fun getVersionName(context: Context): String? {
         var versionName: String? = null
         val pm = context.packageManager
