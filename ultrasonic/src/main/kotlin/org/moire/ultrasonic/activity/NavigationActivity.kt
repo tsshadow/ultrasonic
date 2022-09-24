@@ -192,6 +192,9 @@ class NavigationActivity : AppCompatActivity() {
             showWelcomeDialog()
         }
 
+        // Ask for permission to send notifications
+        Util.ensurePermissionToPostNotification(this)
+
         RxBus.dismissNowPlayingCommandObservable.subscribe {
             nowPlayingHidden = true
             hideNowPlaying()

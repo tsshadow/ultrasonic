@@ -350,8 +350,6 @@
     <string name="select_share.empty">Geen delingen beschikbaar op server</string>
     <string name="menu_deleted_share">Deling %s verwijderd</string>
     <string name="menu_deleted_share_error">Kan deling %s niet verwijderen</string>
-    <string name="settings.share_milliseconds">Milliseconden </string>
-    <string name="settings.share_seconds">Seconden</string>
     <string name="settings.share_minutes">Minuten</string>
     <string name="settings.share_hours">Uur</string>
     <string name="settings.share_days">Dagen</string>

@@ -7,6 +7,7 @@
 
 package org.moire.ultrasonic.service
 
+import android.annotation.SuppressLint
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -20,6 +21,7 @@ import java.util.Arrays
  * This class wraps a simple playlist provided as List<MediaItem>
  * to be usable as a Media3 Timeline.
  */
+@SuppressLint("UnsafeOptInUsageError")
 class PlaylistTimeline @JvmOverloads constructor(
     mediaItems: List<MediaItem>,
     shuffledIndices: IntArray = createUnshuffledIndices(

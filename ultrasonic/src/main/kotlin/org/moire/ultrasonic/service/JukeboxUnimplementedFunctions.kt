@@ -1,5 +1,5 @@
 /*
- * JukeboxUnimplemented.kt
+ * JukeboxUnimplementedFunctions.kt
  * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
@@ -7,6 +7,7 @@
 
 package org.moire.ultrasonic.service
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.view.Surface
 import android.view.SurfaceHolder
@@ -24,6 +25,7 @@ import androidx.media3.common.Tracks
  * of the crowded Player interface, so the JukeboxMediaPlayer class can be a bit clearer.
  */
 @Suppress("TooManyFunctions")
+@SuppressLint("UnsafeOptInUsageError")
 abstract class JukeboxUnimplementedFunctions : Service(), Player {
 
     override fun setMediaItems(mediaItems: MutableList<MediaItem>) {

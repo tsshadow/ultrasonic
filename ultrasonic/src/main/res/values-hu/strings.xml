@@ -299,8 +299,6 @@
     <string name="select_share.empty">Nincs mentett megosztás a kiszolgálón.</string>
     <string name="menu_deleted_share">%s megosztás törölve</string>
     <string name="menu_deleted_share_error">%s megosztás törlése sikertelen!</string>
-    <string name="settings.share_milliseconds">Ezredmásodperc</string>
-    <string name="settings.share_seconds">Másodperc</string>
     <string name="settings.share_minutes">Perc</string>
     <string name="settings.share_hours">Óra</string>
     <string name="settings.share_days">Nap</string>

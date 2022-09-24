@@ -318,8 +318,6 @@
     <string name="select_share.empty">Нет доступных ресурсов на сервере</string>
     <string name="menu_deleted_share">Удалить общий ресурс %s</string>
     <string name="menu_deleted_share_error">Не удалось удалить общий ресурс %s</string>
-    <string name="settings.share_milliseconds">Миллисекунды</string>
-    <string name="settings.share_seconds">Секунды</string>
     <string name="settings.share_minutes">Минуты</string>
     <string name="settings.share_hours">Часы</string>
     <string name="settings.share_days">Дни</string>

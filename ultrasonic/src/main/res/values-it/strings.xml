@@ -265,8 +265,6 @@
     <string name="widget.sdcard_missing">Nessuna scheda SD</string>
     <string name="settings.share_description_default">Descrizione Predefinita di Condivisione</string>
     <string name="download.menu_clear_playlist">Pulisci Playlist</string>
-    <string name="settings.share_milliseconds">Millisecondi</string>
-    <string name="settings.share_seconds">Secondi</string>
     <string name="settings.share_minutes">Minuti</string>
     <string name="settings.share_hours">Ore</string>
     <string name="settings.share_days">Giorni</string>

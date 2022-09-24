@@ -247,18 +247,15 @@ class SettingsFragment :
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference) {
-        var dialogFragment: DialogFragment? = null
         if (preference is TimeSpanPreference) {
-            dialogFragment = TimeSpanPreferenceDialogFragmentCompat()
+            val dialogFragment = TimeSpanPreferenceDialogFragmentCompat()
             val bundle = Bundle(1)
             bundle.putString("key", preference.getKey())
             dialogFragment.setArguments(bundle)
-        }
-        if (dialogFragment != null) {
             dialogFragment.setTargetFragment(this, 0)
             dialogFragment.show(
                 this.parentFragmentManager,
-                "android.support.v7.preference.PreferenceFragment.DIALOG"
+                "androidx.preference.PreferenceFragment.DIALOG"
             )
         } else {
             super.onDisplayPreferenceDialog(preference)

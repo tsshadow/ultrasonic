@@ -30,7 +30,6 @@ import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.FragmentBackgroundTask
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.ShareDetails
-import org.moire.ultrasonic.util.TimeSpan
 import org.moire.ultrasonic.util.TimeSpanPicker
 import org.moire.ultrasonic.util.Util.ifNotNull
 
@@ -145,9 +144,8 @@ class ShareHandler(val context: Context) {
             showDialog(fragment, shareDetails, swipe, cancellationToken, additionalId)
         } else {
             shareDetails.Description = Settings.defaultShareDescription
-            shareDetails.Expiration = TimeSpan.getCurrentTime().add(
+            shareDetails.Expiration = System.currentTimeMillis() +
                 Settings.defaultShareExpirationInMillis
-            ).totalMilliseconds
             share(fragment, shareDetails, swipe, cancellationToken, additionalId)
         }
     }
@@ -165,11 +163,11 @@ class ShareHandler(val context: Context) {
             shareDescription = layout.findViewById<View>(R.id.share_description) as EditText
             hideDialogCheckBox = layout.findViewById<View>(R.id.hide_dialog) as CheckBox
             shareOnServerCheckBox = layout.findViewById<View>(R.id.share_on_server) as CheckBox
-            noExpirationCheckBox = layout.findViewById<View>(
-                R.id.timeSpanDisableCheckBox
-            ) as CheckBox
             saveAsDefaultsCheckBox = layout.findViewById<View>(R.id.save_as_defaults) as CheckBox
             timeSpanPicker = layout.findViewById<View>(R.id.date_picker) as TimeSpanPicker
+            noExpirationCheckBox = timeSpanPicker!!.findViewById<View>(
+                R.id.timeSpanDisableCheckBox
+            ) as CheckBox
             textViewComment = layout.findViewById<View>(R.id.textViewComment) as TextView
             textViewExpiration = layout.findViewById<View>(R.id.textViewExpiration) as TextView
         }
@@ -191,9 +189,8 @@ class ShareHandler(val context: Context) {
 
         builder.setPositiveButton(R.string.menu_share) { _, _ ->
             if (!noExpirationCheckBox!!.isChecked) {
-                val timeSpan: TimeSpan = timeSpanPicker!!.timeSpan
-                val now = TimeSpan.getCurrentTime()
-                shareDetails.Expiration = now.add(timeSpan).totalMilliseconds
+                val timeSpan: Long = timeSpanPicker!!.getTimeSpan()
+                shareDetails.Expiration = System.currentTimeMillis() + timeSpan
             }
 
             shareDetails.Description = shareDescription!!.text.toString()
@@ -204,7 +201,7 @@ class ShareHandler(val context: Context) {
             }
 
             if (saveAsDefaultsCheckBox!!.isChecked) {
-                val timeSpanType: String = timeSpanPicker!!.timeSpanType
+                val timeSpanType: String = timeSpanPicker!!.timeSpanType!!
                 val timeSpanAmount: Int = timeSpanPicker!!.timeSpanAmount
                 Settings.defaultShareExpiration =
                     if (!noExpirationCheckBox!!.isChecked && timeSpanAmount > 0)
@@ -240,7 +237,7 @@ class ShareHandler(val context: Context) {
                 noExpirationCheckBox!!.isChecked = false
                 timeSpanPicker!!.isEnabled = true
                 timeSpanPicker!!.setTimeSpanAmount(timeSpanAmount.toString())
-                timeSpanPicker!!.setTimeSpanType(timeSpanType)
+                timeSpanPicker!!.timeSpanType = timeSpanType
             } else {
                 noExpirationCheckBox!!.isChecked = true
                 timeSpanPicker!!.isEnabled = false

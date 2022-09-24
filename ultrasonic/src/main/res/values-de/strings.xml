@@ -351,8 +351,6 @@
     <string name="select_share.empty">Keine Freigaben auf dem Server verfügbar</string>
     <string name="menu_deleted_share">Freigabe %s gelöscht</string>
     <string name="menu_deleted_share_error">Löschen der Freigabe %s fehlgeschlagen</string>
-    <string name="settings.share_milliseconds">Millisekunden</string>
-    <string name="settings.share_seconds">Sekunden</string>
     <string name="settings.share_minutes">Minuten</string>
     <string name="settings.share_hours">Stunden</string>
     <string name="settings.share_days">Tage</string>

@@ -28,6 +28,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.util.Util.applyTheme
+import org.w3c.dom.Text
 import timber.log.Timber
 
 /**
@@ -168,10 +169,9 @@ class EqualizerFragment : Fragment() {
         val bandBar = LayoutInflater.from(context)
             .inflate(R.layout.equalizer_bar, equalizerLayout, false)
 
-        val freqTextView: TextView =
-            bandBar.findViewById<View>(R.id.equalizer_frequency) as TextView
-        val levelTextView = bandBar.findViewById<View>(R.id.equalizer_level) as TextView
-        val bar = bandBar.findViewById<View>(R.id.equalizer_bar) as SeekBar
+        val freqTextView: TextView = bandBar.findViewById(R.id.equalizer_frequency)
+        val levelTextView: TextView = bandBar.findViewById(R.id.equalizer_level)
+        val bar: SeekBar = bandBar.findViewById(R.id.equalizer_bar)
 
         val range = equalizer!!.getBandFreqRange(band)
 

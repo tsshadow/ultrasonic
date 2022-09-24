@@ -6,6 +6,7 @@
  */
 package org.moire.ultrasonic.playback
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
@@ -39,6 +40,7 @@ import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
 
+@SuppressLint("UnsafeOptInUsageError")
 class PlaybackService : MediaLibraryService(), KoinComponent {
     private lateinit var player: ExoPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
@@ -84,7 +86,12 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
         mediaLibrarySession.release()
         rxBusSubscription.dispose()
         isStarted = false
-        stopForeground(true)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
         stopSelf()
     }
 

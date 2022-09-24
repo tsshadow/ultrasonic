@@ -218,8 +218,6 @@
         <item>@string/settings.search_500</item>
     </string-array>
     <string-array name="shareExpirationNames" translatable="false">
-        <item>@string/settings.share_milliseconds</item>
-        <item>@string/settings.share_seconds</item>
         <item>@string/settings.share_minutes</item>
         <item>@string/settings.share_hours</item>
         <item>@string/settings.share_days</item>

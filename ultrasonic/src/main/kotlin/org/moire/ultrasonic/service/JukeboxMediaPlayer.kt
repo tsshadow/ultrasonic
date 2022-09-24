@@ -39,7 +39,6 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.common.VideoSize
 import androidx.media3.common.text.CueGroup
-import androidx.media3.common.util.Util
 import androidx.media3.session.MediaSession
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
@@ -76,6 +75,7 @@ private const val SEEK_START_AFTER_SECONDS = 5
  * TODO: Minimize status updates.
  */
 @Suppress("TooManyFunctions")
+@SuppressLint("UnsafeOptInUsageError")
 class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
     private val tasks = TaskQueue()
     private val executorService = Executors.newSingleThreadScheduledExecutor()
@@ -119,7 +119,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
             JukeboxNotificationActionFactory()
         ) {}
 
-        if (Util.SDK_INT >= 29) {
+        if (Build.VERSION.SDK_INT >= 29) {
             startForeground(
                 notification.notificationId,
                 notification.notification,
@@ -140,7 +140,12 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
         val extras = intent.extras
         if ((extras != null) && extras.containsKey(Intent.EXTRA_KEY_EVENT)) {
-            val event = extras.getParcelable<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+            val event = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                extras.getParcelable(Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                extras.getParcelable<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+            }
             when (event?.keyCode) {
                 KEYCODE_MEDIA_PLAY -> play()
                 KEYCODE_MEDIA_PAUSE -> stop()
