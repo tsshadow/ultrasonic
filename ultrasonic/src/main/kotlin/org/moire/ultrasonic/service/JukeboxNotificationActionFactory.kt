@@ -7,6 +7,7 @@
 
 package org.moire.ultrasonic.service
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Intent
@@ -25,6 +26,7 @@ import org.moire.ultrasonic.app.UApp
  * This class creates Intents and Actions to be used with the Media Notification
  * of the Jukebox Service
  */
+@SuppressLint("UnsafeOptInUsageError")
 class JukeboxNotificationActionFactory : MediaNotification.ActionFactory {
     override fun createMediaAction(
         mediaSession: MediaSession,

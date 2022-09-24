@@ -334,8 +334,6 @@
     <string name="select_share.empty">Pas de partages disponibles sur le serveur</string>
     <string name="menu_deleted_share">Partage supprimé %s</string>
     <string name="menu_deleted_share_error">Échec de la suppression du partage %s</string>
-    <string name="settings.share_milliseconds">Millisecondes</string>
-    <string name="settings.share_seconds">Secondes</string>
     <string name="settings.share_minutes">Minutes</string>
     <string name="settings.share_hours">Heures</string>
     <string name="settings.share_days">Jours</string>

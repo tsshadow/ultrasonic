@@ -292,8 +292,6 @@
     <string name="select_share.empty">Na serveru nejsou žádná sdílení</string>
     <string name="menu_deleted_share">Smazaná sdílení %s</string>
     <string name="menu_deleted_share_error">Chyba vymazání sdílení %s</string>
-    <string name="settings.share_milliseconds">Milisekund</string>
-    <string name="settings.share_seconds">Sekund</string>
     <string name="settings.share_minutes">Minut</string>
     <string name="settings.share_hours">Hodin</string>
     <string name="settings.share_days">Dní</string>

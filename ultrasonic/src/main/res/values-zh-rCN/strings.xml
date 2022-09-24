@@ -318,8 +318,6 @@
     <string name="select_share.empty">服务器上没有可用的共享</string>
     <string name="menu_deleted_share">删除分享 %s</string>
     <string name="menu_deleted_share_error">删除分享失败 %s</string>
-    <string name="settings.share_milliseconds">毫秒</string>
-    <string name="settings.share_seconds">秒</string>
     <string name="settings.share_minutes">分钟</string>
     <string name="settings.share_hours">小时</string>
     <string name="settings.share_days">天</string>

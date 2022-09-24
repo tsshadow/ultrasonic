@@ -40,7 +40,6 @@ import org.moire.ultrasonic.util.BackgroundTask
 import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.FragmentBackgroundTask
 import org.moire.ultrasonic.util.LoadingTask
-import org.moire.ultrasonic.util.TimeSpan
 import org.moire.ultrasonic.util.TimeSpanPicker
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.view.ShareAdapter
@@ -79,16 +78,16 @@ class SharesFragment : Fragment() {
         sharesListView = view.findViewById(R.id.select_share_list)
         refreshSharesListView!!.setOnRefreshListener { load(true) }
         emptyTextView = view.findViewById(R.id.select_share_empty)
-        sharesListView!!.onItemClickListener = AdapterView.OnItemClickListener {
-            parent, _, position, _ ->
-            val share = parent.getItemAtPosition(position) as Share
+        sharesListView!!.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, _, position, _ ->
+                val share = parent.getItemAtPosition(position) as Share
 
-            val action = SharesFragmentDirections.sharesToTrackCollection(
-                shareId = share.id,
-                shareName = share.name
-            )
-            findNavController().navigate(action)
-        }
+                val action = SharesFragmentDirections.sharesToTrackCollection(
+                    shareId = share.id,
+                    shareName = share.name
+                )
+                findNavController().navigate(action)
+            }
         registerForContextMenu(sharesListView!!)
         FragmentTitle.setTitle(this, R.string.button_bar_shares)
         load(false)
@@ -273,19 +272,19 @@ class SharesFragment : Fragment() {
                   Entry Count: ${share.getEntries().size}
                   Visit Count: ${share.visitCount}
             """.trimIndent() +
-                (
-                    if (share.created == null) "" else """
+                    (
+                            if (share.created == null) "" else """
      
      Creation Date: ${share.created!!.replace('T', ' ')}
                     """.trimIndent()
-                    ) +
-                (
-                    if (share.lastVisited == null) "" else """
+                            ) +
+                    (
+                            if (share.lastVisited == null) "" else """
      
      Last Visited Date: ${share.lastVisited!!.replace('T', ' ')}
                     """.trimIndent()
-                    ) +
-                if (share.expires == null) "" else """
+                            ) +
+                    if (share.expires == null) "" else """
      
      Expiration Date: ${share.expires!!.replace('T', ' ')}
                 """.trimIndent()
@@ -321,9 +320,9 @@ class SharesFragment : Fragment() {
             object : LoadingTask<Any?>(activity, refreshSharesListView, cancellationToken) {
                 @Throws(Throwable::class)
                 override fun doInBackground(): Any? {
-                    var millis = timeSpanPicker.timeSpan.totalMilliseconds
+                    var millis = timeSpanPicker.getTimeSpan()
                     if (millis > 0) {
-                        millis = TimeSpan.getCurrentTime().add(millis).totalMilliseconds
+                        millis += System.currentTimeMillis()
                     }
                     val shareDescriptionText = shareDescription.text
                     val description = shareDescriptionText?.toString()
@@ -341,19 +340,22 @@ class SharesFragment : Fragment() {
                 }
 
                 override fun error(error: Throwable) {
-                    val msg: String
-                    msg = if (error is OfflineException || error is ApiNotSupportedException) {
-                        getErrorMessage(
-                            error
-                        )
-                    } else {
-                        String.format(
-                            Locale.ROOT,
-                            "%s %s",
-                            resources.getString(R.string.playlist_updated_info_error, share.name),
-                            getErrorMessage(error)
-                        )
-                    }
+                    val msg: String =
+                        if (error is OfflineException || error is ApiNotSupportedException) {
+                            getErrorMessage(
+                                error
+                            )
+                        } else {
+                            String.format(
+                                Locale.ROOT,
+                                "%s %s",
+                                resources.getString(
+                                    R.string.playlist_updated_info_error,
+                                    share.name
+                                ),
+                                getErrorMessage(error)
+                            )
+                        }
                     Util.toast(context, msg, false)
                 }
             }.execute()

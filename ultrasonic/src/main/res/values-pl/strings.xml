@@ -288,8 +288,6 @@
     <string name="select_share.empty">Brak udostępnień na serwerze</string>
     <string name="menu_deleted_share">Usunięto udostępnienie %s</string>
     <string name="menu_deleted_share_error">Nieudane usunięcie udostępnienia %s</string>
-    <string name="settings.share_milliseconds">Milisekundy</string>
-    <string name="settings.share_seconds">Sekundy</string>
     <string name="settings.share_minutes">Minuty</string>
     <string name="settings.share_hours">Godziny</string>
     <string name="settings.share_days">Dni</string>

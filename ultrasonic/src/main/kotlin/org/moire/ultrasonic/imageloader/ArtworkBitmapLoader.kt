@@ -7,9 +7,11 @@
 
 package org.moire.ultrasonic.imageloader
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.BitmapLoader
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.ListeningExecutorService
@@ -19,6 +21,7 @@ import java.util.concurrent.Executors
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+@SuppressLint("UnsafeOptInUsageError")
 class ArtworkBitmapLoader : BitmapLoader, KoinComponent {
 
     private val imageLoader: ImageLoader by inject()

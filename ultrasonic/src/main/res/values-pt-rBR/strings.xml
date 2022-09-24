@@ -341,8 +341,6 @@
     <string name="select_share.empty">Nenhum compartilhamento disponível no servidor</string>
     <string name="menu_deleted_share">Compartilhamento %s excluído</string>
     <string name="menu_deleted_share_error">Falha ao excluir o compartilhamento %s</string>
-    <string name="settings.share_milliseconds">Milisegundos</string>
-    <string name="settings.share_seconds">Segundos</string>
     <string name="settings.share_minutes">Minutos</string>
     <string name="settings.share_hours">Horas</string>
     <string name="settings.share_days">Dias</string>

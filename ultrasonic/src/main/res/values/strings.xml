@@ -353,8 +353,6 @@
     <string name="select_share.empty">No shares available on server</string>
     <string name="menu_deleted_share">Deleted share %s</string>
     <string name="menu_deleted_share_error">Failed to delete share %s</string>
-    <string name="settings.share_milliseconds">Milliseconds</string>
-    <string name="settings.share_seconds">Seconds</string>
     <string name="settings.share_minutes">Minutes</string>
     <string name="settings.share_hours">Hours</string>
     <string name="settings.share_days">Days</string>
@@ -383,7 +381,7 @@
     <string name="settings.debug.log_delete">Delete files</string>
     <string name="settings.debug.log_deleted">Deleted log files.</string>
     <string name="notification.downloading_title">Downloading media in the background…</string>
-
+    <string name="notification.permission_required">Notifications are required for media playback. You can grant the permission anytime in the Android settings.</string>
     <string name="server_selector.label">Configured servers</string>
     <string name="server_selector.delete_confirmation">Are you sure you want to delete the server?</string>
     <string name="server_editor.label">Editing server</string>

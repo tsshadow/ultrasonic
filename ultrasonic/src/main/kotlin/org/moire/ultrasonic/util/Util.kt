@@ -7,6 +7,7 @@
 
 package org.moire.ultrasonic.util
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.PendingIntent
@@ -32,7 +33,10 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.AnyRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -505,6 +509,25 @@ object Util {
                 seconds
             )
             else -> String.format(Locale.getDefault(), "0:%02d", seconds)
+        }
+    }
+
+    fun ensurePermissionToPostNotification(fragment: AppCompatActivity) {
+        if (ContextCompat.checkSelfPermission(
+                applicationContext(),
+                POST_NOTIFICATIONS,
+            ) != PackageManager.PERMISSION_GRANTED &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        ) {
+
+            val requestPermissionLauncher =
+                fragment.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                    if (!it) {
+                        toast(applicationContext(), R.string.notification_permission_required)
+                    }
+                }
+
+            requestPermissionLauncher.launch(POST_NOTIFICATIONS)
         }
     }
 

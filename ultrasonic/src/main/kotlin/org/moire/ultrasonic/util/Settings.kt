@@ -18,7 +18,7 @@ import org.moire.ultrasonic.app.UApp
  * Contains convenience functions for reading and writing preferences
  */
 object Settings {
-    private val PATTERN = Pattern.compile(":")
+
 
     @JvmStatic
     var theme by StringSetting(
@@ -229,15 +229,12 @@ object Settings {
 
     val defaultShareExpirationInMillis: Long
         get() {
-            val preference =
-                preferences.getString(getKey(R.string.setting_key_default_share_expiration), "0")!!
-            val split = PATTERN.split(preference)
+            val preference = defaultShareExpiration
+            val split = COLON_PATTERN.split(preference)
             if (split.size == 2) {
-                val timeSpanAmount = split[0].toInt()
+                val timeSpanAmount = split[0].toLong()
                 val timeSpanType = split[1]
-                val timeSpan =
-                    TimeSpanPicker.calculateTimeSpan(appContext, timeSpanType, timeSpanAmount)
-                return timeSpan.totalMilliseconds
+                return TimeSpanPicker.calculateTimeSpan(appContext, timeSpanType, timeSpanAmount)
             }
             return 0
         }
@@ -292,4 +289,6 @@ object Settings {
 
     private val appContext: Context
         get() = UApp.applicationContext()
+
+    val COLON_PATTERN = Pattern.compile(":")
 }

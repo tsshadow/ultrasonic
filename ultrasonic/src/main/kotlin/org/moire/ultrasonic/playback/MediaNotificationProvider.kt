@@ -7,11 +7,11 @@
 
 package org.moire.ultrasonic.playback
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.HeartRating
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaNotification
@@ -24,7 +24,7 @@ import org.moire.ultrasonic.imageloader.ArtworkBitmapLoader
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.util.toTrack
 
-@UnstableApi
+@SuppressLint("UnsafeOptInUsageError")
 class MediaNotificationProvider(context: Context) :
     DefaultMediaNotificationProvider(context, ArtworkBitmapLoader()), KoinComponent {
 
