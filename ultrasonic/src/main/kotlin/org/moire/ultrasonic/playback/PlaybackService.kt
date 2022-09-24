@@ -37,6 +37,7 @@ import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.Util.stopForegroundRemoveNotification
 import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
 
@@ -86,12 +87,7 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
         mediaLibrarySession.release()
         rxBusSubscription.dispose()
         isStarted = false
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        }
+        stopForegroundRemoveNotification()
         stopSelf()
     }
 
@@ -155,7 +151,7 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
             .build()
 
         // Set a listener to update the API client when the active server has changed
-        rxBusSubscription += RxBus.activeServerChangeObservable.subscribe {
+        rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
             // Set the player wake mode
             player.setWakeMode(getWakeModeFlag())
         }

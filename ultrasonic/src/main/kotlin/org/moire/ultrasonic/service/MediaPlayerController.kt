@@ -33,6 +33,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.playback.PlaybackService
 import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider4X1
@@ -162,9 +163,28 @@ class MediaPlayerController(
             switchToLocalPlayer(onCreated)
         }
 
-        rxBusSubscription += RxBus.activeServerChangeObservable.subscribe {
-            // Update the Jukebox state when the active server has changed
-            isJukeboxEnabled = activeServerProvider.getActiveServer().jukeboxByDefault
+        rxBusSubscription += RxBus.activeServerChangingObservable.subscribe { oldServer ->
+            if (oldServer != OFFLINE_DB_ID) {
+                // When the server changes, the playlist can retain the downloaded songs.
+                // Incomplete songs should be removed as the new server won't recognise them.
+                removeIncompleteTracksFromPlaylist()
+                DownloadService.requestStop()
+            }
+            if (controller is JukeboxMediaPlayer) {
+                // When the server changes, the Jukebox should be released.
+                // The new server won't understand the jukebox requests of the old one.
+                releaseJukebox(controller)
+                controller = null
+            }
+        }
+
+        rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
+            val jukebox = activeServerProvider.getActiveServer().jukeboxByDefault
+            // Remove all songs when changing servers before turning on Jukebox.
+            // Jukebox wouldn't find the songs on the new server.
+            if (jukebox) controller?.clearMediaItems()
+            // Update the Jukebox state as the new server requires
+            isJukeboxEnabled = jukebox
         }
 
         rxBusSubscription += RxBus.throttledPlaylistObservable.subscribe {
@@ -550,7 +570,7 @@ class MediaPlayerController(
         }
 
     private fun switchToJukebox(onCreated: () -> Unit) {
-        if (JukeboxMediaPlayer.running.get()) return
+        if (controller is JukeboxMediaPlayer) return
         val currentPlaylist = playlist
         val currentIndex = controller?.currentMediaItemIndex ?: 0
         val currentPosition = controller?.currentPosition ?: 0
@@ -564,14 +584,14 @@ class MediaPlayerController(
         Handler(Looper.getMainLooper()).postDelayed({
             if (oldController != null) releaseLocalPlayer(oldController)
             setupJukebox {
-                controller?.addMediaItems(0, currentPlaylist)
-                controller?.seekTo(currentIndex, currentPosition)
+                controller?.setMediaItems(currentPlaylist, currentIndex, currentPosition)
                 onCreated()
             }
         }, CONTROLLER_SWITCH_DELAY)
     }
 
     private fun switchToLocalPlayer(onCreated: () -> Unit) {
+        if (controller is MediaController) return
         val currentPlaylist = playlist
         val currentIndex = controller?.currentMediaItemIndex ?: 0
         val currentPosition = controller?.currentPosition ?: 0
@@ -582,8 +602,7 @@ class MediaPlayerController(
         Handler(Looper.getMainLooper()).postDelayed({
             if (oldController != null) releaseJukebox(oldController)
             setupLocalPlayer {
-                controller?.addMediaItems(0, currentPlaylist)
-                controller?.seekTo(currentIndex, currentPosition)
+                controller?.setMediaItems(currentPlaylist, currentIndex, currentPosition)
                 onCreated()
             }
         }, CONTROLLER_SWITCH_DELAY)

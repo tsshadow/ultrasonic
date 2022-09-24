@@ -17,8 +17,6 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
 import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.model.ServerSettingsModel
-import org.moire.ultrasonic.service.DownloadService
-import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.util.ErrorDialog
 import org.moire.ultrasonic.util.Util
 import timber.log.Timber
@@ -30,7 +28,6 @@ class ServerSelectorFragment : Fragment() {
 
     private var listView: ListView? = null
     private val serverSettingsModel: ServerSettingsModel by viewModel()
-    private val controller: MediaPlayerController by inject()
     private val activeServerProvider: ActiveServerProvider by inject()
     private var serverRowAdapter: ServerRowAdapter? = null
 
@@ -68,7 +65,7 @@ class ServerSelectorFragment : Fragment() {
         listView?.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
 
             val server = parent.getItemAtPosition(position) as ServerSetting
-            setActiveServerById(server.id)
+            ActiveServerProvider.setActiveServerById(server.id)
             findNavController().popBackStack(R.id.mainFragment, false)
         }
 
@@ -89,26 +86,6 @@ class ServerSelectorFragment : Fragment() {
     }
 
     /**
-     * Sets the active server when a list item is clicked
-     */
-    private fun setActiveServerById(id: Int) {
-        val oldId = activeServerProvider.getActiveServer().id
-
-        // Check if there is a change
-        if (oldId == id)
-            return
-
-        // Remove incomplete tracks if we are going offline, or changing between servers.
-        // If we are coming from offline there is no need to clear downloads etc.
-        if (oldId != OFFLINE_DB_ID) {
-            controller.removeIncompleteTracksFromPlaylist()
-            DownloadService.requestStop()
-        }
-
-        ActiveServerProvider.setActiveServerById(id)
-    }
-
-    /**
      * This Callback handles the deletion of a Server Setting
      */
     private fun deleteServerById(id: Int) {
@@ -122,7 +99,7 @@ class ServerSelectorFragment : Fragment() {
                 val activeServerId = ActiveServerProvider.getActiveServerId()
 
                 // If the currently active server is deleted, go offline
-                if (id == activeServerId) setActiveServerById(OFFLINE_DB_ID)
+                if (id == activeServerId) ActiveServerProvider.setActiveServerById(OFFLINE_DB_ID)
 
                 serverSettingsModel.deleteItemById(id)
 

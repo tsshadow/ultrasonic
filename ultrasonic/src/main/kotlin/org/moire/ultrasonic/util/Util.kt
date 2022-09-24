@@ -11,6 +11,8 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.PendingIntent
+import android.app.Service
+import android.app.Service.STOP_FOREGROUND_REMOVE
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -33,6 +35,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.AnyRes
 import androidx.appcompat.app.AppCompatActivity
@@ -512,7 +515,7 @@ object Util {
         }
     }
 
-    fun ensurePermissionToPostNotification(fragment: AppCompatActivity) {
+    fun ensurePermissionToPostNotification(fragment: ComponentActivity) {
         if (ContextCompat.checkSelfPermission(
                 applicationContext(),
                 POST_NOTIFICATIONS,
@@ -749,6 +752,15 @@ object Util {
             this?.close()
         } catch (_: Exception) {
             // Ignored
+        }
+    }
+
+    fun Service.stopForegroundRemoveNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
         }
     }
 }

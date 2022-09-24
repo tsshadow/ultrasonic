@@ -20,10 +20,17 @@ class RxBus {
 
         private fun mainThread() = AndroidSchedulers.from(Looper.getMainLooper())
 
-        var activeServerChangePublisher: PublishSubject<Int> =
+        var activeServerChangingPublisher: PublishSubject<Int> =
             PublishSubject.create()
-        var activeServerChangeObservable: Observable<Int> =
-            activeServerChangePublisher.observeOn(mainThread())
+
+        // Subscribers should be called synchronously, not on another thread
+        var activeServerChangingObservable: Observable<Int> =
+            activeServerChangingPublisher
+
+        var activeServerChangedPublisher: PublishSubject<Int> =
+            PublishSubject.create()
+        var activeServerChangedObservable: Observable<Int> =
+            activeServerChangedPublisher.observeOn(mainThread())
 
         val themeChangedEventPublisher: PublishSubject<Unit> =
             PublishSubject.create()

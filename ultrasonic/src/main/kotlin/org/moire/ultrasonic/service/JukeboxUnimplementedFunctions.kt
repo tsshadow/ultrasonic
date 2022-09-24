@@ -36,14 +36,6 @@ abstract class JukeboxUnimplementedFunctions : Service(), Player {
         TODO("Not yet implemented")
     }
 
-    override fun setMediaItems(
-        mediaItems: MutableList<MediaItem>,
-        startIndex: Int,
-        startPositionMs: Long
-    ) {
-        TODO("Not yet implemented")
-    }
-
     override fun setMediaItem(mediaItem: MediaItem) {
         TODO("Not yet implemented")
     }
