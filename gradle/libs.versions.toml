@@ -31,7 +31,7 @@ picasso                = "2.8"
 
 junit4                 = "4.13.2"
 junit5                 = "5.9.1"
-mockito                = "4.7.0"
+mockito                = "4.8.0"
 mockitoKotlin          = "4.0.0"
 kluent                 = "1.68"
 apacheCodecs           = "1.15"
