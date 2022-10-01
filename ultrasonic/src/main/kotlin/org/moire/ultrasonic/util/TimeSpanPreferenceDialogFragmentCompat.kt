@@ -20,7 +20,8 @@ class TimeSpanPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat(),
 
     override fun onCreateDialogView(context: Context): View? {
         picker = TimeSpanPicker(context)
-        picker!!.setTimeSpanDisableText(requireContext().resources.getString(R.string.no_expiration))
+        val disabledText = requireContext().resources.getString(R.string.no_expiration)
+        picker!!.setTimeSpanDisableText(disabledText)
         val persisted = Settings.defaultShareExpiration
         if ("" != persisted) {
             val split = Settings.COLON_PATTERN.split(persisted)
