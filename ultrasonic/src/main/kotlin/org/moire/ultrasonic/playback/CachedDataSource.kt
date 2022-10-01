@@ -159,7 +159,6 @@ class CachedDataSource(
                 bytesTransferred(read)
             }
             return
-
         } catch (e: HttpDataSourceException) {
             throw e
         } catch (ignored: IOException) {
