@@ -13,6 +13,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.SearchRecentSuggestions
@@ -246,14 +247,19 @@ class NavigationActivity : AppCompatActivity() {
     }
 
     private fun updateNavigationHeaderForServer() {
+        // Only show the vector graphic on Android 11 or earlier
+        val showVectorBackground = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
+
         val activeServer = activeServerProvider.getActiveServer()
 
         if (cachedServerCount == 0)
             selectServerButton?.text = getString(R.string.main_setup_server, activeServer.name)
         else selectServerButton?.text = activeServer.name
 
-        val foregroundColor = ServerColor.getForegroundColor(this, activeServer.color)
-        val backgroundColor = ServerColor.getBackgroundColor(this, activeServer.color)
+        val foregroundColor =
+            ServerColor.getForegroundColor(this, activeServer.color, showVectorBackground)
+        val backgroundColor =
+            ServerColor.getBackgroundColor(this, activeServer.color)
 
         if (activeServer.index == 0)
             selectServerButton?.icon =
@@ -265,6 +271,11 @@ class NavigationActivity : AppCompatActivity() {
         selectServerButton?.iconTint = ColorStateList.valueOf(foregroundColor)
         selectServerButton?.setTextColor(foregroundColor)
         headerBackgroundImage?.setBackgroundColor(backgroundColor)
+
+        // Hide the vector graphic on Android 12 or later
+        if (!showVectorBackground) {
+            headerBackgroundImage?.setImageDrawable(null)
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {

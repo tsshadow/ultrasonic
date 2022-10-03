@@ -1,7 +1,6 @@
 package org.moire.ultrasonic.adapters
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -21,7 +20,6 @@ class TrackViewBinder(
     val onContextMenuClick: ((MenuItem, Track) -> Boolean)? = null,
     val checkable: Boolean,
     val draggable: Boolean,
-    context: Context,
     val lifecycleOwner: LifecycleOwner,
     val createContextMenu: (View, Track) -> PopupMenu = { view, _ ->
         Utils.createPopupMenu(
@@ -35,8 +33,6 @@ class TrackViewBinder(
 
     // Set our layout files
     val layout = R.layout.list_item_track
-
-    private val imageHelper: Utils.ImageHelper = Utils.ImageHelper(context)
 
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): TrackViewHolder {
         return TrackViewHolder(inflater.inflate(layout, parent, false))
@@ -55,8 +51,6 @@ class TrackViewBinder(
                 return
             }
         }
-
-        holder.imageHelper = imageHelper
 
         // Remove observer before binding
         holder.observableChecked.removeObservers(lifecycleOwner)

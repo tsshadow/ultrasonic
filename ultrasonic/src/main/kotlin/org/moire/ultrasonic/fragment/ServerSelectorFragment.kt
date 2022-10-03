@@ -63,7 +63,6 @@ class ServerSelectorFragment : Fragment() {
         listView?.adapter = serverRowAdapter
 
         listView?.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
-
             val server = parent.getItemAtPosition(position) as ServerSetting
             ActiveServerProvider.setActiveServerById(server.id)
             findNavController().popBackStack(R.id.mainFragment, false)

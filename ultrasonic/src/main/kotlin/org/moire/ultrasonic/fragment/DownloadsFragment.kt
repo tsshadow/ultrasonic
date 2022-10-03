@@ -57,7 +57,6 @@ class DownloadsFragment : MultiListFragment<Track>() {
                 { _, _ -> true },
                 checkable = false,
                 draggable = false,
-                context = requireContext(),
                 lifecycleOwner = viewLifecycleOwner
             )
         )

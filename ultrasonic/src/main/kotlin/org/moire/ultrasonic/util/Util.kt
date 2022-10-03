@@ -31,7 +31,6 @@ import android.os.Build
 import android.os.Environment
 import android.text.TextUtils
 import android.util.DisplayMetrics
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -94,21 +93,13 @@ object Util {
     fun applyTheme(context: Context?) {
         if (context == null) return
         val style = getStyleFromSettings(context)
+        // First set the theme (light, dark, etc.)
         context.setTheme(style)
+        // Then set an overlay controlling the status bar behaviour etc.
+        context.setTheme(R.style.UltrasonicTheme_Base)
     }
 
     private fun getStyleFromSettings(context: Context): Int {
-        // Migration
-        // TODO: Remove in June 2023
-        when (Settings.theme.lowercase()) {
-            "fullscreen" -> {
-                Settings.theme = context.getString(R.string.setting_key_theme_dark)
-            }
-            "fullscreenlight" -> {
-                Settings.theme = context.getString(R.string.setting_key_theme_light)
-            }
-        }
-
         return when (Settings.theme.lowercase()) {
             context.getString(R.string.setting_key_theme_dark) -> {
                 R.style.UltrasonicTheme_Dark
@@ -120,7 +111,7 @@ object Util {
                 R.style.UltrasonicTheme_Light
             }
             else -> {
-                R.style.UltrasonicTheme_Dark
+                R.style.UltrasonicTheme_DayNight
             }
         }
     }
@@ -569,13 +560,6 @@ object Util {
             applicationContext(), arrayOf(file),
             null, null
         )
-    }
-
-    fun getResourceFromAttribute(context: Context, resId: Int): Int {
-        val typedValue = TypedValue()
-        val theme = context.theme
-        theme.resolveAttribute(resId, typedValue, true)
-        return typedValue.resourceId
     }
 
     fun isFirstRun(): Boolean {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.3.0" type="baseline" client="gradle" dependencies="false" name="AGP (7.3.0)" variant="all" version="7.3.0">
+<issues format="6" by="lint 7.3.0" type="baseline" client="gradle" dependencies="true" name="AGP (7.3.0)" variant="all" version="7.3.0">
 
     <issue
         id="PluralsCandidate"
@@ -44,7 +44,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="164"
+            line="128"
             column="10"/>
     </issue>
 
@@ -55,7 +55,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="169"
+            line="133"
             column="10"/>
     </issue>
 
@@ -101,50 +101,6 @@
             file="src/main/res/layout/time_span_dialog.xml"
             line="28"
             column="9"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/Theme.Material3.DynamicColors.Dark`)"
-        errorLine1="    a:background=&quot;@drawable/appwidget_dark_bg_trans&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x1.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/Theme.Material3.DynamicColors.Dark`)"
-        errorLine1="    a:background=&quot;@drawable/appwidget_dark_bg_trans&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x2.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/Theme.Material3.DynamicColors.Dark`)"
-        errorLine1="    a:background=&quot;@drawable/appwidget_dark_bg_trans&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x3.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/appwidget_dark_bg_trans` with a theme that also paints a background (inferred theme is `@style/Theme.Material3.DynamicColors.Dark`)"
-        errorLine1="    a:background=&quot;@drawable/appwidget_dark_bg_trans&quot; >"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x4.xml"
-            line="8"
-            column="5"/>
     </issue>
 
     <issue
@@ -384,182 +340,6 @@
         errorLine1="    &lt;ImageView"
         errorLine2="     ~~~~~~~~~">
         <location
-            file="src/main/res/layout/appwidget4x1.xml"
-            line="10"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x1.xml"
-            line="76"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x1.xml"
-            line="85"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x1.xml"
-            line="94"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x2.xml"
-            line="10"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x2.xml"
-            line="97"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x2.xml"
-            line="106"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x2.xml"
-            line="115"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x3.xml"
-            line="10"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x3.xml"
-            line="99"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x3.xml"
-            line="108"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x3.xml"
-            line="117"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x4.xml"
-            line="10"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x4.xml"
-            line="100"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x4.xml"
-            line="109"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x4.xml"
-            line="118"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
             file="src/main/res/layout/chat_item.xml"
             line="7"
             column="6"/>
@@ -607,127 +387,6 @@
             file="src/main/res/layout/time_span_dialog.xml"
             line="30"
             column="10"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Title&quot;, should use `@string` resource"
-        errorLine1="                a:text=&quot;Title&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x1.xml"
-            line="46"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Artist&quot;, should use `@string` resource"
-        errorLine1="                a:text=&quot;Artist&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x1.xml"
-            line="64"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Title&quot;, should use `@string` resource"
-        errorLine1="                a:text=&quot;Title&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x2.xml"
-            line="48"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Artist&quot;, should use `@string` resource"
-        errorLine1="                a:text=&quot;Artist&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x2.xml"
-            line="65"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Album&quot;, should use `@string` resource"
-        errorLine1="                a:text=&quot;Album&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x2.xml"
-            line="82"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Title&quot;, should use `@string` resource"
-        errorLine1="                a:text=&quot;Title&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x3.xml"
-            line="50"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Artist&quot;, should use `@string` resource"
-        errorLine1="                a:text=&quot;Artist&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x3.xml"
-            line="66"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Album&quot;, should use `@string` resource"
-        errorLine1="                a:text=&quot;Album&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x3.xml"
-            line="83"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Title&quot;, should use `@string` resource"
-        errorLine1="                a:text=&quot;Title&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x4.xml"
-            line="51"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Artist&quot;, should use `@string` resource"
-        errorLine1="                a:text=&quot;Artist&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x4.xml"
-            line="67"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Album&quot;, should use `@string` resource"
-        errorLine1="               a:text=&quot;Album&quot;"
-        errorLine2="               ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/appwidget4x4.xml"
-            line="84"
-            column="16"/>
     </issue>
 
     <issue

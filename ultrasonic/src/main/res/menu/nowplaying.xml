@@ -6,7 +6,7 @@
 
     <item
         a:id="@+id/menu_item_toggle_list"
-        a:icon="@drawable/media_toggle_list_normal"
+        a:icon="@drawable/media_toggle_list"
         app:showAsAction="always"
         a:title="@string/download.toggle_playlist"/>
     <item

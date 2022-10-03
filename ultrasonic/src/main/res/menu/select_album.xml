@@ -12,7 +12,7 @@
 
     <item
         a:id="@+id/select_album_play_all"
-        a:icon="@drawable/media_start_normal"
+        a:icon="@drawable/media_start"
         app:showAsAction="ifRoom|withText"
         a:title="@string/select_album.play_all"/>
 

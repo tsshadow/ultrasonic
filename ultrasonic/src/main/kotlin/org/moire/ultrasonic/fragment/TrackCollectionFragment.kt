@@ -133,7 +133,6 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 onContextMenuClick = { menu, id -> onContextMenuItemSelected(menu, id) },
                 checkable = true,
                 draggable = false,
-                context = requireContext(),
                 lifecycleOwner = viewLifecycleOwner
             )
         )

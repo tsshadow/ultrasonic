@@ -1203,7 +1203,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
             mediaId,
             null,
             false,
-            icon = R.drawable.media_start_normal
+            icon = R.drawable.media_start
         )
     }
 

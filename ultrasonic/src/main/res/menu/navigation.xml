@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:a="http://schemas.android.com/apk/res/android">
+<menu xmlns:a="http://schemas.android.com/apk/res/android">
     <group
         a:checkableBehavior="none"
         a:enabled="true"
@@ -48,7 +47,7 @@
         <item
             a:id="@+id/playerFragment"
             a:checkable="true"
-            a:icon="@drawable/media_start_normal"
+            a:icon="@drawable/media_start"
             a:title="@string/button_bar.now_playing" />
         <item
             a:id="@+id/podcastFragment"

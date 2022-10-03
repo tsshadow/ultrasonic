@@ -98,12 +98,12 @@
         a:layout_marginTop="8dp"
         a:layout_marginEnd="10dip"
         a:indeterminate="true"
-        app:indicatorColor="?attr/color_menu_selected"
+        app:indicatorColor="?attr/colorOnSurface"
         app:indicatorSize="20dp"
         app:layout_constraintBottom_toTopOf="@id/song_duration"
         app:layout_constraintEnd_toEndOf="@id/star_barrier"
         app:layout_constraintTop_toTopOf="parent"
-        app:trackColor="?attr/color_selected" />
+        app:trackColor="?attr/colorSurfaceVariant" />
 
     <TextView
         a:id="@+id/song_duration"

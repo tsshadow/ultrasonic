@@ -8,29 +8,45 @@
 package org.moire.ultrasonic.util
 
 import android.content.Context
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import org.moire.ultrasonic.R
+import com.google.android.material.color.MaterialColors
 
 private const val LUMINANCE_LIMIT = 0.5
+private const val LUMINANCE_CORRECTION = -0.25
 
 /**
  * Contains functions for computing server display colors
  */
 object ServerColor {
+
+    @ColorInt
     fun getBackgroundColor(context: Context, serverColor: Int?): Int {
-        return serverColor ?: ContextCompat.getColor(
-            context, Util.getResourceFromAttribute(context, R.attr.colorPrimary)
-        )
+        return if (serverColor != null) {
+            MaterialColors.harmonizeWithPrimary(context, serverColor)
+        } else {
+            MaterialColors.getColor(context, android.R.attr.colorPrimary, "")
+        }
     }
 
-    fun getForegroundColor(context: Context, serverColor: Int?): Int {
+    @ColorInt
+    fun getForegroundColor(
+        context: Context,
+        serverColor: Int?,
+        showVectorBackground: Boolean = false
+    ): Int {
         val backgroundColor = getBackgroundColor(context, serverColor)
-        val luminance = ColorUtils.calculateLuminance(backgroundColor)
+        var luminance = ColorUtils.calculateLuminance(backgroundColor)
+
+        // The actual luminance is a good bit lower
+        // when the background color is being overlayed by the vector
+        if (showVectorBackground) luminance += LUMINANCE_CORRECTION
+
         return if (luminance < LUMINANCE_LIMIT) {
-            ContextCompat.getColor(context, R.color.selected_menu_dark)
+            ContextCompat.getColor(context, org.moire.ultrasonic.R.color.selected_menu_dark)
         } else {
-            ContextCompat.getColor(context, R.color.selected_menu_light)
+            ContextCompat.getColor(context, org.moire.ultrasonic.R.color.selected_menu_light)
         }
     }
 }

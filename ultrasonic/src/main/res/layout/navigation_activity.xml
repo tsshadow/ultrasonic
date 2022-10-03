@@ -6,7 +6,8 @@
     a:id="@+id/drawer_layout"
     a:layout_width="match_parent"
     a:layout_height="match_parent"
-    tools:context="org.moire.ultrasonic.activity.NavigationActivity">
+    tools:context="org.moire.ultrasonic.activity.NavigationActivity"
+    a:fitsSystemWindows="true">
 
     <RelativeLayout
         a:layout_width="match_parent"
@@ -44,7 +45,6 @@
         a:layout_height="match_parent"
         a:layout_gravity="start"
         a:fitsSystemWindows="true"
-        a:background="?attr/color_menu_background"
         app:headerLayout="@layout/navigation_header"
         app:menu="@menu/navigation" />
 </androidx.drawerlayout.widget.DrawerLayout>

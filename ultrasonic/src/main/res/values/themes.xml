@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="CleanSearchStyle" parent="Widget.AppCompat.SearchView">
         <item name="queryBackground">@null</item>
         <item name="submitBackground">@null</item>
     </style>
 
-    <style name="UltrasonicTheme.Black" parent="Theme.Material3.Dark">
+    <!-- Here we define some basic attributes that are the same for each theme -->
+    <style name="UltrasonicTheme.Base" parent="">
+        <item name="searchViewStyle">@style/CleanSearchStyle</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- The day & night theme. There is a night specific override in the values-night folder -->
+    <style name="UltrasonicTheme.DayNight" parent="Theme.Material3.DynamicColors.DayNight">
+        <item name="colorControlNormal">?attr/colorOnSurface</item>
+        <item name="colorControlHighlight">?attr/colorSecondary</item>
+    </style>
+
+    <style name="UltrasonicTheme.Black" parent="Theme.Material3.Dark">
         <item name="colorPrimaryDark">?attr/backgroundColor</item>
         <item name="android:colorBackground">@color/background_color_black</item>
-        <item name="color_background">?attr/colorSurface</item>
-        <item name="color_selected">?attr/colorPrimaryContainer</item>
-        <item name="color_menu_background">?attr/colorSurface</item>
-        <item name="color_menu_selected">?attr/colorOnSurface</item>
         <item name="colorControlNormal">?attr/colorOnSurface</item>
-        <item name="searchViewStyle">@style/CleanSearchStyle</item>
     </style>
 
     <style name="UltrasonicTheme.Dark" parent="Theme.Material3.DynamicColors.Dark">
-        <item name="windowNoTitle">true</item>
-        <item name="colorPrimaryDark">?attr/backgroundColor</item>
-        <item name="color_background">?attr/colorSurface</item>
-        <item name="color_selected">?attr/colorPrimaryContainer</item>
-        <item name="color_menu_background">?attr/colorSurface</item>
-        <item name="color_menu_selected">?attr/colorOnSurface</item>
+        <item name="colorPrimaryDark">?attr/colorSurface</item>
         <item name="colorControlNormal">?attr/colorOnSurface</item>
-        <item name="searchViewStyle">@style/CleanSearchStyle</item>
+        <item name="colorControlHighlight">?attr/colorSecondary</item>
     </style>
 
     <style name="UltrasonicTheme.Light" parent="Theme.Material3.DynamicColors.Light">
-        <item name="windowNoTitle">true</item>
-        <item name="color_background">?attr/colorSurface</item>
-        <item name="color_selected">?attr/colorPrimaryContainer</item>
-        <item name="color_menu_background">?attr/colorSurface</item>
-        <item name="color_menu_selected">?attr/colorOnSurface</item>
         <item name="colorControlNormal">?attr/colorOnSurface</item>
-        <item name="searchViewStyle">@style/CleanSearchStyle</item>
+        <item name="colorControlHighlight">?attr/colorSecondary</item>
     </style>
+
 </resources>

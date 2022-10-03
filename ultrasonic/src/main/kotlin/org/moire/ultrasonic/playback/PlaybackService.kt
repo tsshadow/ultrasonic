@@ -30,6 +30,8 @@ import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.domain.Track
+import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider
 import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
@@ -172,6 +174,12 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            updateWidgetTrack(mediaItem?.toTrack())
+            cacheNextSongs()
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            updateWidgetPlayerState(isPlaying)
             cacheNextSongs()
         }
     }
@@ -204,5 +212,15 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
             .setUsage(USAGE_MEDIA)
             .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
             .build()
+    }
+
+    private fun updateWidgetTrack(song: Track?) {
+        val context = UApp.applicationContext()
+        UltrasonicAppWidgetProvider.notifyTrackChange(context, song)
+    }
+
+    private fun updateWidgetPlayerState(isPlaying: Boolean) {
+        val context = UApp.applicationContext()
+        UltrasonicAppWidgetProvider.notifyPlayerStateChange(context, isPlaying)
     }
 }

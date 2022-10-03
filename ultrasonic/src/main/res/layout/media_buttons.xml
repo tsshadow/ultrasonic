@@ -19,7 +19,7 @@
         a:focusable="true"
         a:scaleType="fitCenter"
         a:contentDescription="@string/buttons.shuffle"
-        app:icon="@drawable/media_shuffle_normal"
+        app:icon="@drawable/media_shuffle"
         app:iconGravity="textTop" />
 
     <org.moire.ultrasonic.view.AutoRepeatButton
@@ -33,7 +33,7 @@
         a:contentDescription="@string/buttons.previous"
         a:focusable="true"
         a:scaleType="fitCenter"
-        app:icon="@drawable/media_backward_normal"
+        app:icon="@drawable/media_backward"
         app:iconGravity="textTop"
         app:iconSize="32dp" />
 
@@ -48,7 +48,7 @@
         a:scaleType="fitCenter"
         tools:visibility="gone"
         a:contentDescription="@string/buttons.play"
-        app:icon="@drawable/media_start_normal"
+        app:icon="@drawable/media_start"
         app:iconGravity="textTop"
         app:iconSize="48dp" />
 
@@ -62,7 +62,7 @@
         a:contentDescription="@string/buttons.pause"
         a:focusable="true"
         a:scaleType="fitCenter"
-        app:icon="@drawable/media_pause_normal"
+        app:icon="@drawable/media_pause"
         app:iconGravity="textTop"
         app:iconSize="48dp" />
 
@@ -77,7 +77,7 @@
         a:scaleType="fitCenter"
         tools:visibility="gone"
         a:contentDescription="@string/buttons.stop"
-        app:icon="@drawable/media_stop_normal"
+        app:icon="@drawable/media_stop"
         app:iconGravity="textTop"
         app:iconSize="48dp" />
 
@@ -92,7 +92,7 @@
         a:contentDescription="@string/buttons.next"
         a:focusable="true"
         a:scaleType="fitCenter"
-        app:icon="@drawable/media_forward_normal"
+        app:icon="@drawable/media_forward"
         app:iconGravity="textTop"
         app:iconSize="32dp" />
 

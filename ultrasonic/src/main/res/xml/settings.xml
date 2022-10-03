@@ -8,7 +8,7 @@
         a:title="@string/settings.appearance_title"
         app:iconSpaceReserved="false">
         <ListPreference
-            a:defaultValue="@string/preferences_key_theme_dark"
+            a:defaultValue="@string/setting_key.theme_day_night"
             a:entries="@array/themeNames"
             a:entryValues="@array/themeValues"
             a:key="@string/setting_key.theme"
