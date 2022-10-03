@@ -1,66 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/now_playing"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/colorSecondaryContainer"
+    a:id="@+id/now_playing"
+    a:layout_width="fill_parent"
+    a:layout_height="wrap_content"
+    a:background="?attr/colorSecondaryContainer"
     tools:ignore="Overdraw">
 
     <ImageView
-        android:id="@+id/now_playing_image"
-        android:layout_width="72.0dip"
-        android:layout_height="72.0dip"
-        android:layout_marginStart="0dp"
-        android:elevation="4dp"
-        android:focusable="true"
-        android:gravity="center"
-        android:importantForAccessibility="no" />
+        a:id="@+id/now_playing_image"
+        a:layout_width="72.0dip"
+        a:layout_height="72.0dip"
+        a:layout_marginStart="0dp"
+        a:elevation="4dp"
+        a:focusable="true"
+        a:gravity="center"
+        a:importantForAccessibility="no" />
 
     <LinearLayout
-        android:layout_width="0.0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1.0"
-        android:orientation="vertical"
-        android:paddingStart="11.0dip">
+        a:layout_width="0.0dp"
+        a:layout_height="wrap_content"
+        a:layout_gravity="center_vertical"
+        a:layout_weight="1.0"
+        a:orientation="vertical"
+        a:paddingStart="11.0dip">
 
         <TextView
-            android:id="@+id/now_playing_trackname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:ellipsize="marquee"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            />
+            a:id="@+id/now_playing_trackname"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:layout_gravity="start"
+            a:ellipsize="marquee"
+            a:singleLine="true"
+            a:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
         <TextView
-            android:id="@+id/now_playing_artist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:ellipsize="end"
-            android:scrollHorizontally="true"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+            a:id="@+id/now_playing_artist"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:layout_gravity="start"
+            a:ellipsize="end"
+            a:scrollHorizontally="true"
+            a:singleLine="true"
+            a:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
     </LinearLayout>
 
     <Button
-            android:id="@+id/now_playing_control_play"
-            style="@style/Widget.Material3.Button.IconButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center|end"
-            android:layout_marginTop="2dip"
-            android:layout_marginEnd="16dip"
-            android:layout_weight="0.0"
-            android:contentDescription="@string/buttons.play"
-            android:focusable="false"
-            android:scaleType="fitCenter"
-            app:icon="@drawable/media_pause"
-            app:iconGravity="textTop"
-            app:iconSize="42dp" />
+        a:id="@+id/now_playing_control_play"
+        style="@style/Widget.Material3.Button.IconButton"
+        a:layout_width="48dp"
+        a:layout_height="48dp"
+        a:layout_gravity="center|end"
+        a:layout_marginTop="2dip"
+        a:layout_marginEnd="16dip"
+        a:layout_weight="0.0"
+        a:contentDescription="@string/buttons.play"
+        a:focusable="false"
+        a:scaleType="fitCenter"
+        app:icon="@drawable/media_pause"
+        app:iconGravity="textTop"
+        app:iconSize="42dp" />
 
 </LinearLayout>
