@@ -54,6 +54,8 @@ import timber.log.Timber
 
 /**
  * Initiates a search on the media library and displays the results
+ *
+ * TODO: Implement the search field without using the deprecated OptionsMenu calls
  */
 class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     private var searchResult: SearchResult? = null
@@ -140,7 +142,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     }
 
     /**
-     * This method create the search bar above the recycler view
+     * This method creates the search bar above the recycler view
      */
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         val activity = activity ?: return
