@@ -1,0 +1,33 @@
+Corrección de errores
+- #765: Mal rendimiento en el desplazamiento de pistas.
+- #779: El inicio de la reproducción desde Bluetooth debería mostrar la
+  notificación de medios.
+- #780: La carátula del álbum no se muestra en la primera reproducción de
+  una pista no almacenada.
+- #790: Los elementos no deberían quedarse en la cola de
+  ActivelyDownloading.
+- #792: LyricsFragment no es accesible.
+- #794: Ecualizador roto.
+- #795: Copias de seguridad no permitidas.
+- #797: Configuración del servidor 'Jukebox por defecto' esta rota.
+- #798: El modo Jukebox en la versión 4.0.0 parece estar roto en su mayor
+  parte.
+- #799: Al intentar abrir la configuración se bloquea la aplicación.
+- #801: El scrobbling de Last.FM no funciona en la versión 4.0.0.
+- #817: Se bloquea al cambiar al modo Offline.
+
+Mejoras
+- #734: Migración del descargador.
+- #778: No mostrar la insignia en el icono de Ultrasonic durante la
+  reproducción.
+- #784: Rediseño de la descarga de la carátula del álbum y manejo de la
+  caché.
+- #796: Hacer la aplicación más material.
+- #815: Los botones de descarga no se muestran cuando una pista se está
+  descargando.
+- #826: Reformular el ajuste de forzar la contraseña en texto plano.
+
+Otros
+- #510: Usar SafeArgs para los fragmentos restantes.
+- #793: Eliminar el visualizador.
+- #818: Añadir Renovatebot.

@@ -1,0 +1,27 @@
+Bug fixes
+- #765: Bad performance in Track scrolling.
+- #779: Starting playback from Bluetooth should display the Media
+  notification.
+- #780: Album art isn't displayed on first play of a non-cached track.
+- #790: Items shouldn't be stuck in the ActivelyDownloading queue.
+- #792: LyricsFragment unaccessible.
+- #794: Equalizer broken.
+- #795: Backups not allowed.
+- #797: Server setting 'Jukebox By Default' broken.
+- #798: Jukebox mode in 4.0.0 seems mostly broken.
+- #799: Trying to open settings crashes the app.
+- #801: Last.FM scrobbling broken on v4.0.0.
+- #817: Crash when switching to Offline mode.
+
+Enhancements
+- #734: Migrate Downloader.
+- #778: Do not show badge on Ultrasonic icon during playback.
+- #784: Redesign Album Art download and cache handling.
+- #796: Make the app more material.
+- #815: Download buttons don't show when a track is downloading.
+- #826: Reword the force plain text password setting.
+
+Others
+- #510: Use SafeArgs for remaining fragments.
+- #793: Remove Visualizer.
+- #818: Add Renovatebot.
