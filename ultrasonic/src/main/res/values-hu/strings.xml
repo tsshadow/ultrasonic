@@ -266,6 +266,7 @@
     <string name="settings.theme_black">Fekete</string>
     <string name="settings.theme_title">Téma</string>
     <string name="settings.title.allow_self_signed_certificate">Engedélyezze az önaláírt HTTPS tanúsítványt</string>
+    <string name="settings.title.force_plain_text_password">Az LDAP-felhasználók támogatásának engedélyezése</string>
     <string name="settings.use_folder_for_album_artist">Mappanevek használata az előadók neveként</string>
     <string name="settings.use_folder_for_album_artist_summary">Feltételezi, hogy a legfelső szintű mappa az előadó neve.</string>
     <string name="settings.use_id3">Böngészés ID3 Tag használatával</string>
@@ -342,6 +343,7 @@
     <!-- Subsonic api errors -->
     <string name="api.subsonic.generic">Általános api hiba: %1$s</string>
     <string name="api.subsonic.generic.no.message">nincs üzenet a szerverről</string>
+    <string name="api.subsonic.token_auth_not_supported_for_ldap">Az LDAP-felhasználók számára nem támogatott a token-hitelesítés.</string>
     <string name="api.subsonic.not_authenticated">Hibás felhasználónév vagy jelszó!</string>
     <string name="api.subsonic.not_authorized">Nem engedélyezett! Ellenőrizze a felhasználó jogosultságait a Subsonic kiszolgálón!</string>
     <string name="api.subsonic.param_missing">A szükséges param hiányzik.</string>

@@ -28,6 +28,7 @@
     <string name="button_bar.playlists">Afspeellijsten</string>
     <string name="button_bar.search">Zoeken</string>
     <string name="chat.send_a_message">Bericht versturen</string>
+    <string name="chat.send_button">Versturen</string>
     <string name="common.album">Album</string>
     <string name="common.appname">Ultrasonic</string>
     <string name="common.artist">Artiest</string>
@@ -306,6 +307,7 @@
     <string name="settings.theme_black">Zwart</string>
     <string name="settings.theme_title">Thema</string>
     <string name="settings.title.allow_self_signed_certificate">Zelf-gesigneerd HTTPS-certificaat toestaan</string>
+    <string name="settings.title.force_plain_text_password">Ondersteuning voor LDAP-gebruikers inschakelen</string>
     <string name="settings.summary.force_plain_text_password">Dit dwingt de app om het wachtwoord altijd op de ouderwetse manier te versturen, als de Subsonic-server geen ondersteuning biedt voor het autoriseren via de nieuwe api.</string>
     <string name="settings.use_folder_for_album_artist">Mappen gebruiken voor artiestennaam</string>
     <string name="settings.use_folder_for_album_artist_summary">Aannemen dat de naam van de bovenliggende map de naam van de albumartiest is</string>
@@ -378,7 +380,7 @@
     <string name="settings.debug.log_delete">Verwijderen</string>
     <string name="settings.debug.log_deleted">De logboeken zijn verwijderd.</string>
     <string name="notification.downloading_title">Bezig met downloaden van media op de achtergrond…</string>
-
+    <string name="notification.permission_required">Meldingen zijn vereist voor het afspelen van media. Je kunt dit recht te allen tijde verlenen in de Android-instellingen.</string>
     <string name="server_selector.label">Ingestelde servers:</string>
     <string name="server_selector.delete_confirmation">Weet je zeker dat je deze server wilt verwijderen?</string>
     <string name="server_editor.label">Server bewerken</string>

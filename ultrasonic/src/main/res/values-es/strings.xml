@@ -28,6 +28,7 @@
     <string name="button_bar.playlists">Listas de reproducción</string>
     <string name="button_bar.search">Buscar</string>
     <string name="chat.send_a_message">Enviar un mensaje</string>
+    <string name="chat.send_button">Enviar</string>
     <string name="common.album">Álbum</string>
     <string name="common.appname">Ultrasonic</string>
     <string name="common.artist">Artista</string>
@@ -306,7 +307,7 @@
     <string name="settings.theme_black">Negro</string>
     <string name="settings.theme_title">Tema</string>
     <string name="settings.title.allow_self_signed_certificate">Permir certificado HTTPS autofirmado</string>
-    <string name="settings.title.force_plain_text_password">Forzar autenticación de contraseña plana</string>
+    <string name="settings.title.force_plain_text_password">Forzar la autenticación con contraseña sin cifrar</string>
     <string name="settings.summary.force_plain_text_password">Esto obliga a la aplicación a enviar siempre la contraseña sin cifrar. Útil si el servidor Subsonic no admite la nueva API de autenticación para los usuarios.</string>
     <string name="settings.use_folder_for_album_artist">Usar carpetas para el nombre del artista</string>
     <string name="settings.use_folder_for_album_artist_summary">Se asume que la carpeta en el nivel mal alto es el nombre del artista del álbum</string>
@@ -379,7 +380,7 @@
     <string name="settings.debug.log_delete">Borrar archivos</string>
     <string name="settings.debug.log_deleted">Archivos de registro eliminados.</string>
     <string name="notification.downloading_title">Descargando medios en segundo plano…</string>
-
+    <string name="notification.permission_required">Las notificaciones son necesarias para la reproducción de medios. Puedes conceder el permiso en cualquier momento en los ajustes de Android.</string>
     <string name="server_selector.label">Servidores configurados</string>
     <string name="server_selector.delete_confirmation">¿Seguro que deseas borrar el servidor?</string>
     <string name="server_editor.label">Editando servidor</string>

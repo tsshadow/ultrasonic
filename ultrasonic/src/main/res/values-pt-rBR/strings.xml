@@ -367,7 +367,6 @@
     <string name="settings.debug.log_delete">Excluir arquivos</string>
     <string name="settings.debug.log_deleted">Arquivos de log excluídos.</string>
     <string name="notification.downloading_title">Baixado mídia em segundo plano…</string>
-
     <string name="server_selector.label">Servidores Configurados</string>
     <string name="server_selector.delete_confirmation">Quer realmente excluir o servidor?</string>
     <string name="server_editor.label">Gerenciar Servidor</string>

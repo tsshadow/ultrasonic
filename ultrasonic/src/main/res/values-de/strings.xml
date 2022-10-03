@@ -306,7 +306,7 @@
     <string name="settings.theme_black">Schwarz</string>
     <string name="settings.theme_title">Thema</string>
     <string name="settings.title.allow_self_signed_certificate">Selbst-signierte HTTPS Zertifikate erlauben</string>
-    <string name="settings.title.force_plain_text_password">Passwort als Klartext senden</string>
+    <string name="settings.title.force_plain_text_password">LDAP Benutzeranmeldung aktivieren</string>
     <string name="settings.summary.force_plain_text_password">Dies zwingt die App, das Kennwort immer unverschlüsselt zu senden. Hilfreich wenn der Subsonic Server keine Autorisierungs-API unterstützt.</string>
     <string name="settings.use_folder_for_album_artist">Nutze den Ordnernamen als Namen der Künstler*in</string>
     <string name="settings.use_folder_for_album_artist_summary">Annehmen, dass der Ordner nach der Künstler*in benannt ist.</string>
@@ -379,7 +379,6 @@
     <string name="settings.debug.log_delete">Dateien löschen</string>
     <string name="settings.debug.log_deleted">Logeinträge gelöscht</string>
     <string name="notification.downloading_title">Lade Medien im Hintergrund runter…</string>
-
     <string name="server_selector.label">Konfigurierte Server</string>
     <string name="server_selector.delete_confirmation">Bist Du sicher, dass Du den Server löschen möchtest?</string>
     <string name="server_editor.label">Server bearbeiten</string>

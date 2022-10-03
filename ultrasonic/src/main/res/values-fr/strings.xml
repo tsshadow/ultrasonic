@@ -296,6 +296,7 @@
     <string name="settings.theme_black">Noir</string>
     <string name="settings.theme_title">Thème</string>
     <string name="settings.title.allow_self_signed_certificate">Autoriser le certificat HTTPS auto-signé</string>
+    <string name="settings.title.force_plain_text_password">Activer la prise en charge des utilisateurs LDAP</string>
     <string name="settings.use_folder_for_album_artist">Utiliser les noms des dossiers pour les noms d\'artistes</string>
     <string name="settings.use_folder_for_album_artist_summary">Dossier de niveau supérieur devient le nom de l\'artiste de l\'album</string>
     <string name="settings.use_id3">Naviguer en utilisant les tags ID3</string>
@@ -360,7 +361,6 @@
     <string name="settings.debug.log_delete">Supprimer les fichiers</string>
     <string name="settings.debug.log_deleted">Fichiers de log supprimés</string>
     <string name="notification.downloading_title">Téléchargement des fichiers en arrière-plan…</string>
-
     <string name="server_selector.label">Serveurs configurés</string>
     <string name="server_selector.delete_confirmation">Êtes-vous sûr de vouloir supprimer ce serveur ?</string>
     <string name="server_editor.label">Édition du serveur</string>

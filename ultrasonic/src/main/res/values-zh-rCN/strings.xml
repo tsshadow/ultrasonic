@@ -344,7 +344,6 @@
     <string name="settings.debug.log_delete">删除文件</string>
     <string name="settings.debug.log_deleted">删除日志文件</string>
     <string name="notification.downloading_title">在后台下载媒体…</string>
-
     <string name="server_selector.label">配置服务器</string>
     <string name="server_selector.delete_confirmation">您确定要删除此服务器吗？</string>
     <string name="server_editor.label">编辑服务器</string>
