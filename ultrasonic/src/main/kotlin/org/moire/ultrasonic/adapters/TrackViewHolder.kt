@@ -1,12 +1,12 @@
 package org.moire.ultrasonic.adapters
 
-import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.Checkable
 import android.widget.CheckedTextView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
@@ -38,7 +38,6 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     var check: CheckedTextView = view.findViewById(R.id.song_check)
     var drag: ImageView = view.findViewById(R.id.song_drag)
     var observableChecked = MutableLiveData(false)
-    lateinit var imageHelper: Utils.ImageHelper
 
     private var rating: LinearLayout = view.findViewById(R.id.song_five_star)
     private var fiveStar1: ImageView = view.findViewById(R.id.song_five_star_1)
@@ -125,11 +124,15 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         rxBusSubscription?.dispose()
     }
 
+    private val playingIcon by lazy {
+        ContextCompat.getDrawable(view.context, R.drawable.ic_stat_play)!!
+    }
+
     private fun setPlayIcon(isPlaying: Boolean) {
         if (isPlaying && !isPlayingCached) {
             isPlayingCached = true
             title.setCompoundDrawablesWithIntrinsicBounds(
-                imageHelper.playingImage, null, null, null
+                playingIcon, null, null, null
             )
         } else if (!isPlaying && isPlayingCached) {
             isPlayingCached = false
@@ -214,13 +217,13 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
 
         when (status) {
             DownloadState.DONE -> {
-                showStatusImage(imageHelper.downloadedImage)
+                showStatusImage(R.drawable.ic_downloaded)
             }
             DownloadState.PINNED -> {
-                showStatusImage(imageHelper.pinImage)
+                showStatusImage(R.drawable.ic_menu_pin)
             }
             DownloadState.FAILED -> {
-                showStatusImage(imageHelper.errorImage)
+                showStatusImage(R.drawable.ic_baseline_error)
             }
             DownloadState.DOWNLOADING -> {
                 showProgress()
@@ -237,10 +240,14 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         }
     }
 
-    private fun showStatusImage(image: Drawable?) {
+    private fun showStatusImage(image: Int?) {
         progressIndicator.isVisible = false
         statusImage.isVisible = true
-        statusImage.setImageDrawable(image)
+        if (image != null) {
+            statusImage.setImageResource(image)
+        } else {
+            statusImage.setImageDrawable(null)
+        }
     }
 
     private fun showIndefiniteProgress() {

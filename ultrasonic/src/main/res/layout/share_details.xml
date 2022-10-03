@@ -22,8 +22,7 @@
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
             a:text="@string/share_comment"
-            a:textAllCaps="true"
-            a:textColor="?attr/colorPrimary"
+            a:theme="@style/Ultrasonic.AllCapsLabel"
             a:id="@+id/textViewComment"
             a:layout_gravity="center_horizontal"/>
 
@@ -40,8 +39,7 @@
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
             a:text="@string/settings.share_expiration"
-            a:textAllCaps="true"
-            a:textColor="?attr/colorPrimary"
+            a:theme="@style/Ultrasonic.AllCapsLabel"
             a:id="@+id/textViewExpiration"
             a:layout_gravity="center_horizontal"/>
 

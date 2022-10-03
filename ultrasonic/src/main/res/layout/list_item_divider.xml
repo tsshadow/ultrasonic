@@ -11,9 +11,6 @@
         a:layout_height="wrap_content"
         a:gravity="center_vertical"
         a:paddingStart="6dp"
-        a:textAllCaps="true"
-        a:textAppearance="?android:attr/textAppearanceSmall"
-        a:textColor="?attr/colorPrimary"
-        a:textStyle="bold" />
+        a:theme="@style/Ultrasonic.AllCapsLabel" />
 </LinearLayout>
 

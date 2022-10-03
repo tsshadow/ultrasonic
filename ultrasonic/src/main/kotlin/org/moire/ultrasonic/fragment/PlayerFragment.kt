@@ -838,13 +838,11 @@ class PlayerFragment :
         viewAdapter.register(
             TrackViewBinder(
                 onItemClick = clickHandler,
+                onContextMenuClick = { menu, id -> onContextMenuItemSelected(menu, id) },
                 checkable = false,
                 draggable = true,
-                context = requireContext(),
                 lifecycleOwner = viewLifecycleOwner,
-                createContextMenu = { view, track -> onCreateContextMenu(view, track) },
-                onContextMenuClick = { menu, id -> onContextMenuItemSelected(menu, id) },
-            ).apply {
+            ) { view, track -> onCreateContextMenu(view, track) }.apply {
                 this.startDrag = { holder ->
                     dragTouchHelper.startDrag(holder)
                 }

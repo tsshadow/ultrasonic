@@ -14,10 +14,12 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.os.Environment
 import android.view.KeyEvent
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.RemoteViews
-import java.lang.Exception
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.domain.Track
@@ -27,141 +29,197 @@ import org.moire.ultrasonic.util.Constants
 import timber.log.Timber
 
 /**
- * Widget Provider for the Ultrasonic Widgets
+ * Widget Provider for the Ultrasonic Widget
  */
 @Suppress("MagicNumber")
 open class UltrasonicAppWidgetProvider : AppWidgetProvider() {
-    @JvmField
-    protected var layoutId = 0
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
-        defaultAppWidget(context, appWidgetIds)
+        updateTrackAndState(context, appWidgetIds)
     }
 
-    /**
-     * Initialize given widgets to default state, where we launch Ultrasonic on default click
-     * and hide actions if service not running.
-     */
-    private fun defaultAppWidget(context: Context, appWidgetIds: IntArray) {
-        val res = context.resources
-        val views = RemoteViews(context.packageName, layoutId)
-        views.setTextViewText(R.id.title, null)
-        views.setTextViewText(R.id.album, null)
-        views.setTextViewText(R.id.artist, res.getText(R.string.widget_initial_text))
-        linkButtons(context, views, false)
-        pushUpdate(context, appWidgetIds, views)
-    }
-
-    private fun pushUpdate(context: Context, appWidgetIds: IntArray?, views: RemoteViews) {
-        // Update specific list of appWidgetIds if given, otherwise default to all
-        val manager = AppWidgetManager.getInstance(context)
-        if (manager != null) {
-            if (appWidgetIds != null) {
-                manager.updateAppWidget(appWidgetIds, views)
-            } else {
-                manager.updateAppWidget(ComponentName(context, this.javaClass), views)
-            }
-        }
-    }
-
-    /**
-     * Handle a change notification coming over from [MediaPlayerController]
-     */
-    fun notifyChange(context: Context, currentSong: Track?, playing: Boolean, setAlbum: Boolean) {
-        if (hasInstances(context)) {
-            performUpdate(context, currentSong, playing, setAlbum)
-        }
-    }
-
-    /**
-     * Check against [AppWidgetManager] if there are any instances of this widget.
-     */
-    private fun hasInstances(context: Context): Boolean {
-        val manager = AppWidgetManager.getInstance(context)
-        if (manager != null) {
-            val appWidgetIds = manager.getAppWidgetIds(ComponentName(context, javaClass))
-            return appWidgetIds.isNotEmpty()
-        }
-        return false
-    }
-
-    /**
-     * Update all active widget instances by pushing changes
-     */
-    private fun performUpdate(
-        context: Context,
-        currentSong: Track?,
-        playing: Boolean,
-        setAlbum: Boolean
+    override fun onAppWidgetOptionsChanged(
+        context: Context?,
+        appWidgetManager: AppWidgetManager?,
+        appWidgetId: Int,
+        newOptions: Bundle?
     ) {
-        Timber.d("Updating Widget")
-        val res = context.resources
-        val views = RemoteViews(context.packageName, layoutId)
-        val title = currentSong?.title
-        val artist = currentSong?.artist
-        val album = currentSong?.album
-        var errorState: CharSequence? = null
-
-        // Show error message?
-        val status = Environment.getExternalStorageState()
-        if (status == Environment.MEDIA_SHARED || status == Environment.MEDIA_UNMOUNTED) {
-            errorState = res.getText(R.string.widget_sdcard_busy)
-        } else if (status == Environment.MEDIA_REMOVED) {
-            errorState = res.getText(R.string.widget_sdcard_missing)
-        } else if (currentSong == null) {
-            errorState = res.getText(R.string.widget_initial_text)
-        }
-        if (errorState != null) {
-            // Show error state to user
-            views.setTextViewText(R.id.title, null)
-            views.setTextViewText(R.id.artist, errorState)
-            if (setAlbum) {
-                views.setTextViewText(R.id.album, null)
-            }
-            views.setImageViewResource(R.id.appwidget_coverart, R.drawable.unknown_album)
-        } else {
-            // No error, so show normal titles
-            views.setTextViewText(R.id.title, title)
-            views.setTextViewText(R.id.artist, artist)
-            if (setAlbum) {
-                views.setTextViewText(R.id.album, album)
-            }
-        }
-
-        // Set correct drawable for pause state
-        if (playing) {
-            views.setImageViewResource(R.id.control_play, R.drawable.media_pause_normal)
-        } else {
-            views.setImageViewResource(R.id.control_play, R.drawable.media_start_normal)
-        }
-
-        // Set the cover art
-        try {
-            val bitmap =
-                if (currentSong == null) null else BitmapUtils.getAlbumArtBitmapFromDisk(
-                    currentSong,
-                    240
-                )
-            if (bitmap == null) {
-                // Set default cover art
-                views.setImageViewResource(R.id.appwidget_coverart, R.drawable.unknown_album)
-            } else {
-                views.setImageViewBitmap(R.id.appwidget_coverart, bitmap)
-            }
-        } catch (all: Exception) {
-            Timber.e(all, "Failed to load cover art")
-            views.setImageViewResource(R.id.appwidget_coverart, R.drawable.unknown_album)
-        }
-
-        // Link actions buttons to intents
-        linkButtons(context, views, currentSong != null)
-        pushUpdate(context, null, views)
+        updateTrackAndState(context!!, intArrayOf(appWidgetId))
     }
 
     companion object {
+
+        private var isPlaying: Boolean = false
+        private var track: Track? = null
+
+        /**
+         * Pushes the current track details to the widgets
+         */
+        fun notifyTrackChange(context: Context, currentSong: Track?) {
+            this.track = currentSong
+            if (hasInstances(context)) {
+                // The widget won't update correctly if only the track or the state is updated
+                updateTrackAndState(context, null)
+            }
+        }
+
+        /**
+         * Pushes the current player state to the widgets
+         */
+        fun notifyPlayerStateChange(context: Context, isPlaying: Boolean) {
+            this.isPlaying = isPlaying
+            if (hasInstances(context)) {
+                // The widget won't update correctly if only the track or the state is updated
+                updateTrackAndState(context, null)
+            }
+        }
+
+        /**
+         * Send the track and the player state to the widgets
+         */
+        private fun updateTrackAndState(context: Context, appWidgetIds: IntArray? = null) {
+            pushUpdate(context, appWidgetIds) {
+                updateTrack(context, it, track)
+                updatePlayerState(it, isPlaying)
+            }
+        }
+
+        /**
+         * Iterates through the instances of the widget, and pushes the update to them
+         */
+        private fun pushUpdate(
+            context: Context,
+            appWidgetIds: IntArray? = null,
+            update: (RemoteViews) -> Unit
+        ) {
+            val manager = AppWidgetManager.getInstance(context)
+            if (manager != null) {
+                val widgetIds =
+                    appWidgetIds ?: manager.getAppWidgetIds(
+                        ComponentName(
+                            context,
+                            UltrasonicAppWidgetProvider::class.java
+                        )
+                    )
+
+                widgetIds.forEach {
+                    val widgetOptions = manager.getAppWidgetOptions(it)
+                    val minHeight =
+                        widgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+                    val minWidth =
+                        widgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+                    val layoutId = getLayout(minHeight, minWidth)
+                    val views = RemoteViews(context.packageName, layoutId)
+                    update(views)
+                    manager.updateAppWidget(it, views)
+                }
+            }
+        }
+
+        /**
+         * Computes the layout to be displayed for the widget height
+         */
+        private fun getLayout(height: Int, width: Int): Int {
+            val portrait = (width / height.toFloat()) < 1.8F
+            if (portrait) return R.layout.appwidget_portrait
+            if (height > 100) return R.layout.appwidget_landscape
+            return R.layout.appwidget_landscape_small
+        }
+
+        /**
+         * Check against [AppWidgetManager] if there are any instances of this widget.
+         */
+        private fun hasInstances(context: Context): Boolean {
+            val manager = AppWidgetManager.getInstance(context)
+            if (manager != null) {
+                val appWidgetIds = manager.getAppWidgetIds(
+                    ComponentName(
+                        context,
+                        UltrasonicAppWidgetProvider::class.java
+                    )
+                )
+                return appWidgetIds.isNotEmpty()
+            }
+            return false
+        }
+
+        /**
+         * Update Player state in widgets
+         */
+        private fun updatePlayerState(views: RemoteViews, isPlaying: Boolean) {
+            if (isPlaying) {
+                views.setImageViewResource(R.id.control_play, R.drawable.media_pause)
+            } else {
+                views.setImageViewResource(R.id.control_play, R.drawable.media_start)
+            }
+        }
+
+        /**
+         * Update Track details in widgets
+         */
+        private fun updateTrack(
+            context: Context,
+            views: RemoteViews,
+            currentSong: Track?
+        ) {
+            Timber.d("Updating Widget")
+            val res = context.resources
+            val title = currentSong?.title
+            val artist = currentSong?.artist
+            val album = currentSong?.album
+            var errorState: CharSequence? = null
+
+            // Show error message?
+            val status = Environment.getExternalStorageState()
+            if (status == Environment.MEDIA_SHARED || status == Environment.MEDIA_UNMOUNTED) {
+                errorState = res.getText(R.string.widget_sdcard_busy)
+            } else if (status == Environment.MEDIA_REMOVED) {
+                errorState = res.getText(R.string.widget_sdcard_missing)
+            } else if (currentSong == null) {
+                errorState = res.getText(R.string.widget_initial_text)
+            }
+            if (errorState != null) {
+                // Show error state to user
+                views.setViewVisibility(R.id.title, GONE)
+                views.setViewVisibility(R.id.album, GONE)
+                views.setTextViewText(R.id.artist, res.getText(R.string.widget_initial_text))
+                views.setBoolean(R.id.artist, "setSingleLine", false)
+                views.setImageViewResource(R.id.appwidget_coverart, R.drawable.unknown_album)
+            } else {
+                // No error, so show normal titles
+                views.setTextViewText(R.id.title, title)
+                views.setTextViewText(R.id.artist, artist)
+                views.setTextViewText(R.id.album, album)
+                views.setBoolean(R.id.artist, "setSingleLine", true)
+                views.setViewVisibility(R.id.title, VISIBLE)
+                views.setViewVisibility(R.id.album, VISIBLE)
+            }
+            // Set the cover art
+            try {
+                val bitmap =
+                    if (currentSong == null) null else BitmapUtils.getAlbumArtBitmapFromDisk(
+                        currentSong,
+                        240
+                    )
+                if (bitmap == null) {
+                    // Set default cover art
+                    views.setImageViewResource(R.id.appwidget_coverart, R.drawable.unknown_album)
+                } else {
+                    views.setImageViewBitmap(R.id.appwidget_coverart, bitmap)
+                }
+            } catch (all: Exception) {
+                Timber.e(all, "Failed to load cover art")
+                views.setImageViewResource(R.id.appwidget_coverart, R.drawable.unknown_album)
+            }
+
+            // Link actions buttons to intents
+            linkButtons(context, views, currentSong != null)
+        }
+
         /**
          * Link up various button actions using [PendingIntent].
          */

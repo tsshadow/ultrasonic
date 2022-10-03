@@ -36,10 +36,6 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.playback.PlaybackService
-import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider4X1
-import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider4X2
-import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider4X3
-import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider4X4
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.MainThreadExecutor
 import org.moire.ultrasonic.util.Settings
@@ -201,11 +197,6 @@ class MediaPlayerController(
             }
         }
 
-        rxBusSubscription += RxBus.stopServiceCommandObservable.subscribe {
-            // Clear the widget when we stop the service
-            updateWidget(null)
-        }
-
         rxBusSubscription += RxBus.shutdownCommandObservable.subscribe {
             playbackStateSerializer.serializeNow(
                 playlist.map { it.toTrack() },
@@ -236,9 +227,6 @@ class MediaPlayerController(
                 scrobbler.scrobble(currentPlaying, true)
             }
         }
-
-        // Update widget
-        updateWidget(currentPlaying)
     }
 
     private fun clearBookmark() {
@@ -265,15 +253,6 @@ class MediaPlayerController(
         )
         RxBus.playerStatePublisher.onNext(newState)
         Timber.i("New PlaybackState: %s", newState)
-    }
-
-    private fun updateWidget(song: Track?) {
-        val context = UApp.applicationContext()
-
-        UltrasonicAppWidgetProvider4X1.instance?.notifyChange(context, song, isPlaying, false)
-        UltrasonicAppWidgetProvider4X2.instance?.notifyChange(context, song, isPlaying, true)
-        UltrasonicAppWidgetProvider4X3.instance?.notifyChange(context, song, isPlaying, true)
-        UltrasonicAppWidgetProvider4X4.instance?.notifyChange(context, song, isPlaying, true)
     }
 
     fun onDestroy() {

@@ -302,6 +302,7 @@
     <string name="settings.test_connection_title">Test Connection</string>
     <string name="settings.testing_ok">Connection is OK</string>
     <string name="settings.testing_unlicensed">Connection is OK. Server unlicensed.</string>
+    <string name="settings.theme_day_night">Day &amp; Night</string>
     <string name="settings.theme_light">Light</string>
     <string name="settings.theme_dark">Dark</string>
     <string name="settings.theme_black">Black</string>

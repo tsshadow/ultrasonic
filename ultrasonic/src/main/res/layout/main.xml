@@ -11,15 +11,13 @@
 
         <TextView
             android:id="@+id/main_music"
+            android:theme="@style/Ultrasonic.AllCapsLabel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:paddingStart="6dp"
             android:text="@string/main.music"
-            android:textAllCaps="true"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?attr/colorPrimary"
-            android:textStyle="bold" />
+            />
 
         <TextView
             android:id="@+id/main_artists_button"
@@ -61,10 +59,7 @@
             android:gravity="center_vertical"
             android:paddingStart="6dp"
             android:text="@string/main.songs_title"
-            android:textAllCaps="true"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?attr/colorPrimary"
-            android:textStyle="bold" />
+            android:theme="@style/Ultrasonic.AllCapsLabel" />
 
         <TextView
             android:id="@+id/main_songs_button"
@@ -90,15 +85,12 @@
 
         <TextView
             android:id="@+id/main_albums"
+            android:theme="@style/Ultrasonic.AllCapsLabel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:paddingStart="6dp"
-            android:text="@string/main.albums_title"
-            android:textAllCaps="true"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?attr/colorPrimary"
-            android:textStyle="bold" />
+            android:text="@string/main.albums_title" />
 
         <TextView
             android:id="@+id/main_albums_newest"
@@ -195,10 +187,7 @@
             android:gravity="center_vertical"
             android:paddingStart="6dp"
             android:text="@string/main.videos"
-            android:textAllCaps="true"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?attr/colorPrimary"
-            android:textStyle="bold" />
+            android:theme="@style/Ultrasonic.AllCapsLabel" />
 
         <TextView
             android:id="@+id/main_videos"

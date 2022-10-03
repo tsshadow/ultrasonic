@@ -120,7 +120,6 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 onContextMenuClick = ::onContextMenuItemSelected,
                 checkable = false,
                 draggable = false,
-                context = requireContext(),
                 lifecycleOwner = viewLifecycleOwner
             )
         )

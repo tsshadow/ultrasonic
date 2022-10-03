@@ -6,6 +6,7 @@
     <string name="setting_key.theme_light" translatable="false">light</string>
     <string name="setting_key.theme_dark" translatable="false">dark</string>
     <string name="setting_key.theme_black" translatable="false">black</string>
+    <string name="setting_key.theme_day_night" translatable="false">dayNight</string>
     <string name="setting_key.display_bitrate_with_artist" translatable="false">displayBitrateWithArtist</string>
     <string name="setting_key.use_folder_for_album_artist" translatable="false">useFolderForAlbumArtist</string>
     <string name="setting_key.show_track_number" translatable="false">showTrackNumber</string>

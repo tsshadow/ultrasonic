@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="appwidget_text">#FFFFFF</color>
-    <color name="appwidget_button_background">#00000000</color>
     <color name="background_color_black">#000000</color>
     <color name="selected_menu_dark">#F3F3F3</color>
     <color name="selected_menu_light">#000000</color>

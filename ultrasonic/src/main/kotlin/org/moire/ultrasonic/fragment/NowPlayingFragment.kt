@@ -86,9 +86,9 @@ class NowPlayingFragment : Fragment() {
     private fun update() {
         try {
             if (mediaPlayerController.isPlaying) {
-                playButton!!.setIconResource(R.drawable.media_pause_normal)
+                playButton!!.setIconResource(R.drawable.media_pause)
             } else {
-                playButton!!.setIconResource(R.drawable.media_start_normal)
+                playButton!!.setIconResource(R.drawable.media_start)
             }
 
             val file = mediaPlayerController.currentMediaItem?.toTrack()

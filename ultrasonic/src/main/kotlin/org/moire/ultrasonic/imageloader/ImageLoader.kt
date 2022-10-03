@@ -16,7 +16,6 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
-import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
@@ -46,7 +45,7 @@ class ImageLoader(
         .addRequestHandler(AvatarRequestHandler(apiClient))
         .memoryCache(LruCache(calculateMemoryCacheSize(context)))
         .build().apply {
-            setIndicatorsEnabled(BuildConfig.DEBUG)
+            // setIndicatorsEnabled(BuildConfig.DEBUG)
         }
 
     private fun load(request: ImageRequest) = when (request) {

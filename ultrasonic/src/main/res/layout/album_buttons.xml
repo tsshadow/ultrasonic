@@ -29,7 +29,7 @@
         android:layout_weight="1"
         android:visibility="gone"
         android:contentDescription="@string/common.play_now"
-        app:icon="@drawable/media_start_normal"
+        app:icon="@drawable/media_start"
         app:iconGravity="textTop"
         app:iconSize="26dp" />
     
@@ -120,7 +120,7 @@
         android:layout_weight="1"
         android:visibility="gone"
         android:contentDescription="@string/search.more"
-        app:icon="@drawable/media_forward_normal"
+        app:icon="@drawable/media_forward"
         app:iconGravity="textTop"
         app:iconSize="26dp" />
 

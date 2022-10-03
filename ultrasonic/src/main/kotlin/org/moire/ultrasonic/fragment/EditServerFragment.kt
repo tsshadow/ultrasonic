@@ -69,7 +69,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
     private var userNameEditText: TextInputLayout? = null
     private var passwordEditText: TextInputLayout? = null
     private var selfSignedSwitch: SwitchMaterial? = null
-    private var ldapSwitch: SwitchMaterial? = null
+    private var plaintextSwitch: SwitchMaterial? = null
     private var jukeboxSwitch: SwitchMaterial? = null
     private var saveButton: Button? = null
     private var testButton: Button? = null
@@ -102,7 +102,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
         userNameEditText = view.findViewById(R.id.edit_server_username)
         passwordEditText = view.findViewById(R.id.edit_server_password)
         selfSignedSwitch = view.findViewById(R.id.edit_self_signed)
-        ldapSwitch = view.findViewById(R.id.edit_ldap)
+        plaintextSwitch = view.findViewById(R.id.edit_plaintext)
         jukeboxSwitch = view.findViewById(R.id.edit_jukebox)
         saveButton = view.findViewById(R.id.edit_save)
         testButton = view.findViewById(R.id.edit_test)
@@ -195,7 +195,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
 
     private fun updateColor(color: Int?) {
         val image = ContextCompat.getDrawable(requireContext(), R.drawable.thumb_drawable)
-        currentColor = ServerColor.getBackgroundColor(requireContext(), color)
+        currentColor = color ?: ServerColor.getBackgroundColor(requireContext(), null)
         image?.setTint(currentColor)
         serverColorImageView?.background = image
     }
@@ -221,7 +221,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
             ::selfSignedSwitch.name, selfSignedSwitch!!.isChecked
         )
         savedInstanceState.putBoolean(
-            ::ldapSwitch.name, ldapSwitch!!.isChecked
+            ::plaintextSwitch.name, plaintextSwitch!!.isChecked
         )
         savedInstanceState.putBoolean(
             ::jukeboxSwitch.name, jukeboxSwitch!!.isChecked
@@ -258,7 +258,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
             savedInstanceState.getString(::passwordEditText.name)
         )
         selfSignedSwitch!!.isChecked = savedInstanceState.getBoolean(::selfSignedSwitch.name)
-        ldapSwitch!!.isChecked = savedInstanceState.getBoolean(::ldapSwitch.name)
+        plaintextSwitch!!.isChecked = savedInstanceState.getBoolean(::plaintextSwitch.name)
         jukeboxSwitch!!.isChecked = savedInstanceState.getBoolean(::jukeboxSwitch.name)
         updateColor(savedInstanceState.getInt(::serverColorImageView.name))
         if (savedInstanceState.containsKey(::selectedColor.name))
@@ -277,7 +277,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
         userNameEditText!!.editText?.setText(currentServerSetting!!.userName)
         passwordEditText!!.editText?.setText(currentServerSetting!!.password)
         selfSignedSwitch!!.isChecked = currentServerSetting!!.allowSelfSignedCertificate
-        ldapSwitch!!.isChecked = currentServerSetting!!.forcePlainTextPassword
+        plaintextSwitch!!.isChecked = currentServerSetting!!.forcePlainTextPassword
         jukeboxSwitch!!.isChecked = currentServerSetting!!.jukeboxByDefault
         updateColor(currentServerSetting!!.color)
     }
@@ -331,7 +331,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
             currentServerSetting!!.userName = userNameEditText!!.editText?.text.toString()
             currentServerSetting!!.password = passwordEditText!!.editText?.text.toString()
             currentServerSetting!!.allowSelfSignedCertificate = selfSignedSwitch!!.isChecked
-            currentServerSetting!!.forcePlainTextPassword = ldapSwitch!!.isChecked
+            currentServerSetting!!.forcePlainTextPassword = plaintextSwitch!!.isChecked
             currentServerSetting!!.jukeboxByDefault = jukeboxSwitch!!.isChecked
         }
 
@@ -354,7 +354,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
             currentServerSetting!!.userName != userNameEditText!!.editText?.text.toString() ||
             currentServerSetting!!.password != passwordEditText!!.editText?.text.toString() ||
             currentServerSetting!!.allowSelfSignedCertificate != selfSignedSwitch!!.isChecked ||
-            currentServerSetting!!.forcePlainTextPassword != ldapSwitch!!.isChecked ||
+            currentServerSetting!!.forcePlainTextPassword != plaintextSwitch!!.isChecked ||
             currentServerSetting!!.jukeboxByDefault != jukeboxSwitch!!.isChecked
     }
 

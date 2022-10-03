@@ -77,6 +77,8 @@ android {
         ignore 'MissingTranslation', 'UnusedQuantity', 'MissingQuantity'
         warning 'ImpliedQuantity'
         disable 'ObsoleteLintCustomCheck'
+        textReport true
+        checkDependencies true
     }
     namespace 'org.moire.ultrasonic'
 
