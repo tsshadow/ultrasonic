@@ -1,0 +1,6 @@
+Bug fixes
+- #821: Multiple podcast selected = Never-ending buffering.
+- !847: Fix Download bug in Custom Locations.
+
+Enhancements
+- !820: Updated widget handling and layouts, add Day&Night theme.

@@ -1,0 +1,7 @@
+Corrección de errores
+- #821: Múltiples podcasts seleccionados = Buffering interminable.
+- !847: Corrección del error de descarga en las ubicaciones personalizadas.
+
+Mejoras
+- !820: Actualización del manejo de los widgets y de los diseños, adición
+  del tema Day&Night.
