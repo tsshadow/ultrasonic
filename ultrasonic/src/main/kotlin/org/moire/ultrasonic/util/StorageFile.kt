@@ -1,6 +1,6 @@
 /*
  * StorageFile.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -87,12 +87,10 @@ class StorageFile(
 
     override fun getFileOutputStream(append: Boolean): OutputStream {
         val mode = if (append) "wa" else "w"
-        val descriptor = UApp.applicationContext().contentResolver.openAssetFileDescriptor(
+        return UApp.applicationContext().contentResolver.openOutputStream(
             uri,
             mode
-        )
-        return descriptor?.createOutputStream()
-            ?: throw IOException("Couldn't retrieve OutputStream")
+        ) ?: throw IOException("Couldn't retrieve OutputStream")
     }
 
     override fun getFileInputStream(): InputStream {
