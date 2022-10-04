@@ -302,6 +302,7 @@
     <string name="settings.test_connection_title">Verbinding testen</string>
     <string name="settings.testing_ok">Verbinding is goed</string>
     <string name="settings.testing_unlicensed">Verbinding is goed; geen serverlicentie.</string>
+    <string name="settings.theme_day_night">Dag en nacht</string>
     <string name="settings.theme_light">Licht</string>
     <string name="settings.theme_dark">Donker</string>
     <string name="settings.theme_black">Zwart</string>

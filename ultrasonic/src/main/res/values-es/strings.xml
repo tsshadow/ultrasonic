@@ -302,6 +302,7 @@
     <string name="settings.test_connection_title">Comprobar conexión</string>
     <string name="settings.testing_ok">La conexión es correcta</string>
     <string name="settings.testing_unlicensed">La conexión es correcta. Servidor sin licencia.</string>
+    <string name="settings.theme_day_night">Día y noche</string>
     <string name="settings.theme_light">Claro</string>
     <string name="settings.theme_dark">Oscuro</string>
     <string name="settings.theme_black">Negro</string>
