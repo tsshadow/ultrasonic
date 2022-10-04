@@ -46,8 +46,10 @@ import java.io.Closeable
 import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
 import java.text.DecimalFormat
+import java.text.Normalizer
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -668,6 +670,37 @@ object Util {
             bitrate = bitRate,
             fileFormat = fileFormat,
         )
+    }
+
+    /**
+     * Removes diacritics (~= accents) from a string. The case will not be altered.
+     * Note that ligatures will be left as is.
+     *
+     * @param input String to be stripped
+     * @return input text with diacritics removed
+     *
+     */
+    fun stripAccents(input: String): String {
+        val decomposed: java.lang.StringBuilder =
+            java.lang.StringBuilder(Normalizer.normalize(input, Normalizer.Form.NFD))
+        convertRemainingAccentCharacters(decomposed)
+        return STRIP_ACCENTS_PATTERN.matcher(decomposed).replaceAll("")
+    }
+
+    /**
+     * Pattern used in [.stripAccents].
+     */
+    private val STRIP_ACCENTS_PATTERN: Pattern =
+        Pattern.compile("\\p{InCombiningDiacriticalMarks}+") // $NON-NLS-1$
+
+    private fun convertRemainingAccentCharacters(decomposed: java.lang.StringBuilder) {
+        for (i in decomposed.indices) {
+            if (decomposed[i] == '\u0141') {
+                decomposed.setCharAt(i, 'L')
+            } else if (decomposed[i] == '\u0142') {
+                decomposed.setCharAt(i, 'l')
+            }
+        }
     }
 
     fun getPlayListFromTimeline(

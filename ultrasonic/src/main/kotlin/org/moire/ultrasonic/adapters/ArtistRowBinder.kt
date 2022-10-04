@@ -25,6 +25,7 @@ import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.imageloader.ImageLoader
 import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.Util
 
 /**
  * Creates a Row in a RecyclerView which contains the details of an Artist
@@ -106,7 +107,7 @@ class ArtistRowBinder(
         if (name.isEmpty()) return SECTION_KEY_DEFAULT
         val section = name.first().uppercaseChar()
         if (!section.isLetter()) return SECTION_KEY_DEFAULT
-        return section.toString()
+        return Util.stripAccents(section.toString())!!
     }
 
     private fun showArtistPicture(): Boolean {
