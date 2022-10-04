@@ -22,6 +22,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -220,6 +221,8 @@ class NavigationActivity : AppCompatActivity() {
             cachedServerCount = count ?: 0
             updateNavigationHeaderForServer()
         }
+
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 
     override fun onResume() {
@@ -337,13 +340,16 @@ class NavigationActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfig)
     }
 
-    override fun onBackPressed() {
-        if (drawerLayout?.isDrawerVisible(GravityCompat.START) == true) {
-            this.drawerLayout?.closeDrawer(GravityCompat.START)
-        } else {
-            val currentFragment = host!!.childFragmentManager.fragments.last()
-            if (currentFragment is OnBackPressedHandler) currentFragment.onBackPressed()
-            else super.onBackPressed()
+    val callback: OnBackPressedCallback = object : OnBackPressedCallback(
+        true
+    ) {
+        override fun handleOnBackPressed() {
+            if (drawerLayout?.isDrawerVisible(GravityCompat.START) == true) {
+                drawerLayout?.closeDrawer(GravityCompat.START)
+            } else {
+                val currentFragment = host!!.childFragmentManager.fragments.last()
+                if (currentFragment is OnBackPressedHandler) currentFragment.onBackPressed()
+            }
         }
     }
 

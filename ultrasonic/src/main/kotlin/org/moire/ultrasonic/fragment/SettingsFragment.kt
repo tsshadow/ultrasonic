@@ -250,7 +250,8 @@ class SettingsFragment :
             val dialogFragment = TimeSpanPreferenceDialogFragmentCompat()
             val bundle = Bundle(1)
             bundle.putString("key", preference.getKey())
-            dialogFragment.setArguments(bundle)
+            dialogFragment.arguments = bundle
+            @Suppress("DEPRECATION") // Their own super class uses this call :shrug:
             dialogFragment.setTargetFragment(this, 0)
             dialogFragment.show(
                 this.parentFragmentManager,
