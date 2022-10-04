@@ -87,14 +87,10 @@ class StorageFile(
 
     override fun getFileOutputStream(append: Boolean): OutputStream {
         val mode = if (append) "wa" else "w"
-        val descriptor = UApp.applicationContext().contentResolver.openAssetFileDescriptor(
+        return UApp.applicationContext().contentResolver.openOutputStream(
             uri,
             mode
-        )
-        val stream = descriptor?.createOutputStream()
-            ?: throw IOException("Couldn't retrieve OutputStream")
-        descriptor.close()
-        return stream
+        ) ?: throw IOException("Couldn't retrieve OutputStream")
     }
 
     override fun getFileInputStream(): InputStream {
