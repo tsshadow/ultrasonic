@@ -110,10 +110,19 @@ class DownloadTask(
                     // Manual throttling to avoid overloading Rx
                     if (SystemClock.elapsedRealtime() - lastPostTime > REFRESH_INTERVAL) {
                         lastPostTime = SystemClock.elapsedRealtime()
+
+                        // If the file size is unknown we can only provide null as the progress
+                        val size = item.track.size ?: 0
+                        val progress = if (size <= 0) {
+                            null
+                        } else {
+                            (totalBytesCopied * 100 / (size)).toInt()
+                        }
+
                         stateChangedCallback(
                             item,
                             DownloadState.DOWNLOADING,
-                            (totalBytesCopied * 100 / (item.track.size ?: 1)).toInt()
+                            progress
                         )
                     }
                 }
