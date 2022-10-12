@@ -81,73 +81,66 @@ class DownloadTask(
 
             stateChangedCallback(item, DownloadState.DOWNLOADING, null)
 
-            // Some devices seem to throw error on partial file which doesn't exist
-            val needsDownloading: Boolean
-            val duration = item.track.duration
             val fileLength = Storage.getFromPath(item.partialFile)?.length ?: 0
 
-            needsDownloading = (duration == null || duration == 0 || fileLength == 0L)
+            // Attempt partial HTTP GET, appending to the file if it exists.
+            val (inStream, isPartial) = musicService.getDownloadInputStream(
+                item.track, fileLength,
+                Settings.maxBitRate,
+                item.pinned
+            )
 
-            if (needsDownloading) {
-                // Attempt partial HTTP GET, appending to the file if it exists.
-                val (inStream, isPartial) = musicService.getDownloadInputStream(
-                    item.track, fileLength,
-                    Settings.maxBitRate,
-                    item.pinned
-                )
+            inputStream = inStream
 
-                inputStream = inStream
+            if (isPartial) {
+                Timber.i("Executed partial HTTP GET, skipping %d bytes", fileLength)
+            }
 
-                if (isPartial) {
-                    Timber.i("Executed partial HTTP GET, skipping %d bytes", fileLength)
-                }
+            outputStream = Storage.getOrCreateFileFromPath(item.partialFile)
+                .getFileOutputStream(isPartial)
 
-                outputStream = Storage.getOrCreateFileFromPath(item.partialFile)
-                    .getFileOutputStream(isPartial)
+            var lastPostTime: Long = 0
+            val len = inputStream.copyTo(outputStream) { totalBytesCopied ->
+                // Manual throttling to avoid overloading Rx
+                if (SystemClock.elapsedRealtime() - lastPostTime > REFRESH_INTERVAL) {
+                    lastPostTime = SystemClock.elapsedRealtime()
 
-                var lastPostTime: Long = 0
-                val len = inputStream.copyTo(outputStream) { totalBytesCopied ->
-                    // Manual throttling to avoid overloading Rx
-                    if (SystemClock.elapsedRealtime() - lastPostTime > REFRESH_INTERVAL) {
-                        lastPostTime = SystemClock.elapsedRealtime()
-
-                        // If the file size is unknown we can only provide null as the progress
-                        val size = item.track.size ?: 0
-                        val progress = if (size <= 0) {
-                            null
-                        } else {
-                            (totalBytesCopied * 100 / (size)).toInt()
-                        }
-
-                        stateChangedCallback(
-                            item,
-                            DownloadState.DOWNLOADING,
-                            progress
-                        )
+                    // If the file size is unknown we can only provide null as the progress
+                    val size = item.track.size ?: 0
+                    val progress = if (size <= 0) {
+                        null
+                    } else {
+                        (totalBytesCopied * 100 / (size)).toInt()
                     }
-                }
 
-                Timber.i("Downloaded %d bytes to %s", len, item.partialFile)
-
-                inputStream.close()
-                outputStream.flush()
-                outputStream.close()
-
-                if (isCancelled) {
-                    stateChangedCallback(item, DownloadState.CANCELLED, null)
-                    throw RuntimeException(
-                        String.format(
-                            Locale.ROOT, "Download of '%s' was cancelled",
-                            item
-                        )
+                    stateChangedCallback(
+                        item,
+                        DownloadState.DOWNLOADING,
+                        progress
                     )
                 }
+            }
 
-                try {
-                    item.track.cacheMetadataAndArtwork()
-                } catch (ignore: Exception) {
-                    Timber.w(ignore)
-                }
+            Timber.i("Downloaded %d bytes to %s", len, item.partialFile)
+
+            inputStream.close()
+            outputStream.flush()
+            outputStream.close()
+
+            if (isCancelled) {
+                stateChangedCallback(item, DownloadState.CANCELLED, null)
+                throw RuntimeException(
+                    String.format(
+                        Locale.ROOT, "Download of '%s' was cancelled",
+                        item
+                    )
+                )
+            }
+
+            try {
+                item.track.cacheMetadataAndArtwork()
+            } catch (ignore: Exception) {
+                Timber.w(ignore)
             }
 
             if (item.pinned) {

@@ -775,11 +775,12 @@ class PlayerFragment :
         Util.toast(context, resources.getString(R.string.download_playlist_saving, playlistName))
         mediaPlayerController.suggestedPlaylistName = playlistName
 
-        ioScope.launch {
+        // The playlist can be acquired only from the main thread
+        val entries = mediaPlayerController.playlist.map {
+            it.toTrack()
+        }
 
-            val entries = mediaPlayerController.playlist.map {
-                it.toTrack()
-            }
+        ioScope.launch {
             val musicService = getMusicService()
             musicService.createPlaylist(null, playlistName, entries)
         }.invokeOnCompletion {
