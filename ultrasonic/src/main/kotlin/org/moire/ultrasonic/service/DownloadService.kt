@@ -266,7 +266,7 @@ class DownloadService : Service(), KoinComponent {
         return notificationBuilder.build()
     }
 
-    @Suppress("MagicNumber")
+    @Suppress("MagicNumber", "NestedBlockDepth")
     companion object {
 
         private var startFuture: SettableFuture<DownloadService>? = null
@@ -291,7 +291,12 @@ class DownloadService : Service(), KoinComponent {
             if (save) {
                 tracks.filter { Storage.isPathExists(it.getCompleteFile()) }.forEach { track ->
                     Storage.getFromPath(track.getCompleteFile())?.let {
-                        Storage.rename(it, track.getPinnedFile())
+                        try {
+                            Storage.rename(it, track.getPinnedFile())
+                        } catch (ignored: FileAlreadyExistsException) {
+                            // Play console has revealed a crash when for some reason both files exist
+                            Storage.delete(it.path)
+                        }
                         postState(track, DownloadState.PINNED)
                     }
                 }
@@ -299,7 +304,12 @@ class DownloadService : Service(), KoinComponent {
             } else {
                 tracks.filter { Storage.isPathExists(it.getPinnedFile()) }.forEach { track ->
                     Storage.getFromPath(track.getPinnedFile())?.let {
-                        Storage.rename(it, track.getCompleteFile())
+                        try {
+                            Storage.rename(it, track.getCompleteFile())
+                        } catch (ignored: FileAlreadyExistsException) {
+                            // Play console has revealed a crash when for some reason both files exist
+                            Storage.delete(it.path)
+                        }
                         postState(track, DownloadState.DONE)
                     }
                 }
@@ -367,7 +377,12 @@ class DownloadService : Service(), KoinComponent {
             val pinnedFile = track.getPinnedFile()
             if (!Storage.isPathExists(pinnedFile)) return
             val file = Storage.getFromPath(track.getPinnedFile()) ?: return
-            Storage.rename(file, track.getCompleteFile())
+            try {
+                Storage.rename(file, track.getCompleteFile())
+            } catch (ignored: FileAlreadyExistsException) {
+                // Play console has revealed a crash when for some reason both files exist
+                Storage.delete(file.path)
+            }
             postState(track, DownloadState.DONE)
         }
 
