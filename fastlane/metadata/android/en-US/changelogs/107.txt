@@ -1,0 +1,8 @@
+Bug fixes
+- #823: Version 4 caches incomplete files (poor download error handling?).
+- #832: Version 4.1.1 and develop: back(-navigation) no longer possible.
+- #835: Crashing when play all songs in offline mode.
+- #837: Saving playlist fails.
+
+Enhancements
+- #816: Accented letters should not be added seperately in the Artists list.

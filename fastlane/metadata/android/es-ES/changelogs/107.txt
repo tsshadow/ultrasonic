@@ -1,0 +1,10 @@
+Corrección de errores
+- #823: La versión 4 almacena en caché los archivos incompletos (¿mal manejo
+  de errores de descarga?).
+- #832: Versión 4.1.1 y desarrollo: ya no es posible retroceder(-navegar).
+- #835: Crash al reproducir todas las canciones en modo offline.
+- #837: No se puede guardar la lista de reproducción.
+
+Mejoras
+- #816: Las letras acentuadas no deben añadirse por separado en la lista de
+  artistas.
