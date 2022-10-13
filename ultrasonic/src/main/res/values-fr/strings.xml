@@ -28,6 +28,7 @@
     <string name="button_bar.playlists">Playlists</string>
     <string name="button_bar.search">Recherche</string>
     <string name="chat.send_a_message">Envoyer un message</string>
+    <string name="chat.send_button">Envoyer</string>
     <string name="common.album">Album</string>
     <string name="common.appname">Ultrasonic</string>
     <string name="common.artist">Artiste</string>
@@ -50,6 +51,8 @@
     <string name="common.select_all">Tout sélectionner</string>
     <string name="common.title">Titre</string>
     <string name="common.unpin">Détacher</string>
+    <string name="common.delete_selection_confirmation">Voulez-vous vraiment supprimer la sélection actuelle?</string>
+    <string name="common.unpin_selection_confirmation">Voulez-vous vraiment désépingler la sélection actuelle?</string>
     <string name="common.various_artists">Artistes divers</string>
     <string name="delete_playlist">Voulez-vous supprimer %1$s</string>
     <string name="download.bookmark_removed" formatted="false">Signet supprimé.</string>
@@ -72,6 +75,7 @@
     <string name="download.menu_screen_on">Sur l\'écran</string>
     <string name="download.menu_show_album">Afficher l\'album</string>
     <string name="download.menu_shuffle">Aléatoire</string>
+    <string name="download.playerstate_loading">Mise en mémoire tampon…</string>
     <string name="download.playerstate_playing_shuffle">En lecture aléatoire</string>
     <string name="download.playlist_done">Playlist enregistrée avec succès !</string>
     <string name="download.playlist_error">Échec de l\'enregistrement de la playlist, veuillez réessayer plus tard.</string>
@@ -146,6 +150,7 @@
     <string name="search.title">Recherche</string>
     <string name="select_album.empty">Aucun titre trouvé</string>
     <string name="select_album.n_selected">%d pistes sélectionnées.</string>
+    <string name="select_album.no_network">Avertissement : Aucun réseau disponible.\n Si vous êtes en train d\'utiliser une connexion mobile, il se peut que vous deviez autoriser dans les préférences les téléchargements depuis une connexion limitée.</string>
     <string name="select_album.no_sdcard">Erreur : Aucune carte SD disponible.</string>
     <string name="select_album.play_all">Tout jouer</string>
     <string name="select_artist.all_folders">Tous les dossiers</string>

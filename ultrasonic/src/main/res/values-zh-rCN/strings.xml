@@ -28,6 +28,7 @@
     <string name="button_bar.playlists">播放列表</string>
     <string name="button_bar.search">搜索</string>
     <string name="chat.send_a_message">发送消息</string>
+    <string name="chat.send_button">发送</string>
     <string name="common.album">专辑</string>
     <string name="common.appname">Ultrasonic</string>
     <string name="common.artist">艺术家</string>
@@ -50,6 +51,7 @@
     <string name="common.select_all">选择所有</string>
     <string name="common.title">标题</string>
     <string name="common.unpin">取消固定</string>
+    <string name="common.delete_selection_confirmation">您真的要删除当前选择吗？</string>
     <string name="common.various_artists">群星</string>
     <string name="delete_playlist">确定要删除 %1$s吗</string>
     <string name="download.bookmark_removed" formatted="false">书签已删除。</string>
@@ -72,6 +74,9 @@
     <string name="download.menu_screen_on">开启屏幕常亮</string>
     <string name="download.menu_show_album">显示专辑</string>
     <string name="download.menu_shuffle">随机</string>
+    <string name="download.menu_shuffle_on">随机播放模式已启用</string>
+    <string name="download.menu_shuffle_off">随机播放模式已禁用</string>
+    <string name="download.playerstate_loading">缓冲…</string>
     <string name="download.playerstate_playing_shuffle">随机播放</string>
     <string name="download.playlist_done">已成功保存播放列表。</string>
     <string name="download.playlist_error">保存播放列表失败，请重试。</string>
@@ -87,6 +92,7 @@
     <string name="error.label">错误</string>
     <string name="jukebox.is_default">默认自动点唱机</string>
     <string name="lyrics.nomatch">找不到歌词</string>
+    <string name="language.default">系统默认</string>
     <string name="main.albums_alphaByArtist">按艺术家排序</string>
     <string name="main.albums_alphaByName">按名称排序</string>
     <string name="main.albums_frequent">最多播放</string>
@@ -131,8 +137,9 @@
     <string name="search.title">搜索</string>
     <string name="select_album.empty">找不到歌曲</string>
     <string name="select_album.n_selected">已选择 %d 首曲目</string>
+    <string name="select_album.no_network">警告：当前没有可用的网络.\n 如果您要使用移动数据，您需要在设置中允许使用流量进行下载</string>
     <string name="select_album.no_sdcard">错误：没有SD卡</string>
-    <string name="select_album.play_all">播放所有</string>
+    <string name="select_album.play_all">播放全部</string>
     <string name="select_artist.all_folders">所有文件夹</string>
     <string name="select_artist.folder">选择文件夹</string>
     <string name="select_genre.empty">找不到流派</string>
@@ -193,6 +200,7 @@
     <string name="settings.disc_sort_summary">按光盘编号和曲目编号对歌曲列表进行排序</string>
     <string name="settings.display_bitrate">展示比特率和文件后缀</string>
     <string name="settings.display_bitrate_summary">在艺术家姓名后追加比特率和文件后缀</string>
+    <string name="settings.download_transition">正在播放</string>
     <string name="settings.hide_media_summary">隐藏来自其他应用的音乐</string>
     <string name="settings.hide_media_title">隐藏其他来源</string>
     <string name="settings.hide_media_toast">在安卓系统下次扫描音乐时生效。</string>
