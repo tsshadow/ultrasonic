@@ -5,11 +5,10 @@
     a:layout_width="fill_parent"
     a:layout_height="wrap_content"
     a:minWidth="220dp"
-    a:minHeight="80dp"
+    a:minHeight="45dp"
     a:orientation="horizontal"
     a:theme="@style/Theme.AppWidget.AppWidgetContainerCropped"
-    tools:ignore="UseAppTint,NestedWeights"
-    >
+    tools:ignore="UseAppTint,NestedWeights">
 
     <ImageView
         a:id="@+id/appwidget_coverart"
@@ -30,9 +29,12 @@
         a:layout_width="match_parent"
         a:layout_height="match_parent"
         a:layout_marginHorizontal="5dp"
+        a:baselineAligned="false"
         a:orientation="horizontal"
-        a:padding="12dp"
-        a:baselineAligned="false">
+        a:paddingStart="12dp"
+        a:paddingTop="6dp"
+        a:paddingEnd="12dp"
+        a:paddingBottom="6dp">
 
         <LinearLayout
             a:id="@+id/appwidget_top"
@@ -52,8 +54,7 @@
                 a:ellipsize="marquee"
                 a:gravity="bottom"
                 a:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                tools:text="Title"
-                 />
+                tools:text="Title" />
 
 
             <TextView
@@ -80,31 +81,30 @@
                 a:layout_width="0dp"
                 a:layout_height="match_parent"
                 a:layout_weight="0.6"
+                a:background="@null"
                 a:importantForAccessibility="no"
                 a:scaleType="fitCenter"
-                a:src="@drawable/media_backward"
-                a:background="@null"
-                />
+                a:src="@drawable/media_backward" />
 
             <ImageButton
                 a:id="@+id/control_play"
                 a:layout_width="0dp"
                 a:layout_height="match_parent"
                 a:layout_weight="1"
+                a:background="@null"
                 a:importantForAccessibility="no"
                 a:scaleType="fitCenter"
-                a:src="@drawable/media_start"
-                a:background="@null"/>
+                a:src="@drawable/media_start" />
 
             <ImageButton
                 a:id="@+id/control_next"
                 a:layout_width="0dp"
                 a:layout_height="match_parent"
                 a:layout_weight="0.6"
+                a:background="@null"
                 a:importantForAccessibility="no"
                 a:scaleType="fitCenter"
-                a:src="@drawable/media_forward"
-                a:background="@null"/>
+                a:src="@drawable/media_forward" />
         </LinearLayout>
 
     </LinearLayout>
