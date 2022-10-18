@@ -413,6 +413,7 @@ class SettingsFragment :
         // Clear download queue.
         mediaPlayerController.clear()
         Storage.reset()
+        Storage.ensureRootIsAvailable()
     }
 
     private fun setDebugLogToFile(writeLog: Boolean) {

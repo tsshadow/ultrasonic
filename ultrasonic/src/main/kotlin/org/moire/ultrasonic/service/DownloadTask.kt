@@ -188,6 +188,8 @@ class DownloadTask(
         val albumId: String? = if (albumId.isNullOrEmpty()) null else albumId
 
         var album: Album? = null
+        var directArtist: Artist? = null
+        var compilationArtist: Artist? = null
 
         // Sometime in compilation albums, the individual tracks won't have an Artist id
         // In this case, try to get the ArtistId of the album...
@@ -198,7 +200,7 @@ class DownloadTask(
 
         // Cache the artist
         if (artistId != null)
-            cacheArtist(onlineDB, offlineDB, artistId)
+            directArtist = cacheArtist(onlineDB, offlineDB, artistId)
 
         // Now cache the album
         if (albumId != null) {
@@ -216,7 +218,7 @@ class DownloadTask(
 
                 // If the album is a Compilation, also cache the Album artist
                 if (album.artistId != null && album.artistId != artistId)
-                    cacheArtist(onlineDB, offlineDB, album.artistId!!)
+                    compilationArtist = cacheArtist(onlineDB, offlineDB, album.artistId!!)
             }
         }
 
@@ -224,10 +226,20 @@ class DownloadTask(
         offlineDB.trackDao().insert(this)
 
         // Download the largest size that we can display in the UI
-        imageLoaderProvider.getImageLoader().cacheCoverArt(this)
+        val imageLoader = imageLoaderProvider.getImageLoader()
+        imageLoader.cacheCoverArt(this)
+
+        // Cache small copies of the Artist picture
+
+        directArtist?.let { imageLoader.cacheArtistPicture(it) }
+        compilationArtist?.let { imageLoader.cacheArtistPicture(it) }
     }
 
-    private fun cacheArtist(onlineDB: MetaDatabase, offlineDB: MetaDatabase, artistId: String) {
+    private fun cacheArtist(
+        onlineDB: MetaDatabase,
+        offlineDB: MetaDatabase,
+        artistId: String
+    ): Artist? {
         var artist: Artist? = onlineDB.artistDao().get(artistId)
 
         // If we are downloading a new album, and the user has not visited the Artists list
@@ -243,6 +255,8 @@ class DownloadTask(
         if (artist != null) {
             offlineDB.artistDao().insert(artist)
         }
+
+        return artist
     }
 
     @Throws(IOException::class)

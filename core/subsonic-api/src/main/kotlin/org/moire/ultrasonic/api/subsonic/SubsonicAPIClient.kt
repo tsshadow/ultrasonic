@@ -155,11 +155,17 @@ class SubsonicAPIClient(
         return call.toStreamResponse()
     }
 
+    val isOffline by lazy {
+        config.baseUrl == OFFLINE_DB_URL
+    }
+
     companion object {
         val jacksonMapper: ObjectMapper = ObjectMapper()
             .configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
             .registerModule(KotlinModule.Builder().build())
+
+        const val OFFLINE_DB_URL = "http://localhost"
     }
 }

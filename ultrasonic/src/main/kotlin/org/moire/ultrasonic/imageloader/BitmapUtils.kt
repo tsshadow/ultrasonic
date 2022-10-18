@@ -85,7 +85,6 @@ class BitmapUtils {
             } catch (expected: Exception) {
                 Timber.e(expected, "Exception in BitmapFactory.decodeFile()")
             }
-            Timber.i("getBitmapFromDisk %s", size.toString())
             return bitmap1
         }
     }

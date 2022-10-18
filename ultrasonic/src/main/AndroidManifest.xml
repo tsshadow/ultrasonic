@@ -127,12 +127,12 @@
         </receiver>
         <provider
             android:name=".provider.SearchSuggestionProvider"
-            android:authorities="org.moire.ultrasonic.provider.SearchSuggestionProvider"
+            android:authorities="${applicationId}.provider.SearchSuggestionProvider"
             android:exported="true" />
 
         <provider
             android:name=".provider.AlbumArtContentProvider"
-            android:authorities="org.moire.ultrasonic.provider.AlbumArtContentProvider"
+            android:authorities="${applicationId}.provider.AlbumArtContentProvider"
             android:exported="true" />
     </application>
 

@@ -62,6 +62,12 @@ interface AlbumDao : GenericDao<Album> {
     fun clearByArtist(id: String)
 
     /**
+     * Clear albums by artist
+     */
+    @Query("DELETE FROM albums WHERE id LIKE :id")
+    fun delete(id: String)
+
+    /**
      * TODO: Make generic
      * Upserts (insert or update) an object to the database
      *

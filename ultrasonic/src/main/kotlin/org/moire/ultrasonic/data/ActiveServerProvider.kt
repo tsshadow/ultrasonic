@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient.Companion.OFFLINE_DB_URL
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.di.DB_FILENAME
 import org.moire.ultrasonic.service.MusicServiceFactory.resetMusicService
@@ -202,7 +203,7 @@ class ActiveServerProvider(
             id = OFFLINE_DB_ID,
             index = OFFLINE_DB_INDEX,
             name = UApp.applicationContext().getString(R.string.main_offline),
-            url = "http://localhost",
+            url = OFFLINE_DB_URL,
             userName = "",
             password = "",
             jukeboxByDefault = false,

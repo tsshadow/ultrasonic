@@ -24,6 +24,9 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.activity.NavigationActivity
@@ -44,7 +47,10 @@ import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
 
 @SuppressLint("UnsafeOptInUsageError")
-class PlaybackService : MediaLibraryService(), KoinComponent {
+class PlaybackService :
+    MediaLibraryService(),
+    KoinComponent,
+    CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private lateinit var player: ExoPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
     private var equalizer: EqualizerController? = null
@@ -192,7 +198,10 @@ class PlaybackService : MediaLibraryService(), KoinComponent {
             player.currentMediaItemIndex,
             Settings.preloadCount
         ).map { it.toTrack() }
-        DownloadService.download(nextSongs, save = false, isHighPriority = true)
+
+        launch {
+            DownloadService.download(nextSongs, save = false, isHighPriority = true)
+        }
     }
 
     private fun getPendingIntentForContent(): PendingIntent {

@@ -30,6 +30,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.DownloadState.Companion.isFinalState
+import org.moire.ultrasonic.util.CacheCleaner
 import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.FileUtil.getCompleteFile
 import org.moire.ultrasonic.util.FileUtil.getPartialFile
@@ -365,6 +366,7 @@ class DownloadService : Service(), KoinComponent {
             Storage.delete(track.getCompleteFile())
             Storage.delete(track.getPinnedFile())
             postState(track, DownloadState.IDLE)
+            CacheCleaner().cleanDatabaseSelective(track)
             Util.scanMedia(track.getPinnedFile())
         }
 

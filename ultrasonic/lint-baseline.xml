@@ -13,17 +13,6 @@
     </issue>
 
     <issue
-        id="AllowAllHostnameVerifier"
-        message="Using the `AllowAllHostnameVerifier` HostnameVerifier is unsafe because it always returns true, which could cause insecure network traffic due to trusting TLS/SSL server certificates for wrong hostnames"
-        errorLine1=" public static final X509HostnameVerifier ALLOW_ALL_HOSTNAME_VERIFIER = new AllowAllHostnameVerifier();"
-        errorLine2="                                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/org/moire/ultrasonic/service/ssl/SSLSocketFactory.java"
-            line="142"
-            column="73"/>
-    </issue>
-
-    <issue
         id="TrustAllX509TrustManager"
         message="`checkClientTrusted` is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers">
         <location
@@ -297,7 +286,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/res/layout/share_details.xml"
-            line="30"
+            line="29"
             column="10"/>
     </issue>
 
@@ -374,7 +363,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/res/layout/share_details.xml"
-            line="30"
+            line="29"
             column="10"/>
     </issue>
 
@@ -397,17 +386,6 @@
         <location
             file="src/main/res/layout/equalizer_bar.xml"
             line="26"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;http://&quot;, should use `@string` resource"
-        errorLine1="            a:text=&quot;http://&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/server_edit.xml"
-            line="43"
             column="13"/>
     </issue>
 

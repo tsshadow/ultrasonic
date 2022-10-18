@@ -7,7 +7,6 @@ import com.squareup.picasso.RequestHandler
 import java.io.IOException
 import okio.source
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
-import org.moire.ultrasonic.api.subsonic.toStreamResponse
 import org.moire.ultrasonic.util.FileUtil.SUFFIX_LARGE
 import org.moire.ultrasonic.util.FileUtil.SUFFIX_SMALL
 
@@ -28,14 +27,22 @@ class CoverArtRequestHandler(private val client: SubsonicAPIClient) : RequestHan
         val size = request.uri.getQueryParameter(SIZE)?.toLong()
 
         // Check if we have a hit in the disk cache
-        // Note: Currently we are only caching full size images on disk
-        // So we modify the key to query for the full size image,
+        // First check for a large and fallback to the small size.
         // because scaling down a larger size image on the device is quicker than
         // requesting the down-sized image from the network.
-        val key = request.stableKey!!.replace(SUFFIX_SMALL, SUFFIX_LARGE)
-        val cache = BitmapUtils.getAlbumArtBitmapFromDisk(key, size?.toInt())
+        val key = request.stableKey!!
+        val largeKey = key.replace(SUFFIX_SMALL, SUFFIX_LARGE)
+        var cache = BitmapUtils.getAlbumArtBitmapFromDisk(largeKey, size?.toInt())
+        if (cache == null && key != largeKey) {
+            cache = BitmapUtils.getAlbumArtBitmapFromDisk(key, size?.toInt())
+        }
         if (cache != null) {
             return Result(cache, DISK)
+        }
+
+        // Cancel early if we are offline
+        if (client.isOffline) {
+            throw UnsupportedOperationException()
         }
 
         // Try to fetch the image from the API

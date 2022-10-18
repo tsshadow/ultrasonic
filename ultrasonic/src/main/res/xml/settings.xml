@@ -33,7 +33,7 @@
             a:title="@string/settings.use_folder_for_album_artist"
             app:iconSpaceReserved="false"/>
         <CheckBoxPreference
-            a:defaultValue="true"
+            a:defaultValue="false"
             a:key="@string/setting_key.show_track_number"
             a:summary="@string/settings.show_track_number_summary"
             a:title="@string/settings.show_track_number"
