@@ -1,7 +1,10 @@
 package org.moire.ultrasonic.app
 
 import android.content.Context
+import android.os.Build
 import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
+import android.os.StrictMode.VmPolicy
 import androidx.multidex.MultiDexApplication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +21,7 @@ import org.moire.ultrasonic.di.musicServiceModule
 import org.moire.ultrasonic.log.FileLoggerTree
 import org.moire.ultrasonic.log.TimberKoinLogger
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.Util
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 
@@ -31,11 +35,15 @@ class UApp : MultiDexApplication() {
 
     init {
         instance = this
-        if (BuildConfig.DEBUG)
-            StrictMode.enableDefaults()
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(ThreadPolicy.Builder().detectAll().penaltyLog().build())
+            StrictMode.setVmPolicy(VmPolicy.Builder().detectAllExceptSocket().penaltyLog().build())
+        }
     }
 
     var initiated = false
+    var isFirstRun = false
+    var setupDialogDisplayed = false
 
     override fun onCreate() {
         initiated = true
@@ -52,6 +60,7 @@ class UApp : MultiDexApplication() {
             if (Settings.debugLogToFile) {
                 FileLoggerTree.plantToTimberForest()
             }
+            isFirstRun = Util.isFirstRun()
         }
 
         startKoin()
@@ -91,4 +100,24 @@ class UApp : MultiDexApplication() {
             return instance!!.applicationContext
         }
     }
+}
+
+private fun VmPolicy.Builder.detectAllExceptSocket(): VmPolicy.Builder {
+    detectLeakedSqlLiteObjects()
+    detectActivityLeaks()
+    detectLeakedClosableObjects()
+    detectLeakedRegistrationObjects()
+    detectFileUriExposure()
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        detectContentUriWithoutPermission()
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        detectCredentialProtectedWhileLocked()
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        detectUnsafeIntentLaunch()
+        detectIncorrectContextUse()
+    }
+    return this
 }

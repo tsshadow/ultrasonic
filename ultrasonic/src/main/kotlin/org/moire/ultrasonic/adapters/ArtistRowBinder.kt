@@ -107,7 +107,7 @@ class ArtistRowBinder(
         if (name.isEmpty()) return SECTION_KEY_DEFAULT
         val section = name.first().uppercaseChar()
         if (!section.isLetter()) return SECTION_KEY_DEFAULT
-        return Util.stripAccents(section.toString())!!
+        return Util.stripAccents(section.toString())
     }
 
     private fun showArtistPicture(): Boolean {

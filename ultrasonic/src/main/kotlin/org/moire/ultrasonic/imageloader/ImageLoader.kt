@@ -20,6 +20,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
 import org.moire.ultrasonic.api.subsonic.toStreamResponse
+import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.util.FileUtil
@@ -174,6 +175,13 @@ class ImageLoader(
         } else {
             view.setImageResource(R.drawable.ic_contact_picture)
         }
+    }
+
+    fun cacheArtistPicture(artist: Artist) {
+        if (artist.coverArt == null) return
+        val key = FileUtil.getArtistArtKey(artist.name, false)
+        val file = FileUtil.getAlbumArtFile(key)
+        cacheCoverArt(artist.coverArt!!, file)
     }
 
     /**

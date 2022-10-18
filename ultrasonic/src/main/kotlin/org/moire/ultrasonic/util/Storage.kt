@@ -29,6 +29,9 @@ object Storage {
         StorageFile.notExistingPathDictionary.clear()
         mediaRoot.reset()
         Timber.i("StorageFile caches were reset")
+    }
+
+    fun ensureRootIsAvailable() {
         val root = getRoot()
         if (root == null) {
             Settings.customCacheLocation = false

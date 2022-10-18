@@ -2,6 +2,9 @@ package org.moire.ultrasonic.subsonic
 
 import android.content.Context
 import androidx.core.content.res.ResourcesCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -15,7 +18,9 @@ import org.moire.ultrasonic.util.Util
 /**
  * Handles the lifetime of the Image Loader
  */
-class ImageLoaderProvider(val context: Context) : KoinComponent {
+class ImageLoaderProvider(val context: Context) :
+    KoinComponent,
+    CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private var imageLoader: ImageLoader? = null
     private var serverID: String = get(named("ServerID"))
 
@@ -32,6 +37,11 @@ class ImageLoaderProvider(val context: Context) : KoinComponent {
             imageLoader = get()
             serverID = currentID
         }
+
+        launch {
+            FileUtil.ensureAlbumArtDirectory()
+        }
+
         return imageLoader!!
     }
 

@@ -11,6 +11,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import java.io.Serializable
 import java.lang.Exception
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.util.FileUtil.deserialize
 import org.moire.ultrasonic.util.FileUtil.serialize
@@ -21,7 +24,7 @@ import timber.log.Timber
  *
  * TODO: Maybe store the settings in the DB?
  */
-class EqualizerController {
+class EqualizerController : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
     @JvmField
     var equalizer: Equalizer? = null
@@ -29,22 +32,30 @@ class EqualizerController {
 
     fun saveSettings() {
         if (equalizer == null) return
-        try {
-            serialize(UApp.applicationContext(), EqualizerSettings(equalizer!!), "equalizer.dat")
-        } catch (all: Throwable) {
-            Timber.w(all, "Failed to save equalizer settings.")
+        launch {
+            try {
+                serialize(
+                    UApp.applicationContext(),
+                    EqualizerSettings(equalizer!!),
+                    "equalizer.dat"
+                )
+            } catch (all: Throwable) {
+                Timber.w(all, "Failed to save equalizer settings.")
+            }
         }
     }
 
     fun loadSettings() {
         if (equalizer == null) return
-        try {
-            val settings = deserialize<EqualizerSettings>(
-                UApp.applicationContext(), "equalizer.dat"
-            )
-            settings?.apply(equalizer!!)
-        } catch (all: Throwable) {
-            Timber.w(all, "Failed to load equalizer settings.")
+        launch {
+            try {
+                val settings = deserialize<EqualizerSettings>(
+                    UApp.applicationContext(), "equalizer.dat"
+                )
+                settings?.apply(equalizer!!)
+            } catch (all: Throwable) {
+                Timber.w(all, "Failed to load equalizer settings.")
+            }
         }
     }
 

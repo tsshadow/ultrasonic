@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentContainerView
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player.STATE_BUFFERING
 import androidx.media3.common.Player.STATE_READY
@@ -39,10 +40,11 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.moire.ultrasonic.NavigationGraphDirections
@@ -100,7 +102,6 @@ class NavigationActivity : AppCompatActivity() {
     private val activeServerProvider: ActiveServerProvider by inject()
     private val serverRepository: ServerSettingDao by inject()
 
-    private var infoDialogDisplayed = false
     private var currentFragmentId: Int = 0
     private var cachedServerCount: Int = 0
 
@@ -177,15 +178,7 @@ class NavigationActivity : AppCompatActivity() {
         }
 
         // Determine if this is a first run
-        val showWelcomeScreen = Util.isFirstRun()
-
-        // Migrate Feature storage if needed
-        // TODO: Remove in December 2022
-        if (!Settings.hasKey(Constants.PREFERENCES_KEY_USE_FIVE_STAR_RATING)) {
-            Settings.migrateFeatureStorage()
-        }
-
-        loadSettings()
+        val showWelcomeScreen = UApp.instance!!.isFirstRun
 
         // This is a first run with only the demo entry inside the database
         // We set the active server to the demo one and show the welcome dialog
@@ -227,6 +220,11 @@ class NavigationActivity : AppCompatActivity() {
         super.onResume()
 
         Storage.reset()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            Storage.ensureRootIsAvailable()
+        }
+
         setMenuForServerCapabilities()
 
         // Lifecycle support's constructor registers some event receivers so it should be created early
@@ -402,12 +400,12 @@ class NavigationActivity : AppCompatActivity() {
      */
     override fun attachBaseContext(newBase: Context?) {
         val locale = Settings.overrideLanguage
-        val localeUpdatedContext: ContextWrapper = LocaleHelper.wrap(newBase, locale)
-        super.attachBaseContext(localeUpdatedContext)
-    }
-
-    private fun loadSettings() {
-        PreferenceManager.setDefaultValues(this, R.xml.settings, false)
+        if (locale.isNotEmpty()) {
+            val localeUpdatedContext: ContextWrapper = LocaleHelper.wrap(newBase, locale)
+            super.attachBaseContext(localeUpdatedContext)
+        } else {
+            super.attachBaseContext(newBase)
+        }
     }
 
     private fun exit() {
@@ -423,8 +421,7 @@ class NavigationActivity : AppCompatActivity() {
     }
 
     private fun showWelcomeDialog() {
-        if (!infoDialogDisplayed) {
-            infoDialogDisplayed = true
+        if (!UApp.instance!!.setupDialogDisplayed) {
 
             Settings.firstInstalledVersion = Util.getVersionCode(UApp.applicationContext())
 
@@ -432,11 +429,13 @@ class NavigationActivity : AppCompatActivity() {
                 .setTitle(R.string.main_welcome_title)
                 .setMessage(R.string.main_welcome_text_demo)
                 .setNegativeButton(R.string.main_welcome_cancel) { dialog, _ ->
+                    UApp.instance!!.setupDialogDisplayed = true
                     // Go to the settings screen
                     dialog.dismiss()
                     findNavController(R.id.nav_host_fragment).navigate(R.id.serverSelectorFragment)
                 }
                 .setPositiveButton(R.string.common_ok) { dialog, _ ->
+                    UApp.instance!!.setupDialogDisplayed = true
                     // Add the demo server
                     val activeServerProvider: ActiveServerProvider by inject()
                     val demoIndex = serverSettingsModel.addDemoServer()

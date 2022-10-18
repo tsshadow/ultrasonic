@@ -199,13 +199,17 @@ object FileUtil {
         return "$albumArtDir/$cacheKey"
     }
 
+    /**
+     * Get the album art directory quickly, without checking that it exists.
+     */
     val albumArtDirectory: File
-        get() {
-            val albumArtDir = File(ultrasonicDirectory, "artwork")
-            ensureDirectoryExistsAndIsReadWritable(albumArtDir)
-            ensureDirectoryExistsAndIsReadWritable(File(albumArtDir, ".nomedia"))
-            return albumArtDir
-        }
+        get() = File(ultrasonicDirectory, "artwork")
+
+    fun ensureAlbumArtDirectory() {
+        val albumArtDir = albumArtDirectory
+        ensureDirectoryExistsAndIsReadWritable(albumArtDir)
+        ensureDirectoryExistsAndIsReadWritable(File(albumArtDir, ".nomedia"))
+    }
 
     private fun getAlbumDirectory(entry: MusicDirectory.Child): String {
         val dir: String

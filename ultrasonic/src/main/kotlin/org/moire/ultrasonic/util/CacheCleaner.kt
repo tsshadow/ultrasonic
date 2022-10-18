@@ -8,16 +8,17 @@
 package org.moire.ultrasonic.util
 
 import android.system.Os
-import java.util.ArrayList
-import java.util.HashSet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Playlist
+import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.util.FileUtil.getAlbumArtFile
 import org.moire.ultrasonic.util.FileUtil.getCompleteFile
@@ -35,9 +36,10 @@ import timber.log.Timber
 /**
  * Responsible for cleaning up files from the offline download cache on the filesystem.
  */
-class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO) {
+class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO), KoinComponent {
 
     private var mainScope = CoroutineScope(Dispatchers.Main)
+    private val activeServerProvider by inject<ActiveServerProvider>()
 
     private fun exceptionHandler(tag: String): CoroutineExceptionHandler {
         return CoroutineExceptionHandler { _, exception ->
@@ -54,6 +56,7 @@ class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO) {
             cleaning = true
             launch(exceptionHandler("clean")) {
                 backgroundCleanup()
+                backgroundCleanWholeDatabase()
             }
         }
     }
@@ -77,6 +80,94 @@ class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO) {
             launch(exceptionHandler("cleanPlaylists")) {
                 backgroundPlaylistsCleanup(playlists)
             }
+        }
+    }
+
+    private fun backgroundCleanWholeDatabase() {
+        val offlineDB = activeServerProvider.offlineMetaDatabase
+
+        Timber.i("Starting Database cleanup")
+
+        // Get all tracks in the db
+        val tracks = offlineDB.trackDao().get().toMutableSet()
+
+        // Check all tracks if they have files
+        val orphanedTracks = tracks.filter {
+            !Storage.isPathExists(it.getPinnedFile()) && !Storage.isPathExists(it.getCompleteFile())
+        }
+
+        // Delete orphaned tracks
+        orphanedTracks.forEach {
+            offlineDB.trackDao().delete(it)
+        }
+
+        // Remove deleted tracks from our list
+        tracks -= orphanedTracks.toSet()
+
+        // Check for orphaned Albums
+        val usedAlbumIds = tracks.mapNotNull { it.albumId }.toSet()
+        val albums = offlineDB.albumDao().get().toMutableSet()
+        val orphanedAlbums = albums.filterNot {
+            usedAlbumIds.contains(it.id)
+        }.toSet()
+
+        // Delete orphaned Albums
+        orphanedAlbums.forEach {
+            offlineDB.albumDao().delete(it)
+        }
+
+        albums -= orphanedAlbums
+
+        // Check for orphaned Artists
+        val usedArtistsIds = tracks.mapNotNull { it.artistId } + albums.mapNotNull { it.artistId }
+        val artists = offlineDB.artistDao().get().toSet()
+        val orphanedArtists = artists.filterNot {
+            usedArtistsIds.contains(it.id)
+        }
+
+        // Delete orphaned Artists
+        orphanedArtists.forEach {
+            offlineDB.artistDao().delete(it)
+        }
+
+        Timber.e("Database cleanup done")
+    }
+
+    fun cleanDatabaseSelective(trackToRemove: Track) {
+        launch(exceptionHandler("cleanDatabase")) {
+            backgroundDatabaseSelective(trackToRemove)
+        }
+    }
+
+    private fun backgroundDatabaseSelective(track: Track) {
+        val offlineDB = activeServerProvider.offlineMetaDatabase
+
+        // Delete track
+        offlineDB.trackDao().delete(track)
+
+        // Setup up artistList
+        val artistsToCheck = mutableListOf(track.artistId)
+
+        // Check if we have other tracks for the album
+        var albumToDelete: String? = null
+        if (track.albumId != null) {
+            val tracks = offlineDB.trackDao().byAlbum(track.albumId!!)
+            if (tracks.isEmpty()) albumToDelete = track.albumId!!
+        }
+
+        // Delete empty album
+        if (albumToDelete != null) {
+            val album = offlineDB.albumDao().get(albumToDelete)
+            if (album != null) {
+                artistsToCheck.add(album.artistId)
+                offlineDB.albumDao().delete(album)
+            }
+        }
+
+        // Check if we have an empty artist now..
+        artistsToCheck.filterNotNull().forEach {
+            val tracks = offlineDB.trackDao().byArtist(it)
+            if (tracks.isEmpty()) offlineDB.artistDao().delete(it)
         }
     }
 
