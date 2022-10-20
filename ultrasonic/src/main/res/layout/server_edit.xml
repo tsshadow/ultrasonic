@@ -27,7 +27,6 @@
                 a:layout_height="wrap_content"
                 a:layout_marginBottom="8dp"
                 a:inputType="text"
-                a:text=" "
                 a:maxLines="1" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -79,7 +78,6 @@
                 a:layout_marginTop="8dp"
                 a:layout_marginBottom="0dp"
                 a:inputType="text"
-                a:text=" "
                 a:maxLines="1" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -100,7 +98,6 @@
                 a:layout_width="match_parent"
                 a:layout_height="wrap_content"
                 a:inputType="textPassword"
-                a:text=" "
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
