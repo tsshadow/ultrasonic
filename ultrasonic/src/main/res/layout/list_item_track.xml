@@ -1,169 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:a="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<!-- DON'T CONVERT TO ConstraintLayout! We have been there and it was slower than LinearLayout :) -->
+<LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     a:id="@+id/song_layout"
     a:layout_width="fill_parent"
-    a:layout_height="wrap_content"
-    a:minHeight="?android:attr/listPreferredItemHeight">
+    a:layout_height="?android:attr/listPreferredItemHeight"
+    a:minHeight="?android:attr/listPreferredItemHeight"
+    a:orientation="horizontal">
 
     <ImageView
         a:id="@+id/song_drag"
-        a:layout_width="wrap_content"
-        a:layout_height="0dp"
+        a:layout_width="38dp"
+        a:layout_height="fill_parent"
         a:background="@android:color/transparent"
         a:focusable="false"
         a:gravity="center_vertical"
         a:importantForAccessibility="no"
-        a:paddingStart="5dip"
-        a:paddingEnd="6dip"
+        a:paddingStart="7dip"
+        a:paddingEnd="4dip"
         a:src="@drawable/ic_drag_vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/song_check"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        a:visibility="gone" />
 
     <CheckedTextView
         a:id="@+id/song_check"
-        a:layout_width="wrap_content"
-        a:layout_height="0dp"
-        a:layout_marginStart="4dp"
+        a:layout_width="38dp"
+        a:layout_height="fill_parent"
         a:checkMark="@drawable/btn_check_custom"
         a:gravity="center_vertical"
         a:paddingEnd="4dip"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/song_drag"
-        app:layout_constraintTop_toTopOf="parent" />
+        a:visibility="gone" />
 
-
-    <TextView
-        a:id="@+id/song_track"
-        a:layout_width="wrap_content"
-        a:layout_height="wrap_content"
-        a:layout_marginTop="8dp"
-        a:paddingEnd="6dip"
-        a:textAppearance="?android:attr/textAppearanceMedium"
-        a:visibility="visible"
-        app:layout_constraintEnd_toStartOf="@+id/song_title"
-        app:layout_constraintStart_toEndOf="@+id/song_check"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Track"
-        tools:visibility="visible" />
-
-    <TextView
-        a:id="@+id/song_title"
-        a:layout_width="0dp"
-        a:layout_height="wrap_content"
-        a:layout_marginTop="8dp"
-        a:drawablePadding="4dip"
-        a:ellipsize="end"
-        a:paddingEnd="4dip"
-        a:singleLine="true"
-        a:textAppearance="?android:attr/textAppearanceMedium"
-        app:layout_constraintEnd_toStartOf="@id/barrier"
-        app:layout_constraintStart_toEndOf="@+id/song_track"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Title" />
-
-    <TextView
-        a:id="@+id/song_artist"
-        a:layout_width="0dp"
-        a:layout_height="wrap_content"
-        a:layout_marginBottom="10dp"
-        a:ellipsize="middle"
-        a:paddingStart="1dip"
-        a:paddingEnd="4dip"
-        a:singleLine="true"
-        a:textAppearance="?android:attr/textAppearanceSmall"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/barrier"
-        app:layout_constraintStart_toEndOf="@+id/song_check"
-        tools:text="Artist" />
-
-    <ImageView
-        a:id="@+id/song_status_image"
-        a:layout_width="25dp"
-        a:layout_height="0dp"
-        a:layout_marginTop="8dp"
-        a:layout_marginEnd="10dip"
-        a:importantForAccessibility="no"
-        app:layout_constraintBottom_toTopOf="@id/song_duration"
-        app:layout_constraintEnd_toEndOf="@id/star_barrier"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        a:id="@+id/song_status_progress"
-        a:layout_width="wrap_content"
-        a:layout_height="0dp"
-        a:layout_marginTop="8dp"
-        a:layout_marginEnd="10dip"
-        a:indeterminate="true"
-        app:indicatorColor="?attr/colorOnSurface"
-        app:indicatorSize="20dp"
-        app:layout_constraintBottom_toTopOf="@id/song_duration"
-        app:layout_constraintEnd_toEndOf="@id/star_barrier"
-        app:layout_constraintTop_toTopOf="parent"
-        app:trackColor="?attr/colorSurfaceVariant" />
-
-    <TextView
-        a:id="@+id/song_duration"
-        a:layout_width="wrap_content"
-        a:layout_height="wrap_content"
-        a:layout_marginBottom="10dp"
-        a:paddingStart="3dip"
-        a:paddingEnd="9dip"
-        a:singleLine="true"
-        a:textAppearance="?android:attr/textAppearanceSmall"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/star_barrier"
-        tools:text="Duration" />
-
-    <androidx.constraintlayout.widget.Barrier
-        a:id="@+id/barrier"
-        a:layout_width="wrap_content"
-        a:layout_height="wrap_content"
-        app:barrierDirection="left"
-        app:constraint_referenced_ids="song_duration"
-        tools:layout_editor_absoluteX="289dp" />
-
-
-    <androidx.constraintlayout.widget.Barrier
-        a:id="@+id/star_barrier"
-        a:layout_width="wrap_content"
-        a:layout_height="wrap_content"
-        app:barrierDirection="left"
-        app:constraint_referenced_ids="song_five_star,song_star"
-        tools:layout_editor_absoluteX="354dp" />
-
-    <ImageView
-        a:id="@+id/song_star"
-        a:layout_width="wrap_content"
-        a:layout_height="0dp"
-        a:background="@android:color/transparent"
-        a:contentDescription="@string/download.menu_star"
-        a:focusable="false"
-        a:gravity="center_vertical"
-        a:importantForAccessibility="no"
-        a:paddingStart="5dip"
-        a:paddingEnd="6dip"
-        a:src="@drawable/ic_star_hollow"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/star_barrier"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="invisible" />
+    <include layout="@layout/list_item_track_details" />
 
     <LinearLayout
-        a:id="@+id/song_five_star"
+        a:id="@+id/song_rating"
         a:layout_width="wrap_content"
-        a:layout_height="0dp"
+        a:layout_height="fill_parent"
         a:layout_gravity="center_vertical"
         a:orientation="horizontal"
-        a:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/star_barrier"
-        app:layout_constraintTop_toTopOf="parent">
+        a:visibility="gone"
+        tools:visibility="visible">
 
         <ImageView
             a:id="@+id/song_five_star_1"
@@ -223,4 +99,16 @@
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageView
+        a:id="@+id/song_star"
+        a:layout_width="38dp"
+        a:layout_height="fill_parent"
+        a:background="@android:color/transparent"
+        a:contentDescription="@string/download.menu_star"
+        a:focusable="false"
+        a:gravity="center_vertical"
+        a:paddingEnd="8dip"
+        a:src="@drawable/ic_star_hollow"
+        a:visibility="gone" />
+
+</LinearLayout>
