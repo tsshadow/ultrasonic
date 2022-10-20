@@ -7,11 +7,15 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider
@@ -31,7 +35,11 @@ const val INDICATOR_THICKNESS_DEFINITE = 10
 /**
  * Used to display songs and videos in a `ListView`.
  */
-class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable, KoinComponent {
+class TrackViewHolder(val view: View) :
+    RecyclerView.ViewHolder(view),
+    Checkable,
+    KoinComponent,
+    CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
     var entry: Track? = null
         private set
@@ -39,7 +47,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     var drag: ImageView = view.findViewById(R.id.song_drag)
     var observableChecked = MutableLiveData(false)
 
-    private var rating: LinearLayout = view.findViewById(R.id.song_five_star)
+    private var rating: LinearLayout = view.findViewById(R.id.song_rating)
     private var fiveStar1: ImageView = view.findViewById(R.id.song_five_star_1)
     private var fiveStar2: ImageView = view.findViewById(R.id.song_five_star_2)
     private var fiveStar3: ImageView = view.findViewById(R.id.song_five_star_3)
@@ -62,12 +70,18 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
 
     private var rxBusSubscription: CompositeDisposable? = null
 
+    init {
+        Timber.v("New ViewHolder created")
+    }
+
+    @Suppress("ComplexMethod")
     fun setSong(
         song: Track,
         checkable: Boolean,
         draggable: Boolean,
         isSelected: Boolean = false
     ) {
+        Timber.v("Setting song")
         val useFiveStarRating = Settings.useFiveStarRating
         entry = song
 
@@ -80,21 +94,28 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         if (Settings.shouldShowTrackNumber && song.track != null && song.track!! > 0) {
             track.text = entryDescription.trackNumber
         } else {
-            track.isVisible = false
+            if (!track.isGone) track.isGone = true
         }
 
-        check.isVisible = (checkable && !song.isVideo)
-        initChecked(isSelected)
-        drag.isVisible = draggable
+        val checkValue = (checkable && !song.isVideo)
+        if (check.isVisible != checkValue) check.isVisible = checkValue
+        if (checkValue) initChecked(isSelected)
+        if (drag.isVisible != draggable) drag.isVisible = draggable
 
         if (ActiveServerProvider.isOffline()) {
-            star.isVisible = false
-            rating.isVisible = false
+            star.isGone = true
         } else {
             setupStarButtons(song, useFiveStarRating)
         }
 
-        updateStatus(DownloadService.getDownloadState(song), null)
+        // Instead of blocking the UI thread while looking up the current state,
+        // launch the request in an IO thread and propagate the result through RX
+        launch {
+            val state = DownloadService.getDownloadState(song)
+            RxBus.trackDownloadStatePublisher.onNext(
+                RxBus.TrackDownloadState(song.id, state, null)
+            )
+        }
 
         if (useFiveStarRating) {
             setFiveStars(entry?.userRating ?: 0)
@@ -103,8 +124,8 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         }
 
         if (song.isVideo) {
-            artist.isVisible = false
-            progressIndicator.isVisible = false
+            artist.isGone = true
+            progressIndicator.isGone = true
         }
 
         // Create new Disposable for the new Subscriptions
@@ -117,6 +138,8 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
             if (it.id != song.id) return@subscribe
             updateStatus(it.state, it.progress)
         }
+
+        Timber.v("Setting song done")
     }
 
     // This is called when the Holder is recycled and receives a new Song
@@ -145,13 +168,13 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     private fun setupStarButtons(song: Track, useFiveStarRating: Boolean) {
         if (useFiveStarRating) {
             // Hide single star
-            star.visibility = View.INVISIBLE
+            star.isGone = true
+            rating.isVisible = true
             val rating = if (song.userRating == null) 0 else song.userRating!!
             setFiveStars(rating)
         } else {
-            // Hide five stars
-            rating.isVisible = false
-
+            star.isVisible = true
+            rating.isGone = true
             setSingleStar(song.starred)
             star.setOnClickListener {
                 val isStarred = song.starred
@@ -241,7 +264,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     }
 
     private fun showStatusImage(image: Int?) {
-        progressIndicator.isVisible = false
+        progressIndicator.isGone = true
         statusImage.isVisible = true
         if (image != null) {
             statusImage.setImageResource(image)
@@ -251,7 +274,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     }
 
     private fun showIndefiniteProgress() {
-        statusImage.isVisible = false
+        statusImage.isGone = true
         progressIndicator.isVisible = true
         progressIndicator.isIndeterminate = true
         progressIndicator.indicatorDirection =
@@ -260,7 +283,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     }
 
     private fun showProgress() {
-        statusImage.isVisible = false
+        statusImage.isGone = true
         progressIndicator.isVisible = true
         progressIndicator.isIndeterminate = false
         progressIndicator.indicatorDirection =

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- DON'T CONVERT TO ConstraintLayout! We have been there and it was slower than LinearLayout :) -->
+<LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    a:layout_width="0dp"
+    a:layout_height="?android:attr/listPreferredItemHeight"
+    a:layout_gravity="center_vertical"
+    a:layout_marginStart="4dp"
+    a:layout_weight="1"
+    a:orientation="vertical"
+    tools:layout_height="?android:attr/listPreferredItemHeight"
+    tools:layout_width="match_parent">
+
+    <LinearLayout
+        a:layout_width="fill_parent"
+        a:layout_height="0dp"
+        a:layout_weight="3"
+        a:orientation="horizontal">
+
+        <TextView
+            a:id="@+id/song_track"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:layout_gravity="left|center_vertical"
+            a:paddingEnd="6dip"
+            a:textAppearance="?android:attr/textAppearanceMedium"
+            a:visibility="gone"
+            tools:text="0/1" />
+
+        <TextView
+            a:id="@+id/song_title"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_gravity="bottom|left"
+            a:layout_weight="1"
+            a:drawablePadding="4dip"
+            a:ellipsize="end"
+            a:paddingEnd="4dip"
+            a:singleLine="true"
+            a:textAppearance="?android:attr/textAppearanceMedium"
+            tools:text="Title"
+            tools:ignore="NestedWeights" />
+
+        <ImageView
+            a:id="@+id/song_status_image"
+            a:layout_width="wrap_content"
+            a:layout_height="match_parent"
+            a:layout_marginTop="8dp"
+            a:layout_marginEnd="10dip"
+            a:importantForAccessibility="no"
+            a:visibility="gone" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            a:id="@+id/song_status_progress"
+            a:layout_width="wrap_content"
+            a:layout_height="match_parent"
+            a:layout_gravity="bottom|right"
+            a:layout_marginTop="8dp"
+            a:layout_marginEnd="10dip"
+            a:indeterminate="true"
+            a:visibility="gone"
+            app:indicatorColor="?attr/colorOnSurface"
+            app:indicatorSize="20dp"
+            app:trackColor="?attr/colorSurfaceVariant"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+    <LinearLayout
+        a:layout_width="fill_parent"
+        a:layout_height="wrap_content"
+        a:layout_gravity="center_vertical"
+        a:layout_weight="1"
+        a:orientation="horizontal">
+
+        <TextView
+            a:id="@+id/song_artist"
+            a:layout_width="0dip"
+            a:layout_height="wrap_content"
+            a:layout_gravity="top|left"
+            a:layout_weight="1"
+            a:ellipsize="middle"
+            a:paddingStart="1dip"
+            a:paddingEnd="4dip"
+            a:singleLine="true"
+            a:textAppearance="?android:attr/textAppearanceSmall"
+            tools:text="Artist"
+            tools:ignore="NestedWeights" />
+
+        <TextView
+            a:id="@+id/song_duration"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:layout_gravity="right|top"
+            a:paddingStart="3dip"
+            a:paddingEnd="9dip"
+            a:singleLine="true"
+            a:textAppearance="?android:attr/textAppearanceSmall"
+            tools:text="00:00" />
+    </LinearLayout>
+
+</LinearLayout>

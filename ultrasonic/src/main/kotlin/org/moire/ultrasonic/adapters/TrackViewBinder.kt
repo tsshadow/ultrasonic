@@ -13,6 +13,7 @@ import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.Track
+import timber.log.Timber
 
 @Suppress("LongParameterList")
 class TrackViewBinder(
@@ -61,6 +62,8 @@ class TrackViewBinder(
             draggable = draggable,
             diffAdapter.isSelected(item.longId)
         )
+
+        Timber.v("Setting listeners")
 
         holder.itemView.setOnLongClickListener {
             if (onContextMenuClick != null) {
@@ -114,6 +117,8 @@ class TrackViewBinder(
 
             if (newStatus != holder.check.isChecked) holder.check.isChecked = newStatus
         }
+
+        Timber.v("Setting listeners done")
     }
 
     override fun onViewRecycled(holder: TrackViewHolder) {
