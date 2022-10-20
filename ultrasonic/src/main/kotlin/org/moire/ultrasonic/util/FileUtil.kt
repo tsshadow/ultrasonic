@@ -18,8 +18,10 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
+import java.io.InputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.io.OutputStream
 import java.io.Serializable
 import java.util.Locale
 import java.util.SortedSet
@@ -50,32 +52,32 @@ object FileUtil {
     const val SUFFIX_SMALL = ".jpeg-small"
     private const val UNNAMED = "unnamed"
 
-    fun getSongFile(song: Track): String {
-        val dir = getAlbumDirectory(song)
+    fun getSongFile(track: Track): String {
+        val dir = getAlbumDirectory(track)
 
         // Do not generate new name for offline files. Offline files will have their Path as their Id.
-        if (!TextUtils.isEmpty(song.id)) {
-            if (song.id.startsWith(dir)) return song.id
+        if (!TextUtils.isEmpty(track.id)) {
+            if (track.id.startsWith(dir)) return track.id
         }
 
         // Generate a file name for the song
         val fileName = StringBuilder(256)
-        val track = song.track
+        val trackNumber = track.track
 
         // check if filename already had track number
-        if (song.title != null && !TITLE_WITH_TRACK.matcher(song.title!!).matches()) {
-            if (track != null) {
-                if (track < 10) {
+        if (track.title != null && !TITLE_WITH_TRACK.matcher(track.title!!).matches()) {
+            if (trackNumber != null) {
+                if (trackNumber < 10) {
                     fileName.append('0')
                 }
-                fileName.append(track).append('-')
+                fileName.append(trackNumber).append('-')
             }
         }
-        fileName.append(fileSystemSafe(song.title)).append('.')
-        if (!TextUtils.isEmpty(song.transcodedSuffix)) {
-            fileName.append(song.transcodedSuffix)
+        fileName.append(fileSystemSafe(track.title)).append('.')
+        if (!TextUtils.isEmpty(track.transcodedSuffix)) {
+            fileName.append(track.transcodedSuffix)
         } else {
-            fileName.append(song.suffix)
+            fileName.append(track.suffix)
         }
         return "$dir/$fileName"
     }
@@ -507,5 +509,22 @@ object FileUtil {
             bw.safeClose()
             fw.safeClose()
         }
+    }
+
+    @Throws(IOException::class)
+    fun InputStream.copyWithProgress(
+        out: OutputStream,
+        onCopy: (totalBytesCopied: Long) -> Any
+    ): Long {
+        var bytesCopied: Long = 0
+        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+        var bytes = read(buffer)
+        while (bytes >= 0) {
+            out.write(buffer, 0, bytes)
+            bytesCopied += bytes
+            onCopy(bytesCopied)
+            bytes = read(buffer)
+        }
+        return bytesCopied
     }
 }

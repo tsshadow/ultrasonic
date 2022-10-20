@@ -15,6 +15,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.Collections
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.moire.ultrasonic.R
@@ -37,8 +39,6 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.TrackCollectionModel
-import org.moire.ultrasonic.service.DownloadService
-import org.moire.ultrasonic.service.DownloadState
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
@@ -150,16 +150,16 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
             if (it.progress != null) return@subscribe
             val selectedSongs = getSelectedSongs()
             if (!selectedSongs.any { song -> song.id == it.id }) return@subscribe
-            enableButtons(selectedSongs)
+            triggerButtonUpdate(selectedSongs)
         }
 
-        enableButtons()
+        triggerButtonUpdate()
 
         // Update the buttons when the selection has changed
         viewAdapter.selectionRevision.observe(
             viewLifecycleOwner
         ) {
-            enableButtons()
+            triggerButtonUpdate()
         }
     }
 
@@ -367,41 +367,27 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         }
     }
 
-    @Suppress("ComplexMethod")
-    internal open fun enableButtons(selection: List<Track> = getSelectedSongs()) {
-        val enabled = selection.isNotEmpty()
-        var unpinEnabled = false
-        var deleteEnabled = false
-        var downloadEnabled = false
-        val multipleSelection = viewAdapter.hasMultipleSelection()
+    @Synchronized
+    fun triggerButtonUpdate(selection: List<Track> = getSelectedSongs()) {
+        listModel.calculateButtonState(selection, ::updateButtonState)
+    }
 
-        var pinnedCount = 0
+    private fun updateButtonState(
+        show: TrackCollectionModel.Companion.ButtonStates,
+    ) {
+        // We are coming back from unknown context
+        // and need to ensure Main Thread in order to manipulate the UI
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+            val multipleSelection = viewAdapter.hasMultipleSelection()
 
-        for (song in selection) {
-            val state = DownloadService.getDownloadState(song)
-            when (state) {
-                DownloadState.DONE -> {
-                    deleteEnabled = true
-                }
-                DownloadState.PINNED -> {
-                    deleteEnabled = true
-                    pinnedCount++
-                    unpinEnabled = true
-                }
-                DownloadState.IDLE, DownloadState.FAILED -> {
-                    downloadEnabled = true
-                }
-                else -> {}
-            }
+            playNowButton?.isVisible = show.all
+            playNextButton?.isVisible = show.all && multipleSelection
+            playLastButton?.isVisible = show.all && multipleSelection
+            pinButton?.isVisible = show.all && !isOffline() && show.pin
+            unpinButton?.isVisible = show.all && show.unpin
+            downloadButton?.isVisible = show.all && show.download && !isOffline()
+            deleteButton?.isVisible = show.all && show.delete
         }
-
-        playNowButton?.isVisible = enabled
-        playNextButton?.isVisible = enabled && multipleSelection
-        playLastButton?.isVisible = enabled && multipleSelection
-        pinButton?.isVisible = enabled && !isOffline() && selection.size > pinnedCount
-        unpinButton?.isVisible = enabled && unpinEnabled
-        downloadButton?.isVisible = enabled && downloadEnabled && !isOffline()
-        deleteButton?.isVisible = enabled && deleteEnabled
     }
 
     private fun downloadBackground(save: Boolean) {
@@ -504,7 +490,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         // Show a text if we have no entries
         emptyView.isVisible = entryList.isEmpty()
 
-        enableButtons()
+        triggerButtonUpdate()
 
         val isAlbumList = (navArgs.albumListType != null)
 
@@ -729,7 +715,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 VideoPlayer.playVideo(requireContext(), item)
             }
             else -> {
-                enableButtons()
+                triggerButtonUpdate()
             }
         }
     }

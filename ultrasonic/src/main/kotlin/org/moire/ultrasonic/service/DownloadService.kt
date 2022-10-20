@@ -24,6 +24,10 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.google.common.util.concurrent.SettableFuture
 import java.util.PriorityQueue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
@@ -54,9 +58,9 @@ private const val CHECK_INTERVAL = 5000L
  * "A foreground service is a service that the user is
  * actively aware of and isn’t a candidate for the system to kill when low on memory."
  *
- * TODO: Migrate this to use the Media3 DownloadHelper
  */
 class DownloadService : Service(), KoinComponent {
+    private var scope: CoroutineScope? = null
     private val storageMonitor: ExternalStorageMonitor by inject()
     private val binder: IBinder = SimpleServiceBinder(this)
 
@@ -71,6 +75,11 @@ class DownloadService : Service(), KoinComponent {
 
     override fun onCreate() {
         super.onCreate()
+
+        // Create Coroutine lifecycle scope. We use a SupervisorJob(), otherwise the failure of one
+        // would mean the failure of all jobs!
+        val supervisor = SupervisorJob()
+        scope = CoroutineScope(Dispatchers.IO + supervisor)
 
         // Create Notification Channel
         createNotificationChannel()
@@ -104,16 +113,14 @@ class DownloadService : Service(), KoinComponent {
         clearDownloads()
         observableDownloads.value = listOf()
 
+        scope?.cancel()
+        scope = null
+
         Timber.i("DownloadService destroyed")
     }
 
-    fun addTracks(tracks: List<DownloadableTrack>) {
-        downloadQueue.addAll(tracks)
-        tracks.forEach { postState(it.track, DownloadState.QUEUED) }
-        processNextTracks()
-    }
-
-    private fun processNextTracks() {
+    @Synchronized
+    fun processNextTracks() {
         retrying = false
         if (
             !Util.isNetworkConnected() ||
@@ -129,19 +136,17 @@ class DownloadService : Service(), KoinComponent {
 
         // Fill up active List with waiting tasks
         while (activelyDownloading.size < Settings.parallelDownloads && downloadQueue.size > 0) {
-            val task = downloadQueue.remove()
-            val downloadTask = DownloadTask(task) { downloadableTrack, downloadState, progress ->
-                downloadStateChangedCallback(downloadableTrack, downloadState, progress)
-            }
-            activelyDownloading[task] = downloadTask
-            FileUtil.createDirectoryForParent(task.pinnedFile)
-            activelyDownloading[task]?.start()
-
+            val track = downloadQueue.remove()
+            val downloadTask = DownloadTask(track, scope!!, ::downloadStateChangedCallback)
+            activelyDownloading[track] = downloadTask
+            FileUtil.createDirectoryForParent(track.pinnedFile)
+            downloadTask.start()
             listChanged = true
         }
 
         // Stop Executor service when done downloading
         if (activelyDownloading.isEmpty()) {
+            CacheCleaner().cleanSpace()
             stopSelf()
         }
 
@@ -151,6 +156,7 @@ class DownloadService : Service(), KoinComponent {
     }
 
     private fun retryProcessNextTracks() {
+        Timber.i("Scheduling retry to process next tracks")
         if (isShuttingDown || retrying) return
         retrying = true
         Handler(Looper.getMainLooper()).postDelayed(
@@ -282,6 +288,7 @@ class DownloadService : Service(), KoinComponent {
 
         private var backgroundPriorityCounter = 100
 
+        @Synchronized
         fun download(
             tracks: List<Track>,
             save: Boolean,
@@ -292,12 +299,7 @@ class DownloadService : Service(), KoinComponent {
             if (save) {
                 tracks.filter { Storage.isPathExists(it.getCompleteFile()) }.forEach { track ->
                     Storage.getFromPath(track.getCompleteFile())?.let {
-                        try {
-                            Storage.rename(it, track.getPinnedFile())
-                        } catch (ignored: FileAlreadyExistsException) {
-                            // Play console has revealed a crash when for some reason both files exist
-                            Storage.delete(it.path)
-                        }
+                        Storage.renameOrDeleteIfAlreadyExists(it, track.getPinnedFile())
                         postState(track, DownloadState.PINNED)
                     }
                 }
@@ -305,12 +307,7 @@ class DownloadService : Service(), KoinComponent {
             } else {
                 tracks.filter { Storage.isPathExists(it.getPinnedFile()) }.forEach { track ->
                     Storage.getFromPath(track.getPinnedFile())?.let {
-                        try {
-                            Storage.rename(it, track.getCompleteFile())
-                        } catch (ignored: FileAlreadyExistsException) {
-                            // Play console has revealed a crash when for some reason both files exist
-                            Storage.delete(it.path)
-                        }
+                        Storage.renameOrDeleteIfAlreadyExists(it, track.getCompleteFile())
                         postState(track, DownloadState.DONE)
                     }
                 }
@@ -346,7 +343,11 @@ class DownloadService : Service(), KoinComponent {
                     )
                 }
 
-            if (tracksToDownload.isNotEmpty()) addTracks(tracksToDownload)
+            if (tracksToDownload.isNotEmpty()) {
+                downloadQueue.addAll(tracksToDownload)
+                tracksToDownload.forEach { postState(it.track, DownloadState.QUEUED) }
+                processNextTracksOnService()
+            }
         }
 
         fun requestStop() {
@@ -404,12 +405,12 @@ class DownloadService : Service(), KoinComponent {
             return DownloadState.IDLE
         }
 
-        private fun addTracks(tracks: List<DownloadableTrack>) {
+        private fun processNextTracksOnService() {
             val serviceFuture = startFuture ?: requestStart()
             serviceFuture.addListener({
                 val service = serviceFuture.get()
-                service.addTracks(tracks)
-                Timber.i("Added tracks to DownloadService")
+                service.processNextTracks()
+                Timber.i("DownloadService processNextTracks executed.")
             }, MoreExecutors.directExecutor())
         }
 
