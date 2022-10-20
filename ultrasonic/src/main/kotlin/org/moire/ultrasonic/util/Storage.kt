@@ -64,13 +64,35 @@ object Storage {
         mediaRoot.value.rename(pathFrom, pathTo)
     }
 
+    fun renameOrDeleteIfAlreadyExists(pathFrom: AbstractFile, pathTo: String) {
+        try {
+            rename(pathFrom, pathTo)
+        } catch (ignored: FileAlreadyExistsException) {
+            // Play console has revealed a crash when for some reason both files exist
+            delete(pathFrom.path)
+        }
+    }
+
     fun delete(path: String): Boolean {
-        val storageFile = getFromPath(path)
-        if (storageFile != null && !storageFile.delete()) {
-            Timber.w("Failed to delete file %s", path)
+        // Some implementations will return false on Error,
+        // others will throw a FileNotFoundException...
+        // Handle both here..
+
+        val success: Boolean
+
+        try {
+            val storageFile = getFromPath(path)
+            success = storageFile?.delete() == true
+        } catch (all: Exception) {
+            Timber.d(all, "Failed to delete file $path")
             return false
         }
-        return true
+
+        if (!success) {
+            Timber.d("Failed to delete file %s", path)
+        }
+
+        return success
     }
 
     private fun getRoot(): AbstractFile? {

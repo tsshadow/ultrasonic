@@ -8,10 +8,14 @@
 package org.moire.ultrasonic.service
 
 import android.os.SystemClock
-import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.Locale
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
@@ -20,9 +24,8 @@ import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
-import org.moire.ultrasonic.util.CacheCleaner
-import org.moire.ultrasonic.util.CancellableTask
 import org.moire.ultrasonic.util.FileUtil
+import org.moire.ultrasonic.util.FileUtil.copyWithProgress
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.Util
@@ -34,150 +37,175 @@ private const val REFRESH_INTERVAL = 50
 
 class DownloadTask(
     private val item: DownloadableTrack,
+    private val scope: CoroutineScope,
     private val stateChangedCallback: (DownloadableTrack, DownloadState, progress: Int?) -> Unit
-) :
-    CancellableTask(), KoinComponent {
-    val musicService = MusicServiceFactory.getMusicService()
-
+) : KoinComponent {
+    private val musicService = MusicServiceFactory.getMusicService()
     private val imageLoaderProvider: ImageLoaderProvider by inject()
     private val activeServerProvider: ActiveServerProvider by inject()
 
-    @Suppress("LongMethod", "ComplexMethod", "NestedBlockDepth", "TooGenericExceptionThrown")
-    override fun execute() {
+    private var job: Job? = null
+    private var inputStream: InputStream? = null
+    private var outputStream: OutputStream? = null
+    private var lastPostTime: Long = 0
 
-        var inputStream: InputStream? = null
-        var outputStream: OutputStream? = null
-        try {
-            if (Storage.isPathExists(item.pinnedFile)) {
-                Timber.i("%s already exists. Skipping.", item.pinnedFile)
-                stateChangedCallback(item, DownloadState.PINNED, null)
-                return
-            }
+    private fun checkIfExists(): Boolean {
+        if (Storage.isPathExists(item.pinnedFile)) {
+            Timber.i("%s already exists. Skipping.", item.pinnedFile)
+            stateChangedCallback(item, DownloadState.PINNED, null)
+            return true
+        }
 
-            if (Storage.isPathExists(item.completeFile)) {
-                var newStatus: DownloadState = DownloadState.DONE
-                if (item.pinned) {
-                    Storage.rename(
-                        item.completeFile,
-                        item.pinnedFile
-                    )
-                    newStatus = DownloadState.PINNED
-                } else {
-                    Timber.i(
-                        "%s already exists. Skipping.",
-                        item.completeFile
-                    )
-                }
-
-                // Hidden feature: If track is toggled between pinned/saved, refresh the metadata..
-                try {
-                    item.track.cacheMetadataAndArtwork()
-                } catch (ignore: Exception) {
-                    Timber.w(ignore)
-                }
-                stateChangedCallback(item, newStatus, null)
-                return
-            }
-
-            stateChangedCallback(item, DownloadState.DOWNLOADING, null)
-
-            val fileLength = Storage.getFromPath(item.partialFile)?.length ?: 0
-
-            // Attempt partial HTTP GET, appending to the file if it exists.
-            val (inStream, isPartial) = musicService.getDownloadInputStream(
-                item.track, fileLength,
-                Settings.maxBitRate,
-                item.pinned
-            )
-
-            inputStream = inStream
-
-            if (isPartial) {
-                Timber.i("Executed partial HTTP GET, skipping %d bytes", fileLength)
-            }
-
-            outputStream = Storage.getOrCreateFileFromPath(item.partialFile)
-                .getFileOutputStream(isPartial)
-
-            var lastPostTime: Long = 0
-            val len = inputStream.copyTo(outputStream) { totalBytesCopied ->
-                // Manual throttling to avoid overloading Rx
-                if (SystemClock.elapsedRealtime() - lastPostTime > REFRESH_INTERVAL) {
-                    lastPostTime = SystemClock.elapsedRealtime()
-
-                    // If the file size is unknown we can only provide null as the progress
-                    val size = item.track.size ?: 0
-                    val progress = if (size <= 0) {
-                        null
-                    } else {
-                        (totalBytesCopied * 100 / (size)).toInt()
-                    }
-
-                    stateChangedCallback(
-                        item,
-                        DownloadState.DOWNLOADING,
-                        progress
-                    )
-                }
-            }
-
-            Timber.i("Downloaded %d bytes to %s", len, item.partialFile)
-
-            inputStream.close()
-            outputStream.flush()
-            outputStream.close()
-
-            if (isCancelled) {
-                stateChangedCallback(item, DownloadState.CANCELLED, null)
-                throw RuntimeException(
-                    String.format(
-                        Locale.ROOT, "Download of '%s' was cancelled",
-                        item
-                    )
+        if (Storage.isPathExists(item.completeFile)) {
+            var newStatus: DownloadState = DownloadState.DONE
+            if (item.pinned) {
+                Storage.rename(
+                    item.completeFile,
+                    item.pinnedFile
+                )
+                newStatus = DownloadState.PINNED
+            } else {
+                Timber.i(
+                    "%s already exists. Skipping.",
+                    item.completeFile
                 )
             }
 
+            // Hidden feature: If track is toggled between pinned/saved, refresh the metadata..
             try {
                 item.track.cacheMetadataAndArtwork()
             } catch (ignore: Exception) {
                 Timber.w(ignore)
             }
+            stateChangedCallback(item, newStatus, null)
+            return true
+        }
 
-            if (item.pinned) {
-                Storage.rename(
-                    item.partialFile,
-                    item.pinnedFile
-                )
-                stateChangedCallback(item, DownloadState.PINNED, null)
-                Util.scanMedia(item.pinnedFile)
+        return false
+    }
+
+    fun download() {
+        stateChangedCallback(item, DownloadState.DOWNLOADING, null)
+
+        val fileLength = Storage.getFromPath(item.partialFile)?.length ?: 0
+
+        // Attempt partial HTTP GET, appending to the file if it exists.
+        val (inStream, isPartial) = musicService.getDownloadInputStream(
+            item.track, fileLength,
+            Settings.maxBitRate,
+            item.pinned
+        )
+
+        inputStream = inStream
+
+        if (isPartial) {
+            Timber.i("Executed partial HTTP GET, skipping %d bytes", fileLength)
+        }
+
+        outputStream = Storage.getOrCreateFileFromPath(item.partialFile)
+            .getFileOutputStream(isPartial)
+
+        val len = inputStream!!.copyWithProgress(outputStream!!) { totalBytesCopied ->
+            // Add previous existing file length for correct display when resuming
+            publishProgressUpdate(fileLength + totalBytesCopied)
+        }
+
+        Timber.i("Downloaded %d bytes to %s", len, item.partialFile)
+
+        inputStream?.close()
+        outputStream?.flush()
+        outputStream?.close()
+    }
+
+    private fun publishProgressUpdate(totalBytesCopied: Long) {
+        // Check if we are cancelled...
+        if (job?.isCancelled == true) {
+            throw CancellationException()
+        }
+
+        // Manual throttling to avoid overloading Rx
+        if (SystemClock.elapsedRealtime() - lastPostTime > REFRESH_INTERVAL) {
+            lastPostTime = SystemClock.elapsedRealtime()
+
+            // If the file size is unknown we can only provide null as the progress
+            val size = item.track.size ?: 0
+            val progress = if (size <= 0) {
+                null
             } else {
-                Storage.rename(
-                    item.partialFile,
-                    item.completeFile
-                )
-                stateChangedCallback(item, DownloadState.DONE, null)
+                (totalBytesCopied * 100 / (size)).toInt()
             }
-        } catch (all: Exception) {
-            outputStream.safeClose()
-            Storage.delete(item.completeFile)
-            Storage.delete(item.pinnedFile)
-            if (!isCancelled) {
-                if (item.tryCount < MAX_RETRIES) {
-                    stateChangedCallback(item, DownloadState.RETRYING, null)
-                } else {
-                    stateChangedCallback(item, DownloadState.FAILED, null)
-                }
-                Timber.w(all, "Failed to download '%s'.", item)
-            }
-        } finally {
-            inputStream.safeClose()
-            outputStream.safeClose()
-            CacheCleaner().cleanSpace()
+
+            stateChangedCallback(
+                item,
+                DownloadState.DOWNLOADING,
+                progress
+            )
         }
     }
 
-    override fun toString(): String {
-        return String.format(Locale.ROOT, "DownloadTask (%s)", item)
+    private fun afterDownload() {
+        try {
+            item.track.cacheMetadataAndArtwork()
+        } catch (ignore: Exception) {
+            Timber.w(ignore)
+        }
+
+        if (item.pinned) {
+            Storage.rename(
+                item.partialFile,
+                item.pinnedFile
+            )
+            Timber.i("Renamed file to ${item.pinnedFile}")
+            stateChangedCallback(item, DownloadState.PINNED, null)
+            Util.scanMedia(item.pinnedFile)
+        } else {
+            Storage.rename(
+                item.partialFile,
+                item.completeFile
+            )
+            Timber.i("Renamed file to ${item.completeFile}")
+            stateChangedCallback(item, DownloadState.DONE, null)
+        }
+    }
+
+    private fun onCompletion(e: Throwable?) {
+        if (e is CancellationException) {
+            Timber.w(e, "CompletionHandler ${item.pinnedFile}")
+            stateChangedCallback(item, DownloadState.CANCELLED, null)
+        } else if (e != null) {
+            Timber.w(e, "CompletionHandler ${item.pinnedFile}")
+            if (item.tryCount < MAX_RETRIES) {
+                stateChangedCallback(item, DownloadState.RETRYING, null)
+            } else {
+                stateChangedCallback(item, DownloadState.FAILED, null)
+            }
+        }
+        inputStream.safeClose()
+        outputStream.safeClose()
+    }
+
+    private fun exceptionHandler(): CoroutineExceptionHandler {
+        return CoroutineExceptionHandler { _, exception ->
+            Timber.w(exception, "Exception in DownloadTask ${item.pinnedFile}")
+            Storage.delete(item.completeFile)
+            Storage.delete(item.pinnedFile)
+        }
+    }
+
+    fun start() {
+        Timber.i("Launching new Job ${item.pinnedFile}")
+        job = scope.launch(exceptionHandler()) {
+            if (!checkIfExists() && isActive) {
+                download()
+                afterDownload()
+            }
+        }
+
+        job!!.invokeOnCompletion(::onCompletion)
+    }
+
+    fun cancel() {
+        job?.cancel()
     }
 
     private fun Track.cacheMetadataAndArtwork() {
@@ -230,7 +258,6 @@ class DownloadTask(
         imageLoader.cacheCoverArt(this)
 
         // Cache small copies of the Artist picture
-
         directArtist?.let { imageLoader.cacheArtistPicture(it) }
         compilationArtist?.let { imageLoader.cacheArtistPicture(it) }
     }
@@ -257,19 +284,5 @@ class DownloadTask(
         }
 
         return artist
-    }
-
-    @Throws(IOException::class)
-    fun InputStream.copyTo(out: OutputStream, onCopy: (totalBytesCopied: Long) -> Any): Long {
-        var bytesCopied: Long = 0
-        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-        var bytes = read(buffer)
-        while (!isCancelled && bytes >= 0) {
-            out.write(buffer, 0, bytes)
-            bytesCopied += bytes
-            onCopy(bytesCopied)
-            bytes = read(buffer)
-        }
-        return bytesCopied
     }
 }

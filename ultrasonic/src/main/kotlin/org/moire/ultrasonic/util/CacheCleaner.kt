@@ -130,7 +130,7 @@ class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO), KoinCompo
             offlineDB.artistDao().delete(it)
         }
 
-        Timber.e("Database cleanup done")
+        Timber.i("Database cleanup done")
     }
 
     fun cleanDatabaseSelective(trackToRemove: Track) {

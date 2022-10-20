@@ -41,7 +41,7 @@ class StorageFile(
                     }
                 }
             } catch (_: IllegalArgumentException) {
-                Timber.d("Tried to get length of $uri but it probably doesn't exists")
+                Timber.i("Tried to get length of $uri but it probably doesn't exists")
             }
             return 0
         }
@@ -57,7 +57,7 @@ class StorageFile(
                     }
                 }
             } catch (_: IllegalArgumentException) {
-                Timber.d("Tried to get length of $uri but it probably doesn't exists")
+                Timber.i("Tried to get length of $uri but it probably doesn't exists")
             }
             return 0
         }
@@ -181,7 +181,7 @@ class StorageFile(
     override fun rename(pathFrom: AbstractFile, pathTo: String) {
         val fileFrom = pathFrom as StorageFile
         if (!fileFrom.exists()) throw IOException("File to rename doesn't exist")
-        Timber.d("Renaming from %s to %s", fileFrom.path, pathTo)
+        Timber.i("Renaming from %s to %s", fileFrom.path, pathTo)
 
         val parentTo = getFromPath(FileUtil.getParentPath(pathTo)!!)
             ?: throw IOException("Destination folder doesn't exist")

@@ -9,9 +9,14 @@ package org.moire.ultrasonic.model
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.domain.MusicDirectory
+import org.moire.ultrasonic.domain.Track
+import org.moire.ultrasonic.service.DownloadService
+import org.moire.ultrasonic.service.DownloadState
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
@@ -155,5 +160,58 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
     private fun updateList(root: MusicDirectory) {
         currentList.postValue(root.getChildren())
+    }
+
+    @Synchronized
+    fun calculateButtonState(
+        selection: List<Track>,
+        onComplete: (TrackCollectionModel.Companion.ButtonStates) -> Unit
+    ) {
+        val enabled = selection.isNotEmpty()
+        var unpinEnabled = false
+        var deleteEnabled = false
+        var downloadEnabled = false
+        var pinnedCount = 0
+
+        viewModelScope.launch(Dispatchers.IO) {
+            for (song in selection) {
+                when (DownloadService.getDownloadState(song)) {
+                    DownloadState.DONE -> {
+                        deleteEnabled = true
+                    }
+                    DownloadState.PINNED -> {
+                        deleteEnabled = true
+                        pinnedCount++
+                        unpinEnabled = true
+                    }
+                    DownloadState.IDLE, DownloadState.FAILED -> {
+                        downloadEnabled = true
+                    }
+                    else -> {}
+                }
+            }
+        }.invokeOnCompletion {
+            val pinEnabled = selection.size > pinnedCount
+
+            onComplete(
+                TrackCollectionModel.Companion.ButtonStates(
+                    all = enabled,
+                    pin = pinEnabled,
+                    unpin = unpinEnabled,
+                    delete = deleteEnabled,
+                    download = downloadEnabled
+                )
+            )
+        }
+    }
+
+    companion object {
+        data class ButtonStates(
+            val all: Boolean,
+            val pin: Boolean,
+            val unpin: Boolean,
+            val delete: Boolean,
+            val download: Boolean
+        )
     }
 }
