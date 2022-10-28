@@ -25,36 +25,42 @@
 
     <TextView
         a:id="@+id/current_playing_artist"
-        a:layout_width="wrap_content"
+        a:layout_width="0dp"
         a:layout_height="wrap_content"
-        a:ellipsize="marquee"
+        a:layout_marginEnd="10dp"
+        a:ellipsize="end"
         a:gravity="left"
         a:singleLine="true"
         a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        app:layout_constraintEnd_toStartOf="@+id/current_playing_track"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/current_playing_song"
         tools:text="Artist" />
 
     <TextView
         a:id="@+id/current_playing_album"
-        a:layout_width="wrap_content"
+        a:layout_width="0dp"
         a:layout_height="wrap_content"
-        a:ellipsize="start"
-        a:gravity="right"
+        a:layout_marginEnd="10dp"
+        a:ellipsize="end"
+        a:gravity="start|left"
         a:singleLine="true"
         a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        app:layout_constraintEnd_toStartOf="@+id/current_total_duration"
         app:layout_constraintStart_toStartOf="@+id/current_playing_artist"
         app:layout_constraintTop_toBottomOf="@+id/current_playing_artist"
         tools:text="Album" />
 
     <TextView
         a:id="@+id/current_playing_genre"
-        a:layout_width="wrap_content"
+        a:layout_width="0dp"
         a:layout_height="wrap_content"
-        a:ellipsize="start"
-        a:gravity="right"
+        a:layout_marginEnd="10dp"
+        a:ellipsize="end"
+        a:gravity="left"
         a:singleLine="true"
         a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        app:layout_constraintEnd_toStartOf="@+id/current_playing_bitrate_format"
         app:layout_constraintStart_toStartOf="@+id/current_playing_album"
         app:layout_constraintTop_toBottomOf="@+id/current_playing_album"
         tools:text="Genre" />
@@ -62,14 +68,14 @@
 
     <TextView
         a:id="@+id/current_playing_track"
-        a:layout_width="wrap_content"
+        a:layout_width="0dp"
         a:layout_height="wrap_content"
         a:ellipsize="start"
         a:gravity="right"
         a:text="0 / 0"
         a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/current_playing_song"
+        app:layout_constraintTop_toTopOf="@id/current_playing_artist"
         tools:ignore="HardcodedText" />
 
     <TextView

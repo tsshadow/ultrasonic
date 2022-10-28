@@ -67,7 +67,7 @@ class NowPlayingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         playButton = view.findViewById(R.id.now_playing_control_play)
         nowPlayingAlbumArtImage = view.findViewById(R.id.now_playing_image)
-        nowPlayingTrack = view.findViewById(R.id.now_playing_trackname)
+        nowPlayingTrack = view.findViewById(R.id.now_playing_title)
         nowPlayingArtist = view.findViewById(R.id.now_playing_artist)
         rxBusSubscription = RxBus.playerStateObservable.subscribe { update() }
     }
