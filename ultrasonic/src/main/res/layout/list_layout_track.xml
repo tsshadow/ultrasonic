@@ -6,6 +6,6 @@
 
     <include layout="@layout/list_parts_empty_view" />
     <include layout="@layout/list_parts_recycler" />
-    <include layout="@layout/album_buttons" />
+    <include layout="@layout/track_buttons" />
 
 </LinearLayout>

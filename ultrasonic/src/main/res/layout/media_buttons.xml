@@ -12,15 +12,16 @@
         a:id="@+id/button_shuffle"
         style="@style/Widget.Material3.Button.IconButton"
         a:layout_width="0dip"
-        a:layout_height="26dp"
+        a:layout_height="48dp"
         a:layout_gravity="center"
         a:layout_weight="1"
         a:adjustViewBounds="true"
+        a:contentDescription="@string/buttons.shuffle"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:contentDescription="@string/buttons.shuffle"
         app:icon="@drawable/media_shuffle"
-        app:iconGravity="textTop" />
+        app:iconGravity="textTop"
+        app:iconSize="20dp" />
 
     <org.moire.ultrasonic.view.AutoRepeatButton
         a:id="@+id/button_previous"
@@ -100,14 +101,15 @@
         a:id="@+id/button_repeat"
         style="@style/Widget.Material3.Button.IconButton"
         a:layout_width="0dip"
-        a:layout_height="26dp"
+        a:layout_height="48dp"
         a:layout_gravity="center"
         a:layout_weight="1"
         a:adjustViewBounds="true"
+        a:contentDescription="@string/buttons.repeat"
         a:focusable="true"
         a:scaleType="fitCenter"
-        a:contentDescription="@string/buttons.repeat"
         app:icon="@drawable/media_repeat_off"
-        app:iconGravity="textTop" />
+        app:iconGravity="textTop"
+        app:iconSize="20dp" />
 
     </LinearLayout>

@@ -27,13 +27,15 @@
         a:paddingStart="11.0dip">
 
         <TextView
-            a:id="@+id/now_playing_trackname"
+            a:id="@+id/now_playing_title"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
             a:layout_gravity="start"
             a:ellipsize="marquee"
             a:singleLine="true"
-            a:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+            a:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            a:textSize="20sp"
+            tools:text="Title" />
 
         <TextView
             a:id="@+id/now_playing_artist"
@@ -43,6 +45,7 @@
             a:ellipsize="end"
             a:scrollHorizontally="true"
             a:singleLine="true"
+            tools:text="Artist"
             a:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
     </LinearLayout>
 
@@ -52,7 +55,6 @@
         a:layout_width="48dp"
         a:layout_height="48dp"
         a:layout_gravity="center|end"
-        a:layout_marginTop="2dip"
         a:layout_marginEnd="16dip"
         a:layout_weight="0.0"
         a:contentDescription="@string/buttons.play"
