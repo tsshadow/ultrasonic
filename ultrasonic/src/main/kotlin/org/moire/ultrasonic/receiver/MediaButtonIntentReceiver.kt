@@ -10,6 +10,7 @@ package org.moire.ultrasonic.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Parcelable
 import java.lang.Exception
 import org.koin.core.component.KoinComponent
@@ -36,7 +37,14 @@ class MediaButtonIntentReceiver : BroadcastReceiver(), KoinComponent {
             Constants.CMD_PROCESS_KEYCODE != intentAction
         ) return
         val extras = intent.extras ?: return
-        val event = extras[Intent.EXTRA_KEY_EVENT] as Parcelable?
+
+        val event = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            extras.getParcelable(Intent.EXTRA_KEY_EVENT, Parcelable::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            extras.get(Intent.EXTRA_KEY_EVENT) as Parcelable?
+        }
+
         Timber.i("Got MEDIA_BUTTON key event: %s", event)
         try {
             val serviceIntent = Intent(Constants.CMD_PROCESS_KEYCODE)
