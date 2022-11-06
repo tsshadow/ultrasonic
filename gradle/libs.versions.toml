@@ -24,7 +24,7 @@ kotlinxGuava           = "1.6.4"
 viewModelKtx           = "2.5.1"
 
 retrofit               = "2.9.0"
-jackson                = "2.13.4"
+jackson                = "2.14.0"
 okhttp                 = "4.10.0"
 koin                   = "3.2.2"
 picasso                = "2.8"
