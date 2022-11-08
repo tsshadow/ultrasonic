@@ -1,0 +1,8 @@
+Corrección de errores
+- #833: La altura del widget es siempre un mínimo de 2 filas en lugar de la anterior de 1 fila.
+- #840: DownloadTask no debería iniciarse varias veces para una canción.
+- !849: Un montón de correcciones 💐.
+
+Mejoras
+- #841: Eliminar los espacios en blanco como texto por defecto en la configuración del servidor.
+- !865: Corregir un pequeño aviso de código obsoleto.

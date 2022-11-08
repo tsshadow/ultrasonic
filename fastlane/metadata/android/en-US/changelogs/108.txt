@@ -1,0 +1,8 @@
+Bug fixes
+- #833: Widget height is always a minimum of 2 rows instead of previous 1 row.
+- #840: DownloadTask shouldn't be started multiple times for a track.
+- !849: Bunch of fixes 💐.
+
+Enhancements
+- #841: Remove whitespace as default text in server settings.
+- !865: Fix a small deprecation notice.
