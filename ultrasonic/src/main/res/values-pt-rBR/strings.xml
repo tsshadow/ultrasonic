@@ -28,6 +28,7 @@
     <string name="button_bar.playlists">Playlists</string>
     <string name="button_bar.search">Pesquisa</string>
     <string name="chat.send_a_message">Enviar uma mensagem</string>
+    <string name="chat.send_button">Enviar</string>
     <string name="common.album">Álbum</string>
     <string name="common.appname">Ultrasonic</string>
     <string name="common.artist">Artista</string>
@@ -50,6 +51,8 @@
     <string name="common.select_all">Selecionar tudo</string>
     <string name="common.title">Título</string>
     <string name="common.unpin">Desafixar</string>
+    <string name="common.delete_selection_confirmation">Quer realmente excluir a seleção atual?</string>
+    <string name="common.unpin_selection_confirmation">Quer realmente desafixar a seleção atual?</string>
     <string name="common.various_artists">Vários Artistas</string>
     <string name="delete_playlist">Você quer excluir %1$s</string>
     <string name="download.bookmark_removed" formatted="false">Favorito removido.</string>
@@ -72,6 +75,9 @@
     <string name="download.menu_screen_on">Tela Ligada</string>
     <string name="download.menu_show_album">Mostrar Álbum</string>
     <string name="download.menu_shuffle">Misturar</string>
+    <string name="download.menu_shuffle_on">Modo aleatório ativado</string>
+    <string name="download.menu_shuffle_off">Modo aleatório desativado</string>
+    <string name="download.playerstate_loading">Carregando…</string>
     <string name="download.playerstate_playing_shuffle">Tocando misturado</string>
     <string name="download.playlist_done">Playlist salva com sucesso.</string>
     <string name="download.playlist_error">Falha ao salvar a playlist, Tente mais tarde.</string>
@@ -214,6 +220,7 @@
     <string name="settings.hide_media_summary">Esconder arquivos de músicas de outros aplicativos</string>
     <string name="settings.hide_media_title">Esconder de Outros</string>
     <string name="settings.hide_media_toast">Será efetivado na próxima vez que o Android procurar por músicas em seu celular.</string>
+    <string name="settings.increment_time">Pular Intervalo</string>
     <string name="settings.invalid_url">Especifique uma URL válida.</string>
     <string name="settings.max_albums">Máximo de Álbuns</string>
     <string name="settings.max_artists">Máximo de Artistas</string>
@@ -256,6 +263,7 @@
     <string name="settings.playback.resume_play_on_headphones_plug.title">Retomar ao Inserir Fone de Ouvido</string>
     <string name="settings.playback.resume_play_on_headphones_plug.summary">O aplicativo retomará a reprodução em pausa na inserção dos fones de ouvido no dispositivo</string>
     <string name="settings.preload">Músicas a Pré-carregar</string>
+    <string name="settings.parallel_downloads">Quantas músicas baixar em paralelo</string>
     <string name="settings.preload_1">1 música</string>
     <string name="settings.preload_10">10 músicas</string>
     <string name="settings.preload_2">2 músicas</string>
@@ -294,6 +302,7 @@
     <string name="settings.test_connection_title">Teste de Conexão</string>
     <string name="settings.testing_ok">Conexão OK</string>
     <string name="settings.testing_unlicensed">Conexão OK. Servidor não licenciado.</string>
+    <string name="settings.theme_day_night">Dia &amp; Noite</string>
     <string name="settings.theme_light">Claro</string>
     <string name="settings.theme_dark">Escuro</string>
     <string name="settings.theme_black">Negro</string>
@@ -307,6 +316,9 @@
     <string name="settings.show_now_playing_details">Mostrar detalhes em Tocando Agora</string>
     <string name="settings.use_id3">Navegar Usando Etiquetas ID3</string>
     <string name="settings.use_id3_summary">Usar as etiquetas ID3 ao invés do sistema de arquivos</string>
+    <string name="settings.use_id3_offline">Usar método ID3 quando offline também</string>
+    <string name="settings.use_id3_offline_warning">Experimental: Se você ativar esta configuração, ela mostrará apenas a música que você baixou com o Ultrasonic 4.0 ou posterior.</string>
+    <string name="settings.use_id3_offline_summary">Os downloads anteriores não têm os metadados necessários baixados. Você pode alternar entre os modos Pin e Salvar para acionar o download dos metadados ausentes.</string>
     <string name="settings.show_artist_picture">Mostrar Foto do Artista na Lista</string>
     <string name="settings.show_artist_picture_summary">Mostrar a imagem do artista na lista de artistas, se disponível</string>
     <string name="main.video" tools:ignore="UnusedResources">Vídeo</string>
@@ -359,6 +371,8 @@
     <string name="download.menu_show_artist">Mostrar Artista</string>
     <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Anos Múltiplos</string>
+    <string name="settings.show_confirmation_dialog">Mostrar caixa de diálogo de confirmação</string>
+    <string name="settings.show_confirmation_dialog_summary">Exibe uma caixa de diálogo de confirmação antes de excluir ou desafixar músicas</string>
     <string name="settings.debug.title">Opções de Depuração</string>
     <string name="settings.debug.log_to_file">Log de Depuração em Arquivo</string>
     <string name="settings.debug.log_path">Os arquivos com log estão disponíveis em %1$s/%2$s</string>
@@ -367,6 +381,7 @@
     <string name="settings.debug.log_delete">Excluir arquivos</string>
     <string name="settings.debug.log_deleted">Arquivos de log excluídos.</string>
     <string name="notification.downloading_title">Baixado mídia em segundo plano…</string>
+    <string name="notification.permission_required">As notificações são necessárias para a reprodução de mídia. Você pode conceder a permissão a qualquer momento nas configurações do Android.</string>
     <string name="server_selector.label">Servidores Configurados</string>
     <string name="server_selector.delete_confirmation">Quer realmente excluir o servidor?</string>
     <string name="server_editor.label">Gerenciar Servidor</string>
@@ -437,4 +452,7 @@
     <string name="settings.five_star_rating_title">Avaliar Músicas com Estrelas</string>
     <string name="settings.five_star_rating_description">Usar o sistema de classificação de 5 estrelas em vez de estrelar/não estrelar itens.</string>
 
-    </resources>
+    <string name="settings.use_hw_offload_title">Usar a reprodução por hardware (experimental)</string>
+    <string name="settings.use_hw_offload_description">Tenta reproduzir a mídia usando o chip decodificador de mídia do telefone. Isso pode melhorar o uso da bateria.</string>
+
+</resources>
