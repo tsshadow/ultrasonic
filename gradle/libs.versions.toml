@@ -40,7 +40,7 @@ timber                 = "5.0.1"
 fastScroll             = "2.0.1"
 colorPicker            = "2.2.4"
 rxJava                 = "3.1.5"
-rxAndroid              = "3.0.0"
+rxAndroid              = "3.0.2"
 multiType              = "4.3.0"
 
 [libraries]
