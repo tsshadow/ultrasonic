@@ -136,7 +136,9 @@ class DownloadService : Service(), KoinComponent {
 
         // Fill up active List with waiting tasks
         while (activelyDownloading.size < Settings.parallelDownloads && downloadQueue.size > 0) {
-            val track = downloadQueue.remove()
+            // Use poll() instead of remove() which throws an Exception if there is no element.
+            val track: DownloadableTrack = downloadQueue.poll() ?: continue
+
             val downloadTask = DownloadTask(track, scope!!, ::downloadStateChangedCallback)
             activelyDownloading[track] = downloadTask
             FileUtil.createDirectoryForParent(track.pinnedFile)
