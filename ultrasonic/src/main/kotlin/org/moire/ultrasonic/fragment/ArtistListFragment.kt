@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.ArtistRowBinder
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
@@ -41,7 +42,7 @@ class ArtistListFragment : EntryListFragment<ArtistOrIndex>() {
     /**
      * The central function to pass a query to the model and return a LiveData object
      */
-    override fun getLiveData(refresh: Boolean): LiveData<List<ArtistOrIndex>> {
+    override fun getLiveData(refresh: Boolean, append: Boolean): LiveData<List<ArtistOrIndex>> {
         return listModel.getItems(navArgs.refresh || refresh, refreshListView!!)
     }
 
@@ -66,15 +67,16 @@ class ArtistListFragment : EntryListFragment<ArtistOrIndex>() {
     override fun onItemClick(item: ArtistOrIndex) {
         // Check type
         val action = if (item is Index) {
-            ArtistListFragmentDirections.artistsListToTrackCollection(
+            NavigationGraphDirections.toTrackCollection(
                 id = item.id,
                 name = item.name,
                 parentId = item.id,
                 isArtist = (item is Artist)
             )
         } else {
-            ArtistListFragmentDirections.artistsListToAlbumsList(
-                type = AlbumListType.BY_ARTIST,
+            NavigationGraphDirections.toAlbumList(
+                type = AlbumListType.SORTED_BY_NAME,
+                byArtist = true,
                 id = item.id,
                 title = item.name,
                 size = 1000,

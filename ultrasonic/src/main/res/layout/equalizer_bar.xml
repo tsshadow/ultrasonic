@@ -1,46 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ equalizer_bar.xml
-  ~ Copyright (C) 2009-2022 Ultrasonic developers
-  ~
-  ~ Distributed under terms of the GNU GPLv3 license.
-  -->
-
 <RelativeLayout xmlns:a="http://schemas.android.com/apk/res/android"
-              a:orientation="vertical"
-              a:layout_width="fill_parent"
-              a:layout_height="wrap_content">
+    xmlns:tools="http://schemas.android.com/tools"
+    a:layout_width="fill_parent"
+    a:layout_height="wrap_content"
+    a:orientation="vertical">
 
     <TextView
-            a:id="@+id/equalizer_frequency"
-            a:textSize="12sp"
-            a:textColor="#c0c0c0"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:layout_marginTop="8dp"
-            a:layout_alignParentLeft="true"
-            />
+        a:id="@+id/equalizer_frequency"
+        a:layout_width="wrap_content"
+        a:layout_height="wrap_content"
+        a:layout_alignParentLeft="true"
+        a:layout_marginTop="8dp"
+        a:textColor="#c0c0c0"
+        a:textSize="12sp" />
 
     <TextView
-            a:id="@+id/equalizer_level"
-            a:text="0 dB"
-            a:textSize="12sp"
-            a:textColor="#c0c0c0"
-            a:gravity="right"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:layout_marginTop="8dp"
-            a:layout_alignParentRight="true"
-            a:layout_toEndOf="@+id/equalizer_frequency"
-            />
+        a:id="@+id/equalizer_level"
+        a:layout_width="wrap_content"
+        a:layout_height="wrap_content"
+        a:layout_alignParentRight="true"
+        a:layout_marginTop="8dp"
+        a:layout_toEndOf="@+id/equalizer_frequency"
+        a:gravity="right"
+        a:textColor="#c0c0c0"
+        a:textSize="12sp"
+        tools:text="0 dB" />
 
     <SeekBar
-            a:id="@+id/equalizer_bar"
-            a:layout_width="fill_parent"
-            a:layout_height="wrap_content"
-            a:layout_below="@+id/equalizer_frequency"
-            />
-
+        a:id="@+id/equalizer_bar"
+        a:layout_width="fill_parent"
+        a:layout_height="wrap_content"
+        a:layout_below="@+id/equalizer_frequency" />
 
 </RelativeLayout>
 

@@ -12,4 +12,6 @@ data class PodcastsChannel(
     companion object {
         private const val serialVersionUID = -4160515427075433798L
     }
+
+    override fun toString(): String = name.toString()
 }

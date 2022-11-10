@@ -27,9 +27,10 @@ import java.util.Collections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.AlbumHeader
-import org.moire.ultrasonic.adapters.AlbumRowBinder
+import org.moire.ultrasonic.adapters.AlbumRowDelegate
 import org.moire.ultrasonic.adapters.HeaderViewBinder
 import org.moire.ultrasonic.adapters.TrackViewBinder
 import org.moire.ultrasonic.data.ActiveServerProvider
@@ -50,6 +51,8 @@ import org.moire.ultrasonic.util.ConfirmationDialog
 import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.view.SortOrder
+import org.moire.ultrasonic.view.ViewCapabilities
 import timber.log.Timber
 
 /**
@@ -59,10 +62,11 @@ import timber.log.Timber
  * where the list can contain Albums as well. This happens especially when having ID3 tags disabled,
  * or using Offline mode, both in which Indexes instead of Artists are being used.
  *
- * TODO: Remove more button and introduce endless scrolling
  */
 @Suppress("TooManyFunctions")
-open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
+open class TrackCollectionFragment(
+    initialOrder: SortOrder? = null
+) : MultiListFragment<MusicDirectory.Child>(), FilterableFragment {
 
     private var albumButtons: View? = null
     private var selectButton: MaterialButton? = null
@@ -73,7 +77,6 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
     private var unpinButton: MaterialButton? = null
     private var downloadButton: MaterialButton? = null
     private var deleteButton: MaterialButton? = null
-    private var moreButton: MaterialButton? = null
     private var playAllButtonVisible = false
     private var shareButtonVisible = false
     private var playAllButton: MenuItem? = null
@@ -86,6 +89,9 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
 
     override val listModel: TrackCollectionModel by viewModels()
     private val rxBusSubscription: CompositeDisposable = CompositeDisposable()
+
+    private var sortOrder = initialOrder
+    private var offset: Int? = null
 
     /**
      * The id of the main layout
@@ -138,7 +144,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         )
 
         viewAdapter.register(
-            AlbumRowBinder(
+            AlbumRowDelegate(
                 { entry -> onItemClick(entry) },
                 { menuItem, entry -> onContextMenuItemSelected(menuItem, entry) },
                 imageLoaderProvider.getImageLoader()
@@ -161,6 +167,25 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         ) {
             triggerButtonUpdate()
         }
+
+        // Attach our onScrollListener
+        val scrollListener = object : EndlessScrollListener(viewManager) {
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
+                Timber.w("LOAD MORE")
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadMoreTracks()
+            }
+        }
+
+        listView!!.addOnScrollListener(scrollListener)
+    }
+
+    private fun loadMoreTracks() {
+        if (displayRandom() || navArgs.genreName != null) {
+            offset = navArgs.offset + navArgs.size
+            getLiveData(refresh = true, append = true)
+        }
     }
 
     internal open fun handleRefresh() {
@@ -176,7 +201,6 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         unpinButton = view.findViewById(R.id.select_album_unpin)
         downloadButton = view.findViewById(R.id.select_album_download)
         deleteButton = view.findViewById(R.id.select_album_delete)
-        moreButton = view.findViewById(R.id.select_album_more)
 
         selectButton?.setOnClickListener {
             selectAllOrNone()
@@ -469,23 +493,8 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
             }
         }
 
-        val listSize = navArgs.size
-
         // Hide select button for video lists and singular selection lists
         selectButton!!.isVisible = !allVideos && viewAdapter.hasMultipleSelection() && songCount > 0
-
-        if (songCount > 0) {
-            if (listSize == 0 || songCount < listSize) {
-                moreButton!!.visibility = View.GONE
-            } else {
-                moreButton!!.visibility = View.VISIBLE
-                if (navArgs.getRandom) {
-                    moreRandomTracks()
-                } else if (navArgs.genreName != null) {
-                    moreSongsForGenre()
-                }
-            }
-        }
 
         // Show a text if we have no entries
         emptyView.isVisible = entryList.isEmpty()
@@ -524,33 +533,6 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         Timber.i("Processed list")
     }
 
-    private fun moreSongsForGenre() {
-        moreButton!!.setOnClickListener {
-            val action = TrackCollectionFragmentDirections.loadMoreTracks(
-                genreName = navArgs.genreName,
-                size = navArgs.size,
-                offset = navArgs.offset + navArgs.size
-            )
-            findNavController().navigate(action)
-        }
-    }
-
-    private fun moreRandomTracks() {
-
-        val listSize = navArgs.size
-
-        moreButton!!.setOnClickListener {
-            val offset = navArgs.offset + listSize
-
-            val action = TrackCollectionFragmentDirections.loadMoreTracks(
-                getRandom = true,
-                size = listSize,
-                offset = offset
-            )
-            findNavController().navigate(action)
-        }
-    }
-
     internal fun getSelectedSongs(): List<Track> {
         // Walk through selected set and get the Entries based on the saved ids.
         return viewAdapter.getCurrentList().mapNotNull {
@@ -571,7 +553,8 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
 
     @Suppress("LongMethod")
     override fun getLiveData(
-        refresh: Boolean
+        refresh: Boolean,
+        append: Boolean
     ): LiveData<List<MusicDirectory.Child>> {
         Timber.i("Starting gathering track collection data...")
         val id = navArgs.id
@@ -584,11 +567,11 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         val shareName = navArgs.shareName
         val genreName = navArgs.genreName
 
-        val getStarredTracks = navArgs.getStarred
+        val getStarredTracks = displayStarred()
         val getVideos = navArgs.getVideos
-        val getRandomTracks = navArgs.getRandom
-        val albumListSize = navArgs.size
-        val albumListOffset = navArgs.offset
+        val getRandomTracks = displayRandom()
+        val size = if (navArgs.size < 0) Settings.maxSongs else navArgs.size
+        val offset = offset ?: navArgs.offset
         val refresh2 = navArgs.refresh || refresh
 
         listModel.viewModelScope.launch(handler) {
@@ -605,7 +588,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 listModel.getShare(shareId)
             } else if (genreName != null) {
                 setTitle(genreName)
-                listModel.getSongsForGenre(genreName, albumListSize, albumListOffset)
+                listModel.getSongsForGenre(genreName, size, offset, append)
             } else if (getStarredTracks) {
                 setTitle(getString(R.string.main_songs_starred))
                 listModel.getStarred()
@@ -614,7 +597,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 listModel.getVideos(refresh2)
             } else if (getRandomTracks) {
                 setTitle(R.string.main_songs_random)
-                listModel.getRandom(albumListSize)
+                listModel.getRandom(size, append)
             } else {
                 setTitle(name)
                 if (ActiveServerProvider.isID3Enabled()) {
@@ -632,6 +615,10 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         }
         return listModel.currentList
     }
+
+    private fun displayStarred() = (sortOrder == SortOrder.STARRED) || navArgs.getStarred
+
+    private fun displayRandom() = (sortOrder == SortOrder.RANDOM) || navArgs.getRandom
 
     @Suppress("LongMethod")
     override fun onContextMenuItemSelected(
@@ -703,7 +690,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
     override fun onItemClick(item: MusicDirectory.Child) {
         when {
             item.isDirectory -> {
-                val action = TrackCollectionFragmentDirections.loadMoreTracks(
+                val action = NavigationGraphDirections.toTrackCollection(
                     id = item.id,
                     isAlbum = true,
                     name = item.title,
@@ -718,5 +705,25 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 triggerButtonUpdate()
             }
         }
+    }
+
+    override fun setOrderType(newOrder: SortOrder) {
+        sortOrder = newOrder
+        getLiveData(true)
+    }
+
+    override var viewCapabilities: ViewCapabilities = ViewCapabilities(
+        supportsGrid = false,
+        supportedSortOrders = getListOfSortOrders()
+    )
+
+    private fun getListOfSortOrders(): List<SortOrder> {
+        val isOnline = !isOffline()
+        val supported = mutableListOf(SortOrder.RANDOM)
+
+        if (isOnline) {
+            supported.add(SortOrder.STARRED)
+        }
+        return supported
     }
 }

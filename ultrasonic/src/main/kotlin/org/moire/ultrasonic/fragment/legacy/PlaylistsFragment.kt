@@ -21,6 +21,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView.AdapterContextMenuInfo
+import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ListView
@@ -30,6 +31,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.util.Locale
 import org.koin.java.KoinJavaComponent.inject
+import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
@@ -45,7 +47,6 @@ import org.moire.ultrasonic.util.FragmentBackgroundTask
 import org.moire.ultrasonic.util.LoadingTask
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.Util.toast
-import org.moire.ultrasonic.view.PlaylistAdapter
 
 /**
  * Displays the playlists stored on the server
@@ -56,11 +57,14 @@ class PlaylistsFragment : Fragment() {
     private var refreshPlaylistsListView: SwipeRefreshLayout? = null
     private var playlistsListView: ListView? = null
     private var emptyTextView: View? = null
-    private var playlistAdapter: PlaylistAdapter? = null
+    private var playlistAdapter: ArrayAdapter<Playlist>? = null
+
     private val downloadHandler = inject<DownloadHandler>(
         DownloadHandler::class.java
     )
+
     private var cancellationToken: CancellationToken? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         applyTheme(this.context)
         super.onCreate(savedInstanceState)
@@ -83,7 +87,7 @@ class PlaylistsFragment : Fragment() {
         playlistsListView!!.setOnItemClickListener { parent, _, position, _ ->
             val (id1, name) = parent.getItemAtPosition(position) as Playlist
 
-            val action = PlaylistsFragmentDirections.playlistsToTrackCollection(
+            val action = NavigationGraphDirections.toTrackCollection(
                 id = id1,
                 playlistId = id1,
                 name = name,
@@ -116,7 +120,7 @@ class PlaylistsFragment : Fragment() {
 
                 override fun done(result: List<Playlist>) {
                     playlistsListView!!.adapter =
-                        PlaylistAdapter(context, result).also { playlistAdapter = it }
+                        ArrayAdapter(requireContext(), R.layout.list_item_generic, result)
                     emptyTextView!!.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
                 }
             }
@@ -183,7 +187,7 @@ class PlaylistsFragment : Fragment() {
                 )
             }
             R.id.playlist_menu_play_now -> {
-                val action = PlaylistsFragmentDirections.playlistsToTrackCollection(
+                val action = NavigationGraphDirections.toTrackCollection(
                     playlistId = playlist.id,
                     playlistName = playlist.name,
                     autoPlay = true
@@ -191,7 +195,7 @@ class PlaylistsFragment : Fragment() {
                 findNavController().navigate(action)
             }
             R.id.playlist_menu_play_shuffled -> {
-                val action = PlaylistsFragmentDirections.playlistsToTrackCollection(
+                val action = NavigationGraphDirections.toTrackCollection(
                     playlistId = playlist.id,
                     playlistName = playlist.name,
                     autoPlay = true,

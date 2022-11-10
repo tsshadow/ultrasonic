@@ -37,7 +37,8 @@ class BookmarksFragment : TrackCollectionFragment() {
     }
 
     override fun getLiveData(
-        refresh: Boolean
+        refresh: Boolean,
+        append: Boolean
     ): LiveData<List<MusicDirectory.Child>> {
         listModel.viewModelScope.launch(handler) {
             refreshListView?.isRefreshing = true

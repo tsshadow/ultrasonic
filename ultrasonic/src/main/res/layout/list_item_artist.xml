@@ -23,7 +23,7 @@
         tools:text="A" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        a:id="@+id/coverart"
+        a:id="@+id/cover_art"
         a:layout_width="40dp"
         a:layout_height="40dp"
         a:layout_gravity="center_horizontal|center_vertical"
@@ -33,14 +33,14 @@
         a:layout_toEndOf="@+id/row_section"
         a:scaleType="fitCenter"
         a:src="@drawable/ic_contact_picture"
-        app:shapeAppearanceOverlay="@style/roundedImageView" />
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.MediumComponent" />
 
     <TextView
         a:id="@+id/row_artist_name"
         a:layout_width="fill_parent"
         a:layout_height="wrap_content"
         a:layout_marginEnd="12dp"
-        a:layout_toEndOf="@+id/coverart"
+        a:layout_toEndOf="@+id/cover_art"
         a:drawablePadding="6dip"
         a:gravity="center_vertical"
         a:minHeight="56dip"

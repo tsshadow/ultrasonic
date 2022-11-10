@@ -13,13 +13,11 @@
     <string name="button_bar.bookmarks">Zakładki</string>
     <string name="button_bar.browse">Biblioteka</string>
     <string name="button_bar.chat">Czat</string>
-    <string name="button_bar.home">Ultrasonic</string>
     <string name="button_bar.now_playing">Teraz gra</string>
     <string name="buttons.shuffle">Wymieszaj</string>
     <string name="podcasts.label">Podcasty</string>
     <string name="podcasts_channels.empty">Brak kanałów</string>
     <string name="button_bar.podcasts">Podcast</string>
-    <string name="button_bar.playlists">Playlisty</string>
     <string name="button_bar.search">Szukaj</string>
     <string name="chat.send_a_message">Wyślij wiadomość</string>
     <string name="common.appname">Ultrasonic</string>
@@ -87,7 +85,6 @@
     <string name="main.albums_title">Albumy</string>
     <string name="main.artists_title">Artyści</string>
     <string name="main.genres_title">Gatunki</string>
-    <string name="main.music">Muzyka</string>
     <string name="main.offline">Offline</string>
     <string name="main.songs_random">Losowe</string>
     <string name="main.songs_starred">Ulubione</string>

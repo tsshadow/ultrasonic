@@ -10,7 +10,6 @@ package org.moire.ultrasonic.util
 import android.net.Uri
 import android.os.Bundle
 import androidx.core.net.toUri
-import androidx.media.utils.MediaConstants
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -19,9 +18,15 @@ import java.text.DateFormat
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.provider.AlbumArtContentProvider
 
+// Copied from androidx.media.utils.MediaConstants in order to avoid importing a whole dependecy
+// for a single string value
+private const val DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE =
+    "android.media.browse.CONTENT_STYLE_GROUP_TITLE_HINT"
+
 object MediaItemConverter {
     private const val CACHE_SIZE = 250
     private const val CACHE_EXPIRY_MINUTES = 10L
+
     val mediaItemCache: LRUCache<String, TimeLimitedCache<MediaItem>> = LRUCache(CACHE_SIZE)
     val trackCache: LRUCache<String, TimeLimitedCache<Track>> = LRUCache(CACHE_SIZE)
 
@@ -233,7 +238,7 @@ fun buildMediaItem(
         metadataBuilder.setExtras(
             Bundle().apply {
                 putString(
-                    MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE,
+                    DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE,
                     group
                 )
             }

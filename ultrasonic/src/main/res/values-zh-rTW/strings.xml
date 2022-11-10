@@ -5,7 +5,6 @@
     <string name="button_bar.bookmarks">書籤</string>
     <string name="button_bar.browse">媒體庫</string>
     <string name="button_bar.now_playing">正在播放</string>
-    <string name="button_bar.playlists">播放清單</string>
     <string name="button_bar.search">搜尋</string>
     <string name="common.cancel">取消</string>
     <string name="common.comment">註記</string>

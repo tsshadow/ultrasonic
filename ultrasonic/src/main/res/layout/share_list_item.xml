@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
-              a:layout_width="0dip"
-              a:layout_height="wrap_content"
-              a:layout_gravity="center_vertical"
-              a:layout_weight="1"
-              a:paddingStart="6dip"
-              a:paddingEnd="6dip"
-              a:minHeight="44dip"
-              a:orientation="vertical">
+    xmlns:tools="http://schemas.android.com/tools"
+    a:layout_width="0dp"
+    a:layout_height="56dp"
+    a:layout_gravity="center_vertical"
+    a:layout_weight="1"
+    a:minHeight="44dip"
+    a:orientation="vertical"
+    a:paddingStart="16dip"
+    a:paddingEnd="16dip"
+    tools:layout_width="match_parent">
 
     <LinearLayout
         a:layout_width="fill_parent"
@@ -20,7 +22,8 @@
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
             a:layout_gravity="left|center_vertical"
-            a:textAppearance="?android:attr/textAppearanceMedium"/>
+            a:textAppearance="?android:attr/textAppearanceMedium"
+            tools:text="Url" />
 
     </LinearLayout>
 
@@ -38,9 +41,9 @@
             a:layout_gravity="left|center_vertical"
             a:layout_weight="1"
             a:ellipsize="middle"
-            a:paddingStart="4dip"
             a:singleLine="true"
-            a:textAppearance="?android:attr/textAppearanceSmall"/>
+            a:textAppearance="?android:attr/textAppearanceSmall"
+            tools:text="Description" />
 
     </LinearLayout>
 

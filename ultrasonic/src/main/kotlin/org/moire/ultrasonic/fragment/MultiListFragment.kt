@@ -75,7 +75,7 @@ abstract class MultiListFragment<T : Identifiable> : Fragment() {
     /**
      * The central function to pass a query to the model and return a LiveData object
      */
-    open fun getLiveData(refresh: Boolean = false): LiveData<List<T>> {
+    open fun getLiveData(refresh: Boolean = false, append: Boolean = false): LiveData<List<T>> {
         return MutableLiveData()
     }
 

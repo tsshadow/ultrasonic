@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Ultrasonic.AllCapsLabel" parent="">
         <item name="android:textStyle">bold</item>
@@ -13,16 +13,6 @@
 
     <style name="Ultrasonic.AllCapsLabel.Inset" parent="Ultrasonic.AllCapsLabel">
         <item name="android:paddingStart">16dp</item>
-    </style>
-
-    <style name="roundedImageView" parent="">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">8dp</item>
-    </style>
-
-    <style name="largeRoundedImageView" parent="">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">2dp</item>
     </style>
 
     <style name="Widget.AppWidget.AppWidget.Container" parent="android:Widget">
@@ -58,6 +48,11 @@
         <item name="android:background">@null</item>
         <item name="android:scaleType">fitXY</item>
         <item name="android:adjustViewBounds">true</item>
+    </style>
+
+    <style tools:ignore="PrivateResource" name="Widget.ChipDropdown" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">
+        <item name="shapeAppearance">?attr/shapeAppearanceSmallComponent</item>
+        <item name="boxStrokeColor">@color/m3_textfield_stroke_color</item>
     </style>
 
     <style name="Theme.AppWidget.AppWidgetContainerCropped" parent="Theme.AppWidget.AppWidgetContainer">

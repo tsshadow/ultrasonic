@@ -17,6 +17,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
@@ -58,13 +59,14 @@ class SelectGenreFragment : Fragment() {
         refreshGenreListView = view.findViewById(R.id.select_genre_refresh)
         genreListView = view.findViewById(R.id.select_genre_list)
         refreshGenreListView!!.setOnRefreshListener { load(true) }
+
         genreListView!!.setOnItemClickListener { parent: AdapterView<*>,
             _: View?,
             position: Int,
             _: Long ->
             val genre = parent.getItemAtPosition(position) as Genre
 
-            val action = SelectGenreFragmentDirections.selectGenreToTrackCollection(
+            val action = NavigationGraphDirections.toTrackCollection(
                 genreName = genre.name,
                 size = maxSongs,
                 offset = 0
@@ -82,6 +84,7 @@ class SelectGenreFragment : Fragment() {
         super.onDestroyView()
     }
 
+    // TODO: Migrate to Coroutines
     private fun load(refresh: Boolean) {
         val task: BackgroundTask<List<Genre>> = object : FragmentBackgroundTask<List<Genre>>(
             activity, true, refreshGenreListView, cancellationToken

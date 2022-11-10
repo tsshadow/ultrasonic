@@ -20,6 +20,10 @@ import org.moire.ultrasonic.app.UApp
 object Settings {
 
     @JvmStatic
+    val preferences: SharedPreferences
+        get() = PreferenceManager.getDefaultSharedPreferences(Util.appContext())
+
+    @JvmStatic
     var theme by StringSetting(
         getKey(R.string.setting_key_theme),
         getKey(R.string.setting_key_theme_day_night)
@@ -242,10 +246,6 @@ object Settings {
     var debugLogToFile by BooleanSetting(getKey(R.string.setting_key_debug_log_to_file), false)
 
     @JvmStatic
-    val preferences: SharedPreferences
-        get() = PreferenceManager.getDefaultSharedPreferences(Util.appContext())
-
-    @JvmStatic
     val overrideLanguage by StringSetting(getKey(R.string.setting_key_override_language), "")
 
     var useFiveStarRating by BooleanSetting(
@@ -267,11 +267,11 @@ object Settings {
         false
     )
 
-    // TODO: Remove in December 2022
-    fun migrateFeatureStorage() {
-        val sp = appContext.getSharedPreferences("feature_flags", Context.MODE_PRIVATE)
-        useFiveStarRating = sp.getBoolean("FIVE_STAR_RATING", false)
-    }
+    @JvmStatic
+    var lastViewType by IntSetting(
+        getKey(R.string.setting_key_last_view_type),
+        0
+    )
 
     fun hasKey(key: String): Boolean {
         return preferences.contains(key)

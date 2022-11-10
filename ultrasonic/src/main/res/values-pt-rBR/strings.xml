@@ -13,7 +13,6 @@
     <string name="button_bar.bookmarks">Favoritos</string>
     <string name="button_bar.browse">Biblioteca de Mídia</string>
     <string name="button_bar.chat">Chat</string>
-    <string name="button_bar.home">Menu Principal</string>
     <string name="button_bar.now_playing">Tocando Agora</string>
     <string name="buttons.play">Tocar</string>
     <string name="buttons.pause">Pausar</string>
@@ -25,7 +24,6 @@
     <string name="podcasts.label">Podcasts</string>
     <string name="podcasts_channels.empty">Nenhum canal de podcasts registrado</string>
     <string name="button_bar.podcasts">Podcasts</string>
-    <string name="button_bar.playlists">Playlists</string>
     <string name="button_bar.search">Pesquisa</string>
     <string name="chat.send_a_message">Enviar uma mensagem</string>
     <string name="common.album">Álbum</string>
@@ -113,7 +111,6 @@
     <string name="main.albums_title">Álbuns</string>
     <string name="main.artists_title">Artistas</string>
     <string name="main.genres_title">Gêneros</string>
-    <string name="main.music">Música</string>
     <string name="main.offline">Offline</string>
     <string name="main.setup_server">%s - Configurar Servidor</string>
     <string name="main.songs_random">Aleatórias</string>

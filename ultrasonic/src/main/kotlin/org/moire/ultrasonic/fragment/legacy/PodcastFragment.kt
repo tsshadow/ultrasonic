@@ -7,15 +7,16 @@
 
 package org.moire.ultrasonic.fragment.legacy
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.PodcastsChannel
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
@@ -24,18 +25,20 @@ import org.moire.ultrasonic.util.BackgroundTask
 import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.FragmentBackgroundTask
 import org.moire.ultrasonic.util.Util.applyTheme
-import org.moire.ultrasonic.view.PodcastsChannelsAdapter
 
 /**
  * Displays the podcasts available on the server
  *
  * TODO: This file has been converted from Java, but not modernized yet.
+ * TODO: Use Coroutines
  */
 class PodcastFragment : Fragment() {
+
     private var emptyTextView: View? = null
     var channelItemsListView: ListView? = null
     private var cancellationToken: CancellationToken? = null
     private var swipeRefresh: SwipeRefreshLayout? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         applyTheme(this.context)
         super.onCreate(savedInstanceState)
@@ -53,19 +56,19 @@ class PodcastFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         cancellationToken = CancellationToken()
         swipeRefresh = view.findViewById(R.id.podcasts_refresh)
-        swipeRefresh!!.setOnRefreshListener { load(view.context, true) }
+        swipeRefresh!!.setOnRefreshListener { load(true) }
         setTitle(this, R.string.podcasts_label)
         emptyTextView = view.findViewById(R.id.select_podcasts_empty)
         channelItemsListView = view.findViewById(R.id.podcasts_channels_items_list)
         channelItemsListView!!.setOnItemClickListener { parent, _, position, _ ->
             val (id) = parent.getItemAtPosition(position) as PodcastsChannel
-            val action = PodcastFragmentDirections.podcastToTrackCollection(
+            val action = NavigationGraphDirections.toTrackCollection(
                 podcastChannelId = id
             )
 
             findNavController().navigate(action)
         }
-        load(view.context, false)
+        load(false)
     }
 
     override fun onDestroyView() {
@@ -73,7 +76,7 @@ class PodcastFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun load(context: Context, refresh: Boolean) {
+    private fun load(refresh: Boolean) {
         val task: BackgroundTask<List<PodcastsChannel>> =
             object : FragmentBackgroundTask<List<PodcastsChannel>>(
                 activity, true, swipeRefresh, cancellationToken
@@ -85,7 +88,8 @@ class PodcastFragment : Fragment() {
                 }
 
                 override fun done(result: List<PodcastsChannel>) {
-                    channelItemsListView!!.adapter = PodcastsChannelsAdapter(context, result)
+                    channelItemsListView!!.adapter =
+                        ArrayAdapter(requireContext(), R.layout.list_item_generic, result)
                     emptyTextView!!.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
                 }
             }

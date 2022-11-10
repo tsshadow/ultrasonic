@@ -1,3 +1,10 @@
+/*
+ * AlbumListOrderType.kt
+ * Copyright (C) 2009-2022 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 package org.moire.ultrasonic.api.subsonic.models
 
 /**
@@ -16,8 +23,7 @@ enum class AlbumListType(val typeName: String) {
     SORTED_BY_ARTIST("alphabeticalByArtist"),
     STARRED("starred"),
     BY_YEAR("byYear"),
-    BY_GENRE("byGenre"),
-    BY_ARTIST("albumsByArtist");
+    BY_GENRE("byGenre");
 
     override fun toString(): String {
         return typeName
@@ -36,7 +42,6 @@ enum class AlbumListType(val typeName: String) {
             in STARRED.typeName -> STARRED
             in BY_YEAR.typeName -> BY_YEAR
             in BY_GENRE.typeName -> BY_GENRE
-            in BY_ARTIST.typeName -> BY_ARTIST
             else -> throw IllegalArgumentException("Unknown type: $typeName")
         }
 
