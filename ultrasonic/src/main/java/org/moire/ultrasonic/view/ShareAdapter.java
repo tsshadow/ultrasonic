@@ -16,7 +16,6 @@ import java.util.List;
  */
 public class ShareAdapter extends ArrayAdapter<Share>
 {
-
 	private final Context context;
 
 	public ShareAdapter(Context context, List<Share> Shares)

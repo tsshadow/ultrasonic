@@ -36,6 +36,7 @@ class AlbumListTypeTest {
 
     @Test
     fun `Should return type name for toString call`() {
-        AlbumListType.STARRED.typeName `should be equal to` AlbumListType.STARRED.toString()
+        AlbumListType.STARRED.typeName `should be equal to`
+            AlbumListType.STARRED.toString()
     }
 }

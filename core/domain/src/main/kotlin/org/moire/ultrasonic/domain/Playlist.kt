@@ -14,4 +14,8 @@ data class Playlist @JvmOverloads constructor(
     companion object {
         private const val serialVersionUID = -4160515427075433798L
     }
+
+    override fun toString(): String {
+        return name
+    }
 }

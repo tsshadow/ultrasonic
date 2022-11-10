@@ -29,6 +29,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.util.Locale
 import org.koin.java.KoinJavaComponent
+import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.domain.Share
@@ -82,7 +83,7 @@ class SharesFragment : Fragment() {
             AdapterView.OnItemClickListener { parent, _, position, _ ->
                 val share = parent.getItemAtPosition(position) as Share
 
-                val action = SharesFragmentDirections.sharesToTrackCollection(
+                val action = NavigationGraphDirections.toTrackCollection(
                     shareId = share.id,
                     shareName = share.name
                 )

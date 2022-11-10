@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     a:layout_width="match_parent"
     a:layout_height="wrap_content"
     a:orientation="vertical"
@@ -33,7 +34,8 @@
             a:layout_alignParentRight="true"
             a:layout_marginEnd="12dip"
             a:text="@string/util.no_time"
-            a:textAppearance="?android:attr/textAppearanceSmall" />
+            a:textAppearance="?android:attr/textAppearanceSmall"
+            tools:ignore="RelativeOverlap" />
 
     </RelativeLayout>
 

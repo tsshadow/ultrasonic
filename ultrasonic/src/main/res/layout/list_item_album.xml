@@ -10,7 +10,7 @@
     a:focusable="true">
 
     <com.google.android.material.imageview.ShapeableImageView
-        a:id="@+id/coverart"
+        a:id="@+id/cover_art"
         a:layout_width="64dp"
         a:layout_height="64dp"
         a:layout_gravity="center_horizontal|center_vertical"
@@ -20,7 +20,7 @@
         a:src="@drawable/unknown_album"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearanceOverlay="@style/largeRoundedImageView" />
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.SmallComponent" />
 
     <LinearLayout
         a:id="@+id/row_album_details"
@@ -35,8 +35,8 @@
         a:paddingEnd="3dip"
         a:textAppearance="?android:attr/textAppearanceMedium"
         app:layout_constraintEnd_toStartOf="@+id/album_star"
-        app:layout_constraintLeft_toRightOf="@+id/coverart"
-        app:layout_constraintStart_toEndOf="@+id/coverart"
+        app:layout_constraintLeft_toRightOf="@+id/cover_art"
+        app:layout_constraintStart_toEndOf="@+id/cover_art"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
@@ -61,6 +61,7 @@
     <ImageView
         a:id="@+id/album_star"
         a:layout_width="38dp"
+        a:padding="4dp"
         a:layout_height="38dp"
         a:layout_marginStart="16dp"
         a:layout_marginTop="16dp"

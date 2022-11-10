@@ -7,251 +7,217 @@
 
 package org.moire.ultrasonic.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.FragmentManager
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
+import java.lang.ref.SoftReference
 import org.koin.core.component.KoinComponent
+import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
-import org.moire.ultrasonic.databinding.MainBinding
+import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.fragment.legacy.PlaylistsFragment
+import org.moire.ultrasonic.fragment.legacy.SelectGenreFragment
+import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
-import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.view.EMPTY_CAPABILITIES
+import org.moire.ultrasonic.view.FilterButtonBar
+import org.moire.ultrasonic.view.SortOrder
+import org.moire.ultrasonic.view.ViewCapabilities
+import timber.log.Timber
 
-/**
- * Displays the Main screen of Ultrasonic, where the music library can be browsed
- */
 class MainFragment : Fragment(), KoinComponent {
 
-    private lateinit var musicTitle: TextView
-    private lateinit var artistsButton: TextView
-    private lateinit var albumsButton: TextView
-    private lateinit var genresButton: TextView
-    private lateinit var videosTitle: TextView
-    private lateinit var songsTitle: TextView
-    private lateinit var randomSongsButton: TextView
-    private lateinit var songsStarredButton: TextView
-    private lateinit var albumsTitle: TextView
-    private lateinit var albumsNewestButton: TextView
-    private lateinit var albumsRandomButton: TextView
-    private lateinit var albumsHighestButton: TextView
-    private lateinit var albumsStarredButton: TextView
-    private lateinit var albumsRecentButton: TextView
-    private lateinit var albumsFrequentButton: TextView
-    private lateinit var albumsAlphaByNameButton: TextView
-    private lateinit var albumsAlphaByArtistButton: TextView
-    private lateinit var videosButton: TextView
+    private var filterButtonBar: FilterButtonBar? = null
+    private var layoutType: LayoutType = LayoutType.COVER
+    private var binding: View? = null
 
-    private var binding: MainBinding? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Util.applyTheme(this.context)
-        super.onCreate(savedInstanceState)
-    }
+    private lateinit var musicCollectionAdapter: MusicCollectionAdapter
+    private lateinit var viewPager: ViewPager2
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = MainBinding.inflate(inflater, container, false)
-        return binding!!.root
+        Timber.i("onCreate")
+        binding = inflater.inflate(R.layout.primary, container, false)
+        return binding!!
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupButtons()
-        setupClickListener()
-        setupItemVisibility()
 
-        super.onViewCreated(view, savedInstanceState)
+        FragmentTitle.setTitle(this, R.string.music_library_label)
+
+        // Load last layout from settings
+        layoutType = LayoutType.from(Settings.lastViewType)
+
+        // Init ViewPager2
+        musicCollectionAdapter = MusicCollectionAdapter(this, layoutType)
+        viewPager = binding!!.findViewById(R.id.pager)
+        viewPager.adapter = musicCollectionAdapter
+
+        filterButtonBar = binding!!.findViewById(R.id.filter_button_bar)
+        musicCollectionAdapter.filterButtonBar = filterButtonBar
+
+        filterButtonBar!!.setOnLayoutTypeChangedListener {
+            updateLayoutTypeOnCurrentFragment(it)
+        }
+
+        filterButtonBar!!.setOnOrderChangedListener {
+            updateSortOrderOnCurrentFragment(it)
+        }
+
+        // Set layout toggle Chip to correct state
+        filterButtonBar!!.setLayoutType(layoutType)
+
+        // Listen to changes in the current page (=fragment)
+        viewPager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+
+                Timber.i("On Page changed $position")
+
+                // This is a bit tricky. We need to configure the FilterButtonBar based on the
+                // fragments capabilities. But this function can be called before the fragment has
+                // been created, and the ViewPager might create the fragments in arbitrary order.
+                // Therefore we store a flag in the Adapter, to signal that the next created
+                // fragment of the given position should propagate its capabilities
+                val frag = findFragmentAtPosition(childFragmentManager, position)
+                if (frag != null) {
+                    filterButtonBar!!.configureWithCapabilitiesFromFragment(frag)
+                } else {
+                    musicCollectionAdapter.propagateCapabilitiesMatcher = position
+                }
+            }
+        })
+
+        // The TabLayoutMediator manages the names of the Tabs (Albums, Artists, etc)
+        val tabLayout: TabLayout = binding!!.findViewById(R.id.tab_layout)
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = musicCollectionAdapter.getTitleForFragment(position, requireContext())
+        }.attach()
     }
 
-    override fun onResume() {
-        super.onResume()
-        var shouldRelayout = false
-        val currentId3Setting = Settings.shouldUseId3Tags
+    private fun updateLayoutTypeOnCurrentFragment(it: LayoutType) {
+        val curFrag = findCurrentFragment()
 
-        // If setting has changed...
-        if (currentId3Setting != useId3) {
-            useId3 = currentId3Setting
-            shouldRelayout = true
+        if (curFrag is FilterableFragment) {
+            curFrag.setLayoutType(it)
         }
 
-        // then setup the list anew.
-        if (shouldRelayout) {
-            setupItemVisibility()
-        }
+        Settings.lastViewType = layoutType.value
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
-    }
+    private fun updateSortOrderOnCurrentFragment(it: SortOrder) {
+        val curFrag = findCurrentFragment()
 
-    private fun setupButtons() {
-        musicTitle = binding!!.mainMusic
-        artistsButton = binding!!.mainArtistsButton
-        albumsButton = binding!!.mainAlbumsButton
-        genresButton = binding!!.mainGenresButton
-        videosTitle = binding!!.mainVideosTitle
-        songsTitle = binding!!.mainSongs
-        randomSongsButton = binding!!.mainSongsButton
-        songsStarredButton = binding!!.mainSongsStarred
-        albumsTitle = binding!!.mainAlbums
-        albumsNewestButton = binding!!.mainAlbumsNewest
-        albumsRandomButton = binding!!.mainAlbumsRandom
-        albumsHighestButton = binding!!.mainAlbumsHighest
-        albumsStarredButton = binding!!.mainAlbumsStarred
-        albumsRecentButton = binding!!.mainAlbumsRecent
-        albumsFrequentButton = binding!!.mainAlbumsFrequent
-        albumsAlphaByNameButton = binding!!.mainAlbumsAlphaByName
-        albumsAlphaByArtistButton = binding!!.mainAlbumsAlphaByArtist
-        videosButton = binding!!.mainVideos
-    }
-
-    private fun setupItemVisibility() {
-        // Cache some values
-        useId3 = Settings.shouldUseId3Tags
-        useId3Offline = Settings.useId3TagsOffline
-
-        val isOnline = !isOffline()
-
-        // Music
-        musicTitle.isVisible = true
-        artistsButton.isVisible = true
-        albumsButton.isVisible = isOnline || useId3Offline
-        genresButton.isVisible = isOnline
-
-        // Songs
-        songsTitle.isVisible = true
-        randomSongsButton.isVisible = true
-        songsStarredButton.isVisible = isOnline
-
-        // Albums
-        albumsTitle.isVisible = isOnline || useId3Offline
-        albumsNewestButton.isVisible = isOnline || useId3Offline
-        albumsRecentButton.isVisible = isOnline
-        albumsFrequentButton.isVisible = isOnline
-        albumsHighestButton.isVisible = isOnline && !useId3
-        albumsRandomButton.isVisible = isOnline
-        albumsStarredButton.isVisible = isOnline
-        albumsAlphaByNameButton.isVisible = isOnline || useId3Offline
-        albumsAlphaByArtistButton.isVisible = isOnline || useId3Offline
-
-        // Videos
-        videosTitle.isVisible = isOnline
-        videosButton.isVisible = isOnline
-    }
-
-    private fun setupClickListener() {
-        albumsNewestButton.setOnClickListener {
-            showAlbumList(AlbumListType.NEWEST, R.string.main_albums_newest)
-        }
-
-        albumsRandomButton.setOnClickListener {
-            showAlbumList(AlbumListType.RANDOM, R.string.main_albums_random)
-        }
-
-        albumsHighestButton.setOnClickListener {
-            showAlbumList(AlbumListType.HIGHEST, R.string.main_albums_highest)
-        }
-
-        albumsRecentButton.setOnClickListener {
-            showAlbumList(AlbumListType.RECENT, R.string.main_albums_recent)
-        }
-
-        albumsFrequentButton.setOnClickListener {
-            showAlbumList(AlbumListType.FREQUENT, R.string.main_albums_frequent)
-        }
-
-        albumsStarredButton.setOnClickListener {
-            showAlbumList(AlbumListType.STARRED, R.string.main_albums_starred)
-        }
-
-        albumsAlphaByNameButton.setOnClickListener {
-            showAlbumList(AlbumListType.SORTED_BY_NAME, R.string.main_albums_alphaByName)
-        }
-
-        albumsAlphaByArtistButton.setOnClickListener {
-            showAlbumList(AlbumListType.SORTED_BY_ARTIST, R.string.main_albums_alphaByArtist)
-        }
-
-        songsStarredButton.setOnClickListener {
-            showStarredSongs()
-        }
-
-        artistsButton.setOnClickListener {
-            showArtists()
-        }
-
-        albumsButton.setOnClickListener {
-            showAlbumList(AlbumListType.SORTED_BY_NAME, R.string.main_albums_title)
-        }
-
-        randomSongsButton.setOnClickListener {
-            showRandomSongs()
-        }
-
-        genresButton.setOnClickListener {
-            showGenres()
-        }
-
-        videosButton.setOnClickListener {
-            showVideos()
+        if (curFrag is FilterableFragment) {
+            curFrag.setOrderType(it)
         }
     }
 
-    private fun showStarredSongs() {
-        val action = MainFragmentDirections.mainToTrackCollection(
-            getStarred = true,
-        )
-        findNavController().navigate(action)
+    private fun findCurrentFragment(): Fragment? {
+        return findFragmentAtPosition(childFragmentManager, viewPager.currentItem)
     }
 
-    private fun showRandomSongs() {
-        val action = MainFragmentDirections.mainToTrackCollection(
-            getRandom = true,
-            size = Settings.maxSongs
-        )
-        findNavController().navigate(action)
+    private fun findFragmentAtPosition(
+        fragmentManager: FragmentManager,
+        position: Int
+    ): Fragment? {
+        // If a fragment was recently created and never shown the fragment manager might not
+        // hold a reference to it. Fallback on the WeakMap instead.
+        return fragmentManager.findFragmentByTag("f$position")
+            ?: musicCollectionAdapter.fragmentMap[position]?.get()
+    }
+}
+
+private fun FilterButtonBar.configureWithCapabilitiesFromFragment(frag: Fragment?) {
+    if (frag is FilterableFragment) {
+        Timber.w("Setting kapas: ${frag.viewCapabilities}")
+        this.configureWithCapabilities(frag.viewCapabilities)
+    } else {
+        Timber.w("Setting kapas: $EMPTY_CAPABILITIES")
+        this.configureWithCapabilities(EMPTY_CAPABILITIES)
+    }
+}
+
+@Suppress("MagicNumber")
+class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = LayoutType.LIST) :
+    FragmentStateAdapter(fragment) {
+
+    var filterButtonBar: FilterButtonBar? = null
+    private var layoutType: LayoutType = initialType
+
+    var propagateCapabilitiesMatcher: Int? = null
+
+    // viewPager.findFragmentAtPosition(childFragmentManager, position) is sometimes delayed..
+    var fragmentMap: HashMap<Int, SoftReference<Fragment>> = hashMapOf()
+
+    override fun getItemCount(): Int {
+        // Hide Genre tab when offline
+        return if (ActiveServerProvider.isOffline()) 4 else 5
     }
 
-    private fun showArtists() {
-        val action = MainFragmentDirections.mainToArtistList(
-            title = requireContext().resources.getString(R.string.main_artists_title)
-        )
-        findNavController().navigate(action)
+    override fun createFragment(position: Int): Fragment {
+
+        Timber.i("Creating new fragment at position: $position")
+
+        val action = when (position) {
+            0 -> NavigationGraphDirections.toArtistList()
+            1 -> NavigationGraphDirections.toAlbumList(
+                AlbumListType.NEWEST,
+                size = Settings.maxAlbums
+            )
+            2 -> NavigationGraphDirections.toPlaylistFragment()
+            3 -> NavigationGraphDirections.toTrackCollection()
+            else -> NavigationGraphDirections.toGenreList()
+        }
+
+        val fragment = when (position) {
+            0 -> ArtistListFragment()
+            1 -> AlbumListFragment(layoutType)
+            2 -> PlaylistsFragment()
+            3 -> TrackCollectionFragment(SortOrder.RANDOM)
+            else -> SelectGenreFragment()
+        }
+
+        fragmentMap[position] = SoftReference(fragment)
+        fragment.arguments = action.arguments
+
+        // See comment in onPageSelected
+        if (propagateCapabilitiesMatcher == position) {
+            Timber.w("Setting capacities while creating, $position")
+            propagateCapabilitiesMatcher = null
+            filterButtonBar!!.configureWithCapabilitiesFromFragment(fragment)
+        }
+
+        return fragment
     }
 
-    private fun showAlbumList(type: AlbumListType, titleIndex: Int) {
-        val title = requireContext().resources.getString(titleIndex, "")
-        val action = MainFragmentDirections.mainToAlbumList(
-            type = type,
-            title = title,
-            size = Settings.maxAlbums,
-            offset = 0
-        )
-        findNavController().navigate(action)
+    fun getTitleForFragment(pos: Int, context: Context): String {
+        return when (pos) {
+            0 -> context.getString(R.string.main_artists_title)
+            1 -> context.getString(R.string.main_albums_title)
+            2 -> context.getString(R.string.playlist_label)
+            3 -> context.getString(R.string.main_songs_title)
+            4 -> context.getString(R.string.main_genres_title)
+            else -> "Unknown"
+        }
     }
+}
 
-    private fun showGenres() {
-        findNavController().navigate(R.id.mainToSelectGenre)
-    }
-
-    private fun showVideos() {
-        val action = MainFragmentDirections.mainToTrackCollection(
-            getVideos = true,
-        )
-        findNavController().navigate(action)
-    }
-
-    companion object {
-        private var useId3 = false
-        private var useId3Offline = false
-    }
+interface FilterableFragment {
+    fun setLayoutType(newType: LayoutType) {}
+    fun setOrderType(newOrder: SortOrder)
+    var viewCapabilities: ViewCapabilities
 }

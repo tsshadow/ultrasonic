@@ -123,7 +123,7 @@ class ArtistRowBinder(
         var section: TextView = itemView.findViewById(R.id.row_section)
         var textView: TextView = itemView.findViewById(R.id.row_artist_name)
         var layout: RelativeLayout = itemView.findViewById(R.id.containing_layout)
-        var coverArt: ImageView = itemView.findViewById(R.id.coverart)
+        var coverArt: ImageView = itemView.findViewById(R.id.cover_art)
         var coverArtId: String? = null
     }
 

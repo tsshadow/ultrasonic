@@ -13,13 +13,11 @@
     <string name="button_bar.bookmarks">Záložky</string>
     <string name="button_bar.browse">Knihovna médií</string>
     <string name="button_bar.chat">Chat</string>
-    <string name="button_bar.home">Ultrasonic Menu</string>
     <string name="button_bar.now_playing">Právě hraje</string>
     <string name="buttons.shuffle">Náhodně</string>
     <string name="podcasts.label">Podcasty</string>
     <string name="podcasts_channels.empty">Není registrován žádný podcast kanál</string>
     <string name="button_bar.podcasts">Podcasty</string>
-    <string name="button_bar.playlists">Playlisty</string>
     <string name="button_bar.search">Hledat</string>
     <string name="chat.send_a_message">Poslat zprávu</string>
     <string name="common.appname">Ultrasonic</string>
@@ -87,7 +85,6 @@
     <string name="main.albums_title">Alba</string>
     <string name="main.artists_title">Umělci</string>
     <string name="main.genres_title">Žánry</string>
-    <string name="main.music">Hudba</string>
     <string name="main.offline">Bez připojení</string>
     <string name="main.songs_random">Náhodné</string>
     <string name="main.songs_starred">Označené hvězdičkou</string>
@@ -307,7 +304,6 @@
     <string name="share_via">Sdílet skladby přes</string>
     <string name="menu.share">Sdílení</string>
     <string name="download.menu_show_artist">Zobrazit umělce</string>
-    <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Vícenásobné roky</string>
     <string name="settings.debug.title">Možnosti ladění aplikace</string>
     <string name="settings.debug.log_to_file">Zapisovat logy ladění do souboru</string>

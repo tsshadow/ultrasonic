@@ -9,12 +9,10 @@ ktlint                 = "0.43.2"
 ktlintGradle           = "11.0.0"
 detekt                 = "1.21.0"
 preferences            = "1.2.0"
-media                  = "1.6.0"
 media3                 = "1.0.0-beta02"
 
 androidSupport         = "1.5.0"
-androidLegacySupport   = "1.0.0"
-androidSupportDesign   = "1.6.1"
+materialDesign         = "1.6.1"
 constraintLayout       = "2.1.4"
 multidex               = "2.0.1"
 room                   = "2.4.3"
@@ -22,6 +20,7 @@ kotlin                 = "1.7.20"
 kotlinxCoroutines      = "1.6.4-native-mt"
 kotlinxGuava           = "1.6.4"
 viewModelKtx           = "2.5.1"
+swipeRefresh           = "1.1.0"
 
 retrofit               = "2.9.0"
 jackson                = "2.13.4"
@@ -50,8 +49,7 @@ ktlintGradle            = { module = "org.jlleitschuh.gradle:ktlint-gradle", ver
 detekt                  = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 
 core                    = { module = "androidx.core:core-ktx", version.ref = "androidxcore" }
-support                 = { module = "androidx.legacy:legacy-support-v4", version.ref = "androidLegacySupport" }
-design                  = { module = "com.google.android.material:material", version.ref = "androidSupportDesign" }
+design                  = { module = "com.google.android.material:material", version.ref = "materialDesign" }
 annotations             = { module = "androidx.annotation:annotation", version.ref = "androidSupport" }
 multidex                = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 constraintLayout        = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintLayout" }
@@ -66,11 +64,10 @@ navigationUiKtx         = { module = "androidx.navigation:navigation-ui-ktx", ve
 navigationFeature       = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "navigation" }
 navigationSafeArgs      = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation"}
 preferences             = { module = "androidx.preference:preference", version.ref = "preferences" }
-media                   = { module = "androidx.media:media", version.ref = "media" }
 media3exoplayer         = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 media3okhttp            = { module = "androidx.media3:media3-datasource-okhttp", version.ref = "media3" }
 media3session           = { module = "androidx.media3:media3-session", version.ref = "media3" }
-
+swipeRefresh            = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swipeRefresh" }
 kotlinStdlib            = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlinReflect           = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlinxCoroutines       = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }

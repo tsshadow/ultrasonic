@@ -56,11 +56,11 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
-    suspend fun getSongsForGenre(genre: String, count: Int, offset: Int) {
+    suspend fun getSongsForGenre(genre: String, count: Int, offset: Int, append: Boolean) {
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getSongsByGenre(genre, count, offset)
-            updateList(musicDirectory)
+            updateList(musicDirectory, append)
         }
     }
 
@@ -94,7 +94,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
-    suspend fun getRandom(size: Int) {
+    suspend fun getRandom(size: Int, append: Boolean) {
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
@@ -102,7 +102,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
             currentListIsSortable = false
 
-            updateList(musicDirectory)
+            updateList(musicDirectory, append)
         }
     }
 
@@ -158,8 +158,14 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
-    private fun updateList(root: MusicDirectory) {
-        currentList.postValue(root.getChildren())
+    private fun updateList(root: MusicDirectory, append: Boolean = false) {
+        val newList = if (append) {
+            currentList.value!! + root.getChildren()
+        } else {
+            root.getChildren()
+        }
+
+        currentList.postValue(newList)
     }
 
     @Synchronized

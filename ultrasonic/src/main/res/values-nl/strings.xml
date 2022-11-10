@@ -13,7 +13,6 @@
     <string name="button_bar.bookmarks">Bladwijzers</string>
     <string name="button_bar.browse">Mediabibliotheek</string>
     <string name="button_bar.chat">Chat</string>
-    <string name="button_bar.home">Ultrasonic Main</string>
     <string name="button_bar.now_playing">Nu aan het afspelen</string>
     <string name="buttons.play">Afspelen</string>
     <string name="buttons.pause">Pauzeren</string>
@@ -25,7 +24,6 @@
     <string name="podcasts.label">Podcast</string>
     <string name="podcasts_channels.empty">Geen podcastkanalen opgegeven</string>
     <string name="button_bar.podcasts">Podcast</string>
-    <string name="button_bar.playlists">Afspeellijsten</string>
     <string name="button_bar.search">Zoeken</string>
     <string name="chat.send_a_message">Bericht versturen</string>
     <string name="chat.send_button">Versturen</string>
@@ -119,7 +117,6 @@
     <string name="main.albums_title">Albums</string>
     <string name="main.artists_title">Artiesten</string>
     <string name="main.genres_title">Genres</string>
-    <string name="main.music">Muziek</string>
     <string name="main.offline">Offline</string>
     <string name="main.setup_server">%s - Server instellen</string>
     <string name="main.songs_random">Willekeurig</string>

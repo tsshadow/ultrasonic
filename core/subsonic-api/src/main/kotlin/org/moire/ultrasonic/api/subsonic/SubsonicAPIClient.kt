@@ -129,13 +129,12 @@ class SubsonicAPIClient(
         this.addInterceptor(loggingInterceptor)
     }
 
+    @Suppress("CustomX509TrustManager", "TrustAllX509TrustManager")
     private fun OkHttpClient.Builder.allowSelfSignedCertificates() {
         val trustManager =
-            @Suppress("CustomX509TrustManager")
+
             object : X509TrustManager {
-                @Suppress("TrustAllX509TrustManager")
                 override fun checkClientTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
-                @Suppress("TrustAllX509TrustManager")
                 override fun checkServerTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
                 override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
             }

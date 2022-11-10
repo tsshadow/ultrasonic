@@ -13,7 +13,6 @@
     <string name="button_bar.bookmarks">Signets</string>
     <string name="button_bar.browse">Bibliothèque musicale</string>
     <string name="button_bar.chat">Salon de discussion</string>
-    <string name="button_bar.home">Accueil Ultrasonic</string>
     <string name="button_bar.now_playing">Lecture en cours</string>
     <string name="buttons.play">Lecture</string>
     <string name="buttons.pause">Pause</string>
@@ -25,7 +24,6 @@
     <string name="podcasts.label">Podcast</string>
     <string name="podcasts_channels.empty">Aucune chaîne de podcast enregistrée</string>
     <string name="button_bar.podcasts">Podcast</string>
-    <string name="button_bar.playlists">Playlists</string>
     <string name="button_bar.search">Recherche</string>
     <string name="chat.send_a_message">Envoyer un message</string>
     <string name="chat.send_button">Envoyer</string>
@@ -117,7 +115,6 @@
     <string name="main.albums_title">Albums</string>
     <string name="main.artists_title">Artistes</string>
     <string name="main.genres_title">Genres</string>
-    <string name="main.music">Musique</string>
     <string name="main.offline">Hors-ligne</string>
     <string name="main.setup_server">%s - Configurer le serveur</string>
     <string name="main.songs_random">Aléatoire</string>

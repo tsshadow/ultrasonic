@@ -97,7 +97,6 @@ dependencies {
     }
 
     implementation libs.core
-    implementation libs.support
     implementation libs.design
     implementation libs.multidex
     implementation libs.roomRuntime
@@ -105,10 +104,10 @@ dependencies {
     implementation libs.viewModelKtx
     implementation libs.constraintLayout
     implementation libs.preferences
-    implementation libs.media
     implementation libs.media3exoplayer
     implementation libs.media3session
     implementation libs.media3okhttp
+    implementation libs.swipeRefresh
 
     implementation libs.navigationFragment
     implementation libs.navigationUi

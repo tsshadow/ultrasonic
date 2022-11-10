@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.adapters.AlbumRowBinder
+import org.moire.ultrasonic.adapters.AlbumRowDelegate
 import org.moire.ultrasonic.adapters.ArtistRowBinder
 import org.moire.ultrasonic.adapters.DividerBinder
 import org.moire.ultrasonic.adapters.MoreButtonBinder
@@ -109,7 +109,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         )
 
         viewAdapter.register(
-            AlbumRowBinder(
+            AlbumRowDelegate(
                 onItemClick = ::onItemClick,
                 onContextMenuClick = ::onContextMenuItemSelected,
                 imageLoader = imageLoaderProvider.getImageLoader()
@@ -280,7 +280,8 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             )
         } else {
             SearchFragmentDirections.searchToAlbumsList(
-                type = AlbumListType.BY_ARTIST,
+                type = AlbumListType.SORTED_BY_NAME,
+                byArtist = true,
                 id = item.id,
                 title = item.name,
                 size = 1000,

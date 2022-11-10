@@ -13,7 +13,6 @@
     <string name="button_bar.bookmarks">Könyvjelzők</string>
     <string name="button_bar.browse">Médiakönyvtár</string>
     <string name="button_bar.chat">Csevegés (Chat)</string>
-    <string name="button_bar.home">Ultrasonic főoldal</string>
     <string name="button_bar.now_playing">Lejátszó</string>
     <string name="buttons.play">Lejátszás</string>
     <string name="buttons.pause">Szünet</string>
@@ -25,7 +24,6 @@
     <string name="podcasts.label">Podcast</string>
     <string name="podcasts_channels.empty">Nincsenek podcast-csatornák regisztrálva</string>
     <string name="button_bar.podcasts">Podcast</string>
-    <string name="button_bar.playlists">Lejátszási listák</string>
     <string name="button_bar.search">Keresés</string>
     <string name="chat.send_a_message">Üzenet küldése</string>
     <string name="common.appname">Ultrasonic</string>
@@ -93,7 +91,6 @@
     <string name="main.albums_title">Albumok</string>
     <string name="main.artists_title">Előadók</string>
     <string name="main.genres_title">Műfajok</string>
-    <string name="main.music">Zenék</string>
     <string name="main.offline">Kapcsolat nélküli</string>
     <string name="main.songs_random">Véletlenszerű</string>
     <string name="main.songs_starred">Csillaggal megjelölt</string>

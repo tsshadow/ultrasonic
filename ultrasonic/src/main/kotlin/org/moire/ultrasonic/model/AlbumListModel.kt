@@ -96,6 +96,25 @@ class AlbumListModel(application: Application) : GenericListModel(application) {
         }
     }
 
+    fun sortListByOrder(order: AlbumListType) {
+        val newList = when (order) {
+            AlbumListType.BY_YEAR -> {
+                list.value?.sortedBy {
+                    it.year
+                }
+            }
+            else -> {
+                list.value?.sortedBy {
+                    it.name
+                }
+            }
+        }
+
+        newList?.let {
+            list.postValue(it)
+        }
+    }
+
     override fun showSelectFolderHeader(): Boolean {
         val isAlphabetical = (lastType == AlbumListType.SORTED_BY_NAME) ||
             (lastType == AlbumListType.SORTED_BY_ARTIST)

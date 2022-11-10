@@ -52,7 +52,6 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ServerSettingDao
-import org.moire.ultrasonic.fragment.MainFragmentDirections
 import org.moire.ultrasonic.fragment.OnBackPressedHandler
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.provider.SearchSuggestionProvider
@@ -72,11 +71,12 @@ import timber.log.Timber
 
 /**
  * The main (and only) Activity of Ultrasonic which loads all other screens as Fragments.
- * Because this is the only Activity we have to manage the apps lifecycle through tis activitys
+ * Because this is the only Activity we have to manage the apps lifecycle through this activity
  * onCreate/onResume/onDestroy methods...
  */
 @Suppress("TooManyFunctions")
 class NavigationActivity : AppCompatActivity() {
+    private var videoMenuItem: MenuItem? = null
     private var chatMenuItem: MenuItem? = null
     private var bookmarksMenuItem: MenuItem? = null
     private var sharesMenuItem: MenuItem? = null
@@ -301,6 +301,13 @@ class NavigationActivity : AppCompatActivity() {
                 R.id.bookmarksFragment -> {
                     navController.navigate(NavigationGraphDirections.toBookmarks())
                 }
+                R.id.trackCollectionFragment -> {
+                    navController.navigate(
+                        NavigationGraphDirections.toTrackCollection(
+                            getVideos = true
+                        )
+                    )
+                }
                 R.id.menu_exit -> {
                     setResult(Constants.RESULT_CLOSE_ALL)
                     mediaPlayerController.onDestroy()
@@ -319,6 +326,7 @@ class NavigationActivity : AppCompatActivity() {
         podcastsMenuItem = navigationView?.menu?.findItem(R.id.podcastFragment)
         playlistsMenuItem = navigationView?.menu?.findItem(R.id.playlistsFragment)
         downloadsMenuItem = navigationView?.menu?.findItem(R.id.downloadsFragment)
+        videoMenuItem = navigationView?.menu?.findItem(R.id.trackCollectionFragment)
 
         selectServerButton =
             navigationView?.getHeaderView(0)?.findViewById(R.id.header_select_server)
@@ -348,7 +356,7 @@ class NavigationActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val retValue = super.onCreateOptionsMenu(menu)
         if (navigationView == null) {
-            menuInflater.inflate(R.menu.navigation, menu)
+            menuInflater.inflate(R.menu.navigation_drawer, menu)
             return true
         }
         return retValue
@@ -390,7 +398,7 @@ class NavigationActivity : AppCompatActivity() {
             )
             suggestions.saveRecentQuery(query, null)
 
-            val action = MainFragmentDirections.toSearchFragment(query, autoPlay)
+            val action = NavigationGraphDirections.toSearchFragment(query, autoPlay)
             findNavController(R.id.nav_host_fragment).navigate(action)
         }
     }
@@ -498,5 +506,6 @@ class NavigationActivity : AppCompatActivity() {
         podcastsMenuItem?.isVisible = activeServer.podcastSupport != false
         playlistsMenuItem?.isVisible = isOnline
         downloadsMenuItem?.isVisible = isOnline
+        videoMenuItem?.isVisible = isOnline
     }
 }

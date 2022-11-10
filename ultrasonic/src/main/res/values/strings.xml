@@ -13,7 +13,6 @@
     <string name="button_bar.bookmarks">Bookmarks</string>
     <string name="button_bar.browse">Media Library</string>
     <string name="button_bar.chat">Chat</string>
-    <string name="button_bar.home">Ultrasonic Main</string>
     <string name="button_bar.now_playing">Now Playing</string>
     <string name="buttons.play">Play</string>
     <string name="buttons.pause">Pause</string>
@@ -25,10 +24,10 @@
     <string name="podcasts.label">Podcast</string>
     <string name="podcasts_channels.empty">No podcasts channels registered</string>
     <string name="button_bar.podcasts">Podcast</string>
-    <string name="button_bar.playlists">Playlists</string>
     <string name="button_bar.search">Search</string>
     <string name="chat.send_a_message">Send a message</string>
     <string name="chat.send_button">Send</string>
+    <string name="chat.user_avatar">Avatar image</string>
     <string name="common.album">Album</string>
     <string name="common.appname">Ultrasonic</string>
     <string name="common.artist">Artist</string>
@@ -116,10 +115,10 @@
     <string name="main.albums_random">Random</string>
     <string name="main.albums_recent">Recently Played</string>
     <string name="main.albums_starred">Starred</string>
+    <string name="main.albums_by_year">Chronological</string>
     <string name="main.albums_title">Albums</string>
     <string name="main.artists_title">Artists</string>
     <string name="main.genres_title">Genres</string>
-    <string name="main.music">Music</string>
     <string name="main.offline">Offline</string>
     <string name="main.setup_server">%s - Set up Server</string>
     <string name="main.songs_random">Random</string>
@@ -370,7 +369,7 @@
     <string name="share_via">Share songs via</string>
     <string name="menu.share">Share</string>
     <string name="download.menu_show_artist">Show Artist</string>
-    <string name="albumArt">albumArt</string>
+    <string name="albumArt">Album artwork</string>
     <string name="common_multiple_years">Multiple Years</string>
     <string name="settings.show_confirmation_dialog">Show confirmation dialog</string>
     <string name="settings.show_confirmation_dialog_summary">Displays a confirmation dialog before deleting or unpinning songs</string>
@@ -451,5 +450,8 @@
 
     <string name="settings.use_hw_offload_title">Use hardware playback (experimental)</string>
     <string name="settings.use_hw_offload_description">Try to play the media using the media decoder chip on your phone. This can improve battery usage.</string>
+    <string name="list_view">List</string>
+    <string name="grid_view">Cover</string>
+
 
 </resources>

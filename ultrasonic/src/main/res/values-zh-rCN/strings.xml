@@ -13,7 +13,6 @@
     <string name="button_bar.bookmarks">书签</string>
     <string name="button_bar.browse">媒体库</string>
     <string name="button_bar.chat">聊天</string>
-    <string name="button_bar.home">Ultrasonic 主页</string>
     <string name="button_bar.now_playing">正在播放</string>
     <string name="buttons.play">播放</string>
     <string name="buttons.pause">暂停</string>
@@ -25,7 +24,6 @@
     <string name="podcasts.label">播客</string>
     <string name="podcasts_channels.empty">没有已注册的播客频道</string>
     <string name="button_bar.podcasts">播客</string>
-    <string name="button_bar.playlists">播放列表</string>
     <string name="button_bar.search">搜索</string>
     <string name="chat.send_a_message">发送消息</string>
     <string name="chat.send_button">发送</string>
@@ -104,7 +102,6 @@
     <string name="main.albums_title">专辑</string>
     <string name="main.artists_title">艺术家</string>
     <string name="main.genres_title">流派</string>
-    <string name="main.music">音乐</string>
     <string name="main.offline">离线</string>
     <string name="main.setup_server">%s - 已设置服务器</string>
     <string name="main.songs_random">随机</string>

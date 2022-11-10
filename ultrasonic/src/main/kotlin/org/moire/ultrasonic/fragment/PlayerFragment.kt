@@ -578,7 +578,8 @@ class PlayerFragment :
 
                 if (Settings.shouldUseId3Tags) {
                     val action = PlayerFragmentDirections.playerToAlbumsList(
-                        type = AlbumListType.BY_ARTIST,
+                        type = AlbumListType.SORTED_BY_NAME,
+                        byArtist = true,
                         id = track.artistId,
                         title = track.artist,
                         offset = 0,

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    a:layout_width="match_parent"
+    a:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    a:orientation="vertical">
+
+    <com.google.android.material.tabs.TabLayout
+        a:id="@+id/tab_layout"
+        app:tabMode="scrollable"
+        a:layout_width="match_parent"
+        a:layout_height="wrap_content" />
+
+    <org.moire.ultrasonic.view.FilterButtonBar
+        a:id="@+id/filter_button_bar"
+        a:layout_width="match_parent"
+        a:layout_height="wrap_content" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        a:id="@+id/pager"
+        a:layout_width="match_parent"
+        a:layout_height="match_parent" />
+
+</LinearLayout>

@@ -13,7 +13,6 @@
     <string name="button_bar.bookmarks">Закладки</string>
     <string name="button_bar.browse">Медиа библиотека</string>
     <string name="button_bar.chat">Чат</string>
-    <string name="button_bar.home">UltraSonic Главная</string>
     <string name="button_bar.now_playing">Сейчас играет</string>
     <string name="buttons.play">Воспроизведение</string>
     <string name="buttons.pause">Пауза</string>
@@ -25,7 +24,6 @@
     <string name="podcasts.label">Подкаст</string>
     <string name="podcasts_channels.empty">Подкасты не зарегистрированы</string>
     <string name="button_bar.podcasts">Подкаст</string>
-    <string name="button_bar.playlists">Плейлист</string>
     <string name="button_bar.search">Поиск</string>
     <string name="chat.send_a_message">Отправить сообщение</string>
     <string name="common.album">Альбом</string>
@@ -108,7 +106,6 @@
     <string name="main.albums_title">Альбомы</string>
     <string name="main.artists_title">Исполнители</string>
     <string name="main.genres_title">Жанры</string>
-    <string name="main.music">Музыка</string>
     <string name="main.offline">Не в сети</string>
     <string name="main.songs_random">Случайный</string>
     <string name="main.songs_starred">Отмеченные</string>

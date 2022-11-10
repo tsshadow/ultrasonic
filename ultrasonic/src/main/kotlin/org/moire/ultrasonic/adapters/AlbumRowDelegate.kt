@@ -7,6 +7,7 @@
 
 package org.moire.ultrasonic.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -15,31 +16,31 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.drakeet.multitype.ItemViewBinder
+import com.drakeet.multitype.ItemViewDelegate
 import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.imageloader.ImageLoader
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings.shouldUseId3Tags
 import timber.log.Timber
 
 /**
  * Creates a Row in a RecyclerView which contains the details of an Album
  */
-class AlbumRowBinder(
-    val onItemClick: (Album) -> Unit,
-    val onContextMenuClick: (MenuItem, Album) -> Boolean,
+open class AlbumRowDelegate(
+    open val onItemClick: (Album) -> Unit,
+    open val onContextMenuClick: (MenuItem, Album) -> Boolean,
     private val imageLoader: ImageLoader
-) : ItemViewBinder<Album, AlbumRowBinder.ViewHolder>(), KoinComponent {
+) : ItemViewDelegate<Album, AlbumRowDelegate.ListViewHolder>(), KoinComponent {
 
     private val starDrawable: Int = R.drawable.ic_star_full
     private val starHollowDrawable: Int = R.drawable.ic_star_hollow
 
-    // Set our layout files
-    val layout = R.layout.list_item_album
+    open var layoutType = LayoutType.LIST
 
-    override fun onBindViewHolder(holder: ViewHolder, item: Album) {
+    override fun onBindViewHolder(holder: ListViewHolder, item: Album) {
         holder.album.text = item.title
         holder.artist.text = item.artist
         holder.details.setOnClickListener { onItemClick(item) }
@@ -66,15 +67,40 @@ class AlbumRowBinder(
     /**
      * Holds the view properties of an Item row
      */
-    class ViewHolder(
+    open class ListViewHolder(
         view: View
     ) : RecyclerView.ViewHolder(view) {
-        var album: TextView = view.findViewById(R.id.album_title)
-        var artist: TextView = view.findViewById(R.id.album_artist)
-        var details: LinearLayout = view.findViewById(R.id.row_album_details)
-        var coverArt: ImageView = view.findViewById(R.id.coverart)
-        var star: ImageView = view.findViewById(R.id.album_star)
+
+        var album: TextView
+        var artist: TextView
+        var details: LinearLayout
+        var coverArt: ImageView
+        var star: ImageView
         var coverArtId: String? = null
+
+        constructor(parent: ViewGroup, inflater: LayoutInflater) : this(
+            inflater.inflate(R.layout.list_item_album, parent, false)
+        )
+
+        init {
+            album = view.findViewById(R.id.album_title)
+            artist = view.findViewById(R.id.album_artist)
+            details = view.findViewById(R.id.row_album_details)
+            coverArt = view.findViewById(R.id.cover_art)
+            star = view.findViewById(R.id.album_star)
+            coverArtId = null
+        }
+    }
+
+    /**
+     * Holds the view properties of an Item row
+     */
+    class CoverViewHolder(
+        view: View
+    ) : ListViewHolder(view) {
+        constructor(parent: ViewGroup, inflater: LayoutInflater) : this(
+            inflater.inflate(R.layout.grid_item_album, parent, false)
+        )
     }
 
     /**
@@ -106,7 +132,24 @@ class AlbumRowBinder(
         }.start()
     }
 
-    override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
-        return ViewHolder(inflater.inflate(layout, parent, false))
+    override fun onCreateViewHolder(context: Context, parent: ViewGroup): ListViewHolder {
+        return when (layoutType) {
+            LayoutType.LIST -> ListViewHolder(
+                parent,
+                LayoutInflater.from(context)
+            )
+            LayoutType.COVER -> CoverViewHolder(
+                parent,
+                LayoutInflater.from(context)
+            )
+        }
     }
+}
+
+class AlbumGridDelegate(
+    onItemClick: (Album) -> Unit,
+    onContextMenuClick: (MenuItem, Album) -> Boolean,
+    imageLoader: ImageLoader
+) : AlbumRowDelegate(onItemClick, onContextMenuClick, imageLoader) {
+    override var layoutType = LayoutType.COVER
 }

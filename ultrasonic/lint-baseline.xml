@@ -8,7 +8,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="154"
+            line="153"
             column="5"/>
     </issue>
 
@@ -68,138 +68,6 @@
             file="src/main/AndroidManifest.xml"
             line="77"
             column="10"/>
-    </issue>
-
-    <issue
-        id="ObsoleteLayoutParam"
-        message="Invalid layout param in a `LinearLayout`: `layout_above`"
-        errorLine1="        android:layout_above=&quot;@+id/bottom&quot;>"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/time_span_dialog.xml"
-            line="12"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteLayoutParam"
-        message="Invalid layout param in a `LinearLayout`: `layout_below`"
-        errorLine1="        android:layout_below=&quot;@+id/top&quot;>"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/time_span_dialog.xml"
-            line="28"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_baseline_close` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_baseline_close.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_create_new_folder` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_create_new_folder.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_drag_queue` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_drag_queue.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_folder` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_folder.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_menu_arrow` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_menu_arrow.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_menu_backward` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_menu_backward.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_menu_forward` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_menu_forward.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_menu_help` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_menu_help.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_sd_storage` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_sd_storage.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_subdirectory_up` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_subdirectory_up.xml"
-            line="1"
-            column="1"/>
     </issue>
 
     <issue
@@ -297,52 +165,8 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/res/layout/time_span_dialog.xml"
-            line="30"
+            line="28"
             column="10"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="  &lt;EditText"
-        errorLine2="   ~~~~~~~~">
-        <location
-            file="src/main/res/layout/update_playlist.xml"
-            line="18"
-            column="4"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="  &lt;EditText"
-        errorLine2="   ~~~~~~~~">
-        <location
-            file="src/main/res/layout/update_playlist.xml"
-            line="40"
-            column="4"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/chat_item.xml"
-            line="7"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/chat_item_reverse.xml"
-            line="64"
-            column="6"/>
     </issue>
 
     <issue
@@ -374,29 +198,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/res/layout/time_span_dialog.xml"
-            line="30"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;0 dB&quot;, should use `@string` resource"
-        errorLine1="            a:text=&quot;0 dB&quot;"
-        errorLine2="            ~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/equalizer_bar.xml"
-            line="26"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="RelativeOverlap"
-        message="`@id/current_playing_duration` can overlap `@id/current_playing_position` if @string/util.no_time, @string/util.no_time grow due to localized text expansion"
-        errorLine1="        &lt;TextView"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/player_slider.xml"
-            line="29"
+            line="28"
             column="10"/>
     </issue>
 

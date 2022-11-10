@@ -81,7 +81,7 @@ class TrackViewHolder(val view: View) :
         draggable: Boolean,
         isSelected: Boolean = false
     ) {
-        Timber.v("Setting song")
+        // Timber.v("Setting song")
         val useFiveStarRating = Settings.useFiveStarRating
         entry = song
 
@@ -139,7 +139,7 @@ class TrackViewHolder(val view: View) :
             updateStatus(it.state, it.progress)
         }
 
-        Timber.v("Setting song done")
+        // Timber.v("Setting song done")
     }
 
     // This is called when the Holder is recycled and receives a new Song
