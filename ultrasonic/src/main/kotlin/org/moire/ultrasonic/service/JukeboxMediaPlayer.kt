@@ -384,7 +384,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         if (currentIndex < 0 || currentIndex >= playlist.size) return
         if (newIndex < 0 || newIndex >= playlist.size) return
 
-        val insertIndex = if (newIndex < currentIndex) newIndex else newIndex - 1
+        val insertIndex = if (newIndex < currentIndex) newIndex else (newIndex - 1).coerceAtLeast(0)
         val item = playlist.removeAt(currentIndex)
         playlist.add(insertIndex, item)
         updatePlaylist()
