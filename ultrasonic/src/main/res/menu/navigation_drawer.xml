@@ -16,6 +16,11 @@
             a:icon="@drawable/ic_menu_search"
             a:title="@string/button_bar.search" />
         <item
+            a:id="@+id/playlistsFragment"
+            a:checkable="true"
+            a:icon="@drawable/ic_menu_playlists"
+            a:title="@string/playlist.label" />
+        <item
             a:id="@+id/downloadsFragment"
             a:checkable="true"
             a:icon="@drawable/ic_menu_download"

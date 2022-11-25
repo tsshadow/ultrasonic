@@ -25,7 +25,6 @@ import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.fragment.legacy.PlaylistsFragment
 import org.moire.ultrasonic.fragment.legacy.SelectGenreFragment
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
@@ -165,7 +164,7 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
     override fun getItemCount(): Int {
         // Hide Genre tab when offline
-        return if (ActiveServerProvider.isOffline()) 4 else 5
+        return if (ActiveServerProvider.isOffline()) 3 else 4
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -178,16 +177,14 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
                 AlbumListType.NEWEST,
                 size = Settings.maxAlbums
             )
-            2 -> NavigationGraphDirections.toPlaylistFragment()
-            3 -> NavigationGraphDirections.toTrackCollection()
+            2 -> NavigationGraphDirections.toTrackCollection()
             else -> NavigationGraphDirections.toGenreList()
         }
 
         val fragment = when (position) {
             0 -> ArtistListFragment()
             1 -> AlbumListFragment(layoutType)
-            2 -> PlaylistsFragment()
-            3 -> TrackCollectionFragment(SortOrder.RANDOM)
+            2 -> TrackCollectionFragment(SortOrder.RANDOM)
             else -> SelectGenreFragment()
         }
 
@@ -208,9 +205,8 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
         return when (pos) {
             0 -> context.getString(R.string.main_artists_title)
             1 -> context.getString(R.string.main_albums_title)
-            2 -> context.getString(R.string.playlist_label)
-            3 -> context.getString(R.string.main_songs_title)
-            4 -> context.getString(R.string.main_genres_title)
+            2 -> context.getString(R.string.main_songs_title)
+            3 -> context.getString(R.string.main_genres_title)
             else -> "Unknown"
         }
     }
