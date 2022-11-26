@@ -1,0 +1,7 @@
+Bug fixes
+- #849: NoSuchElementException.
+- !874: Fix a crash.
+
+Features
+- #806: Display albums sorted chronologically.
+- #843: Add Album cover view (Rework UI).

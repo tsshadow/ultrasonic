@@ -1,0 +1,8 @@
+Corrección de errores
+- #849: NoSuchElementException.
+- !874: Corrección de un fallo.
+
+Características
+- #806: Mostrar los álbumes ordenados cronológicamente.
+- #843: Añadir la vista de la portada del álbum (reconstrucción de la
+  interfaz de usuario).
