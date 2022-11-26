@@ -27,6 +27,7 @@
     <string name="button_bar.search">Buscar</string>
     <string name="chat.send_a_message">Enviar un mensaje</string>
     <string name="chat.send_button">Enviar</string>
+    <string name="chat.user_avatar">Imagen del avatar</string>
     <string name="common.album">Álbum</string>
     <string name="common.appname">Ultrasonic</string>
     <string name="common.artist">Artista</string>
@@ -114,6 +115,7 @@
     <string name="main.albums_random">Aleatorio</string>
     <string name="main.albums_recent">Reproducidas recientemente</string>
     <string name="main.albums_starred">Me gusta</string>
+    <string name="main.albums_by_year">Cronológico</string>
     <string name="main.albums_title">Álbumes</string>
     <string name="main.artists_title">Artistas</string>
     <string name="main.genres_title">Géneros</string>
@@ -289,7 +291,7 @@
     <string name="settings.server_name">Nombre</string>
     <string name="settings.server_password">Contraseña</string>
     <string name="settings.server_scaling_summary">Descarga imágenes escaladas del servidor en lugar del tamaño completo (salva ancho de banda)</string>
-    <string name="settings.server_scaling_title">Escalado de caratulas en el servidor</string>
+    <string name="settings.server_scaling_title">Escalado de portadas en el servidor</string>
     <string name="settings.server_username">Nombre de usuario</string>
     <string name="settings.server_color">Color del servidor</string>
     <string name="settings.show_now_playing">Mostrar reproduciendo ahora</string>
@@ -366,7 +368,7 @@
     <string name="share_via">Compartir canciones vía</string>
     <string name="menu.share">Compartir</string>
     <string name="download.menu_show_artist">Mostrar artista</string>
-    <string name="albumArt">Caratula del Álbum</string>
+    <string name="albumArt">Portadas de álbumes</string>
     <string name="common_multiple_years">Múltiples años</string>
     <string name="settings.show_confirmation_dialog">Mostrar diálogo de confirmación</string>
     <string name="settings.show_confirmation_dialog_summary">Muestra un cuadro de diálogo de confirmación antes de eliminar o desanclar las canciones</string>
@@ -451,5 +453,8 @@
 
     <string name="settings.use_hw_offload_title">Utilizar la reproducción por hardware (experimental)</string>
     <string name="settings.use_hw_offload_description">Intenta reproducir los medios utilizando el chip decodificador de medios de tu teléfono. Esto puede mejorar el uso de la batería.</string>
+    <string name="list_view">Lista</string>
+    <string name="grid_view">Portada</string>
+
 
 </resources>

@@ -339,7 +339,6 @@
     <string name="share_via">分享歌曲通过</string>
     <string name="menu.share">分享</string>
     <string name="download.menu_show_artist">显示艺术家</string>
-    <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Multiple Years</string>
     <string name="settings.debug.title">调试选项</string>
     <string name="settings.debug.log_to_file">将调试日志写入文件</string>

@@ -366,7 +366,6 @@
     <string name="share_via">Compartilhar músicas via</string>
     <string name="menu.share">Compartilhar</string>
     <string name="download.menu_show_artist">Mostrar Artista</string>
-    <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Anos Múltiplos</string>
     <string name="settings.show_confirmation_dialog">Mostrar caixa de diálogo de confirmação</string>
     <string name="settings.show_confirmation_dialog_summary">Exibe uma caixa de diálogo de confirmação antes de excluir ou desafixar músicas</string>
@@ -451,5 +450,4 @@
 
     <string name="settings.use_hw_offload_title">Usar a reprodução por hardware (experimental)</string>
     <string name="settings.use_hw_offload_description">Tenta reproduzir a mídia usando o chip decodificador de mídia do telefone. Isso pode melhorar o uso da bateria.</string>
-
-</resources>
+    </resources>

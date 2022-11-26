@@ -330,7 +330,6 @@
     <string name="share_via">Поделиться треками через</string>
     <string name="menu.share">Поделиться</string>
     <string name="download.menu_show_artist">Показать исполнителей</string>
-    <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Несколько лет</string>
     <string name="settings.debug.title">Настройки отладки</string>
     <string name="settings.debug.log_to_file">Записать журнал отладки в файл</string>

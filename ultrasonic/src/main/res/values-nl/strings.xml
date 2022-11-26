@@ -27,6 +27,7 @@
     <string name="button_bar.search">Zoeken</string>
     <string name="chat.send_a_message">Bericht versturen</string>
     <string name="chat.send_button">Versturen</string>
+    <string name="chat.user_avatar">Profielfoto</string>
     <string name="common.album">Album</string>
     <string name="common.appname">Ultrasonic</string>
     <string name="common.artist">Artiest</string>
@@ -114,6 +115,7 @@
     <string name="main.albums_random">Willekeurig</string>
     <string name="main.albums_recent">Recent afgespeeld</string>
     <string name="main.albums_starred">Favorieten</string>
+    <string name="main.albums_by_year">Chronologisch</string>
     <string name="main.albums_title">Albums</string>
     <string name="main.artists_title">Artiesten</string>
     <string name="main.genres_title">Genres</string>
@@ -366,7 +368,7 @@
     <string name="share_via">Nummers delen via</string>
     <string name="menu.share">Delen</string>
     <string name="download.menu_show_artist">Artiest tonen</string>
-    <string name="albumArt">Albumhoes</string>
+    <string name="albumArt">Albumhoezen</string>
     <string name="common_multiple_years">Meerdere jaren</string>
     <string name="settings.show_confirmation_dialog">Bevestingsvensters tonen</string>
     <string name="settings.show_confirmation_dialog_summary">Toon bevestigingsvensters alvorens nummers te verwijderen of los te maken</string>
@@ -444,5 +446,8 @@
 
     <string name="settings.use_hw_offload_title">Hardwarematig afspelen (experimenteel)</string>
     <string name="settings.use_hw_offload_description">Probeer media af te spelen met behulp van de mediadecoder op je telefoon. Let op: hierdoor kan het accuverbruik toenemen.</string>
+    <string name="list_view">Lijst</string>
+    <string name="grid_view">Hoes</string>
+
 
 </resources>

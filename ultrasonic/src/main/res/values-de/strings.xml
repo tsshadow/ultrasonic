@@ -365,7 +365,6 @@
     <string name="share_via">Titel teilen über</string>
     <string name="menu.share">Freigabe</string>
     <string name="download.menu_show_artist">Künstler*in anzeigen</string>
-    <string name="albumArt">Album Cover</string>
     <string name="common_multiple_years">Mehrere Jahre</string>
     <string name="settings.show_confirmation_dialog">Zeige Bestätigungsdialog</string>
     <string name="settings.show_confirmation_dialog_summary">Zeigt einen Bestätigungsdialog vor dem Lösen oder Löschen von Liedern</string>

@@ -353,7 +353,6 @@
     <string name="share_via">Partager des titres via</string>
     <string name="menu.share">Partager</string>
     <string name="download.menu_show_artist">Afficher l\'artiste</string>
-    <string name="albumArt">Pochette d\'album</string>
     <string name="common_multiple_years">Années multiples</string>
     <string name="settings.debug.title">Paramètres de debug</string>
     <string name="settings.debug.log_to_file">Enregistrer les logs de debug dans des fichiers</string>

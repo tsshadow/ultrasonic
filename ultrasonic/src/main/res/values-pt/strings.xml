@@ -301,7 +301,6 @@
     <string name="share_via">Compartilhar músicas via</string>
     <string name="menu.share">Compartilhar</string>
     <string name="download.menu_show_artist">Mostrar Artista</string>
-    <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Múltiplos Anos</string>
     <string name="server_selector.label">Configured servers</string>
     <string name="server_selector.delete_confirmation">Are you sure you want to delete the server?</string>

@@ -312,7 +312,6 @@
     <string name="share_via">Dalok megosztása ezzel</string>
     <string name="menu.share">Megosztás</string>
     <string name="download.menu_show_artist">Ugrás az előadóhoz</string>
-    <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Több év</string>
     <string name="settings.debug.title">Hibakeresési lehetőségek</string>
     <string name="settings.debug.log_to_file">Hibakeresési napló írása fájlba</string>
