@@ -92,10 +92,10 @@ class ArtistRowBinder(
         val previousItem = adapter.items[index - 1]
         val previousSectionKey: String
 
-        if (previousItem is ArtistOrIndex) {
-            previousSectionKey = getSectionFromName(previousItem.name ?: " ")
+        previousSectionKey = if (previousItem is ArtistOrIndex) {
+            getSectionFromName(previousItem.name ?: " ")
         } else {
-            previousSectionKey = " "
+            " "
         }
 
         val currentSectionKey = getSectionFromName(item.name ?: "")

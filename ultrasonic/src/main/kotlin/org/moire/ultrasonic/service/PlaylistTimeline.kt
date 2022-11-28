@@ -129,7 +129,7 @@ class PlaylistTimeline @JvmOverloads constructor(
     init {
         Assertions.checkState(mediaItems.size == shuffledIndices.size)
         this.mediaItems = ImmutableList.copyOf(mediaItems)
-        this.shuffledIndices = Arrays.copyOf(shuffledIndices, shuffledIndices.size)
+        this.shuffledIndices = shuffledIndices.copyOf(shuffledIndices.size)
         indicesInShuffled = IntArray(shuffledIndices.size)
         for (i in shuffledIndices.indices) {
             indicesInShuffled[shuffledIndices[i]] = i

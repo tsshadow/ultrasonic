@@ -289,5 +289,5 @@ object Settings {
     private val appContext: Context
         get() = UApp.applicationContext()
 
-    val COLON_PATTERN = Pattern.compile(":")
+    val COLON_PATTERN: Pattern = Pattern.compile(":")
 }

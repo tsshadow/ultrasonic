@@ -35,7 +35,7 @@ class VersionAwareJacksonConverterFactory(
         type: Type,
         annotations: Array<Annotation>,
         retrofit: Retrofit
-    ): Converter<ResponseBody, *>? {
+    ): Converter<ResponseBody, *> {
         val javaType: JavaType = mapper!!.typeFactory.constructType(type)
         val reader: ObjectReader? = mapper!!.readerFor(javaType)
         return VersionAwareResponseBodyConverter<Any>(notifier, reader!!)

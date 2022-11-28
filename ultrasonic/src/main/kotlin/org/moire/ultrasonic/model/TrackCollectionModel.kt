@@ -71,10 +71,10 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory: MusicDirectory
 
-            if (Settings.shouldUseId3Tags) {
-                musicDirectory = Util.getSongsFromSearchResult(service.getStarred2())
+            musicDirectory = if (Settings.shouldUseId3Tags) {
+                Util.getSongsFromSearchResult(service.getStarred2())
             } else {
-                musicDirectory = Util.getSongsFromSearchResult(service.getStarred())
+                Util.getSongsFromSearchResult(service.getStarred())
             }
 
             updateList(musicDirectory)
@@ -171,7 +171,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     @Synchronized
     fun calculateButtonState(
         selection: List<Track>,
-        onComplete: (TrackCollectionModel.Companion.ButtonStates) -> Unit
+        onComplete: (ButtonStates) -> Unit
     ) {
         val enabled = selection.isNotEmpty()
         var unpinEnabled = false
@@ -200,7 +200,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
             val pinEnabled = selection.size > pinnedCount
 
             onComplete(
-                TrackCollectionModel.Companion.ButtonStates(
+                ButtonStates(
                     all = enabled,
                     pin = pinEnabled,
                     unpin = unpinEnabled,
