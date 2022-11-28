@@ -39,6 +39,7 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.common.VideoSize
 import androidx.media3.common.text.CueGroup
+import androidx.media3.common.util.Size
 import androidx.media3.session.MediaSession
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
@@ -56,7 +57,7 @@ import org.moire.ultrasonic.api.subsonic.SubsonicRESTException
 import org.moire.ultrasonic.app.UApp.Companion.applicationContext
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.JukeboxStatus
-import org.moire.ultrasonic.playback.MediaNotificationProvider
+import org.moire.ultrasonic.playback.CustomNotificationProvider
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.Util.getPendingIntentToShowPlayer
 import org.moire.ultrasonic.util.Util.sleepQuietly
@@ -92,7 +93,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
     private var listeners: MutableList<Player.Listener> = mutableListOf()
     private val playlist: MutableList<MediaItem> = mutableListOf()
     private var currentIndex: Int = 0
-    private val notificationProvider = MediaNotificationProvider(applicationContext())
+    private val notificationProvider = CustomNotificationProvider(applicationContext())
     private lateinit var mediaSession: MediaSession
     private lateinit var notificationManagerCompat: NotificationManagerCompat
 
@@ -767,7 +768,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
     }
 
     override fun getCurrentCues(): CueGroup {
-        return CueGroup.EMPTY
+        return CueGroup.EMPTY_TIME_ZERO
     }
 
     override fun getAudioAttributes(): AudioAttributes {
@@ -776,6 +777,10 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun getVideoSize(): VideoSize {
         return VideoSize(0, 0)
+    }
+
+    override fun getSurfaceSize(): Size {
+        return Size(0, 0)
     }
 
     override fun getContentBufferedPosition(): Long {

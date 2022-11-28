@@ -77,7 +77,7 @@ class ServerSettingsModel(
      */
     fun moveItemDown(index: Int) {
         viewModelScope.launch {
-            if (index < repository.getMaxIndex() ?: 0) {
+            if (index < (repository.getMaxIndex() ?: 0)) {
                 val itemToBeMoved = repository.findByIndex(index)
                 val nextItem = repository.findByIndex(index + 1)
 

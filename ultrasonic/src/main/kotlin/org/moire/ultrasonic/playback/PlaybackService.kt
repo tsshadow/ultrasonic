@@ -34,6 +34,7 @@ import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Track
+import org.moire.ultrasonic.imageloader.ArtworkBitmapLoader
 import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider
 import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
@@ -112,7 +113,7 @@ class PlaybackService :
     private fun initializeSessionAndPlayer() {
         if (isStarted) return
 
-        setMediaNotificationProvider(MediaNotificationProvider(UApp.applicationContext()))
+        setMediaNotificationProvider(CustomNotificationProvider(UApp.applicationContext()))
 
         // Create a new plain OkHttpClient
         val builder = OkHttpClient.Builder()
@@ -156,6 +157,7 @@ class PlaybackService :
         // This will need to use the AutoCalls
         mediaLibrarySession = MediaLibrarySession.Builder(this, player, librarySessionCallback)
             .setSessionActivity(getPendingIntentForContent())
+            .setBitmapLoader(ArtworkBitmapLoader())
             .build()
 
         // Set a listener to update the API client when the active server has changed

@@ -57,15 +57,15 @@ data class Track(
     }
 
     fun compareTo(other: Track): Int {
-        when {
+        return when {
             this.closeness == other.closeness -> {
-                return 0
+                0
             }
             this.closeness > other.closeness -> {
-                return -1
+                -1
             }
             else -> {
-                return 1
+                1
             }
         }
     }
