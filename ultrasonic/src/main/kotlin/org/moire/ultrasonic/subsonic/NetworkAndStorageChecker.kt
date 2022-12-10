@@ -12,7 +12,7 @@ class NetworkAndStorageChecker(val context: Context) {
     fun warnIfNetworkOrStorageUnavailable() {
         if (!Util.isExternalStoragePresent()) {
             Util.toast(context, R.string.select_album_no_sdcard)
-        } else if (!isOffline() && !Util.isNetworkConnected()) {
+        } else if (!isOffline() && !Util.hasUsableNetwork()) {
             Util.toast(context, R.string.select_album_no_network)
         }
     }

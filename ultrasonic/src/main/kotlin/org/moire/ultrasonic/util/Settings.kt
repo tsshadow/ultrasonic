@@ -32,14 +32,10 @@ object Settings {
     @JvmStatic
     val maxBitRate: Int
         get() {
-            val network = Util.networkInfo()
-
-            if (!network.connected) return 0
-
-            return if (network.unmetered) {
-                maxWifiBitRate
-            } else {
+            return if (Util.isNetworkRestricted()) {
                 maxMobileBitRate
+            } else {
+                maxWifiBitRate
             }
         }
 
