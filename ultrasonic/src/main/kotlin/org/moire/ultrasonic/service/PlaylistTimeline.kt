@@ -15,7 +15,6 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.util.Assertions
 import androidx.media3.common.util.Util
 import com.google.common.collect.ImmutableList
-import java.util.Arrays
 
 /**
  * This class wraps a simple playlist provided as List<MediaItem>

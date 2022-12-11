@@ -25,7 +25,7 @@ open class SubsonicResponse(
         companion object {
             fun getStatusFromJson(jsonValue: String) =
                 values().firstOrNull { it.jsonValue == jsonValue }
-                ?: throw IllegalArgumentException("Unknown status value: $jsonValue")
+                    ?: throw IllegalArgumentException("Unknown status value: $jsonValue")
 
             class StatusJsonDeserializer : JsonDeserializer<Status>() {
                 override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): Status {

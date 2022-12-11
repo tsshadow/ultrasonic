@@ -9,8 +9,8 @@ package org.moire.ultrasonic.playback
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.HeartRating
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
@@ -23,7 +23,8 @@ import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.util.toTrack
 
 @UnstableApi
-class CustomNotificationProvider(ctx: Context?) : DefaultMediaNotificationProvider2(Builder(ctx)), KoinComponent {
+class CustomNotificationProvider(ctx: Context?) :
+    DefaultMediaNotificationProvider2(Builder(ctx)), KoinComponent {
 
     /*
     * It is currently not possible to edit a MediaItem after creation so the isRated value
@@ -85,7 +86,7 @@ class CustomNotificationProvider(ctx: Context?) : DefaultMediaNotificationProvid
         val commands = super.getMediaButtons(playerCommands, customLayout, playWhenReady)
 
         commands.forEachIndexed { index, command ->
-            command.extras.putInt(androidx.media3.session.DefaultMediaNotificationProvider.COMMAND_KEY_COMPACT_VIEW_INDEX, index)
+            command.extras.putInt(COMMAND_KEY_COMPACT_VIEW_INDEX, index)
         }
 
         return commands
