@@ -9,6 +9,13 @@ format them using Markdown triple backquote notation.
 Describe how somebody else could observe the same behavior you do. Don't
 share here any logins and passwords!
 
+### Please provide a log!
+
+Many issues are hard to reproduce without a log file. Please enable logging by opening the setting and scrolling to the bottom.
+There you will find an option to activate loging and to export the file. Please note that the log might contain personal information,
+such as the name of the tracks you listened to. If you don't want to post it publicly, let us know, and we will find a way.
+
+
 ## System information
 
 ### Ultrasonic client
