@@ -7,8 +7,6 @@ build:
 
 potential-bugs:
   active: true
-  DuplicateCaseInWhenExpression:
-    active: true
   EqualsWithHashCodeExist:
     active: true
   ExplicitGarbageCollectionCall:
