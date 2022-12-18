@@ -49,6 +49,9 @@ class DownloadTask(
     private var outputStream: OutputStream? = null
     private var lastPostTime: Long = 0
 
+    val track: DownloadableTrack
+        get() = item
+
     private fun checkIfExists(): Boolean {
         if (Storage.isPathExists(item.pinnedFile)) {
             Timber.i("%s already exists. Skipping.", item.pinnedFile)

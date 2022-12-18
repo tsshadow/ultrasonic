@@ -9,7 +9,7 @@ ktlint                 = "0.43.2"
 ktlintGradle           = "11.0.0"
 detekt                 = "1.22.0"
 preferences            = "1.2.0"
-media3                 = "1.0.0-beta03"
+media3                 = "f3e450e783"
 
 androidSupport         = "1.5.0"
 materialDesign         = "1.6.1"
@@ -64,9 +64,11 @@ navigationUiKtx         = { module = "androidx.navigation:navigation-ui-ktx", ve
 navigationFeature       = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "navigation" }
 navigationSafeArgs      = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation"}
 preferences             = { module = "androidx.preference:preference", version.ref = "preferences" }
-media3exoplayer         = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
-media3okhttp            = { module = "androidx.media3:media3-datasource-okhttp", version.ref = "media3" }
-media3session           = { module = "androidx.media3:media3-session", version.ref = "media3" }
+media3common            = { module = "com.github.androidx.media:media3-common", version.ref = "media3" }
+media3exoplayer         = { module = "com.github.androidx.media:media3-exoplayer", version.ref = "media3" }
+media3datasource        = { module = "com.github.androidx.media:media3-datasource", version.ref = "media3" }
+media3okhttp            = { module = "com.github.androidx.media:media3-datasource-okhttp", version.ref = "media3" }
+media3session           = { module = "com.github.androidx.media:media3-session", version.ref = "media3" }
 swipeRefresh            = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swipeRefresh" }
 kotlinStdlib            = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlinReflect           = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }

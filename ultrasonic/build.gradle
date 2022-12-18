@@ -104,8 +104,10 @@ dependencies {
     implementation libs.viewModelKtx
     implementation libs.constraintLayout
     implementation libs.preferences
+    implementation libs.media3common
     implementation libs.media3exoplayer
     implementation libs.media3session
+    implementation libs.media3datasource
     implementation libs.media3okhttp
     implementation libs.swipeRefresh
 
