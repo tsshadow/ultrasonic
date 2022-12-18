@@ -70,6 +70,8 @@ object Storage {
         } catch (ignored: FileAlreadyExistsException) {
             // Play console has revealed a crash when for some reason both files exist
             delete(pathFrom.path)
+        } catch (ignored: Exception) {
+            // Ignore any other exceptions, such as NoSuchFileException etc.
         }
     }
 

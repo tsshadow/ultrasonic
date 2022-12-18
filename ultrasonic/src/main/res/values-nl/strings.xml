@@ -316,8 +316,7 @@
     <string name="settings.use_id3">Navigeren met behulp van ID3-labels</string>
     <string name="settings.use_id3_summary">ID3-labels gebruiken in plaats van systeemlabels</string>
     <string name="settings.use_id3_offline">ID3-methoe ook in offline-modus gebruiken</string>
-    <string name="settings.use_id3_offline_warning">Experimenteel: als je deze instelling inschakelt, dan wordt er alleen muziek getoond die gedownload is met versie 4.0 of hoger.</string>
-    <string name="settings.use_id3_offline_summary">Oudere downloads beschikken niet over de benodigde metagegevens. Je kunt tussen modi schakelen om de ontbrekende metagegevens op te halen.</string>
+    <string name="settings.use_id3_offline_summary">Als je deze instelling inschakelt, dan wordt er alleen muziek getoond die gedownload is met versie 4.0 of hoger. Oudere downloads beschikken niet over de benodigde metagegevens. Je kunt tussen modi schakelen om de ontbrekende metagegevens op te halen.</string>
     <string name="settings.show_artist_picture">Artiestfoto tonen op artiestenlijst</string>
     <string name="settings.show_artist_picture_summary">Toont de artiestfoto op de artiestenlijst (indien beschikbaar)</string>
     <string name="main.video" tools:ignore="UnusedResources">Video</string>

@@ -12,19 +12,20 @@ import androidx.media3.common.HeartRating
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
+import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.service.DefaultMediaNotificationProvider2
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.util.toTrack
 
 @UnstableApi
-class CustomNotificationProvider(ctx: Context?) :
-    DefaultMediaNotificationProvider2(Builder(ctx)), KoinComponent {
+class CustomNotificationProvider(ctx: Context) :
+    DefaultMediaNotificationProvider(ctx),
+    KoinComponent {
 
     /*
     * It is currently not possible to edit a MediaItem after creation so the isRated value

@@ -314,8 +314,7 @@
     <string name="settings.use_id3">Navegar Usando Etiquetas ID3</string>
     <string name="settings.use_id3_summary">Usar as etiquetas ID3 ao invés do sistema de arquivos</string>
     <string name="settings.use_id3_offline">Usar método ID3 quando offline também</string>
-    <string name="settings.use_id3_offline_warning">Experimental: Se você ativar esta configuração, ela mostrará apenas a música que você baixou com o Ultrasonic 4.0 ou posterior.</string>
-    <string name="settings.use_id3_offline_summary">Os downloads anteriores não têm os metadados necessários baixados. Você pode alternar entre os modos Pin e Salvar para acionar o download dos metadados ausentes.</string>
+    <string name="settings.use_id3_offline_summary">Se você ativar esta configuração, ela mostrará apenas a música que você baixou com o Ultrasonic 4.0 ou posterior. Os downloads anteriores não têm os metadados necessários baixados. Você pode alternar entre os modos Pin e Salvar para acionar o download dos metadados ausentes.</string>
     <string name="settings.show_artist_picture">Mostrar Foto do Artista na Lista</string>
     <string name="settings.show_artist_picture_summary">Mostrar a imagem do artista na lista de artistas, se disponível</string>
     <string name="main.video" tools:ignore="UnusedResources">Vídeo</string>

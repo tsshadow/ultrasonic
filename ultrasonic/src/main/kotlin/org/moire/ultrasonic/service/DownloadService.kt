@@ -23,7 +23,8 @@ import androidx.lifecycle.MutableLiveData
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.google.common.util.concurrent.SettableFuture
-import java.util.PriorityQueue
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.PriorityBlockingQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -135,19 +136,19 @@ class DownloadService : Service(), KoinComponent {
         var listChanged = false
 
         // Fill up active List with waiting tasks
-        while (activelyDownloading.size < Settings.parallelDownloads && downloadQueue.size > 0) {
+        while (activeDownloads.size < Settings.parallelDownloads && downloadQueue.peek() != null) {
             // Use poll() instead of remove() which throws an Exception if there is no element.
             val track: DownloadableTrack = downloadQueue.poll() ?: continue
 
             val downloadTask = DownloadTask(track, scope!!, ::downloadStateChangedCallback)
-            activelyDownloading[track] = downloadTask
+            activeDownloads[track.id] = downloadTask
             FileUtil.createDirectoryForParent(track.pinnedFile)
             downloadTask.start()
             listChanged = true
         }
 
         // Stop Executor service when done downloading
-        if (activelyDownloading.isEmpty()) {
+        if (activeDownloads.isEmpty()) {
             CacheCleaner().cleanSpace()
             stopSelf()
         }
@@ -175,14 +176,14 @@ class DownloadService : Service(), KoinComponent {
         postState(item.track, downloadState, progress)
 
         if (downloadState.isFinalState()) {
-            activelyDownloading.remove(item)
+            activeDownloads.remove(item.id)
             processNextTracks()
         }
 
         when (downloadState) {
             DownloadState.FAILED -> {
                 downloadQueue.remove(item)
-                failedList.add(item)
+                failedList[item.id] = item
             }
             DownloadState.RETRYING -> {
                 item.tryCount++
@@ -194,7 +195,7 @@ class DownloadService : Service(), KoinComponent {
 
     private fun updateLiveData() {
         val temp: MutableList<Track> = ArrayList()
-        temp.addAll(activelyDownloading.keys.map { x -> x.track })
+        temp.addAll(activeDownloads.values.map { it.track.track })
         temp.addAll(downloadQueue.map { x -> x.track })
         observableDownloads.postValue(temp.distinct().sorted())
     }
@@ -205,10 +206,10 @@ class DownloadService : Service(), KoinComponent {
             postState(downloadQueue.remove().track, DownloadState.IDLE)
         }
         // Cancel all active downloads
-        for (download in activelyDownloading) {
+        for (download in activeDownloads) {
             download.value.cancel()
         }
-        activelyDownloading.clear()
+        activeDownloads.clear()
         updateLiveData()
     }
 
@@ -280,9 +281,9 @@ class DownloadService : Service(), KoinComponent {
 
         private var startFuture: SettableFuture<DownloadService>? = null
 
-        private val downloadQueue = PriorityQueue<DownloadableTrack>()
-        private val activelyDownloading = mutableMapOf<DownloadableTrack, DownloadTask>()
-        private val failedList = mutableListOf<DownloadableTrack>()
+        private val downloadQueue = PriorityBlockingQueue<DownloadableTrack>()
+        private val activeDownloads = ConcurrentHashMap<String, DownloadTask>()
+        private val failedList = ConcurrentHashMap<String, DownloadableTrack>()
 
         // The generic list models expect a LiveData, so even though we are using Rx for many events
         // surrounding playback the list of Downloads is published as LiveData.
@@ -319,17 +320,15 @@ class DownloadService : Service(), KoinComponent {
             // Update Pinned flag of items in progress
             downloadQueue.filter { item -> tracks.any { it.id == item.id } }
                 .forEach { it.pinned = save }
-            activelyDownloading.filter { item -> tracks.any { it.id == item.key.id } }
-                .forEach { it.key.pinned = save }
-            failedList.filter { item -> tracks.any { it.id == item.id } }
-                .forEach { it.pinned = save }
+            tracks.forEach {
+                activeDownloads[it.id]?.track?.pinned = save
+            }
+            tracks.forEach {
+                failedList[it.id]?.pinned = save
+            }
 
             filteredTracks = filteredTracks.filter {
-                !downloadQueue.any { t ->
-                    t.track.id == it.id
-                } && !activelyDownloading.any { t ->
-                    t.key.track.id == it.id
-                }
+                !downloadQueue.contains(it.id) && !activeDownloads.contains(it.id)
             }
 
             // The remainder tracks should be added to the download queue
@@ -361,8 +360,8 @@ class DownloadService : Service(), KoinComponent {
 
         fun delete(track: Track) {
 
-            downloadQueue.singleOrNull { it.id == track.id }?.let { downloadQueue.remove(it) }
-            failedList.singleOrNull { it.id == track.id }?.let { downloadQueue.remove(it) }
+            downloadQueue.get(track.id)?.let { downloadQueue.remove(it) }
+            failedList[track.id]?.let { downloadQueue.remove(it) }
             cancelDownload(track)
 
             Storage.delete(track.getPartialFile())
@@ -375,9 +374,9 @@ class DownloadService : Service(), KoinComponent {
 
         fun unpin(track: Track) {
             // Update Pinned flag of items in progress
-            downloadQueue.singleOrNull { it.id == track.id }?.pinned = false
-            activelyDownloading.keys.singleOrNull { it.id == track.id }?.pinned = false
-            failedList.singleOrNull { it.id == track.id }?.pinned = false
+            downloadQueue.get(track.id)?.pinned = false
+            activeDownloads[track.id]?.track?.pinned = false
+            failedList[track.id]?.pinned = false
 
             val pinnedFile = track.getPinnedFile()
             if (!Storage.isPathExists(pinnedFile)) return
@@ -393,17 +392,17 @@ class DownloadService : Service(), KoinComponent {
 
         @Suppress("ReturnCount")
         fun getDownloadState(track: Track): DownloadState {
-            if (Storage.isPathExists(track.getCompleteFile())) return DownloadState.DONE
-            if (Storage.isPathExists(track.getPinnedFile())) return DownloadState.PINNED
-            if (activelyDownloading.any { it.key.id == track.id }) return DownloadState.QUEUED
-            if (downloadQueue.any { it.id == track.id }) return DownloadState.QUEUED
+            if (activeDownloads.contains(track.id)) return DownloadState.QUEUED
+            if (downloadQueue.contains(track.id)) return DownloadState.QUEUED
 
-            val key = activelyDownloading.keys.firstOrNull { it.track.id == track.id }
-            if (key != null) {
-                if (key.tryCount > 0) return DownloadState.RETRYING
+            val downloadableTrack = activeDownloads[track.id]?.track
+            if (downloadableTrack != null) {
+                if (downloadableTrack.tryCount > 0) return DownloadState.RETRYING
                 return DownloadState.DOWNLOADING
             }
-            if (failedList.any { it.track.id == track.id }) return DownloadState.FAILED
+            if (failedList[track.id] != null) return DownloadState.FAILED
+            if (Storage.isPathExists(track.getCompleteFile())) return DownloadState.DONE
+            if (Storage.isPathExists(track.getPinnedFile())) return DownloadState.PINNED
             return DownloadState.IDLE
         }
 
@@ -417,8 +416,7 @@ class DownloadService : Service(), KoinComponent {
         }
 
         private fun cancelDownload(track: Track) {
-            val key = activelyDownloading.keys.singleOrNull { it.track.id == track.id } ?: return
-            activelyDownloading[key]?.cancel()
+            activeDownloads[track.id]?.cancel()
         }
 
         private fun postState(track: Track, state: DownloadState, progress: Int? = null) {
@@ -446,6 +444,17 @@ class DownloadService : Service(), KoinComponent {
             } else {
                 context.startService(intent)
             }
+        }
+
+        fun PriorityBlockingQueue<DownloadableTrack>.get(id: String): DownloadableTrack? {
+            for (el in this) {
+                if (el.id == id) return el
+            }
+            return null
+        }
+
+        fun PriorityBlockingQueue<DownloadableTrack>.contains(id: String): Boolean {
+            return (this.get(id) != null)
         }
     }
 }
