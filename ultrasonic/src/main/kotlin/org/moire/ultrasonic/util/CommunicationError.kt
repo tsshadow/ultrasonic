@@ -54,7 +54,7 @@ object CommunicationError {
     @Suppress("ReturnCount")
     fun getErrorMessage(error: Throwable, context: Context?): String {
         if (context == null) return "Couldn't get Error message, Context is null"
-        if (error is IOException && !Util.isNetworkConnected()) {
+        if (error is IOException && !Util.hasUsableNetwork()) {
             return context.resources.getString(R.string.background_task_no_network)
         } else if (error is FileNotFoundException) {
             return context.resources.getString(R.string.background_task_not_found)

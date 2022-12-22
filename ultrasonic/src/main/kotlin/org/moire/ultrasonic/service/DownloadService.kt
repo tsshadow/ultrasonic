@@ -124,7 +124,7 @@ class DownloadService : Service(), KoinComponent {
     fun processNextTracks() {
         retrying = false
         if (
-            !Util.isNetworkConnected() ||
+            !Util.hasUsableNetwork() ||
             !Util.isExternalStoragePresent() ||
             !storageMonitor.isExternalStorageAvailable
         ) {

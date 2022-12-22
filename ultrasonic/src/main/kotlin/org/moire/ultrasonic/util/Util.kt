@@ -17,13 +17,10 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
-import android.net.NetworkCapabilities.NET_CAPABILITY_NOT_METERED
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WifiLock
@@ -317,39 +314,50 @@ object Util {
      * @return Boolean
      */
     @JvmStatic
-    fun isNetworkConnected(): Boolean {
-        val info = networkInfo()
-        val isUnmetered = info.unmetered
+    fun hasUsableNetwork(): Boolean {
+        val isUnmetered = !isNetworkRestricted()
         val wifiRequired = Settings.isWifiRequiredForDownload
-        return info.connected && (!wifiRequired || isUnmetered)
+        return (!wifiRequired || isUnmetered)
     }
 
-    /**
-     * Query connectivity status
-     *
-     * @return NetworkInfo object
-     */
-    @Suppress("DEPRECATION")
-    fun networkInfo(): NetworkInfo {
-        val manager = connectivityManager
-        val info = NetworkInfo()
+    fun isNetworkRestricted(): Boolean {
+        return isNetworkMetered() || isNetworkCellular()
+    }
 
+    private fun isNetworkMetered(): Boolean {
+        val connManager = connectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network: Network? = manager.activeNetwork
-            val capabilities = manager.getNetworkCapabilities(network)
-
-            if (capabilities != null) {
-                info.unmetered = capabilities.hasCapability(NET_CAPABILITY_NOT_METERED)
-                info.connected = capabilities.hasCapability(NET_CAPABILITY_INTERNET)
-            }
-        } else {
-            val networkInfo = manager.activeNetworkInfo
-            if (networkInfo != null) {
-                info.unmetered = networkInfo.type == ConnectivityManager.TYPE_WIFI
-                info.connected = networkInfo.isConnected
+            val capabilities = connManager.getNetworkCapabilities(
+                connManager.activeNetwork
+            )
+            if (capabilities != null &&
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) &&
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+            ) {
+                return false
             }
         }
-        return info
+        return connManager.isActiveNetworkMetered
+    }
+
+    @Suppress("DEPRECATION")
+    private fun isNetworkCellular(): Boolean {
+        val connManager = connectivityManager
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connManager.activeNetwork
+                ?: return false // Nothing connected
+            connManager.getNetworkInfo(network)
+                ?: return true // Better be safe than sorry
+            val capabilities = connManager.getNetworkCapabilities(network)
+                ?: return true // Better be safe than sorry
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+        } else {
+            // if the default network is a VPN,
+            // this method will return the NetworkInfo for one of its underlying networks
+            val info = connManager.activeNetworkInfo
+                ?: return false // Nothing connected
+            info.type == ConnectivityManager.TYPE_MOBILE
+        }
     }
 
     @JvmStatic
@@ -378,10 +386,6 @@ object Util {
         // Assume the size given refers to the width of the image, so calculate the new height using
         // the previously determined aspect ratio
         return (newWidth * aspectRatio).roundToInt()
-    }
-
-    private fun getScaledHeight(bitmap: Bitmap, width: Int): Int {
-        return getScaledHeight(bitmap.height.toDouble(), bitmap.width.toDouble(), width)
     }
 
     fun getSongsFromSearchResult(searchResult: SearchResult): MusicDirectory {
@@ -751,14 +755,6 @@ object Util {
     fun <T : Any, R> T?.ifNotNull(block: (T) -> R): R? {
         return this?.let(block)
     }
-
-    /**
-     * Small data class to store information about the current network
-     **/
-    data class NetworkInfo(
-        var connected: Boolean = false,
-        var unmetered: Boolean = false
-    )
 
     /**
      * Closes a Closeable while ignoring any errors.
