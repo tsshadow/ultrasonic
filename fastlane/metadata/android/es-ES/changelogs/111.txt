@@ -1,0 +1,5 @@
+Corrección de errores
+- #848: Fallo de ConcurrentModification.
+
+Mejoras
+- #859: El ajuste "Descargar sólo en Wi-Fi" no detecta la Wi-Fi cuando la VPN está activada.

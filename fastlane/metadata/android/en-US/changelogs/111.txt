@@ -1,0 +1,5 @@
+Bug fixes
+- #848: ConcurrentModification crash.
+
+Enhancements
+- #859: "Download on Wi-Fi only" setting doesn't detect Wi-Fi when VPN is enabled.
