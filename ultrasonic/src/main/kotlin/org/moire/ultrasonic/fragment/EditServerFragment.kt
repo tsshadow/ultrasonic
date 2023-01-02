@@ -186,11 +186,21 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
                 .setBottomSpace(DIALOG_PADDING)
                 .show()
         }
+
+        serverAddressEditText?.editText?.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) correctServerAddress()
+        }
     }
 
     override fun onStop() {
         Util.hideKeyboard(activity)
         super.onStop()
+    }
+
+    private fun correctServerAddress() {
+        serverAddressEditText?.editText?.setText(
+            serverAddressEditText?.editText?.text?.trim(' ', '/')
+        )
     }
 
     private fun updateColor(color: Int?) {
@@ -296,6 +306,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
             isValid = false
         } else {
             try {
+                correctServerAddress()
                 val urlString = serverAddressEditText!!.editText?.text.toString()
                 url = URL(urlString)
                 if (
