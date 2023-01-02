@@ -145,7 +145,8 @@ abstract class JukeboxUnimplementedFunctions : Service(), Player {
     }
 
     override fun getCurrentTracks(): Tracks {
-        TODO("Not yet implemented")
+        // TODO Dummy information is returned for now, this seems to work
+        return Tracks.EMPTY
     }
 
     override fun setTrackSelectionParameters(parameters: TrackSelectionParameters) {
