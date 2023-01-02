@@ -13,5 +13,5 @@ data class PodcastsChannel(
         private const val serialVersionUID = -4160515427075433798L
     }
 
-    override fun toString(): String = name.toString()
+    override fun toString(): String = title.toString()
 }
