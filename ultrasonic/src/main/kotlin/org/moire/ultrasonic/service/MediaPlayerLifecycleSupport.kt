@@ -47,6 +47,9 @@ class MediaPlayerLifecycleSupport : KoinComponent {
         rxBusSubscription += RxBus.shutdownCommandObservable.subscribe {
             onDestroy()
         }
+        rxBusSubscription += RxBus.stopServiceCommandObservable.subscribe {
+            onDestroy()
+        }
     }
 
     fun onCreate() {
@@ -89,6 +92,7 @@ class MediaPlayerLifecycleSupport : KoinComponent {
     private fun onDestroy() {
 
         if (!created) return
+        rxBusSubscription.dispose()
 
         applicationContext().unregisterReceiver(headsetEventReceiver)
 

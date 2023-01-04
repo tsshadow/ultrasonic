@@ -85,12 +85,14 @@ class PlaybackService :
     override fun onTaskRemoved(rootIntent: Intent?) {
         Timber.i("Stopping the playback because we were swiped away")
         releasePlayerAndSession()
+        super.onTaskRemoved(rootIntent)
     }
 
     private fun releasePlayerAndSession() {
         // Broadcast that the service is being shutdown
         RxBus.stopServiceCommandPublisher.onNext(Unit)
 
+        // TODO Save the player state before shutdown
         player.removeListener(listener)
         player.release()
         mediaLibrarySession.release()
