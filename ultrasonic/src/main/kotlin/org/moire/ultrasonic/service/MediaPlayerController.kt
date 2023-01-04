@@ -198,13 +198,10 @@ class MediaPlayerController(
         }
 
         rxBusSubscription += RxBus.shutdownCommandObservable.subscribe {
-            playbackStateSerializer.serializeNow(
-                playlist.map { it.toTrack() },
-                currentMediaItemIndex,
-                playerPosition,
-                isShufflePlayEnabled,
-                repeatMode
-            )
+            clear(false)
+            onDestroy()
+        }
+        rxBusSubscription += RxBus.stopServiceCommandObservable.subscribe {
             clear(false)
             onDestroy()
         }
