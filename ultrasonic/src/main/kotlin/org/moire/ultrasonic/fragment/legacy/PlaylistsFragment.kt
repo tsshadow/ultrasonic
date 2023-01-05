@@ -119,8 +119,9 @@ class PlaylistsFragment : Fragment() {
                 }
 
                 override fun done(result: List<Playlist>) {
-                    playlistsListView!!.adapter =
+                    playlistAdapter =
                         ArrayAdapter(requireContext(), R.layout.list_item_generic, result)
+                    playlistsListView!!.adapter = playlistAdapter
                     emptyTextView!!.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
                 }
             }
