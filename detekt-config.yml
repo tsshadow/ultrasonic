@@ -66,6 +66,8 @@ style:
     active: false
   ReturnCount:
     max: 5
+  ForbiddenImport:
+    imports: ['android.app.AlertDialog']
 
 comments:
   active: true

@@ -1,7 +1,6 @@
 package org.moire.ultrasonic.fragment
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
@@ -34,6 +33,7 @@ import org.moire.ultrasonic.log.FileLoggerTree.Companion.uprootFromTimberForest
 import org.moire.ultrasonic.provider.SearchSuggestionProvider
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.RxBus
+import org.moire.ultrasonic.util.ConfirmationDialog
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.ErrorDialog
 import org.moire.ultrasonic.util.FileUtil.ultrasonicDirectory
@@ -136,7 +136,7 @@ class SettingsFragment :
                     return
                 }
             }
-            ErrorDialog.Builder(context)
+            ErrorDialog.Builder(requireContext())
                 .setMessage(R.string.settings_cache_location_error)
                 .show()
         }
@@ -297,7 +297,7 @@ class SettingsFragment :
         onChosen: (Int) -> Unit
     ) {
         val choice = intArrayOf(defaultChoice)
-        AlertDialog.Builder(activity).setTitle(title)
+        ConfirmationDialog.Builder(requireContext()).setTitle(title)
             .setSingleChoiceItems(
                 R.array.bluetoothDeviceSettingNames, defaultChoice
             ) { _: DialogInterface?, i: Int -> choice[0] = i }
@@ -404,7 +404,7 @@ class SettingsFragment :
             )
             val keep = R.string.settings_debug_log_keep
             val delete = R.string.settings_debug_log_delete
-            InfoDialog.Builder(activity)
+            ConfirmationDialog.Builder(requireContext())
                 .setMessage(message)
                 .setNegativeButton(keep) { dIf: DialogInterface, _: Int ->
                     dIf.cancel()
@@ -413,7 +413,7 @@ class SettingsFragment :
                     deleteLogFiles()
                     Timber.i("Deleted debug log files")
                     dIf.dismiss()
-                    AlertDialog.Builder(activity)
+                    InfoDialog.Builder(requireContext())
                         .setMessage(R.string.settings_debug_log_deleted)
                         .setPositiveButton(R.string.common_ok) { dIf2: DialogInterface, _: Int ->
                             dIf2.dismiss()

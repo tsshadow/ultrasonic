@@ -157,7 +157,6 @@
     <string name="settings.clear_bookmark">Czyszczenie zakładek</string>
     <string name="settings.clear_bookmark_summary">Czyść zakładkę po zakończeniu odtwarzania utworu</string>
     <string name="settings.clear_search_history">Wyczyść historię wyszukiwania</string>
-    <string name="settings.connection_failure">Błąd połączenia.</string>
     <string name="settings.default_albums">Domyślna ilość wyników - albumy</string>
     <string name="settings.default_artists">Domyślna ilość wyników - artyści</string>
     <string name="settings.default_songs">Domyślna ilość wyników - utwory</string>
@@ -248,8 +247,6 @@
     <string name="settings.show_track_number">Wyświetlaj numer utworu</string>
     <string name="settings.show_track_number_summary">Dołącza numer utworu podczas wyświetlania utworu</string>
     <string name="settings.test_connection_title">Testuj połączenie</string>
-    <string name="settings.testing_ok">Połączenie jest OK</string>
-    <string name="settings.testing_unlicensed">Połączenie jest OK. Brak licencji na serwerze.</string>
     <string name="settings.theme_light">Jasny</string>
     <string name="settings.theme_dark">Ciemny</string>
     <string name="settings.theme_title">Motyw</string>

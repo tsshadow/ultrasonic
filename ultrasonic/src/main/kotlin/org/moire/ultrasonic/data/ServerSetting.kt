@@ -17,8 +17,6 @@ import androidx.room.PrimaryKey
  * @param forcePlainTextPassword: True if the server authenticates the user using old Ldap-like way
  * @param musicFolderId: The Id of the MusicFolder to be used with the server
  *
- * TODO: forcePlainTextPassword is still using the old column name.
- * Could be updated on the next significant change to the DB scheme
  */
 @Entity
 data class ServerSetting(
@@ -32,14 +30,17 @@ data class ServerSetting(
     @ColumnInfo(name = "password") var password: String,
     @ColumnInfo(name = "jukeboxByDefault") var jukeboxByDefault: Boolean,
     @ColumnInfo(name = "allowSelfSignedCertificate") var allowSelfSignedCertificate: Boolean,
-    @ColumnInfo(name = "ldapSupport") var forcePlainTextPassword: Boolean,
+    @ColumnInfo(name = "forcePlainTextPassword") var forcePlainTextPassword: Boolean,
     @ColumnInfo(name = "musicFolderId") var musicFolderId: String?,
     @ColumnInfo(name = "minimumApiVersion") var minimumApiVersion: String?,
     @ColumnInfo(name = "chatSupport") var chatSupport: Boolean? = null,
     @ColumnInfo(name = "bookmarkSupport") var bookmarkSupport: Boolean? = null,
     @ColumnInfo(name = "shareSupport") var shareSupport: Boolean? = null,
-    @ColumnInfo(name = "podcastSupport") var podcastSupport: Boolean? = null
+    @ColumnInfo(name = "podcastSupport") var podcastSupport: Boolean? = null,
+    @ColumnInfo(name = "jukeboxSupport") var jukeboxSupport: Boolean? = null,
+    @ColumnInfo(name = "videoSupport") var videoSupport: Boolean? = null
 ) {
+
     constructor() : this (
         0, 0, "", "", null, "", "", false, false, false, null, null
     )

@@ -11,7 +11,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  */
 @Database(
     entities = [ServerSetting::class],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -265,7 +265,6 @@ val MIGRATION_5_4: Migration = object : Migration(5, 4) {
         database.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
     }
 }
-
 /* ktlint-disable max-line-length */
 val MIGRATION_5_6: Migration = object : Migration(5, 6) {
     override fun migrate(database: SupportSQLiteDatabase) {

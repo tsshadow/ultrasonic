@@ -8,7 +8,6 @@
 package org.moire.ultrasonic.fragment
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.graphics.Canvas
 import android.graphics.Color.argb
 import android.graphics.Point
@@ -90,6 +89,7 @@ import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
 import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.CommunicationError
+import org.moire.ultrasonic.util.ConfirmationDialog
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.toTrack
@@ -1256,12 +1256,14 @@ class PlayerFragment :
         mediaPlayerController.setSongRating(rating)
     }
 
+    @SuppressLint("InflateParams")
     private fun showSavePlaylistDialog() {
-        val layout = LayoutInflater.from(this.context).inflate(R.layout.save_playlist, null)
+        val layout = LayoutInflater.from(this.context)
+            .inflate(R.layout.save_playlist, null)
 
         playlistNameView = layout.findViewById(R.id.save_playlist_name)
 
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = ConfirmationDialog.Builder(requireContext())
         builder.setTitle(R.string.download_playlist_title)
         builder.setMessage(R.string.download_playlist_name)
 

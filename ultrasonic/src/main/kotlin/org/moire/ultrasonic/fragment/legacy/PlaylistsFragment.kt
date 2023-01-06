@@ -8,7 +8,6 @@
 package org.moire.ultrasonic.fragment.legacy
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -43,7 +42,9 @@ import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.util.BackgroundTask
 import org.moire.ultrasonic.util.CacheCleaner
 import org.moire.ultrasonic.util.CancellationToken
+import org.moire.ultrasonic.util.ConfirmationDialog
 import org.moire.ultrasonic.util.FragmentBackgroundTask
+import org.moire.ultrasonic.util.InfoDialog
 import org.moire.ultrasonic.util.LoadingTask
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.Util.toast
@@ -222,7 +223,7 @@ class PlaylistsFragment : Fragment() {
     }
 
     private fun deletePlaylist(playlist: Playlist) {
-        AlertDialog.Builder(context).setIcon(R.drawable.ic_baseline_warning)
+        ConfirmationDialog.Builder(requireContext()).setIcon(R.drawable.ic_baseline_warning)
             .setTitle(R.string.common_confirm).setMessage(
                 resources.getString(R.string.delete_playlist, playlist.name)
             ).setPositiveButton(R.string.common_ok) { _, _ ->
@@ -283,8 +284,8 @@ class PlaylistsFragment : Fragment() {
         Linkify.addLinks(message, Linkify.WEB_URLS)
         textView.text = message
         textView.movementMethod = LinkMovementMethod.getInstance()
-        AlertDialog.Builder(context).setTitle(playlist.name).setCancelable(true)
-            .setIcon(R.drawable.ic_baseline_info).setView(textView).show()
+        InfoDialog.Builder(requireContext()).setTitle(playlist.name).setCancelable(true)
+            .setView(textView).show()
     }
 
     @SuppressLint("InflateParams")
@@ -301,7 +302,7 @@ class PlaylistsFragment : Fragment() {
         } else {
             publicBox.isChecked = pub
         }
-        val alertDialog = AlertDialog.Builder(context)
+        val alertDialog = ConfirmationDialog.Builder(requireContext())
         alertDialog.setIcon(R.drawable.ic_baseline_warning)
         alertDialog.setTitle(R.string.playlist_update_info)
         alertDialog.setView(dialogView)

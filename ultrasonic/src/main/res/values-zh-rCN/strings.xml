@@ -181,7 +181,6 @@
     <string name="settings.clear_bookmark">清空书签</string>
     <string name="settings.clear_bookmark_summary">歌曲播放完毕后清除书签</string>
     <string name="settings.clear_search_history">清空搜索历史</string>
-    <string name="settings.connection_failure">连接失败</string>
     <string name="settings.default_albums">默认专辑</string>
     <string name="settings.default_artists">默认艺术家</string>
     <string name="settings.default_songs">默认音乐</string>
@@ -277,8 +276,6 @@
     <string name="settings.show_track_number">显示曲目编号</string>
     <string name="settings.show_track_number_summary">显示歌曲时包括曲目编号</string>
     <string name="settings.test_connection_title">测试连接</string>
-    <string name="settings.testing_ok">连接正常</string>
-    <string name="settings.testing_unlicensed">连接正常， 服务器未授权。</string>
     <string name="settings.theme_light">Light</string>
     <string name="settings.theme_dark">Dark</string>
     <string name="settings.theme_black">Black</string>

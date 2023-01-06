@@ -196,7 +196,6 @@
     <string name="settings.clear_bookmark">Limpar Favoritos</string>
     <string name="settings.clear_bookmark_summary">Limpar favoritos após terminar de tocar a música</string>
     <string name="settings.clear_search_history">Limpar Histórico de Pesquisas</string>
-    <string name="settings.connection_failure">Falha na conexão.</string>
     <string name="settings.default_albums">Álbuns Padrões</string>
     <string name="settings.default_artists">Artistas Padrões</string>
     <string name="settings.default_songs">Músicas Padrões</string>
@@ -297,8 +296,6 @@
     <string name="settings.show_track_number">Mostrar o Número da Faixa</string>
     <string name="settings.show_track_number_summary">Incluir o número da faixa ao mostrar uma música</string>
     <string name="settings.test_connection_title">Teste de Conexão</string>
-    <string name="settings.testing_ok">Conexão OK</string>
-    <string name="settings.testing_unlicensed">Conexão OK. Servidor não licenciado.</string>
     <string name="settings.theme_day_night">Dia &amp; Noite</string>
     <string name="settings.theme_light">Claro</string>
     <string name="settings.theme_dark">Escuro</string>

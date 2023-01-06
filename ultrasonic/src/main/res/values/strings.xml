@@ -198,7 +198,6 @@
     <string name="settings.clear_bookmark">Clear Bookmark</string>
     <string name="settings.clear_bookmark_summary">Clear bookmark upon completion of playback of a song</string>
     <string name="settings.clear_search_history">Clear Search History</string>
-    <string name="settings.connection_failure">Connection failure.</string>
     <string name="settings.default_albums">Default Albums</string>
     <string name="settings.default_artists">Default Artists</string>
     <string name="settings.default_songs">Default Songs</string>
@@ -299,8 +298,6 @@
     <string name="settings.show_track_number">Show Track Number</string>
     <string name="settings.show_track_number_summary">Include track number when displaying a song</string>
     <string name="settings.test_connection_title">Test Connection</string>
-    <string name="settings.testing_ok">Connection is OK</string>
-    <string name="settings.testing_unlicensed">Connection is OK. Server unlicensed.</string>
     <string name="settings.theme_day_night">Day &amp; Night</string>
     <string name="settings.theme_light">Light</string>
     <string name="settings.theme_dark">Dark</string>
@@ -446,11 +443,12 @@
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Use five star rating for songs</string>
     <string name="settings.five_star_rating_description">Use five star rating system for songs instead of simply starring/unstarring items.</string>
-
     <string name="settings.use_hw_offload_title">Use hardware playback (experimental)</string>
     <string name="settings.use_hw_offload_description">Try to play the media using the media decoder chip on your phone. This can improve battery usage.</string>
     <string name="list_view">List</string>
     <string name="grid_view">Cover</string>
+    <string name="supported_server_features">Supported features</string>
+    <string name="jukebox">Jukebox</string>
 
 
 </resources>

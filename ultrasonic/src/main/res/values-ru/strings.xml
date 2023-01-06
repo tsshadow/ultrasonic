@@ -181,7 +181,6 @@
     <string name="settings.clear_bookmark">Очистить закладку</string>
     <string name="settings.clear_bookmark_summary">Очистить закладку после завершения воспроизведения песни</string>
     <string name="settings.clear_search_history">Очистить историю поиска</string>
-    <string name="settings.connection_failure">Ошибка подключения.</string>
     <string name="settings.default_albums">Альбомы по умолчанию</string>
     <string name="settings.default_artists">Исполнители по умолчанию</string>
     <string name="settings.default_songs">Треки по умолчанию</string>
@@ -274,8 +273,6 @@
     <string name="settings.show_track_number">Показать номер трека</string>
     <string name="settings.show_track_number_summary">Включить номер дорожки при отображении песни</string>
     <string name="settings.test_connection_title">Тестовое соединение</string>
-    <string name="settings.testing_ok">Успешное соединение</string>
-    <string name="settings.testing_unlicensed">Успешное соединение. Сервер нелицензионный.</string>
     <string name="settings.theme_light">Светлая</string>
     <string name="settings.theme_dark">Темная</string>
     <string name="settings.theme_black">Черная</string>

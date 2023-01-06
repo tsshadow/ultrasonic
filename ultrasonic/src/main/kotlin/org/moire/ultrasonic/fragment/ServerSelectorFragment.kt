@@ -88,7 +88,8 @@ class ServerSelectorFragment : Fragment() {
      * This Callback handles the deletion of a Server Setting
      */
     private fun deleteServerById(id: Int) {
-        ErrorDialog.Builder(context)
+        // FIXME
+        ErrorDialog.Builder(requireContext())
             .setTitle(R.string.server_menu_delete)
             .setMessage(R.string.server_selector_delete_confirmation)
             .setPositiveButton(R.string.common_delete) { dialog, _ ->
