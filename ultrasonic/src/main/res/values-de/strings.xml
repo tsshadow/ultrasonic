@@ -196,7 +196,6 @@
     <string name="settings.clear_bookmark">Lesezeichen löschen</string>
     <string name="settings.clear_bookmark_summary">Lesezeichen nach Wiedergabe löschen</string>
     <string name="settings.clear_search_history">Suchverlauf löschen</string>
-    <string name="settings.connection_failure">Verbindungsfehler</string>
     <string name="settings.default_albums">Anzahl der Alben</string>
     <string name="settings.default_artists">Anzahl der Künstler*innen</string>
     <string name="settings.default_songs">Anzahl der Titel</string>
@@ -297,8 +296,6 @@
     <string name="settings.show_track_number">Titelnummer anzeigen</string>
     <string name="settings.show_track_number_summary">Titel mit Nummer anzeigen</string>
     <string name="settings.test_connection_title">Verbindung testen</string>
-    <string name="settings.testing_ok">Verbindung OK</string>
-    <string name="settings.testing_unlicensed">Verbindung OK, Server nicht lizenziert.</string>
     <string name="settings.theme_light">Hell</string>
     <string name="settings.theme_dark">Dunkel</string>
     <string name="settings.theme_black">Schwarz</string>

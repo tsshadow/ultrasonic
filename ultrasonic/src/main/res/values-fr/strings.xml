@@ -194,7 +194,6 @@
     <string name="settings.clear_bookmark">Effacer le signet</string>
     <string name="settings.clear_bookmark_summary">Effacer le signet à la fin de la lecture d\'un titre</string>
     <string name="settings.clear_search_history">Effacer l\'historique des recherches</string>
-    <string name="settings.connection_failure">Échec de la connexion</string>
     <string name="settings.default_albums">Albums par défaut</string>
     <string name="settings.default_artists">Artistes par défaut</string>
     <string name="settings.default_songs">Musiques par défaut</string>
@@ -291,8 +290,6 @@
     <string name="settings.show_track_number">Afficher le numéro du titre</string>
     <string name="settings.show_track_number_summary">Inclure son numéro lors de l\'affichage d\'un titre</string>
     <string name="settings.test_connection_title">Tester la connexion</string>
-    <string name="settings.testing_ok">Connexion correcte</string>
-    <string name="settings.testing_unlicensed">Connexion correcte. Serveur sans licence.</string>
     <string name="settings.theme_light">Clair</string>
     <string name="settings.theme_dark">Sombre</string>
     <string name="settings.theme_black">Noir</string>

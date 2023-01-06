@@ -214,7 +214,9 @@ class ActiveServerProvider(
             bookmarkSupport = false,
             podcastSupport = false,
             shareSupport = false,
-            chatSupport = false
+            chatSupport = false,
+            videoSupport = false,
+            jukeboxSupport = false
         )
 
         /**

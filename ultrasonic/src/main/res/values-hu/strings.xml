@@ -163,7 +163,6 @@
     <string name="settings.clear_bookmark">Könyvjelző törlése</string>
     <string name="settings.clear_bookmark_summary">Könyvjelző törlése a dal lejátszása után.</string>
     <string name="settings.clear_search_history">Keresési előzmények törlése</string>
-    <string name="settings.connection_failure">Csatlakozási hiba!</string>
     <string name="settings.default_albums">Albumok találati száma</string>
     <string name="settings.default_artists">Előadók találati száma</string>
     <string name="settings.default_songs">Dalok találati száma</string>
@@ -256,8 +255,6 @@
     <string name="settings.show_track_number">Sorszám megjelenítése</string>
     <string name="settings.show_track_number_summary">Dalok sorszámának megjelenítése.</string>
     <string name="settings.test_connection_title">Kapcsolat tesztelése</string>
-    <string name="settings.testing_ok">Kapcsolat OK!</string>
-    <string name="settings.testing_unlicensed">Kapcsolat OK! A kiszolgálónak nincs licence!</string>
     <string name="settings.theme_light">Világos</string>
     <string name="settings.theme_dark">Sötét</string>
     <string name="settings.theme_black">Fekete</string>

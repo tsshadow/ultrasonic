@@ -172,9 +172,6 @@ class NavigationActivity : AppCompatActivity() {
             } else {
                 if (!nowPlayingHidden) showNowPlaying()
             }
-
-            // Hides menu items for Offline mode
-            setMenuForServerCapabilities()
         }
 
         // Determine if this is a first run
@@ -207,6 +204,7 @@ class NavigationActivity : AppCompatActivity() {
 
         rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
             updateNavigationHeaderForServer()
+            setMenuForServerCapabilities()
         }
 
         serverRepository.liveServerCount().observe(this) { count ->
@@ -506,6 +504,6 @@ class NavigationActivity : AppCompatActivity() {
         podcastsMenuItem?.isVisible = activeServer.podcastSupport != false
         playlistsMenuItem?.isVisible = isOnline
         downloadsMenuItem?.isVisible = isOnline
-        videoMenuItem?.isVisible = isOnline
+        videoMenuItem?.isVisible = activeServer.videoSupport != false
     }
 }

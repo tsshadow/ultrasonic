@@ -13,8 +13,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -23,32 +26,25 @@ import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.flag.BubbleFlag
 import com.skydoves.colorpickerview.flag.FlagMode
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
-import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
-import java.util.Locale
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
-import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions
-import org.moire.ultrasonic.api.subsonic.SubsonicClientConfiguration
-import org.moire.ultrasonic.api.subsonic.SubsonicRESTException
-import org.moire.ultrasonic.api.subsonic.falseOnFailure
-import org.moire.ultrasonic.api.subsonic.response.SubsonicResponse
-import org.moire.ultrasonic.api.subsonic.throwOnFailure
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ServerSetting
+import org.moire.ultrasonic.model.EditServerModel
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.service.MusicServiceFactory
-import org.moire.ultrasonic.util.Constants
+import org.moire.ultrasonic.util.CommunicationError.getErrorMessage
 import org.moire.ultrasonic.util.ErrorDialog
 import org.moire.ultrasonic.util.InfoDialog
-import org.moire.ultrasonic.util.ModalBackgroundTask
 import org.moire.ultrasonic.util.ServerColor
 import org.moire.ultrasonic.util.Util
-import retrofit2.Response
 import timber.log.Timber
 
 private const val DIALOG_PADDING = 12
@@ -78,6 +74,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
     private var selectedColor: Int? = null
 
     private val navArgs by navArgs<EditServerFragmentArgs>()
+    val model: EditServerModel by viewModels()
 
     @Override
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -372,149 +369,82 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
     /**
      * Tests if the network connection to the entered Server Settings can be made
      */
+    @Suppress("TooGenericExceptionCaught")
     private fun testConnection() {
-        val task: ModalBackgroundTask<String> = object : ModalBackgroundTask<String>(
-            activity,
-            false
-        ) {
-            fun boolToMark(value: Boolean?): String {
-                if (value == null)
-                    return "⌛"
-                return if (value) "✔️" else "❌"
-            }
+        val testSetting = ServerSetting()
+        val builder = InfoDialog.Builder(requireContext())
+        builder.setTitle(R.string.supported_server_features)
+        builder.setMessage(getProgress(testSetting))
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
 
-            fun getProgress(): String {
-                return String.format(
-                    """
+        val testJob = lifecycleScope.launch {
+            try {
+                val flow = model.queryFeatureSupport(currentServerSetting!!).flowOn(Dispatchers.IO)
+
+                flow.collect {
+                    model.storeFeatureSupport(testSetting, it)
+                    dialog.setMessage(getProgress(testSetting))
+                    Timber.w("${it.type} support: ${it.supported}")
+                }
+
+                currentServerSetting!!.chatSupport = testSetting.chatSupport
+                currentServerSetting!!.bookmarkSupport = testSetting.bookmarkSupport
+                currentServerSetting!!.shareSupport = testSetting.shareSupport
+                currentServerSetting!!.podcastSupport = testSetting.podcastSupport
+                currentServerSetting!!.videoSupport = testSetting.videoSupport
+                currentServerSetting!!.jukeboxSupport = testSetting.jukeboxSupport
+            } catch (cancellationException: CancellationException) {
+                Timber.i(cancellationException)
+            } catch (exception: Exception) {
+                dialog.dismiss()
+                Timber.w(exception)
+                ErrorDialog.Builder(requireContext())
+                    .setTitle(R.string.error_label)
+                    .setMessage(getErrorMessage(exception, context))
+                    .show()
+            }
+        }
+
+        dialog.setOnDismissListener { testJob.cancel() }
+    }
+
+    private fun getProgress(serverSetting: ServerSetting): String {
+        val isAnyDisabled = arrayOf(
+            serverSetting.chatSupport,
+            serverSetting.bookmarkSupport,
+            serverSetting.shareSupport,
+            serverSetting.podcastSupport,
+            serverSetting.videoSupport,
+            serverSetting.jukeboxSupport,
+        ).any { x -> x == false }
+
+        var progressString = String.format(
+            """
                     |%s - ${resources.getString(R.string.button_bar_chat)}
                     |%s - ${resources.getString(R.string.button_bar_bookmarks)}
                     |%s - ${resources.getString(R.string.button_bar_shares)}
                     |%s - ${resources.getString(R.string.button_bar_podcasts)}
+                    |%s - ${resources.getString(R.string.main_videos)}
+                    |%s - ${resources.getString(R.string.jukebox)}
                     """.trimMargin(),
-                    boolToMark(currentServerSetting!!.chatSupport),
-                    boolToMark(currentServerSetting!!.bookmarkSupport),
-                    boolToMark(currentServerSetting!!.shareSupport),
-                    boolToMark(currentServerSetting!!.podcastSupport)
-                )
-            }
+            boolToMark(serverSetting.chatSupport),
+            boolToMark(serverSetting.bookmarkSupport),
+            boolToMark(serverSetting.shareSupport),
+            boolToMark(serverSetting.podcastSupport),
+            boolToMark(serverSetting.videoSupport),
+            boolToMark(serverSetting.jukeboxSupport)
+        )
+        if (isAnyDisabled)
+            progressString += "\n\n" + resources.getString(R.string.server_editor_disabled_feature)
 
-            @Throws(Throwable::class)
-            override fun doInBackground(): String {
-
-                currentServerSetting!!.chatSupport = null
-                currentServerSetting!!.bookmarkSupport = null
-                currentServerSetting!!.shareSupport = null
-                currentServerSetting!!.podcastSupport = null
-
-                updateProgress(getProgress())
-
-                val configuration = SubsonicClientConfiguration(
-                    currentServerSetting!!.url,
-                    currentServerSetting!!.userName,
-                    currentServerSetting!!.password,
-                    SubsonicAPIVersions.getClosestKnownClientApiVersion(
-                        Constants.REST_PROTOCOL_VERSION
-                    ),
-                    Constants.REST_CLIENT_ID,
-                    currentServerSetting!!.allowSelfSignedCertificate,
-                    currentServerSetting!!.forcePlainTextPassword,
-                    BuildConfig.DEBUG
-                )
-                val subsonicApiClient = SubsonicAPIClient(configuration)
-
-                // Execute a ping to retrieve the API version.
-                // This is accepted to fail if the authentication is incorrect yet.
-                var pingResponse = subsonicApiClient.api.ping().execute()
-                if (pingResponse.body() != null) {
-                    val restApiVersion = pingResponse.body()!!.version.restApiVersion
-                    currentServerSetting!!.minimumApiVersion = restApiVersion
-                    Timber.i("Server minimum API version set to %s", restApiVersion)
-                }
-
-                // Execute a ping to check the authentication, now using the correct API version.
-                pingResponse = subsonicApiClient.api.ping().execute()
-                pingResponse.throwOnFailure()
-
-                currentServerSetting!!.chatSupport = isServerFunctionAvailable {
-                    subsonicApiClient.api.getChatMessages().execute()
-                }
-
-                updateProgress(getProgress())
-
-                currentServerSetting!!.bookmarkSupport = isServerFunctionAvailable {
-                    subsonicApiClient.api.getBookmarks().execute()
-                }
-
-                updateProgress(getProgress())
-
-                currentServerSetting!!.shareSupport = isServerFunctionAvailable {
-                    subsonicApiClient.api.getShares().execute()
-                }
-
-                updateProgress(getProgress())
-
-                currentServerSetting!!.podcastSupport = isServerFunctionAvailable {
-                    subsonicApiClient.api.getPodcasts().execute()
-                }
-
-                updateProgress(getProgress())
-
-                val licenseResponse = subsonicApiClient.api.getLicense().execute()
-                licenseResponse.throwOnFailure()
-
-                if (!licenseResponse.body()!!.license.valid) {
-                    return getProgress() + "\n" +
-                        resources.getString(R.string.settings_testing_unlicensed)
-                }
-                return getProgress()
-            }
-
-            override fun done(responseString: String) {
-                var dialogText = responseString
-                if (arrayOf(
-                        currentServerSetting!!.chatSupport,
-                        currentServerSetting!!.bookmarkSupport,
-                        currentServerSetting!!.shareSupport,
-                        currentServerSetting!!.podcastSupport
-                    ).any { x -> x == false }
-                ) {
-                    dialogText = String.format(
-                        Locale.ROOT,
-                        "%s\n\n%s",
-                        responseString,
-                        resources.getString(R.string.server_editor_disabled_feature)
-                    )
-                }
-
-                InfoDialog.Builder(requireActivity())
-                    .setTitle(R.string.settings_testing_ok)
-                    .setMessage(dialogText)
-                    .show()
-            }
-
-            override fun error(error: Throwable) {
-                Timber.w(error)
-                ErrorDialog(
-                    context = activity,
-                    message = String.format(
-                        "%s %s",
-                        resources.getString(R.string.settings_connection_failure),
-                        getErrorMessage(error)
-                    )
-                ).show()
-            }
-        }
-        task.execute()
+        return progressString
     }
 
-    private fun isServerFunctionAvailable(function: () -> Response<out SubsonicResponse>): Boolean {
-        return try {
-            function().falseOnFailure()
-        } catch (_: IOException) {
-            false
-        } catch (_: SubsonicRESTException) {
-            false
-        }
+    private fun boolToMark(value: Boolean?): String {
+        if (value == null)
+            return "⌛"
+        return if (value) "✔️" else "❌"
     }
 
     /**
@@ -522,7 +452,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
      */
     private fun finishActivity() {
         if (areFieldsChanged()) {
-            ErrorDialog.Builder(context)
+            ErrorDialog.Builder(requireContext())
                 .setTitle(R.string.common_confirm)
                 .setMessage(R.string.server_editor_leave_confirmation)
                 .setPositiveButton(R.string.common_ok) { dialog, _ ->

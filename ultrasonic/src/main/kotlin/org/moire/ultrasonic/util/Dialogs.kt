@@ -8,10 +8,14 @@
 package org.moire.ultrasonic.util
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.moire.ultrasonic.R
 
+/*
+ * InfoDialog can be used to show some information to the user. Typically it cannot be cancelled,
+ * only dismissed via OK.
+ */
 open class InfoDialog(
     context: Context,
     message: CharSequence?,
@@ -19,7 +23,7 @@ open class InfoDialog(
     private val finishActivityOnClose: Boolean = false
 ) {
 
-    open var builder: AlertDialog.Builder = Builder(activity ?: context, message)
+    open var builder: MaterialAlertDialogBuilder = Builder(activity ?: context, message)
 
     fun show() {
         builder.setOnCancelListener {
@@ -35,7 +39,7 @@ open class InfoDialog(
         builder.create().show()
     }
 
-    class Builder(context: Context?) : AlertDialog.Builder(context) {
+    class Builder(context: Context) : MaterialAlertDialogBuilder(context) {
 
         constructor(context: Context, message: CharSequence?) : this(context) {
             setMessage(message)
@@ -44,7 +48,6 @@ open class InfoDialog(
         init {
             setIcon(R.drawable.ic_baseline_info)
             setTitle(R.string.common_confirm)
-            setCancelable(true)
             setPositiveButton(R.string.common_ok) { _, _ ->
                 // Just close it
             }
@@ -52,6 +55,10 @@ open class InfoDialog(
     }
 }
 
+/*
+ * ErrorDialog can be used to show some an error to the user.
+ * Typically it cannot be cancelled, only dismissed via OK.
+ */
 class ErrorDialog(
     context: Context,
     message: CharSequence?,
@@ -59,9 +66,9 @@ class ErrorDialog(
     finishActivityOnClose: Boolean = false
 ) : InfoDialog(context, message, activity, finishActivityOnClose) {
 
-    override var builder: AlertDialog.Builder = Builder(activity ?: context, message)
+    override var builder: MaterialAlertDialogBuilder = Builder(activity ?: context, message)
 
-    class Builder(context: Context?) : AlertDialog.Builder(context) {
+    class Builder(context: Context) : MaterialAlertDialogBuilder(context) {
         constructor(context: Context, message: CharSequence?) : this(context) {
             setMessage(message)
         }
@@ -69,7 +76,6 @@ class ErrorDialog(
         init {
             setIcon(R.drawable.ic_baseline_warning)
             setTitle(R.string.error_label)
-            setCancelable(true)
             setPositiveButton(R.string.common_ok) { _, _ ->
                 // Just close it
             }
@@ -77,6 +83,10 @@ class ErrorDialog(
     }
 }
 
+/*
+ * ConfirmationDialog can be used to present a choice to the user.
+ * Typically it will be cancelable..
+ */
 class ConfirmationDialog(
     context: Context,
     message: CharSequence?,
@@ -84,9 +94,9 @@ class ConfirmationDialog(
     finishActivityOnClose: Boolean = false
 ) : InfoDialog(context, message, activity, finishActivityOnClose) {
 
-    override var builder: AlertDialog.Builder = Builder(activity ?: context, message)
+    override var builder: MaterialAlertDialogBuilder = Builder(activity ?: context, message)
 
-    class Builder(context: Context?) : AlertDialog.Builder(context) {
+    class Builder(context: Context) : MaterialAlertDialogBuilder(context) {
         constructor(context: Context, message: CharSequence?) : this(context) {
             setMessage(message)
         }

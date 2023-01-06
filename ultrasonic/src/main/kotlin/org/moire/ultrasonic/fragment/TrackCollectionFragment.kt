@@ -229,7 +229,7 @@ open class TrackCollectionFragment(
 
         unpinButton?.setOnClickListener {
             if (Settings.showConfirmationDialog) {
-                ConfirmationDialog.Builder(context)
+                ConfirmationDialog.Builder(requireContext())
                     .setMessage(R.string.common_unpin_selection_confirmation)
                     .setPositiveButton(R.string.common_unpin) { _, _ ->
                         unpin()
@@ -245,7 +245,7 @@ open class TrackCollectionFragment(
 
         deleteButton?.setOnClickListener {
             if (Settings.showConfirmationDialog) {
-                ConfirmationDialog.Builder(context)
+                ConfirmationDialog.Builder(requireContext())
                     .setMessage(R.string.common_delete_selection_confirmation)
                     .setPositiveButton(R.string.common_delete) { _, _ ->
                         delete()

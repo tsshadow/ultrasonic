@@ -7,7 +7,7 @@
 
 package org.moire.ultrasonic.subsonic
 
-import android.app.AlertDialog
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -27,6 +27,7 @@ import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.BackgroundTask
 import org.moire.ultrasonic.util.CancellationToken
+import org.moire.ultrasonic.util.ConfirmationDialog
 import org.moire.ultrasonic.util.FragmentBackgroundTask
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.ShareDetails
@@ -150,6 +151,8 @@ class ShareHandler(val context: Context) {
         }
     }
 
+    @Suppress("LongMethod")
+    @SuppressLint("InflateParams")
     private fun showDialog(
         fragment: Fragment,
         shareDetails: ShareDetails,
@@ -184,7 +187,7 @@ class ShareHandler(val context: Context) {
         }
         updateVisibility()
 
-        val builder = AlertDialog.Builder(fragment.context)
+        val builder = ConfirmationDialog.Builder(fragment.requireContext())
         builder.setTitle(R.string.share_set_share_options)
 
         builder.setPositiveButton(R.string.menu_share) { _, _ ->

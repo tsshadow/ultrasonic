@@ -157,7 +157,6 @@
     <string name="settings.clear_bookmark">Zahodit záložku</string>
     <string name="settings.clear_bookmark_summary">Zahodit záložku po dokončení přehrávání skladby</string>
     <string name="settings.clear_search_history">Vyčistit historii vyhledávání</string>
-    <string name="settings.connection_failure">Chyba připojení.</string>
     <string name="settings.default_albums">Výchozí alba</string>
     <string name="settings.default_artists">Výchozí umělci</string>
     <string name="settings.default_songs">Výchozí skladby</string>
@@ -248,8 +247,6 @@
     <string name="settings.show_track_number">Zobrazovat číslo skladby</string>
     <string name="settings.show_track_number_summary">Připojovat číslo skladby při zobrazování skladby</string>
     <string name="settings.test_connection_title">Test připojení</string>
-    <string name="settings.testing_ok">Připojení je v pořádku</string>
-    <string name="settings.testing_unlicensed">Připojení je v pořádku. Server bez licence.</string>
     <string name="settings.theme_light">Světlý</string>
     <string name="settings.theme_dark">Tmavý</string>
     <string name="settings.theme_black">Černý</string>

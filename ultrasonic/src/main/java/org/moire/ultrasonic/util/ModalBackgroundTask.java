@@ -19,10 +19,8 @@
 package org.moire.ultrasonic.util;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-
+import androidx.appcompat.app.AlertDialog;
 import org.moire.ultrasonic.R;
-
 import timber.log.Timber;
 
 /**
@@ -47,9 +45,9 @@ public abstract class ModalBackgroundTask<T> extends BackgroundTask<T>
 		this(activity, true);
 	}
 
-	private AlertDialog createProgressDialog()
+	private androidx.appcompat.app.AlertDialog createProgressDialog()
 	{
-		AlertDialog.Builder builder = new InfoDialog.Builder(getActivity());
+		InfoDialog.Builder builder = new InfoDialog.Builder(getActivity().getApplicationContext());
 		builder.setTitle(R.string.background_task_wait);
 		builder.setMessage(R.string.background_task_loading);
 		builder.setOnCancelListener(dialogInterface -> cancel());

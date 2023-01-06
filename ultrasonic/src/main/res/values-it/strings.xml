@@ -154,7 +154,6 @@
     <string name="settings.clear_bookmark">Pulisci Segnalibro</string>
     <string name="settings.clear_bookmark_summary">Pulisci segnalibro al completamento della riproduzione di una canzone</string>
     <string name="settings.clear_search_history">Pulisci Storico Ricerca</string>
-    <string name="settings.connection_failure">Errore connessione.</string>
     <string name="settings.default_albums">Album predefiniti</string>
     <string name="settings.default_artists">Artisti predefiniti</string>
     <string name="settings.default_songs">Canzoni predefinte</string>
@@ -240,8 +239,6 @@
     <string name="settings.show_track_number">Visualizza numero traccia</string>
     <string name="settings.show_track_number_summary">Includi numero traccia quando visualizzi una canzone</string>
     <string name="settings.test_connection_title">Prova Connessione</string>
-    <string name="settings.testing_ok">Connessione OK</string>
-    <string name="settings.testing_unlicensed">Connessione OK. Server senza licenza.</string>
     <string name="settings.theme_light">Chiaro</string>
     <string name="settings.theme_dark">Scuro</string>
     <string name="settings.theme_title">Tema</string>

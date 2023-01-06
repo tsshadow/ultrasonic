@@ -198,7 +198,6 @@
     <string name="settings.clear_bookmark">Bladwijzer verwijderen</string>
     <string name="settings.clear_bookmark_summary">Bladwijzer verwijderen nadat nummer is afgespeeld</string>
     <string name="settings.clear_search_history">Zoekgeschiedenis wissen</string>
-    <string name="settings.connection_failure">Verbindingsfout.</string>
     <string name="settings.default_albums">Standaardalbums</string>
     <string name="settings.default_artists">Standaardartiesten</string>
     <string name="settings.default_songs">Standaardnummers</string>
@@ -299,8 +298,6 @@
     <string name="settings.show_track_number">Itemnummer tonen</string>
     <string name="settings.show_track_number_summary">Itemnummer tonen tijdens tonen van nummers</string>
     <string name="settings.test_connection_title">Verbinding testen</string>
-    <string name="settings.testing_ok">Verbinding is goed</string>
-    <string name="settings.testing_unlicensed">Verbinding is goed; geen serverlicentie.</string>
     <string name="settings.theme_day_night">Dag en nacht</string>
     <string name="settings.theme_light">Licht</string>
     <string name="settings.theme_dark">Donker</string>
