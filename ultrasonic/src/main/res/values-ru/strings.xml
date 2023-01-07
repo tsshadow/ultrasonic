@@ -64,7 +64,6 @@
     <string name="download.menu_jukebox_off">Jukebox выключен</string>
     <string name="download.menu_jukebox_on">Jukebox включен</string>
     <string name="download.menu_lyrics">Тексты</string>
-    <string name="download.menu_remove">Удалить песню</string>
     <string name="download.menu_save">Сохранить плейлист</string>
     <string name="download.menu_screen_off">Отключение дисплея</string>
     <string name="download.menu_screen_on">Включение дисплея</string>

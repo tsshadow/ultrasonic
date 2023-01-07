@@ -31,6 +31,10 @@
         <item>@string/settings.preload_3</item>
         <item>@string/settings.preload_5</item>
         <item>@string/settings.preload_10</item>
+        <item>@string/settings.preload_50</item>
+        <item>@string/settings.preload_100</item>
+        <item>@string/settings.preload_500</item>
+        <item>@string/settings.preload_1000</item>
         <item>@string/settings.preload_unlimited</item>
     </string-array>
     <string-array name="cacheSizeValues" translatable="false">
