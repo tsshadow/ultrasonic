@@ -68,7 +68,6 @@
     <string name="download.menu_jukebox_off">Apagar Jukebox</string>
     <string name="download.menu_jukebox_on">Encender Jukebox</string>
     <string name="download.menu_lyrics">Letras</string>
-    <string name="download.menu_remove">Quitar canción</string>
     <string name="download.menu_save">Guardar lista de reproducción</string>
     <string name="download.menu_screen_off">Pantalla apagada</string>
     <string name="download.menu_screen_on">Pantalla encendida</string>

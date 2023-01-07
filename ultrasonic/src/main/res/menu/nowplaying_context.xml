@@ -11,9 +11,6 @@
         a:id="@+id/menu_lyrics"
         a:title="@string/download.menu_lyrics"/>
     <item
-        a:id="@+id/menu_remove"
-        a:title="@string/download.menu_remove"/>
-    <item
         a:id="@+id/menu_shuffle"
         a:title="@string/download.menu_shuffle"/>
 

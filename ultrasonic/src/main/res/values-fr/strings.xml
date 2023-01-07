@@ -67,7 +67,6 @@
     <string name="download.menu_jukebox_off">Désactiver le mode jukebox</string>
     <string name="download.menu_jukebox_on">Activer le mode jukebox</string>
     <string name="download.menu_lyrics">Paroles</string>
-    <string name="download.menu_remove">Retirer le morceau</string>
     <string name="download.menu_save">Enregistrer la playlist</string>
     <string name="download.menu_screen_off">Désactiver l\'écran</string>
     <string name="download.menu_screen_on">Sur l\'écran</string>

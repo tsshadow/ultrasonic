@@ -610,10 +610,6 @@ class PlayerFragment :
                 Navigation.findNavController(requireView()).navigate(action)
                 return true
             }
-            R.id.menu_remove -> {
-                onPlaylistChanged()
-                return true
-            }
             R.id.menu_item_screen_on_off -> {
                 val window = requireActivity().window
                 if (mediaPlayerController.keepScreenOn) {

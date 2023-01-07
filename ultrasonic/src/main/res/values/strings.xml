@@ -68,7 +68,6 @@
     <string name="download.menu_jukebox_off">Jukebox Off</string>
     <string name="download.menu_jukebox_on">Jukebox On</string>
     <string name="download.menu_lyrics">Lyrics</string>
-    <string name="download.menu_remove">Remove Song</string>
     <string name="download.menu_save">Save Playlist</string>
     <string name="download.menu_screen_off">Screen Off</string>
     <string name="download.menu_screen_on">Screen On</string>
@@ -267,6 +266,10 @@
     <string name="settings.preload_2">2 songs</string>
     <string name="settings.preload_3">3 songs</string>
     <string name="settings.preload_5">5 songs</string>
+    <string name="settings.preload_50">50 songs</string>
+    <string name="settings.preload_100">100 songs</string>
+    <string name="settings.preload_500">500 songs</string>
+    <string name="settings.preload_1000">1000 songs</string>
     <string name="settings.preload_unlimited">Unlimited</string>
     <string name="settings.scrobble_summary">Remember to set up your user and password in the Scrobble service(s) on the server</string>
     <string name="settings.scrobble_title">Scrobble my plays</string>

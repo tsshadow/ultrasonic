@@ -38,14 +38,9 @@ public abstract class LoadingTask<T> extends BackgroundTask<T>
 						return;
 					}
 
-					getHandler().post(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							swipe.setRefreshing(false);
-							done(result);
-						}
+					getHandler().post(() -> {
+						swipe.setRefreshing(false);
+						done(result);
 					});
 				}
 				catch (final Throwable t)
@@ -55,14 +50,9 @@ public abstract class LoadingTask<T> extends BackgroundTask<T>
 						return;
 					}
 
-					getHandler().post(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							swipe.setRefreshing(false);
-							error(t);
-						}
+					getHandler().post(() -> {
+						swipe.setRefreshing(false);
+						error(t);
 					});
 				}
 			}
