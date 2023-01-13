@@ -265,8 +265,8 @@ class StorageFile(
             val createdUri = DocumentsContract.createDocument(
                 UApp.applicationContext().contentResolver,
                 parent.uri,
-                mimeTypeMap.getMimeTypeFromExtension(name.extension())!!,
-                name.withoutExtension()
+                "*/*",
+                name
             ) ?: throw IOException("Can't create file")
 
             return StorageFile(parent, createdUri, name, false)
