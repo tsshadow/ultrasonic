@@ -328,7 +328,7 @@ class DownloadService : Service(), KoinComponent {
             }
 
             filteredTracks = filteredTracks.filter {
-                !downloadQueue.contains(it.id) && !activeDownloads.contains(it.id)
+                !downloadQueue.any { i -> i.id == it.id } && !activeDownloads.containsKey(it.id)
             }
 
             // The remainder tracks should be added to the download queue
