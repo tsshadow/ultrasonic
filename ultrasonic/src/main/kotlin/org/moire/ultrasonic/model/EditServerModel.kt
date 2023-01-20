@@ -119,13 +119,13 @@ class EditServerModel(val app: Application) : AndroidViewModel(app), KoinCompone
 
         // Execute a ping to retrieve the API version.
         // This is accepted to fail if the authentication is incorrect yet.
-        var pingResponse = client.api.pingSuspend()
+        val pingResponse = client.api.pingSuspend()
         val restApiVersion = pingResponse.version.restApiVersion
         serverSetting.minimumApiVersion = restApiVersion
         Timber.i("Server minimum API version set to %s", restApiVersion)
 
         // Execute a ping to check the authentication, now using the correct API version.
-        pingResponse = client.api.pingSuspend()
+        client.api.pingSuspend()
         return client
     }
 
