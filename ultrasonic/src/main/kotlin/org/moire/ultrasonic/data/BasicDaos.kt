@@ -5,8 +5,8 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.MusicFolder
 
@@ -51,41 +51,6 @@ interface IndexDao : GenericDao<Index> {
      */
     @Query("SELECT * FROM indexes where musicFolderId LIKE :musicFolderId")
     fun get(musicFolderId: String): List<Index>
-
-    /**
-     * TODO: Make generic
-     * Upserts (insert or update) an object to the database
-     *
-     * @param obj the object to upsert
-     */
-    @Transaction
-    @JvmSuppressWildcards
-    fun upsert(obj: Index) {
-        val id = insertIgnoring(obj)
-        if (id == -1L) {
-            update(obj)
-        }
-    }
-
-    /**
-     * Upserts (insert or update) a list of objects
-     *
-     * @param objList the object to be upserted
-     */
-    @Transaction
-    @JvmSuppressWildcards
-    fun upsert(objList: List<Index>) {
-        val insertResult = insertIgnoring(objList)
-        val updateList: MutableList<Index> = ArrayList()
-        for (i in insertResult.indices) {
-            if (insertResult[i] == -1L) {
-                updateList.add(objList[i])
-            }
-        }
-        if (updateList.isNotEmpty()) {
-            update(updateList)
-        }
-    }
 }
 
 interface GenericDao<T> {
@@ -154,4 +119,20 @@ interface GenericDao<T> {
     @Delete
     @JvmSuppressWildcards
     fun delete(obj: T)
+
+    /**
+     * Upserts (insert or update) an object to the database
+     *
+     * @param obj the object to upsert
+     */
+    @Upsert
+    fun upsert(obj: T)
+
+    /**
+     * Upserts (insert or update) a list of objects
+     *
+     * @param objList the object to be upserted
+     */
+    @Upsert
+    fun upsert(objList: List<T>)
 }

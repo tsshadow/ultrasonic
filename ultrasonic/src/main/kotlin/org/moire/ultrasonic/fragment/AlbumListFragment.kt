@@ -76,14 +76,13 @@ class AlbumListFragment(
     }
 
     private fun fetchAlbums(refresh: Boolean = navArgs.refresh, append: Boolean = navArgs.append) {
-        val refresh = navArgs.refresh || refresh
 
         listModel.viewModelScope.launch(handler) {
             refreshListView?.isRefreshing = true
 
             if (navArgs.byArtist) {
                 listModel.getAlbumsOfArtist(
-                    refresh = navArgs.refresh,
+                    refresh = refresh,
                     id = navArgs.id!!,
                     name = navArgs.title
                 )
@@ -184,6 +183,12 @@ class AlbumListFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Setup refresh handler
+        refreshListView = view.findViewById(refreshListId)
+        refreshListView?.setOnRefreshListener {
+            fetchAlbums(refresh = true)
+        }
 
         // In most cases this fragment will be hosted by a ViewPager2 in the MainFragment,
         // which provides its own FilterBar.
