@@ -61,7 +61,7 @@
         a:focusable="false"
         a:scaleType="fitCenter"
         app:icon="@drawable/media_pause"
-        app:iconGravity="textTop"
+        app:iconGravity="textEnd"
         app:iconSize="42dp" />
 
 </LinearLayout>

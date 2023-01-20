@@ -20,7 +20,7 @@
         a:focusable="true"
         a:scaleType="fitCenter"
         app:icon="@drawable/media_shuffle"
-        app:iconGravity="textTop"
+        app:iconGravity="textEnd"
         app:iconSize="20dp" />
 
     <org.moire.ultrasonic.view.AutoRepeatButton
@@ -35,7 +35,7 @@
         a:focusable="true"
         a:scaleType="fitCenter"
         app:icon="@drawable/media_backward"
-        app:iconGravity="textTop"
+        app:iconGravity="textEnd"
         app:iconSize="32dp" />
 
     <Button
@@ -50,7 +50,7 @@
         tools:visibility="gone"
         a:contentDescription="@string/buttons.play"
         app:icon="@drawable/media_start"
-        app:iconGravity="textTop"
+        app:iconGravity="textEnd"
         app:iconSize="48dp" />
 
     <Button
@@ -64,7 +64,7 @@
         a:focusable="true"
         a:scaleType="fitCenter"
         app:icon="@drawable/media_pause"
-        app:iconGravity="textTop"
+        app:iconGravity="textEnd"
         app:iconSize="48dp" />
 
     <Button
@@ -79,7 +79,7 @@
         tools:visibility="gone"
         a:contentDescription="@string/buttons.stop"
         app:icon="@drawable/media_stop"
-        app:iconGravity="textTop"
+        app:iconGravity="textEnd"
         app:iconSize="48dp" />
 
     <org.moire.ultrasonic.view.AutoRepeatButton
@@ -94,7 +94,7 @@
         a:focusable="true"
         a:scaleType="fitCenter"
         app:icon="@drawable/media_forward"
-        app:iconGravity="textTop"
+        app:iconGravity="textEnd"
         app:iconSize="32dp" />
 
     <Button
@@ -109,7 +109,7 @@
         a:focusable="true"
         a:scaleType="fitCenter"
         app:icon="@drawable/media_repeat_off"
-        app:iconGravity="textTop"
+        app:iconGravity="textEnd"
         app:iconSize="20dp" />
 
     </LinearLayout>
