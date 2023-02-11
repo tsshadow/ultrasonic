@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
-    <string name="background_task.loading">Cargando&#8230;</string>
+    <string name="background_task.loading">Cargando…</string>
     <string name="background_task.network_error">Se ha producido un error de red. Por favor comprueba la dirección del servidor o reinténtalo mas tarde.</string>
     <string name="background_task.unsupported_api">La API del servidor v%1$s no soporta esta función.</string>
     <string name="background_task.no_network">Este programa requiere acceso a la red. Por favor enciende la Wi-Fi o la red móvil.</string>
@@ -9,7 +8,7 @@
     <string name="background_task.parse_error">No se entiende la respuesta. Por favor comprueba la dirección del servidor.</string>
     <string name="background_task.ssl_cert_error">Error del certificado HTTPS: %1$s.</string>
     <string name="background_task.ssl_error">Excepción de conexión SSL. Compruebe el certificado del servidor.</string>
-    <string name="background_task.wait">Por favor espera&#8230;</string>
+    <string name="background_task.wait">Por favor espera…</string>
     <string name="button_bar.bookmarks">Marcadores</string>
     <string name="button_bar.browse">Biblioteca</string>
     <string name="button_bar.chat">Chat</string>
@@ -80,7 +79,7 @@
     <string name="download.playlist_done">Lista de reproducción guardada con éxito.</string>
     <string name="download.playlist_error">Fallo al guardar la lista de reproducción, por favor reinténtalo mas tarde.</string>
     <string name="download.playlist_name">Introduce el nombre de la lista de reproducción:</string>
-    <string name="download.playlist_saving">Guardando lista de reproducción \"%s\"&#8230;</string>
+    <string name="download.playlist_saving">Guardando lista de reproducción \"%s\"…</string>
     <string name="download.playlist_title">Guardar lista de reproducción</string>
     <string name="download.repeat_all">Repetir todo</string>
     <string name="download.repeat_off">No repetir</string>
@@ -149,7 +148,7 @@
     <string name="search.songs">Canciones</string>
     <string name="search.title">Buscar</string>
     <string name="select_album.empty">No se han encontrado medios</string>
-    <string name="select_album.n_selected">%d pista(s) seleccionada(s).</string>
+    <string name="select_album.n_selected">%d pista(s) seleccionada(s)</string>
     <string name="select_album.no_network">Atención: No hay ninguna red utilizable disponible.\n Si estás utilizando datos móviles, es posible que tengas que permitir las descargas en conexiones con tarificación o en itinerancia en los ajustes.</string>
     <string name="select_album.no_sdcard">Error: No hay tarjeta SD disponible.</string>
     <string name="select_album.play_all">Reproducir todo</string>
@@ -260,12 +259,12 @@
     <string name="settings.playback.resume_play_on_headphones_plug.title">Reanudar al insertar los auriculares</string>
     <string name="settings.playback.resume_play_on_headphones_plug.summary">La aplicación reanudará la reproducción en pausa al insertar los auriculares en el dispositivo.</string>
     <string name="settings.preload">Canciones a precargar</string>
-    <string name="settings.parallel_downloads">¿Cuántas canciones se pueden descargar en paralelo?</string>
+    <string name="settings.parallel_downloads">Cuántas canciones se descargan en paralelo</string>
     <string name="settings.preload_1">1 canción</string>
-    <string name="settings.preload_10">10 canciónes</string>
-    <string name="settings.preload_2">2 canciónes</string>
-    <string name="settings.preload_3">3 canciónes</string>
-    <string name="settings.preload_5">5 canciónes</string>
+    <string name="settings.preload_10">10 canciones</string>
+    <string name="settings.preload_2">2 canciones</string>
+    <string name="settings.preload_3">3 canciones</string>
+    <string name="settings.preload_5">5 canciones</string>
     <string name="settings.preload_unlimited">Ilimitado</string>
     <string name="settings.scrobble_summary">Recuerda configurar tu nombre de usuario y contraseña en los servicios de Scrobble en el servidor</string>
     <string name="settings.scrobble_title">Hacer Scrobble de mis reproducciones</string>
@@ -390,7 +389,6 @@
     <string name="server_editor.advanced">Configuración avanzada</string>
     <string name="server_editor.disabled_feature">Una o más funciones se han deshabilitado porque el servidor no las admite.\nPuedes ejecutar esta prueba nuevamente en cualquier momento.</string>
     <string name="server_menu.demo">Servidor de demostración</string>
-
     <string name="about.webpage">Visitar la página web</string>
     <string name="about.report">Informar de un error</string>
     <string name="about.text"><b>Ultrasonic</b> es un cliente Android de streaming de música gratuito y de código abierto para servidores compatibles con la API de Subsonic (versión 1.7.0 o superior).\n\nCon <b>Ultrasonic</b> puede transmitir o descargar fácilmente música desde su ordenador de casa a su teléfono Android utilizando su servidor multimedia compatible con Subsonic. El software del servidor Subsonic requiere una configuración adicional aparte de Ultrasonic.\n\nPor defecto, Ultrasonic no está configurado. Una vez que hayas configurado tu propio servidor, cambia la configuración del servidor para que se conecte a tu propio ordenador.</string>
@@ -426,10 +424,9 @@
     </plurals>
     <plurals name="select_album_n_songs_play_next">
         <item quantity="one">%d canción insertada después de la canción actual</item>
-        <item quantity="many">%d canciones insertadas después de la canción actual.</item>
-        <item quantity="other">%d canciones insertadas después de la canción actual.</item>
+        <item quantity="many">%d canciones insertadas después de la canción actual</item>
+        <item quantity="other">%d canciones insertadas después de la canción actual</item>
     </plurals>
-
     <!-- Subsonic api errors -->
     <string name="api.subsonic.generic">Error genérico de api: %1$s</string>
     <string name="api.subsonic.generic.no.message">ningún mensaje dado desde el servidor</string>
@@ -441,15 +438,17 @@
     <string name="api.subsonic.trial_period_is_over">El período de prueba ha terminado.</string>
     <string name="api.subsonic.upgrade_client">Versiones incompatibles. Por favor actualiza la aplicación de Android Ultrasonic.</string>
     <string name="api.subsonic.upgrade_server">Versiones incompatibles. Por favor actualiza el servidor de Subsonic.</string>
-
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Use cinco estrellas para las canciones</string>
     <string name="settings.five_star_rating_description">Utilice el sistema de calificación de cinco estrellas para canciones en lugar de simplemente marcar / desmarcar elementos.</string>
-
     <string name="settings.use_hw_offload_title">Utilizar la reproducción por hardware (experimental)</string>
     <string name="settings.use_hw_offload_description">Intenta reproducir los medios utilizando el chip decodificador de medios de tu teléfono. Esto puede mejorar el uso de la batería.</string>
     <string name="list_view">Lista</string>
     <string name="grid_view">Portada</string>
-
-
+    <string name="settings.preload_100">100 canciones</string>
+    <string name="settings.preload_50">50 canciones</string>
+    <string name="settings.preload_1000">1000 canciones</string>
+    <string name="jukebox">Jukebox</string>
+    <string name="settings.preload_500">500 canciones</string>
+    <string name="supported_server_features">Funciones soportadas</string>
 </resources>
