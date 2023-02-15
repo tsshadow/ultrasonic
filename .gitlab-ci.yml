@@ -1,5 +1,5 @@
 default:
-  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/cimg/android:2022.12.1
+  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/cimg/android:2023.02.1
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
