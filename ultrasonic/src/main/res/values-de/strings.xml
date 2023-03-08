@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
-    <string name="background_task.loading">Lade&#8230;</string>
+    <string name="background_task.loading">Lade…</string>
     <string name="background_task.network_error">Ein Netzwerkfehler ist aufgetreten. Bitte die Serveradresse prüfen oder später noch einmal versuchen.</string>
     <string name="background_task.unsupported_api">Server api v%1$s does not support this function.</string>
     <string name="background_task.no_network">Dieses Programm benötigt eine Netzwerkverbindung. Bitte das WLAN oder Mobilfunk einschalten.</string>
@@ -9,7 +8,7 @@
     <string name="background_task.parse_error">Antwort nicht verstanden. Bitte die Serveradresse überprüfen.</string>
     <string name="background_task.ssl_cert_error">HTTPS Zertifikatsfehler: %1$s.</string>
     <string name="background_task.ssl_error">SSL Verbindungsfehler. Bitte das Serverzertifikat überprüfen.</string>
-    <string name="background_task.wait">Bitte warten&#8230; </string>
+    <string name="background_task.wait">Bitte warten… </string>
     <string name="button_bar.bookmarks">Lesezeichen</string>
     <string name="button_bar.browse">Medienbibliothek</string>
     <string name="button_bar.chat">Chat</string>
@@ -57,7 +56,7 @@
     <string name="download.bookmark_set_at_position" formatted="false">Lesezeichen gesetzt als %s.</string>
     <string name="download.empty">Es wird nichts heruntergeladen</string>
     <string name="playlist.empty">Wiedergabeliste ist leer</string>
-    <string name="download.jukebox_not_authorized">Fernbedienung ist nicht erlaubt. Bitte Jukebox Modus auf dem Subsonic Server in <b>Benutzer > Einstellungen</b> aktivieren.</string>
+    <string name="download.jukebox_not_authorized">Fernbedienung ist nicht erlaubt. Bitte Jukebox Modus auf dem Subsonic Server in <b>Benutzer &gt; Einstellungen</b> aktivieren.</string>
     <string name="download.jukebox_off">Fernbedienung ausgeschaltet. Musik wird auf dem Telefon wiedergegeben.</string>
     <string name="download.jukebox_offline">Fernbedienungs-Modus is Offline nicht verfügbar.</string>
     <string name="download.jukebox_on">Fernbedienung ausgeschaltet. Musik wird auf dem Server wiedergegeben.</string>
@@ -79,7 +78,7 @@
     <string name="download.playlist_done">Die Wiedergabeliste wurde gespeichert</string>
     <string name="download.playlist_error">Konnte die Wiedergabeliste nicht speichern, bitte später erneut versuchen.</string>
     <string name="download.playlist_name">Namen der Wiedergabeliste eingeben:</string>
-    <string name="download.playlist_saving">Speichere Wiedergabeliste %s&#8230;</string>
+    <string name="download.playlist_saving">Speichere Wiedergabeliste %s…</string>
     <string name="download.playlist_title">Wiedergabeliste speichern</string>
     <string name="download.repeat_all">Alles wiederholen</string>
     <string name="download.repeat_off">Wiederholen aus</string>
@@ -298,7 +297,7 @@
     <string name="settings.theme_light">Hell</string>
     <string name="settings.theme_dark">Dunkel</string>
     <string name="settings.theme_black">Schwarz</string>
-    <string name="settings.theme_title">Thema</string>
+    <string name="settings.theme_title">Farbschema</string>
     <string name="settings.title.allow_self_signed_certificate">Selbst-signierte HTTPS Zertifikate erlauben</string>
     <string name="settings.title.force_plain_text_password">Authentifizierung mit einfachem Passwort erzwingen</string>
     <string name="settings.summary.force_plain_text_password">Dies zwingt die App, das Kennwort immer unverschlüsselt zu senden. Hilfreich wenn der Subsonic Server keine Autorisierungs-API unterstützt.</string>
@@ -364,8 +363,8 @@
     <string name="settings.show_confirmation_dialog_summary">Zeigt einen Bestätigungsdialog vor dem Lösen oder Löschen von Liedern</string>
     <string name="settings.debug.title">Debug Optionen</string>
     <string name="settings.debug.log_to_file">Schreibe Debug Log in Datei</string>
-    <string name="settings.debug.log_path">Die Log Dateien sind unter %1$s/%2$s verfügbar</string>
-    <string name="settings.debug.log_summary">%1$s Log Dateien im Verzeichnis %3$s benötigen ~%2$s MB Speicherplatz. Möchtest Du die Dateien behalten?</string>
+    <string name="settings.debug.log_path">Die Protokolldateien sind verfügbar unter %1$s/%2$s</string>
+    <string name="settings.debug.log_summary">Es gibt %1$s Protokolldateien, die ~%2$s MB Speicherplatz im Verzeichnis %3$s einnehmen. Möchten Sie diese behalten\?</string>
     <string name="settings.debug.log_keep">Dateien behalten</string>
     <string name="settings.debug.log_delete">Dateien löschen</string>
     <string name="settings.debug.log_deleted">Logeinträge gelöscht</string>
@@ -384,7 +383,6 @@
     <string name="server_editor.advanced">Erweiterte Einstellungen</string>
     <string name="server_editor.disabled_feature">Einer oder mehrere Funktionen wurden deaktiviert, da der Server diese nicht unterstützt.\nDu kannst diesen Test jederzeit nochmals ausführen.</string>
     <string name="server_menu.demo">Demo Server</string>
-
     <string name="about.webpage">Website besuchen</string>
     <string name="about.report">Melde einen Fehler</string>
     <plurals name="select_album_n_songs">
@@ -415,7 +413,6 @@
         <item quantity="one">%d Titel nach aktuellen Titel hinzugefügt</item>
         <item quantity="other">%d Titel nach aktuellen Titel hinzugefügt</item>
     </plurals>
-
     <!-- Subsonic api errors -->
     <string name="api.subsonic.generic">Allgemeiner API Fehler: %1$s</string>
     <string name="api.subsonic.generic.no.message">Keine Nachricht vom Server erhalten</string>
@@ -427,9 +424,7 @@
     <string name="api.subsonic.trial_period_is_over">Der Testzeitraum ist abgelaufen.</string>
     <string name="api.subsonic.upgrade_client">Inkompatible Versionen. Bitte die Ultrasonic App aktualisieren.</string>
     <string name="api.subsonic.upgrade_server">Inkompatible Versionen. Bitte den Subsonic Server aktualisieren.</string>
-
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Fünf-Stern Bewertung</string>
     <string name="settings.five_star_rating_description">Benutze Bewertungssystem mit fünf Sternen, anstatt Lieder mit nur mit einem Stern zu markieren.</string>
-
-    </resources>
+</resources>

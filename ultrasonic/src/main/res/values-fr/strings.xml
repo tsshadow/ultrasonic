@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
-    <string name="background_task.loading">Chargement&#8230;</string>
+    <string name="background_task.loading">Chargement…</string>
     <string name="background_task.network_error">Une erreur réseau est survenue. Veuillez vérifier l\'adresse du serveur ou réessayer plus tard.</string>
     <string name="background_task.unsupported_api">L’API v%1$s du serveur ne supporte pas cette fonction.</string>
     <string name="background_task.no_network">Cette application requiert un accès au réseau. Veuillez activer le Wi-Fi ou le réseau mobile.</string>
@@ -9,7 +8,7 @@
     <string name="background_task.parse_error">Réponse incorrecte. Veuillez vérifier l\'adresse du serveur.</string>
     <string name="background_task.ssl_cert_error">Erreur de certificat HTTPS : %1$s.</string>
     <string name="background_task.ssl_error">Erreur de connexion SSL. Veuillez vérifier le certificat du serveur.</string>
-    <string name="background_task.wait">Veuillez patienter&#8230;</string>
+    <string name="background_task.wait">Veuillez patienter…</string>
     <string name="button_bar.bookmarks">Signets</string>
     <string name="button_bar.browse">Bibliothèque musicale</string>
     <string name="button_bar.chat">Salon de discussion</string>
@@ -77,7 +76,7 @@
     <string name="download.playlist_done">Playlist enregistrée avec succès !</string>
     <string name="download.playlist_error">Échec de l\'enregistrement de la playlist, veuillez réessayer plus tard.</string>
     <string name="download.playlist_name">Saisissez le nom de la playlist :</string>
-    <string name="download.playlist_saving">Enregistrement de la playlist \"%s\"&#8230;</string>
+    <string name="download.playlist_saving">Enregistrement de la playlist \"%s\"…</string>
     <string name="download.playlist_title">Enregistrer la playlist</string>
     <string name="download.repeat_all">Tout répéter</string>
     <string name="download.repeat_off">Répétition désactivée</string>
@@ -305,11 +304,11 @@
     <string name="settings.wifi_required_summary">Télécharger des médias uniquement sur des connexions non mesurées</string>
     <string name="settings.wifi_required_title">Téléchargement en Wifi uniquement</string>
     <string name="song_details.kbps">%d kbits/s</string>
-    <string name="util.bytes_format.byte">0 o</string>
-    <string name="util.bytes_format.gigabyte">0.00 Go</string>
-    <string name="util.bytes_format.kilobyte">0 Ko</string>
-    <string name="util.bytes_format.megabyte">0.00 Mo</string>
-    <string name="util.no_time" tools:ignore="TypographyDashes">&#8212;:&#8212;&#8212;</string>
+    <string name="util.bytes_format.byte">0 o</string>
+    <string name="util.bytes_format.gigabyte">0,00 Go</string>
+    <string name="util.bytes_format.kilobyte">0 ko</string>
+    <string name="util.bytes_format.megabyte">0,00 Mo</string>
+    <string name="util.no_time" tools:ignore="TypographyDashes">—:——</string>
     <string name="util.zero_time">0:00</string>
     <string name="widget.initial_text">Touchez pour sélectionner un titre</string>
     <string name="widget.sdcard_busy">Carte SD non disponible</string>
@@ -352,8 +351,8 @@
     <string name="common_multiple_years">Années multiples</string>
     <string name="settings.debug.title">Paramètres de debug</string>
     <string name="settings.debug.log_to_file">Enregistrer les logs de debug dans des fichiers</string>
-    <string name="settings.debug.log_path">Les fichiers de log sont disponibles dans %1$s/%2$s</string>
-    <string name="settings.debug.log_summary">Il y a %1$s fichiers de logs prenant %2$s MB  d’espace dans le répertoire %3$s. Souhaitez-vous les conserver ?</string>
+    <string name="settings.debug.log_path">Les fichiers de journalisation sont disponibles dans %1$s/%2$s</string>
+    <string name="settings.debug.log_summary">Il y a %1$s fichiers de journalisation prenant ~%2$s Mo d’espace dans le répertoire %3$s. Souhaitez-vous les conserver \?</string>
     <string name="settings.debug.log_keep">Conserver les fichiers</string>
     <string name="settings.debug.log_delete">Supprimer les fichiers</string>
     <string name="settings.debug.log_deleted">Fichiers de log supprimés</string>
@@ -362,7 +361,7 @@
     <string name="server_selector.delete_confirmation">Êtes-vous sûr de vouloir supprimer ce serveur ?</string>
     <string name="server_editor.label">Édition du serveur</string>
     <string name="server_editor.new_label">Ajouter un serveur</string>
-    <string name="server_editor.leave_confirmation">Êtes-vous sûr de vouloir quitter et perdre vos modifications ?</string>
+    <string name="server_editor.leave_confirmation">Êtes-vous sûr·e de vouloir quitter et perdre vos modifications \?</string>
     <string name="server_editor.required">Ce champ est requis</string>
     <string name="server_menu.edit">Éditer</string>
     <string name="server_menu.delete">Supprimer</string>
@@ -372,7 +371,6 @@
     <string name="server_editor.advanced">Paramètres avancés</string>
     <string name="server_editor.disabled_feature">Une ou plusieurs fonctionnalités ont été désactivées car le serveur ne les prend pas en charge.\nVous pouvez réexécuter ce test à tout moment.</string>
     <string name="server_menu.demo">Serveur de démo</string>
-
     <string name="about.webpage">Visiter la page web</string>
     <string name="about.report">Signaler un bug</string>
     <string name="about.text"><b>Ultrasonic</b> est un client Android de streaming musical gratuit et open-source pour les serveurs compatibles avec l\'API Subsonic (version 1.7.0 ou supérieure). Avec <b>Ultrasonic</b>, vous pouvez facilement diffuser ou télécharger de la musique depuis votre ordinateur personnel vers votre téléphone Android en utilisant votre serveur multimédia compatible Subsonic. Le logiciel du serveur Subsonic nécessite une configuration supplémentaire distincte d\'Ultrasonic. Par défaut, Ultrasonic n\'est pas configuré. Une fois que vous avez mis en place votre propre serveur, veuillez modifier la configuration du serveur afin qu\'il se connecte à votre ordinateur.</string>
@@ -392,7 +390,26 @@
     <string name="api.subsonic.trial_period_is_over">La période d\'essai est terminée.</string>
     <string name="api.subsonic.upgrade_client">Versions incompatibles. Veuillez mette à jour l\'application Android Ultrasonic.</string>
     <string name="api.subsonic.upgrade_server">Versions incompatibles. Veuillez mette à jour le serveur Subsonic.</string>
-
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Utiliser les étoiles pour noter les morceaux</string>
-    </resources>
+    <string name="main.albums_by_year">Chronologique</string>
+    <string name="grid_view">Reprise</string>
+    <string name="settings.preload_1000">1000 morceaux</string>
+    <string name="settings.preload_100">100 morceaux</string>
+    <string name="settings.preload_500">500 morceaux</string>
+    <string name="albumArt">Pochette d\'album</string>
+    <string name="settings.show_confirmation_dialog_summary">Affiche une boîte de dialogue de confirmation avant de supprimer ou de déprogrammer des chansons</string>
+    <string name="settings.preload_50">50 morceaux</string>
+    <string name="chat.user_avatar">Image d\'avatar</string>
+    <string name="settings.theme_day_night">Jour et nuit</string>
+    <plurals name="select_album_n_songs_added">
+        <item quantity="one">%d morceau ajouté à la file d\'attente de fin de lecture</item>
+        <item quantity="many">"%d morceaux  ajoutés à la file d\'attente de fin de lecture"</item>
+        <item quantity="other">%d morceaux ajoutés à la file d\'attente de fin de lecture</item>
+    </plurals>
+    <plurals name="select_album_n_songs_deleted">
+        <item quantity="one">%d morceau supprimé</item>
+        <item quantity="many">%d morceaux supprimés</item>
+        <item quantity="other">%d morceaux supprimés</item>
+    </plurals>
+</resources>
