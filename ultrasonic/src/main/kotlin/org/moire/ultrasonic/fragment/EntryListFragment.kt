@@ -13,12 +13,14 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.FolderSelectorBinder
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.GenericEntry
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.service.RxBus
+import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.util.Settings
 
@@ -28,6 +30,8 @@ import org.moire.ultrasonic.util.Settings
  * @param T: The type of data which will be used (must extend GenericEntry)
  */
 abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
+
+    private var rxBusSubscription: CompositeDisposable = CompositeDisposable()
 
     /**
      * Whether to show the folder selector
@@ -61,7 +65,7 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
         // because it can't be initialized from inside the callback
         serverSettingsModel.toString()
 
-        RxBus.musicFolderChangedEventObservable.subscribe {
+        rxBusSubscription += RxBus.musicFolderChangedEventObservable.subscribe {
             if (!listModel.isOffline()) {
                 val currentSetting = listModel.activeServer
                 currentSetting.musicFolderId = it.id
@@ -73,6 +77,11 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
         viewAdapter.register(
             FolderSelectorBinder(view.context)
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        rxBusSubscription.dispose()
     }
 
     /**

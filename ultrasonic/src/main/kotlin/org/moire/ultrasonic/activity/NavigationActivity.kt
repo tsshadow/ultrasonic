@@ -186,7 +186,7 @@ class NavigationActivity : AppCompatActivity() {
         // Ask for permission to send notifications
         Util.ensurePermissionToPostNotification(this)
 
-        RxBus.dismissNowPlayingCommandObservable.subscribe {
+        rxBusSubscription += RxBus.dismissNowPlayingCommandObservable.subscribe {
             nowPlayingHidden = true
             hideNowPlaying()
         }

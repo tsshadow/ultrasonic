@@ -16,6 +16,7 @@ import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import com.google.common.collect.ImmutableList
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
@@ -36,7 +37,7 @@ class CustomNotificationProvider(ctx: Context) :
 
     override fun addNotificationActions(
         mediaSession: MediaSession,
-        mediaButtons: MutableList<CommandButton>,
+        mediaButtons: ImmutableList<CommandButton>,
         builder: NotificationCompat.Builder,
         actionFactory: MediaNotification.ActionFactory
     ): IntArray {
@@ -73,18 +74,19 @@ class CustomNotificationProvider(ctx: Context) :
         }
         return super.addNotificationActions(
             mediaSession,
-            mediaButtons + tmp,
+            ImmutableList.copyOf((mediaButtons + tmp)),
             builder,
             actionFactory
         )
     }
 
     override fun getMediaButtons(
+        session: MediaSession,
         playerCommands: Player.Commands,
-        customLayout: MutableList<CommandButton>,
+        customLayout: ImmutableList<CommandButton>,
         playWhenReady: Boolean
-    ): MutableList<CommandButton> {
-        val commands = super.getMediaButtons(playerCommands, customLayout, playWhenReady)
+    ): ImmutableList<CommandButton> {
+        val commands = super.getMediaButtons(session, playerCommands, customLayout, playWhenReady)
 
         commands.forEachIndexed { index, command ->
             command.extras.putInt(COMMAND_KEY_COMPACT_VIEW_INDEX, index)

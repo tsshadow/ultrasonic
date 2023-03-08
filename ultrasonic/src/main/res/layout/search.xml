@@ -2,7 +2,18 @@
 <LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
     a:layout_width="match_parent"
     a:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     a:orientation="vertical">
+
+
+    <com.google.android.material.search.SearchView
+        a:layout_width="match_parent"
+        a:layout_height="match_parent"
+        a:hint="@string/search.title"
+        app:layout_anchor="@id/search_bar">
+        <!-- Search suggestions/results go here (ScrollView, RecyclerView, etc.). -->
+
+
 
     <include layout="@layout/list_parts_empty_view" />
 
@@ -19,5 +30,6 @@
             a:layout_weight="1.0" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </com.google.android.material.search.SearchView>
 
 </LinearLayout>
