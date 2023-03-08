@@ -18,7 +18,7 @@ jobs:
           command: echo This build will be done in GitLab CI
   Check Style:
     docker:
-      - image: cimg/android:2022.12.1
+      - image: cimg/android:2023.02.1
     working_directory: ~/ultrasonic
     environment:
       JVM_OPTS: << pipeline.parameters.memory-config >>
@@ -40,7 +40,7 @@ jobs:
           key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
   Static Analysis:
     docker:
-      - image: cimg/android:2022.12.1
+      - image: cimg/android:2023.02.1
     working_directory: ~/ultrasonic
     environment:
       JVM_OPTS: << pipeline.parameters.memory-config >>
@@ -62,7 +62,7 @@ jobs:
           key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
   Lint:
     docker:
-      - image: cimg/android:2022.12.1
+      - image: cimg/android:2023.02.1
     working_directory: ~/ultrasonic
     environment:
       JVM_OPTS: << pipeline.parameters.memory-config >>
@@ -84,7 +84,7 @@ jobs:
           key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
   Unit Tests:
     docker:
-      - image: cimg/android:2022.12.1
+      - image: cimg/android:2023.02.1
     working_directory: ~/ultrasonic
     environment:
       JVM_OPTS: << pipeline.parameters.memory-config >>
@@ -106,7 +106,7 @@ jobs:
           key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
   Assemble Debug:
     docker:
-      - image: cimg/android:2022.12.1
+      - image: cimg/android:2023.02.1
     working_directory: ~/ultrasonic
     environment:
       JVM_OPTS: << pipeline.parameters.memory-config >>
@@ -128,7 +128,7 @@ jobs:
           key: ultrasonic-{{ .Branch }}-{{ checksum "gradle/libs.versions.toml" }}
   Assemble Release:
     docker:
-      - image: cimg/android:2022.12.1
+      - image: cimg/android:2023.02.1
     working_directory: ~/ultrasonic
     environment:
       JVM_OPTS: << pipeline.parameters.memory-config >>
