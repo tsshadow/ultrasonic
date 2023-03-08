@@ -19,7 +19,7 @@ room                   = "2.5.0"
 kotlin                 = "1.8.10"
 kotlinxCoroutines      = "1.6.4"
 kotlinxGuava           = "1.6.4"
-viewModelKtx           = "2.5.1"
+viewModelKtx           = "2.6.0"
 swipeRefresh           = "1.1.0"
 
 retrofit               = "2.9.0"
