@@ -299,7 +299,9 @@ class PlayerFragment :
         }
 
         playButton.setOnClickListener {
-            networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
+            if (!mediaPlayerController.isJukeboxEnabled)
+                networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
+
             launch(CommunicationError.getHandler(context)) {
                 mediaPlayerController.play()
                 onCurrentChanged()

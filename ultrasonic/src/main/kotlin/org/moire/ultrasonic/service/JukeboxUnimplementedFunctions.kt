@@ -189,15 +189,7 @@ abstract class JukeboxUnimplementedFunctions : Service(), Player {
         TODO("Not yet implemented")
     }
 
-    override fun isCurrentMediaItemLive(): Boolean {
-        TODO("Not yet implemented")
-    }
-
     override fun isCurrentWindowSeekable(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun isCurrentMediaItemSeekable(): Boolean {
         TODO("Not yet implemented")
     }
 

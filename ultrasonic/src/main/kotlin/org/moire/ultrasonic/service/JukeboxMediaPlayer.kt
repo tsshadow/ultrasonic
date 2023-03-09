@@ -273,6 +273,10 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         seekTo((jukeboxStatus?.positionSeconds ?: 0) + SEEK_INCREMENT_SECONDS)
     }
 
+    override fun isCurrentMediaItemSeekable() = true
+
+    override fun isCurrentMediaItemLive() = false
+
     override fun prepare() {}
 
     override fun isPlaying(): Boolean {
