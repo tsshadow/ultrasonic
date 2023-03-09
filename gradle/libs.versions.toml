@@ -23,7 +23,7 @@ viewModelKtx           = "2.6.0"
 swipeRefresh           = "1.1.0"
 
 retrofit               = "2.9.0"
-jackson                = "2.14.1"
+jackson                = "2.14.2"
 okhttp                 = "4.10.0"
 koin                   = "3.3.3"
 picasso                = "2.8"
