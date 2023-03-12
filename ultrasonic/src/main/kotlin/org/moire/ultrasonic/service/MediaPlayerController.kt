@@ -388,15 +388,13 @@ class MediaPlayerController(
             result
         }
 
-        controller?.addMediaItems(insertAt, mediaItems)
-
         if (shuffle) isShufflePlayEnabled = true
+
+        controller?.addMediaItems(insertAt, mediaItems)
 
         prepare()
 
-        if (autoPlay) {
-            play(0)
-        }
+        if (autoPlay) play()
     }
 
     @Synchronized
