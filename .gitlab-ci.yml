@@ -19,6 +19,7 @@ variables:
 stages:
   - Check
   - Assemble
+  - Translations
   - APK
   - Publish
   - Release
@@ -62,6 +63,18 @@ Assemble Release:
       - ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+
+Push Translations:
+  stage: Translations
+  image: cimg/python:3.11
+  script:
+    - python -m venv ~/venv
+    - . ~/venv/bin/activate
+    - pip install transifex-client
+    - echo $'[https://www.transifex.com]\nhostname = https://www.transifex.com\nusername = api\npassword = '"${TRANSIFEX_PASSWORD}"$'\n' > ~/.transifexrc
+    - tx push -s
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == "37671564"
 
 Generate Signed Develop APK:
   stage: APK
