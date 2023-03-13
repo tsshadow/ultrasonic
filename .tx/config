@@ -1,10 +1,10 @@
 [main]
-host = https://www.transifex.com
-lang_map = nl_NL:nl,pl_PL:pl,fr_CA:fr-rCA,pt_BR:pt-rBR,pt_PT:pt,zh_CN:zh-rCN,zh_HK:zh-rHK,zh_TW:zh-rTW,da_DK:da-rDK,de_DE:de,tr_TR:tr,fr_FR:fr,es_ES:es,hu_HU:hu,sv_SE:sv-rSE,bg_BG:bg,el_GR:el,kn_IN:kn-rIN,cs_CZ:cs,sr:sr,he:iw,id:in,lt_LT:lt,km_KH:km-rKH,th_TH:th,ru_RU:ru,it_IT:it
+host     = https://www.transifex.com
+lang_map = fr_CA: fr-rCA, fr_FR: fr, es_ES: es, km_KH: km-rKH, th_TH: th, pl_PL: pl, zh_TW: zh-rTW, ru_RU: ru, pt_BR: pt-rBR, pt_PT: pt, he: iw, zh_HK: zh-rHK, da_DK: da-rDK, de_DE: de, bg_BG: bg, sr: sr, nl_NL: nl, zh_CN: zh-rCN, sv_SE: sv-rSE, el_GR: el, lt_LT: lt, it_IT: it, hu_HU: hu, kn_IN: kn-rIN, tr_TR: tr, cs_CZ: cs, id: in
 
-[ultrasonic.app]
+[o:ultrasonic:p:ultrasonic:r:app]
 file_filter = ultrasonic/src/main/res/values-<lang>/strings.xml
 source_file = ultrasonic/src/main/res/values/strings.xml
 source_lang = en
-type = ANDROID
+type        = ANDROID
 

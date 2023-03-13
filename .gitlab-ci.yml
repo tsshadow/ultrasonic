@@ -66,12 +66,11 @@ Assemble Release:
 
 Push Translations:
   stage: Translations
-  image: cimg/python:3.11
+  image: alpine:latest
   script:
-    - python -m venv ~/venv
-    - . ~/venv/bin/activate
-    - pip install transifex-client
-    - echo $'[https://www.transifex.com]\nhostname = https://www.transifex.com\nusername = api\npassword = '"${TRANSIFEX_PASSWORD}"$'\n' > ~/.transifexrc
+    - wget -O /tmp/tx-linux-amd64.tar.gz https://github.com/transifex/cli/releases/latest/download/tx-linux-amd64.tar.gz
+    - tar xf /tmp/tx-linux-amd64.tar.gz -C /tmp
+    - mv /tmp/tx /usr/bin/tx
     - tx push -s
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == "37671564"
