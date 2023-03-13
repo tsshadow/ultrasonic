@@ -1,0 +1,14 @@
+Bug fixes
+- #831: Version 4.1.1 and develop: 'jukebox on/off' no longer shown in 'Now Playing'.
+- #850: ArrayIndexOutOfBoundsException.
+- #858: Playlist is empty on relauch.
+- #861: Podcast titles all shown as "null".
+- #863: Ultrasonic crashes on startup when pointed to subsonic demo server.
+- #864: Ultrasonic sends invalid URLs when Server Address ends in '/'.
+- #867: Ultrasonic shouldn't crash when deleting a playlist.
+- #872: Ultrasonic should handle custom cache location without creating multiple copies of a track.
+- #886: Jukebox crashes since 4.2.1.
+
+Enhancements
+- #829: isJukeBoxAvailable is called on every visit of PlayerFragment.
+- #854: Remove Videos menu option for servers which don't support it.

@@ -1,0 +1,14 @@
+Corrección de errores
+- #831: Versión 4.1.1 y desarrollo: 'jukebox encender/apagar' ya no se muestra en 'Reproduciendo ahora'.
+- #850: ArrayIndexOutOfBoundsException.
+- #858: La lista de reproducción está vacía.
+- #861: Los títulos de los podcasts se muestran como "null".
+- #863: Ultrasonic se bloquea al inicio cuando se apunta al servidor de demostración subsonic.
+- #864: Ultrasonic envía URLs inválidas cuando la dirección del servidor termina en '/'.
+- #867: Ultrasonic no debería bloquearse al borrar una lista de reproducción.
+- #872: Ultrasonic debería manejar la ubicación de caché personalizada sin crear múltiples copias de una pista.
+- #886: Jukebox se bloquea desde 4.2.1.
+
+Mejoras
+- #829: isJukeBoxAvailable se llama en cada visita de PlayerFragment.
+- #854: Eliminar la opción de menú Videos para servidores que no la soportan.
