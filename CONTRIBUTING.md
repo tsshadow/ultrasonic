@@ -11,7 +11,7 @@ issue](https://gitlab.com/ultrasonic/ultrasonic/issues/new).
 ## Contributing Translations
 
 Interested in help to translate Ultrasonic? You can contribute in our
-[Weblate team](https://hosted.weblate.org/projects/ultrasonic/).
+[Transifex team](https://www.transifex.com/ultrasonic/ultrasonic/).
 
 ## Contributing Code
 
