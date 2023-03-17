@@ -55,7 +55,7 @@
     <string name="download.bookmark_removed" formatted="false">Signet supprimé.</string>
     <string name="download.bookmark_set_at_position" formatted="false">Signet ajouté à %s.</string>
     <string name="download.empty">Rien ne se télécharge</string>
-    <string name="playlist.empty">La playlist est vide</string>
+    <string name="playlist.empty">La liste de lecture est vide</string>
     <string name="download.jukebox_not_authorized">La télécommande n\'est pas autorisée. Veuillez activer le mode jukebox dans <b>Utilisateurs &gt; Paramètres</b> à partir de votre serveur Subsonic.</string>
     <string name="download.jukebox_off">Mode jukebox désactivé. La musique est jouée sur l\'appareil.</string>
     <string name="download.jukebox_offline">Le mode jukebox n\'est pas disponible en mode déconnecté.</string>
@@ -66,18 +66,18 @@
     <string name="download.menu_jukebox_off">Désactiver le mode jukebox</string>
     <string name="download.menu_jukebox_on">Activer le mode jukebox</string>
     <string name="download.menu_lyrics">Paroles</string>
-    <string name="download.menu_save">Enregistrer la playlist</string>
+    <string name="download.menu_save">Enregistrer la liste de lecture</string>
     <string name="download.menu_screen_off">Désactiver l\'écran</string>
     <string name="download.menu_screen_on">Sur l\'écran</string>
     <string name="download.menu_show_album">Afficher l\'album</string>
     <string name="download.menu_shuffle">Aléatoire</string>
     <string name="download.playerstate_loading">Mise en mémoire tampon…</string>
     <string name="download.playerstate_playing_shuffle">En lecture aléatoire</string>
-    <string name="download.playlist_done">Playlist enregistrée avec succès !</string>
-    <string name="download.playlist_error">Échec de l\'enregistrement de la playlist, veuillez réessayer plus tard.</string>
-    <string name="download.playlist_name">Saisissez le nom de la playlist :</string>
-    <string name="download.playlist_saving">Enregistrement de la playlist \"%s\"…</string>
-    <string name="download.playlist_title">Enregistrer la playlist</string>
+    <string name="download.playlist_done">La liste de lecture a bien été enregistrée.</string>
+    <string name="download.playlist_error">L\'enregistrement de la liste de lecture a échoué, veuillez réessayer plus tard.</string>
+    <string name="download.playlist_name">Entrez le nom de la liste de lecture :</string>
+    <string name="download.playlist_saving">Enregistrement de la liste de lecture « %s »…</string>
+    <string name="download.playlist_title">Enregistrer la liste de lecture</string>
     <string name="download.repeat_all">Tout répéter</string>
     <string name="download.repeat_off">Répétition désactivée</string>
     <string name="download.repeat_single">Répéter le morceau</string>
@@ -124,18 +124,18 @@
     <string name="main.welcome_cancel">Aller aux paramètres</string>
     <string name="menu.about">À propos</string>
     <string name="menu.common">Général</string>
-    <string name="menu.deleted_playlist">Playlist %s supprimée</string>
-    <string name="menu.deleted_playlist_error">Échec de suppression de la playlist %s</string>
+    <string name="menu.deleted_playlist">Liste de lecture supprimée %s</string>
+    <string name="menu.deleted_playlist_error">Échec de la suppression de la liste de lecture %s</string>
     <string name="menu.downloads">Téléchargements</string>
     <string name="menu.exit">Quitter</string>
     <string name="menu.settings">Paramètres</string>
     <string name="menu.refresh">Rafraichir</string>
     <string name="music_library.label">Bibliothèque musicale</string>
     <string name="music_library.label_offline">Musique hors-ligne</string>
-    <string name="playlist.label">Playlists</string>
+    <string name="playlist.label">Listes de lecture</string>
     <string name="playlist.update_info">Mise à jour des informations</string>
-    <string name="playlist.updated_info">Informations de la playlist %s mises à jour</string>
-    <string name="playlist.updated_info_error">Échec de mise à jour des informations de la playlist %s</string>
+    <string name="playlist.updated_info">Mise à jour des informations sur les listes de lecture pour %s</string>
+    <string name="playlist.updated_info_error">Échec de la mise à jour des informations de la liste de lecture pour %s</string>
     <string name="search.albums">Albums</string>
     <string name="search.artists">Artistes</string>
     <string name="search.label">Recherche</string>
@@ -151,7 +151,7 @@
     <string name="select_artist.all_folders">Tous les dossiers</string>
     <string name="select_artist.folder">Sélectionner le dossier</string>
     <string name="select_genre.empty">Aucun genre trouvé</string>
-    <string name="select_playlist.empty">Aucune playlist sur le serveur</string>
+    <string name="select_playlist.empty">Pas de listes de lecture enregistrées sur le serveur</string>
     <string name="settings.appearance_title">Apparence</string>
     <string name="settings.increment_time_0">Désactivé</string>
     <string name="settings.increment_time_1">1 seconde</string>
@@ -323,11 +323,11 @@
     <string name="share_on_server">Créer un partage sur le serveur</string>
     <string name="settings.share_on_server_summary">Partager créera un partage sur le serveur et donnera son URL. Si désactivé, seuls les détails de la piste seront partagées.</string>
     <string name="no_expiration">Aucune date d\'expiration</string>
-    <string name="download.toggle_playlist">Changer de vue playlist</string>
+    <string name="download.toggle_playlist">Changer de vue liste de lecture</string>
     <string name="download.bookmark_set">Mettre en signet</string>
     <string name="download.bookmark_delete">Supprimer le signet</string>
     <string name="download.menu_star">Étoiler</string>
-    <string name="download.menu_clear_playlist">Effacer la playlist</string>
+    <string name="download.menu_clear_playlist">Effacer la liste de lecture</string>
     <string name="button_bar.shares">Partages</string>
     <string name="select_share.empty">Pas de partages disponibles sur le serveur</string>
     <string name="menu_deleted_share">Partage supprimé %s</string>
@@ -340,8 +340,8 @@
     <string name="save_as_defaults">Enregistrer par défaut</string>
     <string name="share_comment">Commentaire</string>
     <string name="settings.share_expiration">Temps d\'expiration</string>
-    <string name="download_song_removed">\"%s\" retiré de la playlist</string>
-    <string name="download.share_playlist">Partager playlist</string>
+    <string name="download_song_removed">« %s » a été supprimé de la liste de lecture</string>
+    <string name="download.share_playlist">Partager la liste de lecture</string>
     <string name="download.share_song">Partager la piste actuelle</string>
     <string name="settings.share_greeting_default">Texte par défaut lors d\'un partage</string>
     <string name="share_default_greeting">Écoutez donc cette musique que j\'ai partagée depuis %s</string>
@@ -411,5 +411,44 @@
         <item quantity="one">%d morceau supprimé</item>
         <item quantity="many">%d morceaux supprimés</item>
         <item quantity="other">%d morceaux supprimés</item>
+    </plurals>
+    <string name="settings.use_id3_offline">Utiliser la méthode ID3 même hors ligne</string>
+    <string name="settings.show_now_playing_details">Afficher les détails en cours de lecture</string>
+    <string name="settings.summary.force_plain_text_password">Ceci force l\'application à toujours envoyer le mot de passe en clair. Utile si le serveur Subsonic ne prend pas en charge la nouvelle API d\'authentification pour les utilisateurs.</string>
+    <string name="settings.use_id3_offline_summary">Si vous activez ce paramètre, il n\'affichera que la musique que vous avez téléchargée avec Ultrasonic 4.0 ou une version ultérieure. Les téléchargements antérieurs n\'ont pas les métadonnées nécessaires téléchargées. Vous pouvez basculer entre le mode Épingler et le mode Enregistrer pour déclencher le téléchargement des métadonnées manquantes.</string>
+    <string name="settings.show_confirmation_dialog">Afficher le dialogue de confirmation</string>
+    <string name="notification.permission_required">Les notifications sont nécessaires pour la lecture des médias. Vous pouvez accorder cette autorisation à tout moment dans les paramètres Android.</string>
+    <string name="settings.five_star_rating_description">Utiliser un système de notation à cinq étoiles pour les chansons au lieu d\'attribuer des étoiles ou de ne pas en attribuer à certains éléments.</string>
+    <string name="settings.use_hw_offload_description">Essayez de lire le média à l\'aide de la puce de décodage média de votre téléphone. Ceci peut améliorer l\'utilisation de la batterie.</string>
+    <string name="supported_server_features">Fonctionnalités prises en charge</string>
+    <string name="settings.use_hw_offload_title">Utiliser la lecture matérielle (expérimental)</string>
+    <string name="jukebox">Jukebox</string>
+    <string name="download.menu_shuffle_on">Mode aléatoire activé</string>
+    <string name="download.menu_shuffle_off">Mode aléatoire désactivé</string>
+    <string name="settings.download_transition">Afficher À l\'écoute sur Lecture</string>
+    <string name="settings.download_transition_summary">Passage à la lecture en cours après le démarrage de la lecture dans l\'affichage multimédia</string>
+    <string name="settings.increment_time">Intervalle de recherche</string>
+    <string name="settings.parallel_downloads">Combien de chansons peuvent être téléchargées en parallèle</string>
+    <string name="settings.show_now_playing_details_summary">Afficher plus de détails sur la chanson dans la lecture en cours (genre, année, débit)</string>
+    <string name="list_view">Liste</string>
+    <plurals name="select_album_n_songs_downloaded">
+        <item quantity="one">%d chanson sélectionnée pour téléchargement</item>
+        <item quantity="many">%d chansons sélectionnées pour téléchargement</item>
+        <item quantity="other">%d chansons sélectionnées pour téléchargement</item>
+    </plurals>
+    <plurals name="select_album_n_songs_unpinned">
+        <item quantity="one">%d chanson désépinglée</item>
+        <item quantity="many">%d chansons désépinglées</item>
+        <item quantity="other">%d chansons désépinglées</item>
+    </plurals>
+    <plurals name="select_album_n_songs_play_next">
+        <item quantity="one">%d chanson insérée après la chanson en cours</item>
+        <item quantity="many">%d chansons insérées après la chanson en cours</item>
+        <item quantity="other">%d chansons insérées après la chanson en cours</item>
+    </plurals>
+    <plurals name="select_album_n_songs_pinned">
+        <item quantity="one">%d chanson sélectionnée à épingler</item>
+        <item quantity="many">%d chansons sélectionnées à épingler</item>
+        <item quantity="other">%d chansons sélectionnées à épingler</item>
     </plurals>
 </resources>
