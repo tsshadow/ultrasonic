@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
-    <string name="background_task.loading">Caricamento&#8230;</string>
+    <string name="background_task.loading">Caricamento…</string>
     <string name="background_task.network_error">Si è verificato un errore di rete. Si prega di controllare l\'indirizzo del server o riprovare più tardi.</string>
     <string name="background_task.no_network">Questo programma richiede l\'accesso alla rete. Per favore, abilita la connessione Wi-FI o la rete mobile.</string>
     <string name="background_task.not_found">Risorsa non trovata. Si prega di controllare l\'indirizzo del server.</string>
@@ -60,8 +59,8 @@
     <string name="download.playlist_done">Playlist salvata con successo </string>
     <string name="download.playlist_error">Impossibile salvare la playlist, riprovare più tardi.</string>
     <string name="download.playlist_name">Inserisci nome della playlist:</string>
-    <string name="download.playlist_saving">Salvataggio playlist \"%s\"&#8230;</string>
-    <string name="download.playlist_title">Salva Playlist</string>
+    <string name="download.playlist_saving">Salvataggio della playlist «%s»…</string>
+    <string name="download.playlist_title">Salva la playlist</string>
     <string name="download.repeat_all">Ripeti tutto</string>
     <string name="download.repeat_off">Ripetizione spenta</string>
     <string name="download.repeat_single">Ripeti canzone</string>
@@ -258,7 +257,7 @@
     <string name="widget.sdcard_busy">Scheda SD non disponibile</string>
     <string name="widget.sdcard_missing">Nessuna scheda SD</string>
     <string name="settings.share_description_default">Descrizione Predefinita di Condivisione</string>
-    <string name="download.menu_clear_playlist">Pulisci Playlist</string>
+    <string name="download.menu_clear_playlist">Cancella la playlist</string>
     <string name="settings.share_minutes">Minuti</string>
     <string name="settings.share_hours">Ore</string>
     <string name="settings.share_days">Giorni</string>
@@ -266,8 +265,14 @@
     <string name="time_span_disabled">Disabilitato</string>
     <string name="save_as_defaults">Salva come predefinito</string>
     <string name="share_comment">Commenta</string>
-    <string name="download_song_removed">\"%s\" è stato rimosso dalla playlist</string>
+    <string name="download_song_removed">«%s» è stato rimosso dalla playlist</string>
     <string name="share_via">Condividi canzoni via</string>
     <string name="server_menu.delete">Elimina</string>
     <string name="api.subsonic.trial_period_is_over">Il periodo di prova è terminato.</string>
-    </resources>
+    <string name="button_bar.shares">Condivisioni</string>
+    <string name="select_share.empty">Nessuna condivisione disponibile sul server</string>
+    <string name="download.share_playlist">Condividi la playlist</string>
+    <string name="download.share_song">Condividi la canzone attuale</string>
+    <string name="settings.share_greeting_default">Saluto di condivisione predefinito</string>
+    <string name="menu_deleted_share">Condivisione eliminata %s</string>
+</resources>
