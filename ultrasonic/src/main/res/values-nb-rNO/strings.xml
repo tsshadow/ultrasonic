@@ -1,2 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="settings.increment_time_60">1 minutt</string>
+    <string name="settings.cache_size_1000">1 GB</string>
+    <string name="settings.cache_size_10000">10 GB</string>
+    <string name="settings.cache_size_15000">15 GB</string>
+    <string name="settings.directory_cache_time_1">1 minutt</string>
+    <string name="settings.directory_cache_time_10">10 minutter</string>
+    <string name="settings.directory_cache_time_2">2 minutter</string>
+    <string name="settings.network_timeout_105000">105 sekunder</string>
+    <string name="settings.network_timeout_120000">120 sekunder</string>
+    <string name="settings.network_timeout_15000">15 sekunder</string>
+    <string name="settings.network_timeout_30000">30 sekunder</string>
+    <string name="settings.network_timeout_45000">45 sekunder</string>
+    <string name="settings.network_timeout_60000">60 sekunder</string>
+    <string name="settings.preload_10">10 sanger</string>
+    <string name="settings.search_15">15</string>
+    <string name="settings.preload_3">3 sanger</string>
+    <string name="settings.preload_5">5 sanger</string>
+    <string name="settings.preload_50">50 sanger</string>
+    <string name="settings.preload_500">500 sanger</string>
+    <string name="settings.search_20">20</string>
+    <string name="settings.search_25">25</string>
+    <string name="settings.preload_1">1 sang</string>
+    <string name="settings.directory_cache_time_30">30 minutter</string>
+    <string name="settings.search_3">3</string>
+    <string name="settings.search_30">30</string>
+    <string name="settings.search_40">40</string>
+    <string name="settings.search_50">50</string>
+    <string name="settings.directory_cache_time_60">1 time</string>
+    <string name="settings.preload_2">2 sanger</string>
+    <string name="settings.search_5">5</string>
+    <string name="settings.search_250">250</string>
+    <string name="settings.search_500">500</string>
+</resources>
