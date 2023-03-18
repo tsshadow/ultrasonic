@@ -24,12 +24,13 @@ import org.moire.ultrasonic.adapters.DividerBinder
 import org.moire.ultrasonic.adapters.MoreButtonBinder
 import org.moire.ultrasonic.adapters.MoreButtonBinder.MoreButton
 import org.moire.ultrasonic.adapters.TrackViewBinder
+import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.ArtistOrIndex
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.Index
-import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchResult
+import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.SearchListModel
 import org.moire.ultrasonic.service.DownloadFile
@@ -41,6 +42,7 @@ import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.CommunicationError
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.toast
 import timber.log.Timber
 
@@ -50,6 +52,7 @@ import timber.log.Timber
 class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     private var searchResult: SearchResult? = null
     private var searchRefresh: SwipeRefreshLayout? = null
+    private var searchView: SearchView? = null
 
     private val mediaPlayerController: MediaPlayerController by inject()
 
@@ -69,15 +72,14 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         setHasOptionsMenu(true)
 
         listModel.searchResult.observe(
-            viewLifecycleOwner,
-            {
-                if (it != null) {
-                    // Shorten the display initially
-                    searchResult = it
-                    populateList(listModel.trimResultLength(it))
-                }
+            viewLifecycleOwner
+        ) {
+            if (it != null) {
+                // Shorten the display initially
+                searchResult = it
+                populateList(listModel.trimResultLength(it))
             }
-        )
+        }
 
         searchRefresh = view.findViewById(R.id.swipe_refresh_view)
         searchRefresh!!.isEnabled = false
@@ -107,7 +109,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
 
         viewAdapter.register(
             TrackViewBinder(
-                onItemClick = ::onItemClick,
+                onItemClick = { file, _ -> onItemClick(file) },
                 onContextMenuClick = ::onContextMenuItemSelected,
                 checkable = false,
                 draggable = false,
@@ -143,9 +145,9 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         val searchManager = activity.getSystemService(Context.SEARCH_SERVICE) as SearchManager
         inflater.inflate(R.menu.search, menu)
         val searchItem = menu.findItem(R.id.search_item)
-        val searchView = searchItem.actionView as SearchView
+        searchView = searchItem.actionView as SearchView
         val searchableInfo = searchManager.getSearchableInfo(requireActivity().componentName)
-        searchView.setSearchableInfo(searchableInfo)
+        searchView!!.setSearchableInfo(searchableInfo)
 
         val arguments = arguments
         val autoPlay = arguments != null &&
@@ -154,31 +156,31 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
 
         // If started with a query, enter it to the searchView
         if (query != null) {
-            searchView.setQuery(query, false)
-            searchView.clearFocus()
+            searchView!!.setQuery(query, false)
+            searchView!!.clearFocus()
         }
 
-        searchView.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
+        searchView!!.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
             override fun onSuggestionSelect(position: Int): Boolean {
                 return true
             }
 
             override fun onSuggestionClick(position: Int): Boolean {
                 Timber.d("onSuggestionClick: %d", position)
-                val cursor = searchView.suggestionsAdapter.cursor
+                val cursor = searchView!!.suggestionsAdapter.cursor
                 cursor.moveToPosition(position)
 
                 // 2 is the index of col containing suggestion name.
                 val suggestion = cursor.getString(2)
-                searchView.setQuery(suggestion, true)
+                searchView!!.setQuery(suggestion, true)
                 return true
             }
         })
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        searchView!!.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 Timber.d("onQueryTextSubmit: %s", query)
-                searchView.clearFocus()
+                searchView!!.clearFocus()
                 search(query, autoPlay)
                 return true
             }
@@ -188,16 +190,17 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             }
         })
 
-        searchView.setIconifiedByDefault(false)
+        searchView!!.setIconifiedByDefault(false)
         searchItem.expandActionView()
     }
 
     override fun onDestroyView() {
+        Util.hideKeyboard(activity)
         cancellationToken?.cancel()
         super.onDestroyView()
     }
 
-    private fun downloadBackground(save: Boolean, songs: List<MusicDirectory.Entry?>) {
+    private fun downloadBackground(save: Boolean, songs: List<Track?>) {
         val onValid = Runnable {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             mediaPlayerController.downloadBackground(songs, save)
@@ -285,7 +288,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         }
     }
 
-    private fun onAlbumSelected(album: MusicDirectory.Album, autoplay: Boolean) {
+    private fun onAlbumSelected(album: Album, autoplay: Boolean) {
         val bundle = Bundle()
         bundle.putString(Constants.INTENT_ID, album.id)
         bundle.putString(Constants.INTENT_NAME, album.title)
@@ -294,24 +297,23 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         Navigation.findNavController(requireView()).navigate(R.id.searchToTrackCollection, bundle)
     }
 
-    private fun onSongSelected(song: MusicDirectory.Entry, append: Boolean) {
+    private fun onSongSelected(song: Track, append: Boolean) {
         if (!append) {
             mediaPlayerController.clear()
         }
         mediaPlayerController.addToPlaylist(
             listOf(song),
-            save = false,
+            cachePermanently = false,
             autoPlay = false,
-            playNext = false,
             shuffle = false,
-            newPlaylist = false
+            insertionMode = MediaPlayerController.InsertionMode.APPEND
         )
-        mediaPlayerController.play(mediaPlayerController.playlistSize - 1)
+        mediaPlayerController.play(mediaPlayerController.mediaItemCount - 1)
         toast(context, resources.getQuantityString(R.plurals.select_album_n_songs_added, 1, 1))
     }
 
-    private fun onVideoSelected(entry: MusicDirectory.Entry) {
-        playVideo(requireContext(), entry)
+    private fun onVideoSelected(track: Track) {
+        playVideo(requireContext(), track)
     }
 
     private fun autoplay() {
@@ -327,14 +329,14 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             is ArtistOrIndex -> {
                 onArtistSelected(item)
             }
-            is MusicDirectory.Entry -> {
+            is Track -> {
                 if (item.isVideo) {
                     onVideoSelected(item)
                 } else {
                     onSongSelected(item, true)
                 }
             }
-            is MusicDirectory.Album -> {
+            is Album -> {
                 onAlbumSelected(item, false)
             }
         }
@@ -354,11 +356,11 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
 
         if (found || item !is DownloadFile) return true
 
-        val songs = mutableListOf<MusicDirectory.Entry>()
+        val songs = mutableListOf<Track>()
 
         when (menuItem.itemId) {
             R.id.song_menu_play_now -> {
-                songs.add(item.song)
+                songs.add(item.track)
                 downloadHandler.download(
                     fragment = this,
                     append = false,
@@ -370,7 +372,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 )
             }
             R.id.song_menu_play_next -> {
-                songs.add(item.song)
+                songs.add(item.track)
                 downloadHandler.download(
                     fragment = this,
                     append = true,
@@ -382,7 +384,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 )
             }
             R.id.song_menu_play_last -> {
-                songs.add(item.song)
+                songs.add(item.track)
                 downloadHandler.download(
                     fragment = this,
                     append = true,
@@ -394,7 +396,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 )
             }
             R.id.song_menu_pin -> {
-                songs.add(item.song)
+                songs.add(item.track)
                 toast(
                     context,
                     resources.getQuantityString(
@@ -406,7 +408,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 downloadBackground(true, songs)
             }
             R.id.song_menu_download -> {
-                songs.add(item.song)
+                songs.add(item.track)
                 toast(
                     context,
                     resources.getQuantityString(
@@ -418,7 +420,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 downloadBackground(false, songs)
             }
             R.id.song_menu_unpin -> {
-                songs.add(item.song)
+                songs.add(item.track)
                 toast(
                     context,
                     resources.getQuantityString(
@@ -430,7 +432,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 mediaPlayerController.unpin(songs)
             }
             R.id.song_menu_share -> {
-                songs.add(item.song)
+                songs.add(item.track)
                 shareHandler.createShare(this, songs, searchRefresh, cancellationToken!!)
             }
         }

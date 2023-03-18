@@ -13,6 +13,7 @@ import android.graphics.Point
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.ContextMenu
 import android.view.ContextMenu.ContextMenuInfo
 import android.view.GestureDetector
@@ -32,25 +33,31 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
+import android.widget.Toast
 import android.widget.ViewFlipper
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.media3.common.HeartRating
+import androidx.media3.common.Player
+import androidx.media3.common.Timeline
+import androidx.media3.session.SessionResult
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
-import io.reactivex.rxjava3.disposables.Disposable
+import com.google.common.util.concurrent.FutureCallback
+import com.google.common.util.concurrent.Futures
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.ArrayList
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.CancellationException
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 import kotlin.math.max
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +66,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.adapters.TrackViewBinder
@@ -67,15 +73,13 @@ import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.audiofx.VisualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Identifiable
-import org.moire.ultrasonic.domain.MusicDirectory
-import org.moire.ultrasonic.domain.PlayerState
-import org.moire.ultrasonic.domain.RepeatMode
+import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.service.DownloadFile
-import org.moire.ultrasonic.service.LocalMediaPlayer
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
+import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
 import org.moire.ultrasonic.subsonic.ShareHandler
@@ -90,6 +94,7 @@ import timber.log.Timber
 
 /**
  * Contains the Music Player screen of Ultrasonic with playback controls and the playlist
+ * TODO: Add timeline lister -> updateProgressBar().
  */
 @Suppress("LargeClass", "TooManyFunctions", "MagicNumber")
 class PlayerFragment :
@@ -114,14 +119,13 @@ class PlayerFragment :
     // Data & Services
     private val networkAndStorageChecker: NetworkAndStorageChecker by inject()
     private val mediaPlayerController: MediaPlayerController by inject()
-    private val localMediaPlayer: LocalMediaPlayer by inject()
     private val shareHandler: ShareHandler by inject()
     private val imageLoaderProvider: ImageLoaderProvider by inject()
-    private lateinit var executorService: ScheduledExecutorService
     private var currentPlaying: DownloadFile? = null
-    private var currentSong: MusicDirectory.Entry? = null
+    private var currentSong: Track? = null
     private lateinit var viewManager: LinearLayoutManager
-    private var rxBusSubscription: Disposable? = null
+    private var rxBusSubscription: CompositeDisposable = CompositeDisposable()
+    private lateinit var executorService: ScheduledExecutorService
     private var ioScope = CoroutineScope(Dispatchers.IO)
 
     // Views and UI Elements
@@ -137,8 +141,10 @@ class PlayerFragment :
     private lateinit var playlistFlipper: ViewFlipper
     private lateinit var emptyTextView: TextView
     private lateinit var songTitleTextView: TextView
-    private lateinit var albumTextView: TextView
     private lateinit var artistTextView: TextView
+    private lateinit var albumTextView: TextView
+    private lateinit var genreTextView: TextView
+    private lateinit var bitrateFormatTextView: TextView
     private lateinit var albumArtImageView: ImageView
     private lateinit var playlistView: RecyclerView
     private lateinit var positionTextView: TextView
@@ -147,7 +153,8 @@ class PlayerFragment :
     private lateinit var durationTextView: TextView
     private lateinit var pauseButton: View
     private lateinit var stopButton: View
-    private lateinit var startButton: View
+    private lateinit var playButton: View
+    private lateinit var shuffleButton: View
     private lateinit var repeatButton: ImageView
     private lateinit var hollowStar: Drawable
     private lateinit var fullStar: Drawable
@@ -175,8 +182,10 @@ class PlayerFragment :
         playlistFlipper = view.findViewById(R.id.current_playing_playlist_flipper)
         emptyTextView = view.findViewById(R.id.playlist_empty)
         songTitleTextView = view.findViewById(R.id.current_playing_song)
-        albumTextView = view.findViewById(R.id.current_playing_album)
         artistTextView = view.findViewById(R.id.current_playing_artist)
+        albumTextView = view.findViewById(R.id.current_playing_album)
+        genreTextView = view.findViewById(R.id.current_playing_genre)
+        bitrateFormatTextView = view.findViewById(R.id.current_playing_bitrate_format)
         albumArtImageView = view.findViewById(R.id.current_playing_album_art_image)
         positionTextView = view.findViewById(R.id.current_playing_position)
         downloadTrackTextView = view.findViewById(R.id.current_playing_track)
@@ -187,7 +196,7 @@ class PlayerFragment :
 
         pauseButton = view.findViewById(R.id.button_pause)
         stopButton = view.findViewById(R.id.button_stop)
-        startButton = view.findViewById(R.id.button_start)
+        playButton = view.findViewById(R.id.button_start)
         repeatButton = view.findViewById(R.id.button_repeat)
         visualizerViewLayout = view.findViewById(R.id.current_playing_visualizer_layout)
         fiveStar1ImageView = view.findViewById(R.id.song_five_star_1)
@@ -214,18 +223,13 @@ class PlayerFragment :
         swipeVelocity = swipeDistance
         gestureScanner = GestureDetector(context, this)
 
-        // The secondary progress is an indicator of how far the song is cached.
-        localMediaPlayer.secondaryProgress.observe(
-            viewLifecycleOwner,
-            {
-                progressBar.secondaryProgress = it
-            }
-        )
-
         findViews(view)
         val previousButton: AutoRepeatButton = view.findViewById(R.id.button_previous)
         val nextButton: AutoRepeatButton = view.findViewById(R.id.button_next)
-        val shuffleButton = view.findViewById<View>(R.id.button_shuffle)
+        shuffleButton = view.findViewById(R.id.button_shuffle)
+        updateShuffleButtonState(mediaPlayerController.isShufflePlayEnabled)
+        updateRepeatButtonState(mediaPlayerController.repeatMode)
+
         val ratingLinearLayout = view.findViewById<LinearLayout>(R.id.song_rating)
         if (!useFiveStarRating) ratingLinearLayout.isVisible = false
         hollowStar = Util.getDrawableFromAttribute(view.context, R.attr.star_hollow)
@@ -290,33 +294,38 @@ class PlayerFragment :
             }
         }
 
-        startButton.setOnClickListener {
+        playButton.setOnClickListener {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             launch(CommunicationError.getHandler(context)) {
-                start()
+                mediaPlayerController.play()
                 onCurrentChanged()
                 onSliderProgressChanged()
             }
         }
 
         shuffleButton.setOnClickListener {
-            mediaPlayerController.shuffle()
-            Util.toast(activity, R.string.download_menu_shuffle_notification)
+            toggleShuffle()
         }
 
         repeatButton.setOnClickListener {
-            val repeatMode = mediaPlayerController.repeatMode.next()
-            mediaPlayerController.repeatMode = repeatMode
+            var newRepeat = mediaPlayerController.repeatMode + 1
+            if (newRepeat == 3) {
+                newRepeat = 0
+            }
+
+            mediaPlayerController.repeatMode = newRepeat
+
             onPlaylistChanged()
-            when (repeatMode) {
-                RepeatMode.OFF -> Util.toast(
+
+            when (newRepeat) {
+                0 -> Util.toast(
                     context, R.string.download_repeat_off
                 )
-                RepeatMode.ALL -> Util.toast(
-                    context, R.string.download_repeat_all
-                )
-                RepeatMode.SINGLE -> Util.toast(
+                1 -> Util.toast(
                     context, R.string.download_repeat_single
+                )
+                2 -> Util.toast(
+                    context, R.string.download_repeat_all
                 )
                 else -> {
                 }
@@ -340,9 +349,9 @@ class PlayerFragment :
         registerForContextMenu(playlistView)
 
         if (arguments != null && requireArguments().getBoolean(
-            Constants.INTENT_SHUFFLE,
-            false
-        )
+                Constants.INTENT_SHUFFLE,
+                false
+            )
         ) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             mediaPlayerController.isShufflePlayEnabled = true
@@ -350,52 +359,66 @@ class PlayerFragment :
 
         visualizerViewLayout.isVisible = false
         VisualizerController.get().observe(
-            requireActivity(),
-            { visualizerController ->
-                if (visualizerController != null) {
-                    Timber.d("VisualizerController Observer.onChanged received controller")
-                    visualizerView = VisualizerView(context)
-                    visualizerViewLayout.addView(
-                        visualizerView,
-                        LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.MATCH_PARENT
-                        )
+            requireActivity()
+        ) { visualizerController ->
+            if (visualizerController != null) {
+                Timber.d("VisualizerController Observer.onChanged received controller")
+                visualizerView = VisualizerView(context)
+                visualizerViewLayout.addView(
+                    visualizerView,
+                    LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT
                     )
+                )
 
-                    visualizerViewLayout.isVisible = visualizerView.isActive
+                visualizerViewLayout.isVisible = visualizerView.isActive
 
-                    visualizerView.setOnTouchListener { _, _ ->
-                        visualizerView.isActive = !visualizerView.isActive
-                        mediaPlayerController.showVisualization = visualizerView.isActive
-                        true
-                    }
-                    isVisualizerAvailable = true
-                } else {
-                    Timber.d("VisualizerController Observer.onChanged has no controller")
-                    visualizerViewLayout.isVisible = false
-                    isVisualizerAvailable = false
+                visualizerView.setOnTouchListener { _, _ ->
+                    visualizerView.isActive = !visualizerView.isActive
+                    mediaPlayerController.showVisualization = visualizerView.isActive
+                    true
                 }
+                isVisualizerAvailable = true
+            } else {
+                Timber.d("VisualizerController Observer.onChanged has no controller")
+                visualizerViewLayout.isVisible = false
+                isVisualizerAvailable = false
             }
-        )
+        }
 
         EqualizerController.get().observe(
-            requireActivity(),
-            { equalizerController ->
-                isEqualizerAvailable = if (equalizerController != null) {
-                    Timber.d("EqualizerController Observer.onChanged received controller")
-                    true
-                } else {
-                    Timber.d("EqualizerController Observer.onChanged has no controller")
-                    false
-                }
+            requireActivity()
+        ) { equalizerController ->
+            isEqualizerAvailable = if (equalizerController != null) {
+                Timber.d("EqualizerController Observer.onChanged received controller")
+                true
+            } else {
+                Timber.d("EqualizerController Observer.onChanged has no controller")
+                false
             }
-        )
+        }
 
         // Observe playlist changes and update the UI
-        rxBusSubscription = RxBus.playlistObservable.subscribe {
-            onPlaylistChanged()
+        rxBusSubscription += RxBus.playlistObservable.subscribe {
+            // Use launch to ensure running it in the main thread
+            launch {
+                onPlaylistChanged()
+            }
         }
+
+        rxBusSubscription += RxBus.playerStateObservable.subscribe {
+            // Use launch to ensure running it in the main thread
+            launch {
+                update()
+            }
+        }
+
+        mediaPlayerController.controller?.addListener(object : Player.Listener {
+            override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+                onSliderProgressChanged()
+            }
+        })
 
         // Query the Jukebox state in an IO Context
         ioScope.launch(CommunicationError.getHandler(context)) {
@@ -409,18 +432,68 @@ class PlayerFragment :
         view.setOnTouchListener { _, event -> gestureScanner.onTouchEvent(event) }
     }
 
+    private fun updateShuffleButtonState(isEnabled: Boolean) {
+        if (isEnabled) {
+            shuffleButton.alpha = ALPHA_ACTIVATED
+        } else {
+            shuffleButton.alpha = ALPHA_DEACTIVATED
+        }
+    }
+
+    private fun updateRepeatButtonState(repeatMode: Int) {
+        when (repeatMode) {
+            0 -> {
+                repeatButton.setImageDrawable(
+                    Util.getDrawableFromAttribute(
+                        requireContext(), R.attr.media_repeat_off
+                    )
+                )
+                repeatButton.alpha = ALPHA_DEACTIVATED
+            }
+            1 -> {
+                repeatButton.setImageDrawable(
+                    Util.getDrawableFromAttribute(
+                        requireContext(), R.attr.media_repeat_single
+                    )
+                )
+                repeatButton.alpha = ALPHA_ACTIVATED
+            }
+            2 -> {
+                repeatButton.setImageDrawable(
+                    Util.getDrawableFromAttribute(
+                        requireContext(), R.attr.media_repeat_all
+                    )
+                )
+                repeatButton.alpha = ALPHA_ACTIVATED
+            }
+            else -> {
+            }
+        }
+    }
+
+    private fun toggleShuffle() {
+        val isEnabled = mediaPlayerController.toggleShuffle()
+
+        if (isEnabled) {
+            Util.toast(activity, R.string.download_menu_shuffle_on)
+        } else {
+            Util.toast(activity, R.string.download_menu_shuffle_off)
+        }
+
+        updateShuffleButtonState(isEnabled)
+    }
+
     override fun onResume() {
         super.onResume()
-        if (mediaPlayerController.currentPlaying == null) {
+        if (mediaPlayerController.currentPlayingLegacy == null) {
             playlistFlipper.displayedChild = 1
         } else {
-            // Download list and Album art must be updated when Resumed
+            // Download list and Album art must be updated when resumed
             onPlaylistChanged()
             onCurrentChanged()
         }
-        val handler = Handler()
 
-        // TODO Use Rx for Update instead of polling!
+        val handler = Handler(Looper.getMainLooper())
         val runnable = Runnable { handler.post { update(cancellationToken) } }
         executorService = Executors.newSingleThreadScheduledExecutor()
         executorService.scheduleWithFixedDelay(runnable, 0L, 500L, TimeUnit.MILLISECONDS)
@@ -440,7 +513,7 @@ class PlayerFragment :
 
     // Scroll to current playing.
     private fun scrollToCurrent() {
-        val index = mediaPlayerController.playList.indexOf(currentPlaying)
+        val index = mediaPlayerController.currentMediaItemIndex
 
         if (index != -1) {
             val smoothScroller = LinearSmoothScroller(context)
@@ -458,7 +531,7 @@ class PlayerFragment :
     }
 
     override fun onDestroyView() {
-        rxBusSubscription?.dispose()
+        rxBusSubscription.dispose()
         cancel("CoroutineScope cancelled because the view was destroyed")
         cancellationToken.cancel()
         super.onDestroyView()
@@ -503,10 +576,10 @@ class PlayerFragment :
             visualizerMenuItem.isVisible = isVisualizerAvailable
         }
         val mediaPlayerController = mediaPlayerController
-        val downloadFile = mediaPlayerController.currentPlaying
+        val downloadFile = mediaPlayerController.currentPlayingLegacy
 
         if (downloadFile != null) {
-            currentSong = downloadFile.song
+            currentSong = downloadFile.track
         }
 
         if (useFiveStarRating) starMenuItem.isVisible = false
@@ -543,9 +616,9 @@ class PlayerFragment :
             val downloadFile = viewAdapter.getCurrentList()[info!!.position] as DownloadFile
             val menuInflater = requireActivity().menuInflater
             menuInflater.inflate(R.menu.nowplaying_context, menu)
-            val song: MusicDirectory.Entry?
+            val song: Track?
 
-            song = downloadFile.song
+            song = downloadFile.track
 
             if (song.parent == null) {
                 val menuItem = menu.findItem(R.id.menu_show_album)
@@ -570,21 +643,21 @@ class PlayerFragment :
 
     @Suppress("ComplexMethod", "LongMethod", "ReturnCount")
     private fun menuItemSelected(menuItemId: Int, song: DownloadFile?): Boolean {
-        var entry: MusicDirectory.Entry? = null
+        var track: Track? = null
         val bundle: Bundle
         if (song != null) {
-            entry = song.song
+            track = song.track
         }
 
         when (menuItemId) {
             R.id.menu_show_artist -> {
-                if (entry == null) return false
+                if (track == null) return false
 
                 if (Settings.shouldUseId3Tags) {
                     bundle = Bundle()
-                    bundle.putString(Constants.INTENT_ID, entry.artistId)
-                    bundle.putString(Constants.INTENT_NAME, entry.artist)
-                    bundle.putString(Constants.INTENT_PARENT_ID, entry.artistId)
+                    bundle.putString(Constants.INTENT_ID, track.artistId)
+                    bundle.putString(Constants.INTENT_NAME, track.artist)
+                    bundle.putString(Constants.INTENT_PARENT_ID, track.artistId)
                     bundle.putBoolean(Constants.INTENT_ARTIST, true)
                     Navigation.findNavController(requireView())
                         .navigate(R.id.playerToSelectAlbum, bundle)
@@ -592,29 +665,28 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_show_album -> {
-                if (entry == null) return false
+                if (track == null) return false
 
-                val albumId = if (Settings.shouldUseId3Tags) entry.albumId else entry.parent
+                val albumId = if (Settings.shouldUseId3Tags) track.albumId else track.parent
                 bundle = Bundle()
                 bundle.putString(Constants.INTENT_ID, albumId)
-                bundle.putString(Constants.INTENT_NAME, entry.album)
-                bundle.putString(Constants.INTENT_PARENT_ID, entry.parent)
+                bundle.putString(Constants.INTENT_NAME, track.album)
+                bundle.putString(Constants.INTENT_PARENT_ID, track.parent)
                 bundle.putBoolean(Constants.INTENT_IS_ALBUM, true)
                 Navigation.findNavController(requireView())
                     .navigate(R.id.playerToSelectAlbum, bundle)
                 return true
             }
             R.id.menu_lyrics -> {
-                if (entry == null) return false
+                if (track == null) return false
 
                 bundle = Bundle()
-                bundle.putString(Constants.INTENT_ARTIST, entry.artist)
-                bundle.putString(Constants.INTENT_TITLE, entry.title)
+                bundle.putString(Constants.INTENT_ARTIST, track.artist)
+                bundle.putString(Constants.INTENT_TITLE, track.title)
                 Navigation.findNavController(requireView()).navigate(R.id.playerToLyrics, bundle)
                 return true
             }
             R.id.menu_remove -> {
-                mediaPlayerController.removeFromPlaylist(song!!)
                 onPlaylistChanged()
                 return true
             }
@@ -630,8 +702,7 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_shuffle -> {
-                mediaPlayerController.shuffle()
-                Util.toast(context, R.string.download_menu_shuffle_notification)
+                toggleShuffle()
                 return true
             }
             R.id.menu_item_equalizer -> {
@@ -683,26 +754,32 @@ class PlayerFragment :
                 if (currentSong == null) return true
 
                 val isStarred = currentSong!!.starred
-                val id = currentSong!!.id
-                if (isStarred) {
-                    starMenuItem.icon = hollowStar
-                    currentSong!!.starred = false
-                } else {
-                    starMenuItem.icon = fullStar
-                    currentSong!!.starred = true
+
+                mediaPlayerController.controller?.setRating(
+                    HeartRating(!isStarred)
+                )?.let {
+                    Futures.addCallback(
+                        it,
+                        object : FutureCallback<SessionResult> {
+                            override fun onSuccess(result: SessionResult?) {
+                                if (isStarred) {
+                                    starMenuItem.icon = hollowStar
+                                    currentSong!!.starred = false
+                                } else {
+                                    starMenuItem.icon = fullStar
+                                    currentSong!!.starred = true
+                                }
+                            }
+
+                            override fun onFailure(t: Throwable) {
+                                Toast.makeText(context, "SetRating failed", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        },
+                        this.executorService
+                    )
                 }
-                Thread {
-                    val musicService = getMusicService()
-                    try {
-                        if (isStarred) {
-                            musicService.unstar(id, null, null)
-                        } else {
-                            musicService.star(id, null, null)
-                        }
-                    } catch (all: Exception) {
-                        Timber.e(all)
-                    }
-                }.start()
+
                 return true
             }
             R.id.menu_item_bookmark_set -> {
@@ -745,32 +822,32 @@ class PlayerFragment :
             }
             R.id.menu_item_share -> {
                 val mediaPlayerController = mediaPlayerController
-                val entries: MutableList<MusicDirectory.Entry?> = ArrayList()
+                val tracks: MutableList<Track?> = ArrayList()
                 val downloadServiceSongs = mediaPlayerController.playList
                 for (downloadFile in downloadServiceSongs) {
-                    val playlistEntry = downloadFile.song
-                    entries.add(playlistEntry)
+                    val playlistEntry = downloadFile.track
+                    tracks.add(playlistEntry)
                 }
-                shareHandler.createShare(this, entries, null, cancellationToken)
+                shareHandler.createShare(this, tracks, null, cancellationToken)
                 return true
             }
             R.id.menu_item_share_song -> {
                 if (currentSong == null) return true
 
-                val entries: MutableList<MusicDirectory.Entry?> = ArrayList()
-                entries.add(currentSong)
+                val tracks: MutableList<Track?> = ArrayList()
+                tracks.add(currentSong)
 
-                shareHandler.createShare(this, entries, null, cancellationToken)
+                shareHandler.createShare(this, tracks, null, cancellationToken)
                 return true
             }
             else -> return false
         }
     }
 
-    private fun update(cancel: CancellationToken?) {
-        if (cancel!!.isCancellationRequested) return
+    private fun update(cancel: CancellationToken? = null) {
+        if (cancel?.isCancellationRequested == true) return
         val mediaPlayerController = mediaPlayerController
-        if (currentPlaying != mediaPlayerController.currentPlaying) {
+        if (currentPlaying != mediaPlayerController.currentPlayingLegacy) {
             onCurrentChanged()
         }
         onSliderProgressChanged()
@@ -784,7 +861,7 @@ class PlayerFragment :
         ioScope.launch {
 
             val entries = mediaPlayerController.playList.map {
-                it.song
+                it.track
             }
             val musicService = getMusicService()
             musicService.createPlaylist(null, playlistName, entries)
@@ -821,24 +898,6 @@ class PlayerFragment :
         scrollToCurrent()
     }
 
-    private fun start() {
-        val service = mediaPlayerController
-        val state = service.playerState
-        if (state === PlayerState.PAUSED ||
-            state === PlayerState.COMPLETED || state === PlayerState.STOPPED
-        ) {
-            service.start()
-        } else if (state === PlayerState.IDLE) {
-            networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            val current = mediaPlayerController.currentPlayingNumberOnPlaylist
-            if (current == -1) {
-                service.play(0)
-            } else {
-                service.play(current)
-            }
-        }
-    }
-
     private fun initPlaylistDisplay() {
         // Create a View Manager
         viewManager = LinearLayoutManager(this.context)
@@ -851,17 +910,17 @@ class PlayerFragment :
         }
 
         // Create listener
-        val listener: ((DownloadFile) -> Unit) = { file ->
-            val list = mediaPlayerController.playList
-            val index = list.indexOf(file)
-            mediaPlayerController.play(index)
+        val clickHandler: ((DownloadFile, Int) -> Unit) = { _, pos ->
+            mediaPlayerController.seekTo(pos, 0)
+            mediaPlayerController.prepare()
+            mediaPlayerController.play()
             onCurrentChanged()
             onSliderProgressChanged()
         }
 
         viewAdapter.register(
             TrackViewBinder(
-                onItemClick = listener,
+                onItemClick = clickHandler,
                 checkable = false,
                 draggable = true,
                 context = requireContext(),
@@ -873,68 +932,65 @@ class PlayerFragment :
             }
         )
 
-        dragTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+        val callback = object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
 
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean {
+                val from = viewHolder.bindingAdapterPosition
+                val to = target.bindingAdapterPosition
 
-                    val from = viewHolder.bindingAdapterPosition
-                    val to = target.bindingAdapterPosition
+                // Move it in the data set
+                mediaPlayerController.moveItemInPlaylist(from, to)
+                return true
+            }
 
-                    // Move it in the data set
-                    mediaPlayerController.moveItemInPlaylist(from, to)
-                    viewAdapter.submitList(mediaPlayerController.playList)
+            // Swipe to delete from playlist
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val pos = viewHolder.bindingAdapterPosition
+                val item = mediaPlayerController.controller?.getMediaItemAt(pos)
+                mediaPlayerController.removeFromPlaylist(pos)
 
-                    return true
-                }
+                val songRemoved = String.format(
+                    resources.getString(R.string.download_song_removed),
+                    item?.mediaMetadata?.title
+                )
 
-                // Swipe to delete from playlist
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val pos = viewHolder.bindingAdapterPosition
-                    val file = mediaPlayerController.playList[pos]
-                    mediaPlayerController.removeFromPlaylist(file)
+                Util.toast(context, songRemoved)
+            }
 
-                    val songRemoved = String.format(
-                        resources.getString(R.string.download_song_removed),
-                        file.song.title
-                    )
-                    Util.toast(context, songRemoved)
+            override fun onSelectedChanged(
+                viewHolder: RecyclerView.ViewHolder?,
+                actionState: Int
+            ) {
+                super.onSelectedChanged(viewHolder, actionState)
 
-                    viewAdapter.submitList(mediaPlayerController.playList)
-                    viewAdapter.notifyDataSetChanged()
-                }
-
-                override fun onSelectedChanged(
-                    viewHolder: RecyclerView.ViewHolder?,
-                    actionState: Int
-                ) {
-                    super.onSelectedChanged(viewHolder, actionState)
-
-                    if (actionState == ACTION_STATE_DRAG) {
-                        viewHolder?.itemView?.alpha = 0.6f
-                    }
-                }
-
-                override fun clearView(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder
-                ) {
-                    super.clearView(recyclerView, viewHolder)
-
-                    viewHolder.itemView.alpha = 1.0f
-                }
-
-                override fun isLongPressDragEnabled(): Boolean {
-                    return false
+                if (actionState == ACTION_STATE_DRAG) {
+                    viewHolder?.itemView?.alpha = ALPHA_DEACTIVATED
                 }
             }
-        )
+
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ) {
+                super.clearView(recyclerView, viewHolder)
+
+                viewHolder.itemView.alpha = 1.0f
+            }
+
+            override fun isLongPressDragEnabled(): Boolean {
+                return false
+            }
+        }
+
+        dragTouchHelper = ItemTouchHelper(callback)
 
         dragTouchHelper.attachToRecyclerView(playlistView)
     }
@@ -948,41 +1004,48 @@ class PlayerFragment :
 
         emptyTextView.isVisible = list.isEmpty()
 
-        when (mediaPlayerController.repeatMode) {
-            RepeatMode.OFF -> repeatButton.setImageDrawable(
-                Util.getDrawableFromAttribute(
-                    requireContext(), R.attr.media_repeat_off
-                )
-            )
-            RepeatMode.ALL -> repeatButton.setImageDrawable(
-                Util.getDrawableFromAttribute(
-                    requireContext(), R.attr.media_repeat_all
-                )
-            )
-            RepeatMode.SINGLE -> repeatButton.setImageDrawable(
-                Util.getDrawableFromAttribute(
-                    requireContext(), R.attr.media_repeat_single
-                )
-            )
-            else -> {
-            }
-        }
+        updateRepeatButtonState(mediaPlayerController.repeatMode)
     }
 
     private fun onCurrentChanged() {
-        currentPlaying = mediaPlayerController.currentPlaying
+        currentPlaying = mediaPlayerController.currentPlayingLegacy
+
         scrollToCurrent()
         val totalDuration = mediaPlayerController.playListDuration
         val totalSongs = mediaPlayerController.playlistSize.toLong()
-        val currentSongIndex = mediaPlayerController.currentPlayingNumberOnPlaylist + 1
+        val currentSongIndex = mediaPlayerController.currentMediaItemIndex + 1
         val duration = Util.formatTotalDuration(totalDuration)
         val trackFormat =
             String.format(Locale.getDefault(), "%d / %d", currentSongIndex, totalSongs)
         if (currentPlaying != null) {
-            currentSong = currentPlaying!!.song
+            currentSong = currentPlaying!!.track
             songTitleTextView.text = currentSong!!.title
-            albumTextView.text = currentSong!!.album
             artistTextView.text = currentSong!!.artist
+            albumTextView.text = currentSong!!.album
+            if (currentSong!!.year != null && Settings.showNowPlayingDetails)
+                albumTextView.append(String.format(Locale.ROOT, " (%d)", currentSong!!.year))
+
+            if (Settings.showNowPlayingDetails) {
+                genreTextView.text = currentSong!!.genre
+                genreTextView.isVisible =
+                    (currentSong!!.genre != null && currentSong!!.genre!!.isNotBlank())
+
+                var bitRate = ""
+                if (currentSong!!.bitRate != null && currentSong!!.bitRate!! > 0)
+                    bitRate = String.format(
+                        Util.appContext().getString(R.string.song_details_kbps),
+                        currentSong!!.bitRate
+                    )
+                bitrateFormatTextView.text = String.format(
+                    Locale.ROOT, "%s %s",
+                    bitRate, currentSong!!.suffix
+                )
+                bitrateFormatTextView.isVisible = true
+            } else {
+                genreTextView.isVisible = false
+                bitrateFormatTextView.isVisible = false
+            }
+
             downloadTrackTextView.text = trackFormat
             downloadTotalDurationTextView.text = duration
             imageLoaderProvider.getImageLoader()
@@ -991,8 +1054,10 @@ class PlayerFragment :
         } else {
             currentSong = null
             songTitleTextView.text = null
-            albumTextView.text = null
             artistTextView.text = null
+            albumTextView.text = null
+            genreTextView.text = null
+            bitrateFormatTextView.text = null
             downloadTrackTextView.text = null
             downloadTotalDurationTextView.text = null
             imageLoaderProvider.getImageLoader()
@@ -1000,14 +1065,15 @@ class PlayerFragment :
         }
     }
 
-    @Suppress("LongMethod", "ComplexMethod")
+    @Suppress("LongMethod")
     @Synchronized
     private fun onSliderProgressChanged() {
 
         val isJukeboxEnabled: Boolean = mediaPlayerController.isJukeboxEnabled
         val millisPlayed: Int = max(0, mediaPlayerController.playerPosition)
         val duration: Int = mediaPlayerController.playerDuration
-        val playerState: PlayerState = mediaPlayerController.playerState
+        val playbackState: Int = mediaPlayerController.playbackState
+        val isPlaying = mediaPlayerController.isPlaying
 
         if (cancellationToken.isCancellationRequested) return
         if (currentPlaying != null) {
@@ -1016,7 +1082,7 @@ class PlayerFragment :
             progressBar.max =
                 if (duration == 0) 100 else duration // Work-around for apparent bug.
             progressBar.progress = millisPlayed
-            progressBar.isEnabled = currentPlaying!!.isWorkDone || isJukeboxEnabled
+            progressBar.isEnabled = mediaPlayerController.isPlaying || isJukeboxEnabled
         } else {
             positionTextView.setText(R.string.util_zero_time)
             durationTextView.setText(R.string.util_no_time)
@@ -1025,21 +1091,19 @@ class PlayerFragment :
             progressBar.isEnabled = false
         }
 
-        when (playerState) {
-            PlayerState.DOWNLOADING -> {
-                val progress =
-                    if (currentPlaying != null) currentPlaying!!.progress.value!! else 0
+        val progress = mediaPlayerController.bufferedPercentage
+
+        when (playbackState) {
+            Player.STATE_BUFFERING -> {
+
                 val downloadStatus = resources.getString(
-                    R.string.download_playerstate_downloading,
-                    Util.formatPercentage(progress)
+                    R.string.download_playerstate_loading
                 )
+                progressBar.secondaryProgress = progress
                 setTitle(this@PlayerFragment, downloadStatus)
             }
-            PlayerState.PREPARING -> setTitle(
-                this@PlayerFragment,
-                R.string.download_playerstate_buffering
-            )
-            PlayerState.STARTED -> {
+            Player.STATE_READY -> {
+                progressBar.secondaryProgress = progress
                 if (mediaPlayerController.isShufflePlayEnabled) {
                     setTitle(
                         this@PlayerFragment,
@@ -1049,30 +1113,28 @@ class PlayerFragment :
                     setTitle(this@PlayerFragment, R.string.common_appname)
                 }
             }
-            PlayerState.IDLE,
-            PlayerState.PREPARED,
-            PlayerState.STOPPED,
-            PlayerState.PAUSED,
-            PlayerState.COMPLETED -> {
+            Player.STATE_IDLE,
+            Player.STATE_ENDED,
+            -> {
             }
             else -> setTitle(this@PlayerFragment, R.string.common_appname)
         }
 
-        when (playerState) {
-            PlayerState.STARTED -> {
-                pauseButton.isVisible = true
+        when (playbackState) {
+            Player.STATE_READY -> {
+                pauseButton.isVisible = isPlaying
                 stopButton.isVisible = false
-                startButton.isVisible = false
+                playButton.isVisible = !isPlaying
             }
-            PlayerState.DOWNLOADING, PlayerState.PREPARING -> {
+            Player.STATE_BUFFERING -> {
                 pauseButton.isVisible = false
                 stopButton.isVisible = true
-                startButton.isVisible = false
+                playButton.isVisible = false
             }
             else -> {
                 pauseButton.isVisible = false
                 stopButton.isVisible = false
-                startButton.isVisible = true
+                playButton.isVisible = true
             }
         }
 
@@ -1229,5 +1291,7 @@ class PlayerFragment :
 
     companion object {
         private const val PERCENTAGE_OF_SCREEN_FOR_SWIPE = 5
+        private const val ALPHA_ACTIVATED = 1f
+        private const val ALPHA_DEACTIVATED = 0.4f
     }
 }

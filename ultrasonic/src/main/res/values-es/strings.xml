@@ -41,11 +41,8 @@
     <string name="common.name">Nombre</string>
     <string name="common.ok">OK</string>
     <string name="common.pin">Anclar</string>
-    <string name="common.pause">Pausar</string>
-    <string name="common.play">Reproducir</string>
     <string name="common.play_last">Reproducir última</string>
     <string name="common.play_next">Reproducir a continuación</string>
-    <string name="common.play_previous">Reproducir anterior </string>
     <string name="common.play_now">Reproducir ahora</string>
     <string name="common.play_shuffled">Reproducción aleatoria</string>
     <string name="common.public">Public</string>
@@ -75,10 +72,7 @@
     <string name="download.menu_screen_on">Pantalla encendida</string>
     <string name="download.menu_show_album">Mostrar Álbum</string>
     <string name="download.menu_shuffle">Aleatorio</string>
-    <string name="download.menu_shuffle_notification">Lista de reproducción en modo aleatorio</string>
     <string name="download.menu_visualizer">Visualizador</string>
-    <string name="download.playerstate_buffering">Almacenando en el buffer</string>
-    <string name="download.playerstate_downloading">Descargando - %s</string>
     <string name="download.playerstate_playing_shuffle">Reproduciendo en modo aleatorio</string>
     <string name="download.playlist_done">Lista de reproducción guardada con éxito.</string>
     <string name="download.playlist_error">Fallo al guardar la lista de reproducción, por favor reinténtalo mas tarde.</string>
@@ -94,9 +88,23 @@
     <string name="equalizer.label">Ecualizador</string>
     <string name="equalizer.preset">Seleccionar preajuste</string>
     <string name="error.label">Error</string>
-    <string name="help.url">file:///android_asset/html/en/index.html</string>
     <string name="jukebox.is_default">Jukebox por defecto</string>
     <string name="lyrics.nomatch">No se encontraron letras</string>
+    <string name="language.default">Predeterminado del sistema</string>
+    <string name="language.zh_CN">Chino (China)</string>
+    <string name="language.zh_TW">Chino (Taiwan)</string>
+    <string name="language.cs">Checo</string>
+    <string name="language.nl">Holandés</string>
+    <string name="language.en">Inglés</string>
+    <string name="language.fr">Francés</string>
+    <string name="language.de">Alemán</string>
+    <string name="language.hu">Húngaro</string>
+    <string name="language.it">Italiano</string>
+    <string name="language.es">Español</string>
+    <string name="language.pl">Polaco</string>
+    <string name="language.pt">Portugués</string>
+    <string name="language.pt_BR">Portugués (Brasil)</string>
+    <string name="language.ru">Ruso</string>
     <string name="main.albums_alphaByArtist">Por artista</string>
     <string name="main.albums_alphaByName">Por nombre</string>
     <string name="main.albums_frequent">Mas reproducidas</string>
@@ -111,7 +119,6 @@
     <string name="main.music">Música</string>
     <string name="main.offline">Sin conexión</string>
     <string name="main.setup_server">%s - Configurar servidor</string>
-    <string name="main.shuffle">Reproducción aleatoria</string>
     <string name="main.songs_random">Aleatorio</string>
     <string name="main.songs_starred">Me gusta</string>
     <string name="main.songs_title">Canciones</string>
@@ -125,38 +132,30 @@
     <string name="menu.deleted_playlist_error">Fallo al eliminar la lista de reproducción %s</string>
     <string name="menu.downloads">Descargas</string>
     <string name="menu.exit">Salir</string>
-    <string name="menu.navigation">Navegación</string>
     <string name="menu.settings">Configuración</string>
     <string name="menu.refresh">Actualizar</string>
     <string name="music_library.label">Biblioteca de medios</string>
     <string name="music_library.label_offline">Medios sin conexión</string>
-    <string name="music_service.retry">Se ha producido un error de red. Reintento %1$d de %2$d.</string>
-    <string name="parser.artist_count">Obtenido(s) %d artista(s).</string>
-    <string name="parser.reading">Leyendo del servidor.</string>
-    <string name="parser.reading_done">Leyendo del servidor. ¡Hecho!</string>
     <string name="playlist.label">Listas de reproducción</string>
     <string name="playlist.update_info">Actualizar Información</string>
     <string name="playlist.updated_info">Actualizada la información de la lista de reproducción para %s</string>
     <string name="playlist.updated_info_error">Fallo al actualizar la información de la lista de reproducción para %s</string>
-    <string name="progress.wait">Por favor espere&#8230;</string>
     <string name="search.albums">Álbumes</string>
     <string name="search.artists">Artistas</string>
     <string name="search.label">Buscar</string>
     <string name="search.more">Mostrar mas</string>
     <string name="search.no_match">Sin resultados, por favor inténtalo de nuevo</string>
-    <string name="search.search">Haz click para buscar</string>
     <string name="search.songs">Canciones</string>
     <string name="search.title">Buscar</string>
     <string name="select_album.empty">No se han encontrado medios</string>
     <string name="select_album.n_selected">%d pista(s) seleccionada(s).</string>
-    <string name="select_album.no_network">Atención: No hay red disponible.</string>
+    <string name="select_album.no_network">Atención: No hay ninguna red utilizable disponible.\n Si estás utilizando datos móviles, es posible que tengas que permitir las descargas en conexiones con tarificación o en itinerancia en los ajustes.</string>
     <string name="select_album.no_sdcard">Error: No hay tarjeta SD disponible.</string>
     <string name="select_album.play_all">Reproducir todo</string>
     <string name="select_artist.all_folders">Todas las carpetas</string>
     <string name="select_artist.folder">Seleccionar la carpeta</string>
     <string name="select_genre.empty">No se han encontrado géneros</string>
     <string name="select_playlist.empty">No hay listas de reproducción almacenadas en el servidor</string>
-    <string name="service.connecting">Contactando con el servidor, por favor espera.</string>
     <string name="settings.appearance_title">Apariencia</string>
     <string name="settings.buffer_length">Duración del Buffer</string>
     <string name="settings.buffer_length_0">Deshabilitado</string>
@@ -197,8 +196,6 @@
     <string name="settings.chat_refresh">Intervalo de refresco del Chat</string>
     <string name="settings.clear_bookmark">Limpiar marcador</string>
     <string name="settings.clear_bookmark_summary">Limpiar marcador tras la finalización de la reproducción de una canción</string>
-    <string name="settings.clear_playlist">Limpiar lista de reproducción</string>
-    <string name="settings.clear_playlist_summary">Limpiar la lista de reproducción tras la finalización de la reproducción de todas las canciones</string>
     <string name="settings.clear_search_history">Limpiar el historial de búsqueda</string>
     <string name="settings.connection_failure">Fallo de conexión.</string>
     <string name="settings.default_albums">Álbumes predeterminados</string>
@@ -216,16 +213,13 @@
     <string name="settings.disc_sort_summary">Ordena las canciones por el número de disco y el número de pista</string>
     <string name="settings.display_bitrate">Mostrar tasa de bits y la extensión del archivo</string>
     <string name="settings.display_bitrate_summary">Añadir el nombre del artista con la tasa de bits y la extensión del archivo</string>
-    <string name="settings.download_transition">Mostrar descargas en reproducción</string>
-    <string name="settings.download_transition_summary">Mostrar la actividad de descarga cuando comienza la reproducción</string>
-    <string name="settings.gapless_playback">Reproducción sin pausas</string>
-    <string name="settings.gapless_playback_summary">Activa la reproducción sin pausas</string>
+    <string name="settings.download_transition">Mostrar reproduciendo ahora al reproducir</string>
+    <string name="settings.download_transition_summary">Cambiar a reproduciendo ahora después de iniciar la reproducción en la vista multimedia</string>
     <string name="settings.hide_media_summary">Oculta los archivos de música desde otras aplicaciones.</string>
     <string name="settings.hide_media_title">Ocultar desde otras</string>
     <string name="settings.hide_media_toast">Tiene efecto la próxima vez que Android escanee la música de tu dispositivo.</string>
     <string name="settings.increment_time">Intervalo de salto</string>
     <string name="settings.invalid_url">Por favor especifica una URL válida.</string>
-    <string name="settings.invalid_username">Por favor especifica un nombre de usuario válido (sin espacios al final).</string>
     <string name="settings.max_albums">Máximo de Álbumes</string>
     <string name="settings.max_artists">Máximo de Artistas</string>
     <string name="settings.max_bitrate_112">112 Kbps</string>
@@ -256,6 +250,8 @@
     <string name="settings.notifications_title">Notificaciones</string>
     <string name="settings.network_title">Red</string>
     <string name="settings.other_title">Otra configuración</string>
+    <string name="settings.override_language">Cambiar el idioma</string>
+    <string name="settings.override_language_summary">Es necesario reiniciar la aplicación después de cambiar el idioma</string>
     <string name="settings.playback_control_title">Configuración del control de reproducción</string>
     <string name="settings.preload">Canciones a precargar</string>
     <string name="settings.preload_1">1 canción</string>
@@ -284,28 +280,14 @@
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">Se ha limpiado el historial de búsqueda</string>
     <string name="settings.search_title">Configuración de la búsqueda</string>
-    <string name="settings.send_bluetooth_album_art_summary">Enviar la carátula del álbum vía Bluetooth (Puede causar que las notificaciones Bluetooth fallen)</string>
-    <string name="settings.send_bluetooth_album_art">Carátula del Álbum vía Bluetooth</string>
-    <string name="settings.disable_send_now_playing_list_summary">La lista de reproducción actual no se enviará a los dispositivos conectados. Esto puede restaurar la compatibilidad con dispositivos AVRCP 1.3, cuando la visualización de la pista actual no se actualiza</string>
-    <string name="settings.disable_send_now_playing_list">Desactivar el envío de la lista de reproducción actual</string>
-    <string name="settings.send_bluetooth_notification_summary">Enviar notificaciones de reproducción vía Bluetooth</string>
-    <string name="settings.send_bluetooth_notification">Enviar notificaciones Bluetooth</string>
     <string name="settings.server_manage_servers">Administrar servidores</string>
     <string name="settings.server_address">Dirección del servidor</string>
     <string name="settings.server_name">Nombre</string>
     <string name="settings.server_password">Contraseña</string>
-    <string name="settings.server_remove_server">Quitar servidor</string>
     <string name="settings.server_scaling_summary">Descarga imágenes escaladas del servidor en lugar del tamaño completo (salva ancho de banda)</string>
     <string name="settings.server_scaling_title">Escalado de caratulas en el servidor</string>
-    <string name="settings.server_unused">Sin usar</string>
     <string name="settings.server_username">Nombre de usuario</string>
     <string name="settings.server_color">Color del servidor</string>
-    <string name="settings.show_lockscreen_controls">Mostrar controles en la pantalla de bloqueo</string>
-    <string name="settings.show_lockscreen_controls_summary">Mostrar controles de reproducción en la pantalla de bloqueo</string>
-    <string name="settings.show_notification">Mostrar notificación</string>
-    <string name="settings.show_notification_always">Mostrar siempre la notificación</string>
-    <string name="settings.show_notification_always_summary">Mostrar siempre la notificación de reproduciendo ahora cuando la lista de reproducción contiene datos</string>
-    <string name="settings.show_notification_summary">Mostrar la notificación de reproduciendo ahora en la barra de estado</string>
     <string name="settings.show_now_playing">Mostrar reproduciendo ahora</string>
     <string name="settings.show_now_playing_summary">Mostrar la pista que se esta reproduciendo en todas las actividades</string>
     <string name="settings.show_track_number">Mostrar número de pista</string>
@@ -319,10 +301,11 @@
     <string name="settings.theme_title">Tema</string>
     <string name="settings.title.allow_self_signed_certificate">Permir certificado HTTPS autofirmado</string>
     <string name="settings.title.enable_ldap_users_support">Forzar autenticación de contraseña plana</string>
-    <string name="settings.summary.enable_ldap_users_support">Esto obliga a la aplicación a enviar siempre la contraseña sin cifrar.
-        Útil si el servidor Subsonic no admite la nueva API de autenticación para los usuarios.</string>
+    <string name="settings.summary.enable_ldap_users_support">Esto obliga a la aplicación a enviar siempre la contraseña sin cifrar. Útil si el servidor Subsonic no admite la nueva API de autenticación para los usuarios.</string>
     <string name="settings.use_folder_for_album_artist">Usar carpetas para el nombre del artista</string>
     <string name="settings.use_folder_for_album_artist_summary">Se asume que la carpeta en el nivel mal alto es el nombre del artista del álbum</string>
+    <string name="settings.show_now_playing_details_summary">Mostrar más detalles de la canción en reproduciendo ahora (género, año, bitrate)</string>
+    <string name="settings.show_now_playing_details">Mostrar detalles en reproduciendo ahora</string>
     <string name="settings.use_id3">Navegar usando las etiquetas ID3</string>
     <string name="settings.use_id3_summary">Usar el método de etiquetas ID3 en lugar del método basado en el sistema de ficheros</string>
     <string name="settings.show_artist_picture">Mostrar la imagen del artista en la lista de artistas</string>
@@ -330,7 +313,6 @@
     <string name="main.video" tools:ignore="UnusedResources">Vídeo</string>
     <string name="settings.wifi_required_summary">Solo descargar medios en conexiones sin medir</string>
     <string name="settings.wifi_required_title">Descargar solo por Wi-Fi</string>
-    <string name="song_details.all">%1$s%2$s</string>
     <string name="song_details.kbps">%d kbps</string>
     <string name="util.bytes_format.byte">0 B</string>
     <string name="util.bytes_format.gigabyte">0.00 GB</string>
@@ -377,8 +359,6 @@
     <string name="share_default_greeting">Echa un vistazo a esta música que te comparto desde %s</string>
     <string name="share_via">Compartir canciones vía</string>
     <string name="menu.share">Compartir</string>
-    <string name="settings.show_all_songs_by_artist">Mostrar todas las canciones por artista</string>
-    <string name="settings.show_all_songs_by_artist_summary">Añadir nueva entrada en la vista de artista para acceder a todas las canciones de un artista</string>
     <string name="download.menu_show_artist">Mostrar artista</string>
     <string name="albumArt">Caratula del Álbum</string>
     <string name="common_multiple_years">Múltiples años</string>
@@ -387,8 +367,6 @@
     <string name="settings.playback.bluetooth_all">Todos los dispositivos Bluetooth</string>
     <string name="settings.playback.bluetooth_a2dp">Solo dispositivos de audio (A2DP)</string>
     <string name="settings.playback.bluetooth_disabled">Deshabilitado</string>
-    <string name="settings.playback.single_button_bluetooth_device">Dispositivo Bluetooth con solo un único botón Reproducir / Pausa</string>
-    <string name="settings.playback.single_button_bluetooth_device_summary">Habilitar esto puede ayudar con los dispositivos Bluetooth más antiguos cuando la reproducción / pausa no funciona correctamente</string>
     <string name="settings.debug.title">Opciones de depuración</string>
     <string name="settings.debug.log_to_file">Escribir registro de depuración en un archivo</string>
     <string name="settings.debug.log_path">Los archivos de registro están disponibles en %1$s/%2$s</string>
@@ -413,6 +391,9 @@
     <string name="server_editor.disabled_feature">Una o más funciones se han deshabilitado porque el servidor no las admite.\nPuedes ejecutar esta prueba nuevamente en cualquier momento.</string>
     <string name="server_menu.demo">Servidor de demostración</string>
 
+    <string name="about.webpage">Visitar la página web</string>
+    <string name="about.report">Informar de un error</string>
+    <string name="about.text"><b>Ultrasonic</b> es un cliente Android de streaming de música gratuito y de código abierto para servidores compatibles con la API de Subsonic (versión 1.7.0 o superior).\n\nCon <b>Ultrasonic</b> puede transmitir o descargar fácilmente música desde su ordenador de casa a su teléfono Android utilizando su servidor multimedia compatible con Subsonic. El software del servidor Subsonic requiere una configuración adicional aparte de Ultrasonic.\n\nPor defecto, Ultrasonic no está configurado. Una vez que hayas configurado tu propio servidor, cambia la configuración del servidor para que se conecte a tu propio ordenador.</string>
     <plurals name="select_album_n_songs">
         <item quantity="one">%d canción</item>
         <item quantity="other">%d canciones</item>
@@ -441,10 +422,6 @@
         <item quantity="one">%d canción insertada después de la canción actual</item>
         <item quantity="other">%d canciones insertadas después de la canción actual.</item>
     </plurals>
-    <plurals name="select_album_donate_dialog_n_trial_days_left">
-        <item quantity="one">Queda %d día de periodo de prueba</item>
-        <item quantity="other">Quedan %d días de periodo de prueba</item>
-    </plurals>
 
     <!-- Subsonic api errors -->
     <string name="api.subsonic.generic">Error genérico de api: %1$s</string>
@@ -459,10 +436,7 @@
     <string name="api.subsonic.upgrade_server">Versiones incompatibles. Por favor actualiza el servidor de Subsonic.</string>
 
     <!-- Subsonic features  -->
-    <string name="settings.features_title">Características</string>
     <string name="settings.five_star_rating_title">Use cinco estrellas para las canciones</string>
-    <string name="settings.five_star_rating_description">Utilice el sistema de calificación de cinco estrellas para canciones
-         en lugar de simplemente marcar / desmarcar elementos.
-    </string>
+    <string name="settings.five_star_rating_description">Utilice el sistema de calificación de cinco estrellas para canciones en lugar de simplemente marcar / desmarcar elementos.</string>
 
 </resources>

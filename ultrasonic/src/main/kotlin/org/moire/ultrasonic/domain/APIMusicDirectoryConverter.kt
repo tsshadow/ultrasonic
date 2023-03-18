@@ -1,6 +1,6 @@
 /*
  * APIMusicDirectoryConverter.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -26,12 +26,12 @@ internal val dateFormat: DateFormat by lazy {
     SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault())
 }
 
-fun MusicDirectoryChild.toTrackEntity(): MusicDirectory.Entry = MusicDirectory.Entry(id).apply {
+fun MusicDirectoryChild.toTrackEntity(serverId: Int): Track = Track(id, serverId).apply {
     populateCommonProps(this, this@toTrackEntity)
     populateTrackProps(this, this@toTrackEntity)
 }
 
-fun MusicDirectoryChild.toAlbumEntity(): MusicDirectory.Album = MusicDirectory.Album(id).apply {
+fun MusicDirectoryChild.toAlbumEntity(serverId: Int): Album = Album(id, serverId).apply {
     populateCommonProps(this, this@toAlbumEntity)
 }
 
@@ -64,40 +64,40 @@ private fun populateCommonProps(
 }
 
 private fun populateTrackProps(
-    entry: MusicDirectory.Entry,
+    track: Track,
     source: MusicDirectoryChild
 ) {
-    entry.size = source.size
-    entry.contentType = source.contentType
-    entry.suffix = source.suffix
-    entry.transcodedContentType = source.transcodedContentType
-    entry.transcodedSuffix = source.transcodedSuffix
-    entry.track = source.track
-    entry.albumId = source.albumId
-    entry.bitRate = source.bitRate
-    entry.type = source.type
-    entry.userRating = source.userRating
-    entry.averageRating = source.averageRating
+    track.size = source.size
+    track.contentType = source.contentType
+    track.suffix = source.suffix
+    track.transcodedContentType = source.transcodedContentType
+    track.transcodedSuffix = source.transcodedSuffix
+    track.track = source.track
+    track.albumId = source.albumId
+    track.bitRate = source.bitRate
+    track.type = source.type
+    track.userRating = source.userRating
+    track.averageRating = source.averageRating
 }
 
-fun List<MusicDirectoryChild>.toDomainEntityList(): List<MusicDirectory.Child> {
+fun List<MusicDirectoryChild>.toDomainEntityList(serverId: Int): List<MusicDirectory.Child> {
     val newList: MutableList<MusicDirectory.Child> = mutableListOf()
 
     forEach {
         if (it.isDir)
-            newList.add(it.toAlbumEntity())
+            newList.add(it.toAlbumEntity(serverId))
         else
-            newList.add(it.toTrackEntity())
+            newList.add(it.toTrackEntity(serverId))
     }
 
     return newList
 }
 
-fun List<MusicDirectoryChild>.toTrackList(): List<MusicDirectory.Entry> = this.map {
-    it.toTrackEntity()
+fun List<MusicDirectoryChild>.toTrackList(serverId: Int): List<Track> = this.map {
+    it.toTrackEntity(serverId)
 }
 
-fun APIMusicDirectory.toDomainEntity(): MusicDirectory = MusicDirectory().apply {
+fun APIMusicDirectory.toDomainEntity(serverId: Int): MusicDirectory = MusicDirectory().apply {
     name = this@toDomainEntity.name
-    addAll(this@toDomainEntity.childList.toDomainEntityList())
+    addAll(this@toDomainEntity.childList.toDomainEntityList(serverId))
 }

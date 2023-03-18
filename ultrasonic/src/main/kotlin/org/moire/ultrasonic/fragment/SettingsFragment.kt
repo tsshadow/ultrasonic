@@ -6,11 +6,16 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.graphics.Color
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.DocumentsContract
 import android.provider.SearchRecentSuggestions
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
@@ -18,12 +23,11 @@ import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import java.io.File
 import kotlin.math.ceil
 import org.koin.core.component.KoinComponent
-import org.koin.java.KoinJavaComponent.inject
+import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
@@ -40,7 +44,6 @@ import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.ErrorDialog
 import org.moire.ultrasonic.util.FileUtil.ultrasonicDirectory
 import org.moire.ultrasonic.util.InfoDialog
-import org.moire.ultrasonic.util.MediaSessionHandler
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Settings.preferences
 import org.moire.ultrasonic.util.Settings.shareGreeting
@@ -77,10 +80,8 @@ class SettingsFragment :
     private var chatRefreshInterval: ListPreference? = null
     private var directoryCacheTime: ListPreference? = null
     private var mediaButtonsEnabled: CheckBoxPreference? = null
-    private var lockScreenEnabled: CheckBoxPreference? = null
-    private var sendBluetoothNotifications: CheckBoxPreference? = null
-    private var sendBluetoothAlbumArt: CheckBoxPreference? = null
     private var showArtistPicture: CheckBoxPreference? = null
+    private var useId3TagsOffline: CheckBoxPreference? = null
     private var sharingDefaultDescription: EditTextPreference? = null
     private var sharingDefaultGreeting: EditTextPreference? = null
     private var sharingDefaultExpiration: TimeSpanPreference? = null
@@ -89,12 +90,7 @@ class SettingsFragment :
     private var debugLogToFile: CheckBoxPreference? = null
     private var customCacheLocation: CheckBoxPreference? = null
 
-    private val mediaPlayerControllerLazy = inject<MediaPlayerController>(
-        MediaPlayerController::class.java
-    )
-    private val mediaSessionHandler = inject<MediaSessionHandler>(
-        MediaSessionHandler::class.java
-    )
+    private val mediaPlayerController: MediaPlayerController by inject()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, rootKey)
@@ -121,10 +117,6 @@ class SettingsFragment :
         chatRefreshInterval = findPreference(Constants.PREFERENCES_KEY_CHAT_REFRESH_INTERVAL)
         directoryCacheTime = findPreference(Constants.PREFERENCES_KEY_DIRECTORY_CACHE_TIME)
         mediaButtonsEnabled = findPreference(Constants.PREFERENCES_KEY_MEDIA_BUTTONS)
-        lockScreenEnabled = findPreference(Constants.PREFERENCES_KEY_SHOW_LOCK_SCREEN_CONTROLS)
-        sendBluetoothAlbumArt = findPreference(Constants.PREFERENCES_KEY_SEND_BLUETOOTH_ALBUM_ART)
-        sendBluetoothNotifications =
-            findPreference(Constants.PREFERENCES_KEY_SEND_BLUETOOTH_NOTIFICATIONS)
         sharingDefaultDescription =
             findPreference(Constants.PREFERENCES_KEY_DEFAULT_SHARE_DESCRIPTION)
         sharingDefaultGreeting = findPreference(Constants.PREFERENCES_KEY_DEFAULT_SHARE_GREETING)
@@ -135,27 +127,37 @@ class SettingsFragment :
         pauseOnBluetoothDevice = findPreference(Constants.PREFERENCES_KEY_PAUSE_ON_BLUETOOTH_DEVICE)
         debugLogToFile = findPreference(Constants.PREFERENCES_KEY_DEBUG_LOG_TO_FILE)
         showArtistPicture = findPreference(Constants.PREFERENCES_KEY_SHOW_ARTIST_PICTURE)
+        useId3TagsOffline = findPreference(Constants.PREFERENCES_KEY_ID3_TAGS_OFFLINE)
         customCacheLocation = findPreference(Constants.PREFERENCES_KEY_CUSTOM_CACHE_LOCATION)
 
-        sharingDefaultGreeting!!.text = shareGreeting
+        sharingDefaultGreeting?.text = shareGreeting
+
+        setupTextColors()
         setupClearSearchPreference()
         setupCacheLocationPreference()
         setupBluetoothDevicePreferences()
+    }
 
-        // After API26 foreground services must be used for music playback, and they must have a notification
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationsCategory =
-                findPreference<PreferenceCategory>(Constants.PREFERENCES_KEY_CATEGORY_NOTIFICATIONS)
-            var preferenceToRemove =
-                findPreference<Preference>(Constants.PREFERENCES_KEY_SHOW_NOTIFICATION)
-            if (preferenceToRemove != null) notificationsCategory!!.removePreference(
-                preferenceToRemove
-            )
-            preferenceToRemove = findPreference(Constants.PREFERENCES_KEY_ALWAYS_SHOW_NOTIFICATION)
-            if (preferenceToRemove != null) notificationsCategory!!.removePreference(
-                preferenceToRemove
-            )
-        }
+    private fun setupTextColors(enabled: Boolean = shouldUseId3Tags) {
+        val firstPart = getString(R.string.settings_use_id3_offline_warning)
+        var secondPart = getString(R.string.settings_use_id3_offline_summary)
+
+        // Little hack to circumvent a bug in Android. If we just change the color,
+        // the text is not refreshed. If we also change the string, it is refreshed.
+        if (enabled) secondPart += " "
+
+        val color = if (enabled) "#bd5164" else "#813b48"
+
+        Timber.i(color)
+
+        val warning = SpannableString(firstPart + "\n" + secondPart)
+        warning.setSpan(
+            ForegroundColorSpan(Color.parseColor(color)), 0, firstPart.length, 0
+        )
+        warning.setSpan(
+            StyleSpan(Typeface.BOLD), 0, firstPart.length, 0
+        )
+        useId3TagsOffline?.summary = warning
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -221,17 +223,14 @@ class SettingsFragment :
             Constants.PREFERENCES_KEY_HIDE_MEDIA -> {
                 setHideMedia(sharedPreferences.getBoolean(key, false))
             }
-            Constants.PREFERENCES_KEY_MEDIA_BUTTONS -> {
-                setMediaButtonsEnabled(sharedPreferences.getBoolean(key, true))
-            }
-            Constants.PREFERENCES_KEY_SEND_BLUETOOTH_NOTIFICATIONS -> {
-                setBluetoothPreferences(sharedPreferences.getBoolean(key, true))
-            }
             Constants.PREFERENCES_KEY_DEBUG_LOG_TO_FILE -> {
                 setDebugLogToFile(sharedPreferences.getBoolean(key, false))
             }
             Constants.PREFERENCES_KEY_ID3_TAGS -> {
-                showArtistPicture!!.isEnabled = sharedPreferences.getBoolean(key, false)
+                val enabled = sharedPreferences.getBoolean(key, false)
+                showArtistPicture?.isEnabled = enabled
+                useId3TagsOffline?.isEnabled = enabled
+                setupTextColors(enabled)
             }
             Constants.PREFERENCES_KEY_THEME -> {
                 RxBus.themeChangedEventPublisher.onNext(Unit)
@@ -306,9 +305,7 @@ class SettingsFragment :
                     R.string.settings_playback_resume_on_bluetooth_device,
                     Settings.resumeOnBluetoothDevice
                 ) { choice: Int ->
-                    val editor = resumeOnBluetoothDevice!!.sharedPreferences.edit()
-                    editor.putInt(Constants.PREFERENCES_KEY_RESUME_ON_BLUETOOTH_DEVICE, choice)
-                    editor.apply()
+                    Settings.resumeOnBluetoothDevice = choice
                     resumeOnBluetoothDevice!!.summary = bluetoothDevicePreferenceToString(choice)
                 }
                 true
@@ -399,23 +396,17 @@ class SettingsFragment :
         sharingDefaultExpiration!!.summary = sharingDefaultExpiration!!.text
         sharingDefaultDescription!!.summary = sharingDefaultDescription!!.text
         sharingDefaultGreeting!!.summary = sharingDefaultGreeting!!.text
-        if (!mediaButtonsEnabled!!.isChecked) {
-            lockScreenEnabled!!.isChecked = false
-            lockScreenEnabled!!.isEnabled = false
-        }
-        if (!sendBluetoothNotifications!!.isChecked) {
-            sendBluetoothAlbumArt!!.isChecked = false
-            sendBluetoothAlbumArt!!.isEnabled = false
-        }
-        if (debugLogToFile!!.isChecked) {
-            debugLogToFile!!.summary = getString(
+
+        if (debugLogToFile?.isChecked == true) {
+            debugLogToFile?.summary = getString(
                 R.string.settings_debug_log_path,
                 ultrasonicDirectory, FileLoggerTree.FILENAME
             )
         } else {
-            debugLogToFile!!.summary = ""
+            debugLogToFile?.summary = ""
         }
-        showArtistPicture!!.isEnabled = shouldUseId3Tags
+        showArtistPicture?.isEnabled = shouldUseId3Tags
+        useId3TagsOffline?.isEnabled = shouldUseId3Tags
     }
 
     private fun setHideMedia(hide: Boolean) {
@@ -433,15 +424,6 @@ class SettingsFragment :
         toast(activity, R.string.settings_hide_media_toast, false)
     }
 
-    private fun setMediaButtonsEnabled(enabled: Boolean) {
-        lockScreenEnabled!!.isEnabled = enabled
-        mediaSessionHandler.value.updateMediaButtonReceiver()
-    }
-
-    private fun setBluetoothPreferences(enabled: Boolean) {
-        sendBluetoothAlbumArt!!.isEnabled = enabled
-    }
-
     private fun setCacheLocation(path: String) {
         if (path != "") {
             val uri = Uri.parse(path)
@@ -451,8 +433,8 @@ class SettingsFragment :
         Settings.cacheLocationUri = path
 
         // Clear download queue.
-        mediaPlayerControllerLazy.value.clear()
-        mediaPlayerControllerLazy.value.clearCaches()
+        mediaPlayerController.clear()
+        mediaPlayerController.clearCaches()
         Storage.reset()
     }
 
@@ -468,7 +450,7 @@ class SettingsFragment :
             val message = getString(
                 R.string.settings_debug_log_summary,
                 fileNum.toString(),
-                ceil(fileSize / 1000 * 1000.0).toString(),
+                ceil(fileSize.toDouble() / 1000 / 1000).toString(),
                 ultrasonicDirectory
             )
             val keep = R.string.settings_debug_log_keep

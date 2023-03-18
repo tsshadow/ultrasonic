@@ -15,7 +15,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.domain.MusicDirectory
+import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.DownloadFile
 import org.moire.ultrasonic.service.DownloadStatus
 import org.moire.ultrasonic.service.MusicServiceFactory
@@ -44,7 +44,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     var duration: TextView = view.findViewById(R.id.song_duration)
     var progress: TextView = view.findViewById(R.id.song_status)
 
-    var entry: MusicDirectory.Entry? = null
+    var entry: Track? = null
         private set
     var downloadFile: DownloadFile? = null
         private set
@@ -67,7 +67,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         isSelected: Boolean = false
     ) {
         val useFiveStarRating = Settings.useFiveStarRating
-        val song = file.song
+        val song = file.track
         downloadFile = file
         entry = song
 
@@ -109,7 +109,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         }
 
         rxSubscription = RxBus.playerStateObservable.subscribe {
-            setPlayIcon(it.track == downloadFile)
+            setPlayIcon(it.index == bindingAdapterPosition && it.track == downloadFile)
         }
     }
 
@@ -131,7 +131,7 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
         }
     }
 
-    private fun setupStarButtons(song: MusicDirectory.Entry, useFiveStarRating: Boolean) {
+    private fun setupStarButtons(song: Track, useFiveStarRating: Boolean) {
         if (useFiveStarRating) {
             // Hide single star
             star.isVisible = false
@@ -153,6 +153,8 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
                     star.setImageDrawable(imageHelper.starHollowDrawable)
                     song.starred = false
                 }
+
+                // Should this be done here ?
                 Thread {
                     val musicService = MusicServiceFactory.getMusicService()
                     try {

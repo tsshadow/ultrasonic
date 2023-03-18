@@ -1,51 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.2" client="gradle" variant="release" version="4.2.2">
-
-    <issue
-        id="ObsoleteLintCustomCheck"
-        message="Lint found an issue registry (`androidx.appcompat.AppCompatIssueRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 7 (4.0), current lint API level is 8 (4.1)">
-        <location
-            file="../../../../.gradle/caches/transforms-3/cfd0dffad81bb5ff9173a2c6d47f5e0a/transformed/appcompat-1.2.0/jars/lint.jar"/>
-    </issue>
-
-    <issue
-        id="ObsoleteLintCustomCheck"
-        message="Lint found an issue registry (`timber.lint.TimberIssueRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 1 (3.1), current lint API level is 8 (4.1)">
-        <location
-            file="../../../../.gradle/caches/transforms-3/9362f92689454001c7932b460b41bbdb/transformed/jetified-timber-4.7.1/jars/lint.jar"/>
-    </issue>
+<issues format="6" by="lint 7.2.1" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.1)" variant="all" version="7.2.1">
 
     <issue
         id="InflateParams"
         message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
-        errorLine1="   View view = inflater.inflate(R.layout.jukebox_volume, null);"
-        errorLine2="                                                         ~~~~">
+        errorLine1="            val view = inflater.inflate(R.layout.jukebox_volume, null)"
+        errorLine2="                                                                 ~~~~">
         <location
-            file="src/main/java/org/moire/ultrasonic/service/JukeboxMediaPlayer.java"
-            line="477"
-            column="58"/>
-    </issue>
-
-    <issue
-        id="Typos"
-        message="&quot;lizensiert&quot; is a common misspelling; did you mean &quot;lizenziert&quot; ?"
-        errorLine1="    &lt;string name=&quot;settings.testing_unlicensed&quot;>Verbindung OK, Server nicht lizensiert.&lt;/string>"
-        errorLine2="                                                                           ^">
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="289"
-            column="76"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;Artists&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;parser.artist_count&quot;>Got %d Artists.&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="134"
-            column="5"/>
+            file="src/main/kotlin/org/moire/ultrasonic/service/JukeboxMediaPlayer.kt"
+            line="331"
+            column="66"/>
     </issue>
 
     <issue
@@ -55,7 +19,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="151"
+            line="154"
             column="5"/>
     </issue>
 
@@ -71,14 +35,17 @@
     </issue>
 
     <issue
-        id="SetJavaScriptEnabled"
-        message="Using `setJavaScriptEnabled` can introduce XSS vulnerabilities into your application, review carefully"
-        errorLine1="        webView.getSettings().setJavaScriptEnabled(true);"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="TrustAllX509TrustManager"
+        message="`checkClientTrusted` is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers">
         <location
-            file="src/main/java/org/moire/ultrasonic/fragment/AboutFragment.java"
-            line="51"
-            column="9"/>
+            file="org/moire/ultrasonic/api/subsonic/SubsonicAPIClient$allowSelfSignedCertificates$trustManager$1.class"/>
+    </issue>
+
+    <issue
+        id="TrustAllX509TrustManager"
+        message="`checkServerTrusted` is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers">
+        <location
+            file="org/moire/ultrasonic/api/subsonic/SubsonicAPIClient$allowSelfSignedCertificates$trustManager$1.class"/>
     </issue>
 
     <issue
@@ -88,18 +55,29 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="146"
+            line="155"
             column="10"/>
     </issue>
 
     <issue
         id="ExportedReceiver"
         message="Exported receiver does not require permission"
-        errorLine1="        &lt;receiver android:name=&quot;.receiver.UltrasonicIntentReceiver&quot;>"
+        errorLine1="        &lt;receiver android:name=&quot;.receiver.UltrasonicIntentReceiver&quot;"
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="81"
+            line="79"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ExportedService"
+        message="Exported service does not require permission"
+        errorLine1="        &lt;service android:name=&quot;.playback.PlaybackService&quot;"
+        errorLine2="         ~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="68"
             column="10"/>
     </issue>
 
@@ -171,6 +149,17 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.drawable.ic_baseline_close` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_baseline_close.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.drawable.ic_menu_arrow` appears to be unused"
         errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -182,805 +171,57 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.drawable.menu_arrow` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        message="The resource `R.drawable.media3_notification_pause` appears to be unused"
+        errorLine1="&lt;vector android:height=&quot;48dp&quot;"
         errorLine2="^">
         <location
-            file="src/main/res/drawable/menu_arrow.xml"
+            file="src/main/res/drawable/media3_notification_pause.xml"
             line="1"
             column="1"/>
     </issue>
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.main_shuffle` appears to be unused"
-        errorLine1="    &lt;string name=&quot;main.shuffle&quot;>Shuffle Play&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        message="The resource `R.drawable.media3_notification_play` appears to be unused"
+        errorLine1="&lt;vector android:height=&quot;48dp&quot;"
+        errorLine2="^">
         <location
-            file="src/main/res/values/strings.xml"
-            line="114"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="98"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="97"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="111"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="108"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="108"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="95"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="111"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="97"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="97"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="108"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="108"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="107"
-            column="13"/>
+            file="src/main/res/drawable/media3_notification_play.xml"
+            line="1"
+            column="1"/>
     </issue>
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.menu_navigation` appears to be unused"
-        errorLine1="    &lt;string name=&quot;menu.navigation&quot;>Navigation&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        message="The resource `R.drawable.media3_notification_seek_to_next` appears to be unused"
+        errorLine1="&lt;vector android:height=&quot;32dp&quot;"
+        errorLine2="^">
         <location
-            file="src/main/res/values/strings.xml"
-            line="128"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="109"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="108"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="124"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="121"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="119"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="106"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="124"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="108"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="108"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="121"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="121"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="120"
-            column="13"/>
+            file="src/main/res/drawable/media3_notification_seek_to_next.xml"
+            line="1"
+            column="1"/>
     </issue>
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.music_service_retry` appears to be unused"
-        errorLine1="    &lt;string name=&quot;music_service.retry&quot;>A network error occurred. Retrying %1$d of %2$d.&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="The resource `R.drawable.media3_notification_seek_to_previous` appears to be unused"
+        errorLine1="&lt;vector android:height=&quot;32dp&quot;"
+        errorLine2="^">
         <location
-            file="src/main/res/values/strings.xml"
-            line="133"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="114"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="113"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="129"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="126"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="124"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="110"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="129"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="112"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="112"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="126"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="126"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="125"
-            column="13"/>
+            file="src/main/res/drawable/media3_notification_seek_to_previous.xml"
+            line="1"
+            column="1"/>
     </issue>
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.parser_artist_count` appears to be unused"
-        errorLine1="    &lt;string name=&quot;parser.artist_count&quot;>Got %d Artists.&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="134"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="115"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="114"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="130"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="127"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="125"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="111"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="130"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="113"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="113"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="127"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="127"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="126"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.parser_reading` appears to be unused"
-        errorLine1="    &lt;string name=&quot;parser.reading&quot;>Reading from server.&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="135"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="116"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="115"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="131"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="128"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="126"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="112"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="131"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="114"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="114"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="128"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="128"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="127"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.parser_reading_done` appears to be unused"
-        errorLine1="    &lt;string name=&quot;parser.reading_done&quot;>Reading from server. Done!&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="136"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="117"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="116"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="132"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="129"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="127"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="113"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="132"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="115"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="115"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="129"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="129"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="128"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.progress_wait` appears to be unused"
-        errorLine1="    &lt;string name=&quot;progress.wait&quot;>Please wait&amp;#8230;&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="141"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="122"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="121"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="137"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="134"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="132"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="118"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="137"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="120"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="120"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="134"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="134"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="133"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.search_search` appears to be unused"
-        errorLine1="    &lt;string name=&quot;search.search&quot;>Click to search&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="147"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="128"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="127"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="143"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="140"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="138"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="124"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="143"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="126"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="126"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="140"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="140"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="139"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.service_connecting` appears to be unused"
-        errorLine1="    &lt;string name=&quot;service.connecting&quot;>Contacting server, please wait.&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="159"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="140"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="139"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="155"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="152"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="150"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="136"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="155"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="138"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="138"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="152"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="152"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="151"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.settings_allow_self_signed_certificate` appears to be unused"
-        errorLine1="    &lt;string name=&quot;settings.allow_self_signed_certificate&quot; translatable=&quot;false&quot;>allowSelfSignedCertificate&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="160"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.settings_enable_ldap_user_support` appears to be unused"
-        errorLine1="    &lt;string name=&quot;settings.enable_ldap_user_support&quot; translatable=&quot;false&quot;>enableLdapUserSupport&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="161"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.settings_invalid_username` appears to be unused"
-        errorLine1="    &lt;string name=&quot;settings.invalid_username&quot;>Please specify a valid username (no trailing spaces).&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="230"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="208"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="207"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="223"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="220"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="218"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="203"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="223"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="206"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="206"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="220"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="220"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="217"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.settings_server_remove_server` appears to be unused"
-        errorLine1="    &lt;string name=&quot;settings.server_remove_server&quot;>Remove Server&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="299"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="273"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="272"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="292"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="287"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="285"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="266"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="292"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="271"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="271"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="289"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="287"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="285"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.settings_server_unused` appears to be unused"
-        errorLine1="    &lt;string name=&quot;settings.server_unused&quot;>Unused&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="302"
-            column="13"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="276"
-            column="13"/>
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="275"
-            column="13"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="295"
-            column="13"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="290"
-            column="13"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="288"
-            column="13"/>
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="269"
-            column="13"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="295"
-            column="13"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="274"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="274"
-            column="13"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="292"
-            column="13"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="290"
-            column="13"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="288"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.settings_server_address_unset` appears to be unused"
-        errorLine1="    &lt;string name=&quot;settings.server_address_unset&quot; translatable=&quot;false&quot;>http://example.com&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="387"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.plurals.select_album_donate_dialog_n_trial_days_left` appears to be unused"
-        errorLine1="    &lt;plurals name=&quot;select_album_donate_dialog_n_trial_days_left&quot;>"
-        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="447"
-            column="14"/>
-        <location
-            file="src/main/res/values-cs/strings.xml"
-            line="413"
-            column="14"/>
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="436"
-            column="14"/>
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="425"
-            column="14"/>
-        <location
-            file="src/main/res/values-hu/strings.xml"
-            line="420"
-            column="14"/>
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="436"
-            column="14"/>
-        <location
-            file="src/main/res/values-pl/strings.xml"
-            line="388"
-            column="14"/>
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="375"
-            column="14"/>
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="429"
-            column="14"/>
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="437"
-            column="14"/>
-        <location
-            file="src/main/res/values-zh-rCN/strings.xml"
-            line="419"
-            column="14"/>
+        message="The resource `R.drawable.media3_notification_small_icon` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/media3_notification_small_icon.xml"
+            line="1"
+            column="1"/>
     </issue>
 
     <issue
@@ -1279,39 +520,6 @@
     </issue>
 
     <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView a:id=&quot;@+id/help_back&quot;"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/help.xml"
-            line="12"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView a:id=&quot;@+id/help_stop&quot;"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/help.xml"
-            line="18"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView a:id=&quot;@+id/help_forward&quot;"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/help.xml"
-            line="24"
-            column="10"/>
-    </issue>
-
-    <issue
         id="LabelFor"
         message="Missing accessibility label: provide either a view with an `android:labelFor` that references this view or provide an `android:hint`"
         errorLine1="    &lt;EditText"
@@ -1463,17 +671,6 @@
             file="src/main/res/layout/server_edit.xml"
             line="43"
             column="13"/>
-    </issue>
-
-    <issue
-        id="RelativeOverlap"
-        message="`LinearLayout-3` can overlap `LinearLayout-1` if LinearLayout-1, LinearLayout-3 grow due to localized text expansion"
-        errorLine1="    &lt;LinearLayout"
-        errorLine2="     ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/player_media_info.xml"
-            line="52"
-            column="6"/>
     </issue>
 
     <issue

@@ -1,6 +1,6 @@
 /*
  * OfflineMusicService.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -23,6 +23,8 @@ import java.util.regex.Pattern
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.data.MetaDatabase
+import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.ArtistOrIndex
 import org.moire.ultrasonic.domain.Bookmark
@@ -45,9 +47,11 @@ import org.moire.ultrasonic.domain.PodcastsChannel
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Share
+import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
 import org.moire.ultrasonic.util.AbstractFile
 import org.moire.ultrasonic.util.Constants
+import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
 import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.Util.safeClose
@@ -57,12 +61,19 @@ import timber.log.Timber
 class OfflineMusicService : MusicService, KoinComponent {
     private val activeServerProvider: ActiveServerProvider by inject()
 
+    private var metaDatabase: MetaDatabase = activeServerProvider.getActiveMetaDatabase()
+
+    // New Room Database
+    private var cachedArtists = metaDatabase.artistDao()
+    private var cachedAlbums = metaDatabase.albumDao()
+    private var cachedTracks = metaDatabase.trackDao()
+
     override fun getIndexes(musicFolderId: String?, refresh: Boolean): List<Index> {
         val indexes: MutableList<Index> = ArrayList()
         val root = FileUtil.musicDirectory
         for (file in FileUtil.listFiles(root)) {
             if (file.isDirectory) {
-                val index = Index(file.path)
+                val index = Index(id = file.path)
                 index.id = file.path
                 index.index = file.name.substring(0, 1)
                 index.name = file.name
@@ -102,6 +113,13 @@ class OfflineMusicService : MusicService, KoinComponent {
         return indexes
     }
 
+    @Throws(OfflineException::class)
+    override fun getArtists(refresh: Boolean): List<Artist> {
+        val result = cachedArtists.get()
+
+        return result
+    }
+
     /*
     * Especially when dealing with indexes, this method can return Albums, Entries or a mix of both!
     */
@@ -133,8 +151,8 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     override fun search(criteria: SearchCriteria): SearchResult {
         val artists: MutableList<ArtistOrIndex> = ArrayList()
-        val albums: MutableList<MusicDirectory.Album> = ArrayList()
-        val songs: MutableList<MusicDirectory.Entry> = ArrayList()
+        val albums: MutableList<Album> = ArrayList()
+        val songs: MutableList<Track> = ArrayList()
         val root = FileUtil.musicDirectory
         var closeness: Int
         for (artistFile in FileUtil.listFiles(root)) {
@@ -234,14 +252,14 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Suppress("TooGenericExceptionCaught")
     @Throws(Exception::class)
-    override fun createPlaylist(id: String?, name: String?, entries: List<MusicDirectory.Entry>) {
+    override fun createPlaylist(id: String?, name: String?, tracks: List<Track>) {
         val playlistFile =
             FileUtil.getPlaylistFile(activeServerProvider.getActiveServer().name, name)
         val fw = FileWriter(playlistFile)
         val bw = BufferedWriter(fw)
         try {
             fw.write("#EXTM3U\n")
-            for (e in entries) {
+            for (e in tracks) {
                 var filePath = FileUtil.getSongFile(e)
                 if (!Storage.isPathExists(filePath)) {
                     val ext = FileUtil.getExtension(filePath)
@@ -306,7 +324,7 @@ class OfflineMusicService : MusicService, KoinComponent {
         size: Int,
         offset: Int,
         musicFolderId: String?
-    ): List<MusicDirectory.Album> {
+    ): List<Album> {
         throw OfflineException("Album lists not available in offline mode")
     }
 
@@ -316,8 +334,9 @@ class OfflineMusicService : MusicService, KoinComponent {
         size: Int,
         offset: Int,
         musicFolderId: String?
-    ): List<MusicDirectory.Album> {
-        throw OfflineException("getAlbumList2 isn't available in offline mode")
+    ): List<Album> {
+        // TODO: Implement filtering by musicFolder?
+        return cachedAlbums.get(size, offset)
     }
 
     @Throws(Exception::class)
@@ -524,20 +543,39 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     override fun isLicenseValid(): Boolean = true
 
-    @Throws(OfflineException::class)
-    override fun getArtists(refresh: Boolean): List<Artist> {
-        throw OfflineException("getArtists isn't available in offline mode")
+    @Throws(Exception::class)
+    override fun getAlbumsOfArtist(id: String, name: String?, refresh: Boolean):
+        List<Album> {
+        val directAlbums = cachedAlbums.byArtist(id)
+
+        // The direct albums won't contain any compilations that the artist has participated in
+        // We need to fetch the tracks of the artist and then gather the compilation albums from that.
+        val tracks = cachedTracks.byArtist(id)
+        val albumIds = tracks.map {
+            it.albumId
+        }.distinct().filterNotNull()
+
+        val compilationAlbums = albumIds.map {
+            cachedAlbums.get(it)
+        }
+
+        return directAlbums.plus(compilationAlbums).distinct()
     }
 
     @Throws(OfflineException::class)
-    override fun getArtist(id: String, name: String?, refresh: Boolean):
-        List<MusicDirectory.Album> {
-            throw OfflineException("getArtist isn't available in offline mode")
-        }
-
-    @Throws(OfflineException::class)
     override fun getAlbum(id: String, name: String?, refresh: Boolean): MusicDirectory {
-        throw OfflineException("getAlbum isn't available in offline mode")
+
+        Timber.i("Starting album query...")
+
+        val list = cachedTracks
+            .byAlbum(id)
+            .sortedWith(EntryByDiscAndTrackComparator())
+
+        val dir = MusicDirectory()
+        dir.addAll(list)
+
+        Timber.i("Returning query.")
+        return dir
     }
 
     @Throws(OfflineException::class)
@@ -547,7 +585,7 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Throws(OfflineException::class)
     override fun getDownloadInputStream(
-        song: MusicDirectory.Entry,
+        song: Track,
         offset: Long,
         maxBitrate: Int,
         save: Boolean
@@ -578,14 +616,14 @@ class OfflineMusicService : MusicService, KoinComponent {
         return FileUtil.getBaseName(name)
     }
 
-    private fun createEntry(file: AbstractFile, name: String?): MusicDirectory.Entry {
-        val entry = MusicDirectory.Entry(file.path)
+    private fun createEntry(file: AbstractFile, name: String?): Track {
+        val entry = Track(file.path)
         entry.populateWithDataFrom(file, name)
         return entry
     }
 
-    private fun createAlbum(file: AbstractFile, name: String?): MusicDirectory.Album {
-        val album = MusicDirectory.Album(file.path)
+    private fun createAlbum(file: AbstractFile, name: String?): Album {
+        val album = Album(file.path)
         album.populateWithDataFrom(file, name)
         return album
     }
@@ -612,7 +650,7 @@ class OfflineMusicService : MusicService, KoinComponent {
      * More extensive variant of Child.populateWithDataFrom(), which also parses the ID3 tags of
      * a given track file.
      */
-    private fun MusicDirectory.Entry.populateWithDataFrom(file: AbstractFile, name: String?) {
+    private fun Track.populateWithDataFrom(file: AbstractFile, name: String?) {
         (this as MusicDirectory.Child).populateWithDataFrom(file, name)
 
         val meta = RawMetadata(null)
@@ -637,7 +675,7 @@ class OfflineMusicService : MusicService, KoinComponent {
         } catch (ignored: Exception) {
         }
 
-        artist = meta.artist ?: file.parent!!.parent!!.name
+        artist = meta.artist ?: file.parent!!.parent?.name ?: ""
         album = meta.album ?: file.parent!!.name
         title = meta.title ?: title
         isVideo = meta.hasVideo != null
@@ -685,8 +723,8 @@ class OfflineMusicService : MusicService, KoinComponent {
         artistName: String,
         file: AbstractFile,
         criteria: SearchCriteria,
-        albums: MutableList<MusicDirectory.Album>,
-        songs: MutableList<MusicDirectory.Entry>
+        albums: MutableList<Album>,
+        songs: MutableList<Track>
     ) {
         var closeness: Int
         for (albumFile in FileUtil.listMediaFiles(file)) {

@@ -8,6 +8,7 @@ import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
+import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
@@ -68,12 +69,24 @@ class SubsonicAPIClient(
         .addInterceptor { chain ->
             // Adds default request params
             val originalRequest = chain.request()
-            val newUrl = originalRequest.url().newBuilder()
+            val newUrl = originalRequest.url.newBuilder()
                 .addQueryParameter("u", config.username)
                 .addQueryParameter("c", config.clientID)
                 .addQueryParameter("f", "json")
                 .build()
-            chain.proceed(originalRequest.newBuilder().url(newUrl).build())
+            val newRequestBuilder = originalRequest.newBuilder().url(newUrl)
+            if (originalRequest.url.username.isNotEmpty() &&
+                originalRequest.url.password.isNotEmpty()
+            ) {
+                newRequestBuilder.addHeader(
+                    "Authorization",
+                    Credentials.basic(
+                        originalRequest.url.username,
+                        originalRequest.url.password
+                    )
+                )
+            }
+            chain.proceed(newRequestBuilder.build())
         }
         .addInterceptor(versionInterceptor)
         .addInterceptor(proxyPasswordInterceptor)
@@ -83,7 +96,7 @@ class SubsonicAPIClient(
 
     // Create the Retrofit instance, and register a special converter factory
     // It will update our protocol version to the correct version, once we made a successful call
-    val retrofit: Retrofit = Retrofit.Builder()
+    private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl("${config.baseUrl}/rest/")
         .client(okHttpClient)
         .addConverterFactory(
@@ -109,17 +122,20 @@ class SubsonicAPIClient(
 
     private fun OkHttpClient.Builder.addLogging() {
         val loggingInterceptor = HttpLoggingInterceptor(okLogger)
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
         this.addInterceptor(loggingInterceptor)
     }
 
-    @SuppressWarnings("TrustAllX509TrustManager", "EmptyFunctionBlock")
     private fun OkHttpClient.Builder.allowSelfSignedCertificates() {
-        val trustManager = object : X509TrustManager {
-            override fun checkClientTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
-            override fun checkServerTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
-            override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
-        }
+        val trustManager =
+            @Suppress("CustomX509TrustManager")
+            object : X509TrustManager {
+                @Suppress("TrustAllX509TrustManager")
+                override fun checkClientTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
+                @Suppress("TrustAllX509TrustManager")
+                override fun checkServerTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
+                override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
+            }
 
         val sslContext = SSLContext.getInstance("SSL")
         sslContext.init(null, arrayOf(trustManager), SecureRandom())

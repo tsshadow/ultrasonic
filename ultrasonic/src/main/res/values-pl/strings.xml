@@ -3,6 +3,7 @@
 
     <string name="background_task.loading">Ładowanie&#8230;</string>
     <string name="background_task.network_error">Wystąpił błąd sieci. Proszę sprawdzić adres serwera i spróbować później.</string>
+    <string name="background_task.unsupported_api">Server api v%1$s does not support this function.</string>
     <string name="background_task.no_network">Ta aplikacja wymaga dostępu do sieci. Proszę włączyć wi-fi lub dane komórkowe.</string>
     <string name="background_task.not_found">Nie znaleziono zasobów. Proszę sprawdzić adres serwera.</string>
     <string name="background_task.parse_error">Brak prawidłowej odpowiedzi. Proszę sprawdzić adres serwera.</string>
@@ -14,6 +15,7 @@
     <string name="button_bar.chat">Czat</string>
     <string name="button_bar.home">Ultrasonic</string>
     <string name="button_bar.now_playing">Teraz gra</string>
+    <string name="buttons.shuffle">Wymieszaj</string>
     <string name="podcasts.label">Podcasty</string>
     <string name="podcasts_channels.empty">Brak kanałów</string>
     <string name="button_bar.podcasts">Podcast</string>
@@ -42,6 +44,7 @@
     <string name="delete_playlist">Czy chcesz usunąć %1$s?</string>
     <string name="download.bookmark_removed" formatted="false">Zakładka usunięta.</string>
     <string name="download.bookmark_set_at_position" formatted="false">Zakładka ustawiona na %s.</string>
+    <string name="playlist.empty">Playlista jest pusta</string>
     <string name="download.jukebox_not_authorized">Kontrola pilotem jest niedostępna. Proszę uruchomić tryb jukebox w <b>Użytkownicy &gt; Ustawienia</b> na serwerze Subsonic.</string>
     <string name="download.jukebox_off">Tryb pilota jest wyłączony. Muzyka jest odtwarzana w telefonie.</string>
     <string name="download.jukebox_offline">Pilot jest niedostępny w trybie offline.</string>
@@ -58,10 +61,7 @@
     <string name="download.menu_screen_on">Ekran włączony</string>
     <string name="download.menu_show_album">Wyświetl album</string>
     <string name="download.menu_shuffle">Wymieszaj</string>
-    <string name="download.menu_shuffle_notification">Playlista została wymieszana</string>
     <string name="download.menu_visualizer">Efekt wizualny</string>
-    <string name="download.playerstate_buffering">Buforowanie</string>
-    <string name="download.playerstate_downloading">Pobieranie - %s</string>
     <string name="download.playerstate_playing_shuffle">Odtwarzanie losowe</string>
     <string name="download.playlist_done">Playlista została zapisana.</string>
     <string name="download.playlist_error">Błąd zapisu playlisty. Proszę spróbować później.</string>
@@ -77,7 +77,6 @@
     <string name="equalizer.label">Korektor dźwięku</string>
     <string name="equalizer.preset">Wybierz preset</string>
     <string name="error.label">Błąd</string>
-    <string name="help.url">file:///android_asset/html/en/index.html</string>
     <string name="jukebox.is_default">Jukebox domyślnie</string>
     <string name="lyrics.nomatch">Brak tekstu utworu</string>
     <string name="main.albums_alphaByArtist">wg artystów</string>
@@ -93,7 +92,6 @@
     <string name="main.genres_title">Gatunki</string>
     <string name="main.music">Muzyka</string>
     <string name="main.offline">Offline</string>
-    <string name="main.shuffle">Losowo</string>
     <string name="main.songs_random">Losowe</string>
     <string name="main.songs_starred">Ulubione</string>
     <string name="main.songs_title">Utwory</string>
@@ -104,36 +102,28 @@
     <string name="menu.deleted_playlist">Usunięto playlistę %s</string>
     <string name="menu.deleted_playlist_error">Usunięcie playlisty %s nie powiodło się</string>
     <string name="menu.exit">Zakończ</string>
-    <string name="menu.navigation">Nawigacja</string>
     <string name="menu.settings">Ustawienia</string>
+    <string name="menu.refresh">Refresh</string>
     <string name="music_library.label">Biblioteka mediów</string>
     <string name="music_library.label_offline">Media offline</string>
-    <string name="music_service.retry">Wystąpił błąd sieci. Ponawiam %1$d z %2$d.</string>
-    <string name="parser.artist_count">Znaleziono %d artystów.</string>
-    <string name="parser.reading">Trwa odczyt z serwera.</string>
-    <string name="parser.reading_done">Odczyt z serwera zakończony!</string>
     <string name="playlist.label">Playlisty</string>
     <string name="playlist.update_info">Aktualizacja informacji</string>
     <string name="playlist.updated_info">Zaktualizowano informacje dla playlisty %s</string>
     <string name="playlist.updated_info_error">Błąc podczas aktualizacji playlisty %s</string>
-    <string name="progress.wait">Proszę czekać&#8230;</string>
     <string name="search.albums">Albumy</string>
     <string name="search.artists">Artyści</string>
     <string name="search.label">Wyszukaj</string>
     <string name="search.more">Wyświetl więcej</string>
     <string name="search.no_match">Brak wyników, proszę spróbować ponownie</string>
-    <string name="search.search">Kliknij, aby wyszukać</string>
     <string name="search.songs">Utwory</string>
     <string name="search.title">Wyszukiwanie</string>
     <string name="select_album.empty">Brak mediów</string>
-    <string name="select_album.no_network">Uwaga: sieć niedostępna.</string>
     <string name="select_album.no_sdcard">Błąd: Niedostępna karta SD.</string>
     <string name="select_album.play_all">Odtwórz wszystkie</string>
     <string name="select_artist.all_folders">Wszystkie foldery</string>
     <string name="select_artist.folder">Wybierz folder</string>
     <string name="select_genre.empty">Brak gatunków</string>
     <string name="select_playlist.empty">Brak zapisanych playlist na serwerze</string>
-    <string name="service.connecting">Trwa łączenie z serwerem, proszę czekać.</string>
     <string name="settings.appearance_title">Wygląd</string>
     <string name="settings.buffer_length">Wielkość bufora</string>
     <string name="settings.buffer_length_0">Wyłączone</string>
@@ -173,8 +163,6 @@
     <string name="settings.chat_refresh">Okres odświeżania czatu</string>
     <string name="settings.clear_bookmark">Czyszczenie zakładek</string>
     <string name="settings.clear_bookmark_summary">Czyść zakładkę po zakończeniu odtwarzania utworu</string>
-    <string name="settings.clear_playlist">Czyszczenie playlist</string>
-    <string name="settings.clear_playlist_summary">Czyść playlistę po zakończeniu odtwarzania wszystkich utworów</string>
     <string name="settings.clear_search_history">Wyczyść historię wyszukiwania</string>
     <string name="settings.connection_failure">Błąd połączenia.</string>
     <string name="settings.default_albums">Domyślna ilość wyników - albumy</string>
@@ -191,15 +179,11 @@
     <string name="settings.disc_sort">Sortuj utwory wg dysku</string>
     <string name="settings.disc_sort_summary">Sortuje listę utworów wg numeru dysku i numeru utworu</string>
     <string name="settings.display_bitrate_summary">Dołącza bitrate i typ pliku do nazwy artysty</string>
-    <string name="settings.download_transition_summary">Wyświetla postęp pobierania podczas odtwarzania</string>
-    <string name="settings.gapless_playback">Odtwarzanie bez przerw</string>
-    <string name="settings.gapless_playback_summary">Włącz odtwarzanie bez przerw między utworami</string>
     <string name="settings.hide_media_summary">Ukrywa pliki muzyczne przed innymi aplikacjami.</string>
     <string name="settings.hide_media_title">Ukryj pliki</string>
     <string name="settings.hide_media_toast">Efekt widoczny będzie po następnym skanowaniu muzyki przez system Android</string>
     <string name="settings.increment_time">Skok przewijania</string>
     <string name="settings.invalid_url">Proszę wprowadzić prawidłowy URL</string>
-    <string name="settings.invalid_username">Proszę wprowadzić prawidłową nazwę użytkownika (bez spacji na końcu)</string>
     <string name="settings.max_albums">Maksymalna ilość wyników - albumy</string>
     <string name="settings.max_artists">Maksymalna ilość wyników - artyści</string>
     <string name="settings.max_bitrate_112">112 Kbps</string>
@@ -256,25 +240,13 @@
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">Wyczyść historię wyszukiwania</string>
     <string name="settings.search_title">Ustawienia wyszukiwania</string>
-    <string name="settings.send_bluetooth_album_art_summary">Wysyła okładki przez Bluetooth (może powodować problemy z powiadomieniami)</string>
-    <string name="settings.send_bluetooth_album_art">Okładki przez Bluetooth</string>
-    <string name="settings.send_bluetooth_notification_summary">Wysyła powiadomienia o odtwarzaniu przez Bluetooth</string>
-    <string name="settings.send_bluetooth_notification">Wysyłaj powiadomienia Bluetooth</string>
     <string name="settings.server_manage_servers">Manage Servers</string>
     <string name="settings.server_address">Adres serwera</string>
     <string name="settings.server_name">Nazwa</string>
     <string name="settings.server_password">Hasło</string>
-    <string name="settings.server_remove_server">Usuń serwer</string>
     <string name="settings.server_scaling_summary">Pobiera przeskalowane obrazy z serwera zamiast pełnego rozmiaru (oszczędza ilość przesyłanych danych)</string>
     <string name="settings.server_scaling_title">Skalowanie okładek po stronie serwera</string>
-    <string name="settings.server_unused">Bez nazwy</string>
     <string name="settings.server_username">Nazwa użytkownika</string>
-    <string name="settings.show_lockscreen_controls">Wyświetlaj na ekranie blokady</string>
-    <string name="settings.show_lockscreen_controls_summary">Wyświetla widżet odtwarzacza na ekranie blokady</string>
-    <string name="settings.show_notification">Wyświetlaj powiadomienia</string>
-    <string name="settings.show_notification_always">Zawsze wyświetlaj powiadomienia</string>
-    <string name="settings.show_notification_always_summary">Zawsze wyświetla powiadomienia o odtwarzanych utworach, gdy playlista jest wypełniona</string>
-    <string name="settings.show_notification_summary">Wyświetla powiadomienia o odtwarzanym utworze na pasku statusu</string>
     <string name="settings.show_now_playing">Wyświetlaj powiadomienia o utworach</string>
     <string name="settings.show_now_playing_summary">Wyświetla bieżący utwór we wszystkich aktywnościach</string>
     <string name="settings.show_track_number">Wyświetlaj numer utworu</string>
@@ -287,14 +259,11 @@
     <string name="settings.theme_title">Motyw</string>
     <string name="settings.title.allow_self_signed_certificate">Zezwalaj na własne certyfikaty HTTPS</string>
     <string name="settings.title.enable_ldap_users_support">Włącz wsparcie dla użytkowników LDAP</string>
-    <string name="settings.summary.enable_ldap_users_support">To ustawienie wymusza, aby aplikacja wysyłała hasło w stary sposób,
-ponieważ api Subsonic nie wspiera nowego sposobu autoryzacji dla użytkowników LDAP.</string>
     <string name="settings.use_folder_for_album_artist">Używaj folderów jako nazw artystów</string>
     <string name="settings.use_folder_for_album_artist_summary">Zakłada, że folder najwyższego poziomu jest nazwą artysty albumu</string>
     <string name="settings.use_id3">Przeglądaj używając tagów ID3</string>
     <string name="settings.use_id3_summary">Używa metod z tagów ID3 zamiast metod opartych na systemie plików</string>
     <string name="main.video" tools:ignore="UnusedResources">Wideo</string>
-    <string name="song_details.all">%1$s%2$s</string>
     <string name="song_details.kbps">%d kbps</string>
     <string name="util.bytes_format.byte">0 B</string>
     <string name="util.bytes_format.gigabyte">0.00 GB</string>
@@ -337,23 +306,31 @@ ponieważ api Subsonic nie wspiera nowego sposobu autoryzacji dla użytkowników
     <string name="share_default_greeting">Sprawdź muzykę, którą udostępniam na %s</string>
     <string name="share_via">Udostępnij utwory za pomocą</string>
     <string name="menu.share">Udostępnianie</string>
-    <string name="settings.show_all_songs_by_artist">Wyświetlaj wszystkie utwory artysty</string>
-    <string name="settings.show_all_songs_by_artist_summary">Dodaje nową pozycję w widoku artysty z wszystkimi jego utworami</string>
     <string name="download.menu_show_artist">Wyświetlaj artystę</string>
     <string name="albumArt">Okładka</string>
     <string name="common_multiple_years">Z różnych lat</string>
+    <string name="settings.playback.resume_on_bluetooth_device">Resume when a Bluetooth device is connected</string>
+    <string name="settings.playback.pause_on_bluetooth_device">Pause when a Bluetooth device is disconnected</string>
+    <string name="settings.playback.bluetooth_all">All Bluetooth devices</string>
+    <string name="settings.playback.bluetooth_a2dp">Only audio (A2DP) devices</string>
+    <string name="settings.playback.bluetooth_disabled">Wyłączone</string>
+    <string name="server_selector.label">Configured servers</string>
+    <string name="server_selector.delete_confirmation">Are you sure you want to delete the server?</string>
+    <string name="server_editor.label">Editing server</string>
     <string name="server_editor.new_label">Dodaj serwer</string>
+    <string name="server_editor.leave_confirmation">Are you sure you want to leave and lose your changes?</string>
+    <string name="server_editor.required">This field is required</string>
+    <string name="server_menu.edit">Edit</string>
+    <string name="server_menu.delete">Usuń</string>
+    <string name="server_menu.move_up">Move up</string>
+    <string name="server_menu.move_down">Move down</string>
+    <string name="server_editor.authentication">Authentication</string>
+    <string name="server_editor.advanced">Advanced settings</string>
     <plurals name="select_album_n_songs">
         <item quantity="one">%d utwór</item>
         <item quantity="few">%d utwory</item>
         <item quantity="many">%d utworów</item>
         <item quantity="other">%d utworów</item>
-    </plurals>
-    <plurals name="select_album_donate_dialog_n_trial_days_left">
-        <item quantity="one">%d dzień pozostał do zakończenia okresu próbnego</item>
-        <item quantity="few">%d dni pozostały do zakończenia okresu próbnego</item>
-        <item quantity="many">%d dni pozostało do zakończenia okresu próbnego</item>
-        <item quantity="other">%d dni pozostało do zakończenia okresu próbnego</item>
     </plurals>
 
     <!-- Subsonic api errors -->
@@ -368,4 +345,6 @@ ponieważ api Subsonic nie wspiera nowego sposobu autoryzacji dla użytkowników
     <string name="api.subsonic.upgrade_client">Brak zgodności wersji. Uaktualnij aplikację Ultrasonic na Androida.</string>
     <string name="api.subsonic.upgrade_server">Brak zgodności wersji. Uaktualnij serwer Subsonic.</string>
 
+    <!-- Subsonic features  -->
+    <string name="settings.five_star_rating_title">Użyj pięciu gwiazdek dla utworów</string>
     </resources>

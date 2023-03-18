@@ -8,6 +8,7 @@ import java.util.LinkedList
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.MusicDirectory
+import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.Constants
@@ -33,20 +34,23 @@ class DownloadHandler(
         autoPlay: Boolean,
         playNext: Boolean,
         shuffle: Boolean,
-        songs: List<MusicDirectory.Entry?>
+        songs: List<Track>,
     ) {
         val onValid = Runnable {
-            if (!append && !playNext) {
-                mediaPlayerController.clear()
+            // TODO: The logic here is different than in the controller...
+            val insertionMode = when {
+                playNext -> MediaPlayerController.InsertionMode.AFTER_CURRENT
+                append -> MediaPlayerController.InsertionMode.APPEND
+                else -> MediaPlayerController.InsertionMode.CLEAR
             }
+
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             mediaPlayerController.addToPlaylist(
                 songs,
                 save,
                 autoPlay,
-                playNext,
                 shuffle,
-                false
+                insertionMode
             )
             val playlistName: String? = fragment.arguments?.getString(
                 Constants.INTENT_PLAYLIST_NAME
@@ -195,15 +199,15 @@ class DownloadHandler(
         isArtist: Boolean
     ) {
         val activity = fragment.activity as Activity
-        val task = object : ModalBackgroundTask<List<MusicDirectory.Entry>>(
+        val task = object : ModalBackgroundTask<List<Track>>(
             activity,
             false
         ) {
 
             @Throws(Throwable::class)
-            override fun doInBackground(): List<MusicDirectory.Entry> {
+            override fun doInBackground(): List<Track> {
                 val musicService = getMusicService()
-                val songs: MutableList<MusicDirectory.Entry> = LinkedList()
+                val songs: MutableList<Track> = LinkedList()
                 val root: MusicDirectory
                 if (!isOffline() && isArtist && Settings.shouldUseId3Tags) {
                     getSongsForArtist(id, songs)
@@ -235,7 +239,7 @@ class DownloadHandler(
             @Throws(Exception::class)
             private fun getSongsRecursively(
                 parent: MusicDirectory,
-                songs: MutableList<MusicDirectory.Entry>
+                songs: MutableList<Track>
             ) {
                 if (songs.size > maxSongs) {
                     return
@@ -259,13 +263,13 @@ class DownloadHandler(
             @Throws(Exception::class)
             private fun getSongsForArtist(
                 id: String,
-                songs: MutableCollection<MusicDirectory.Entry>
+                songs: MutableCollection<Track>
             ) {
                 if (songs.size > maxSongs) {
                     return
                 }
                 val musicService = getMusicService()
-                val artist = musicService.getArtist(id, "", false)
+                val artist = musicService.getAlbumsOfArtist(id, "", false)
                 for ((id1) in artist) {
                     val albumDirectory = musicService.getAlbum(
                         id1,
@@ -280,26 +284,28 @@ class DownloadHandler(
                 }
             }
 
-            override fun done(songs: List<MusicDirectory.Entry>) {
+            // Called when we have collected the tracks
+            override fun done(songs: List<Track>) {
                 if (Settings.shouldSortByDisc) {
                     Collections.sort(songs, EntryByDiscAndTrackComparator())
                 }
                 if (songs.isNotEmpty()) {
-                    if (!append && !playNext && !unpin && !background) {
-                        mediaPlayerController.clear()
-                    }
                     networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
                     if (!background) {
                         if (unpin) {
                             mediaPlayerController.unpin(songs)
                         } else {
+                            val insertionMode = when {
+                                append -> MediaPlayerController.InsertionMode.APPEND
+                                playNext -> MediaPlayerController.InsertionMode.AFTER_CURRENT
+                                else -> MediaPlayerController.InsertionMode.CLEAR
+                            }
                             mediaPlayerController.addToPlaylist(
                                 songs,
                                 save,
                                 autoPlay,
-                                playNext,
                                 shuffle,
-                                false
+                                insertionMode
                             )
                             if (
                                 !append &&
