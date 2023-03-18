@@ -366,7 +366,7 @@
     <string name="language.it">Italiano</string>
     <string name="language.es">Espanhol</string>
     <string name="main.albums_by_year">Cronológico</string>
-    <string name="menu.downloads">Downloads</string>
+    <string name="menu.downloads">Descargas</string>
     <string name="select_album.n_selected">%d trilhas selecionadas</string>
     <string name="settings.custom_cache_location">Usar Localização Personalizada do Cache</string>
     <string name="settings.parallel_downloads">Quantas músicas descarregar em paralelo</string>
@@ -422,7 +422,7 @@
 \n➤ Caso contrário, configure o seu servidor nas <b>configurações</b>.</string>
     <string name="main.welcome_cancel">Vá às configurações</string>
     <string name="select_album.no_network">Atenção: Nenhuma rede encontrada.
-\nSe usa dados móveis, deve permitir downloads em conexões deste tipo, nas configurações.</string>
+\nSe usa dados móveis, deve permitir descargas em conexões deste tipo, nas configurações.</string>
     <string name="settings.display_bitrate">Mostrar Taxa de Bits e Sufixo de Ficheiro</string>
     <string name="settings.download_transition">Mostrar Agora Tocando ao Reproduzir</string>
     <string name="settings.download_transition_summary">Alternar para Tocando Agora após iniciar o playback na visualização de mídia</string>
@@ -430,7 +430,7 @@
     <string name="settings.override_language">Sobrescrever o idioma</string>
     <string name="settings.override_language_summary">Precisa reiniciar a app após alterar o idioma</string>
     <string name="settings.wifi_required_summary">Descarregar média somente em conexões não medidas</string>
-    <string name="settings.wifi_required_title">Download somente via Wi-Fi</string>
+    <string name="settings.wifi_required_title">Descargas somente via Wi-Fi</string>
     <string name="settings.share_on_server_summary">Compartilhar cria o compartilhamento no servidor e compartilha sua URL. Se desativado, somente os detalhes da música são compartilhados</string>
     <string name="download.share_song">Compartilhar a Música Atual</string>
     <string name="settings.show_confirmation_dialog">Mostrar caixa de diálogo de confirmação</string>
