@@ -632,25 +632,13 @@ open class RESTMusicService(
     @Throws(Exception::class)
     override fun getSongsByGenre(
         genre: String,
-        count: Int,
-        offset: Int
-    ): MusicDirectory {
-        val response = API.getSongsByGenre(genre, count, offset, null).execute().throwOnFailure()
-
-        val result = MusicDirectory()
-        result.addAll(response.body()!!.songsList.toDomainEntityList())
-
-        return result
-    }
-    
-    @Throws(Exception::class)
-    override fun getSongsByGenreAndYear(
-        genre: String,
         year: Int,
+        ratingMin: Int,
+        ratingMax: Int,
         count: Int,
         offset: Int
     ): MusicDirectory {
-        val response = API.getSongsByGenreAndYear(genre, year, count, offset, null).execute().throwOnFailure()
+        val response = API.getSongsByGenre(genre, year, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList())
@@ -731,31 +719,20 @@ open class RESTMusicService(
     @Throws(Exception::class)
     override fun getSongsByMood(
         mood: String,
-        count: Int,
-        offset: Int
-    ): MusicDirectory {
-        val response = API.getSongsByMood(mood, count, offset, null).execute().throwOnFailure()
-
-        val result = MusicDirectory()
-        result.addAll(response.body()!!.songsList.toDomainEntityList())
-
-        return result
-    }
-
-    @Throws(Exception::class)
-    override fun getSongsByMoodAndYear(
-        mood: String,
         year: Int,
+        ratingMin: Int,
+        ratingMax: Int,
         count: Int,
         offset: Int
     ): MusicDirectory {
-        val response = API.getSongsByMoodAndYear(mood, year, count, offset, null).execute().throwOnFailure()
+        val response = API.getSongsByMood(mood, year, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList())
 
         return result
     }
+
     
     @Throws(Exception::class)
     override fun getSongsByYear(

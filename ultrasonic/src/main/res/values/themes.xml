@@ -10,6 +10,7 @@
         <item name="color_navigation_header_background">@color/navigation_header_dark</item>
         <item name="star_hollow">@drawable/ic_star_hollow_dark</item>
         <item name="star_full">@drawable/ic_star_full_dark</item>
+        <item name="star_half">@drawable/ic_star_half_dark</item>
         <item name="about">@drawable/ic_menu_about_dark</item>
         <item name="select_all">@drawable/ic_menu_select_all_dark</item>
         <item name="browse">@drawable/ic_menu_browse_dark</item>
@@ -74,6 +75,7 @@
         <item name="color_navigation_header_background">@color/navigation_header_dark</item>
         <item name="star_hollow">@drawable/ic_star_hollow_dark</item>
         <item name="star_full">@drawable/ic_star_full_dark</item>
+        <item name="star_half">@drawable/ic_star_half_dark</item>
         <item name="about">@drawable/ic_menu_about_dark</item>
         <item name="select_all">@drawable/ic_menu_select_all_dark</item>
         <item name="browse">@drawable/ic_menu_browse_dark</item>
@@ -137,6 +139,7 @@
         <item name="color_navigation_header_background">@color/navigation_header_light</item>
         <item name="star_hollow">@drawable/ic_star_hollow_light</item>
         <item name="star_full">@drawable/ic_star_full_light</item>
+        <item name="star_half">@drawable/ic_star_half_dark</item>
         <item name="about">@drawable/ic_menu_about_light</item>
         <item name="select_all">@drawable/ic_menu_select_all_light</item>
         <item name="browse">@drawable/ic_menu_browse_light</item>

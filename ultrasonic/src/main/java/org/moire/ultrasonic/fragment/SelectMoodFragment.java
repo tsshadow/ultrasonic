@@ -39,6 +39,8 @@ public class SelectMoodFragment extends Fragment {
     private SwipeRefreshLayout refreshMoodListView;
     private ListView moodListView;
     private EditText yearEditBox;
+    private EditText ratingMin;
+    private EditText ratingMax;
     private View emptyView;
     private CancellationToken cancellationToken;
 
@@ -79,6 +81,8 @@ public class SelectMoodFragment extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putString(Constants.INTENT_MOOD_NAME, mood.getName());
                     bundle.putString(Constants.INTENT_YEAR_NAME, yearEditBox.getText().toString());
+                    bundle.putString(Constants.INTENT_RATING_MIN, ratingMin.getText().toString());
+                    bundle.putString(Constants.INTENT_RATING_MAX, ratingMax.getText().toString());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.getMaxSongs());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0);
                     Navigation.findNavController(view).navigate(R.id.trackCollectionFragment, bundle);
@@ -89,6 +93,8 @@ public class SelectMoodFragment extends Fragment {
         emptyView = view.findViewById(R.id.select_mood_empty);
         registerForContextMenu(moodListView);
         yearEditBox = (EditText)view.findViewById(R.id.selectYear);
+        ratingMin = (EditText)view.findViewById(R.id.ratingMin);
+        ratingMax = (EditText)view.findViewById(R.id.ratingMax);
 
         FragmentTitle.Companion.setTitle(this, R.string.main_mood_title);
         load(false);

@@ -271,21 +271,14 @@ interface SubsonicAPIDefinition {
     @GET("getSongsByGenre.view")
     fun getSongsByGenre(
         @Query("genre") genre: String,
+        @Query("year") year: Int = -1,
+        @Query("ratingMin") ratingMin: Int = 0,
+        @Query("ratingMax") ratingMax: Int = 10,
         @Query("count") count: Int = 10,
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByGenreResponse>
-    
-    @GET("getSongsByGenreAndYear.view")
-    fun getSongsByGenreAndYear(
-        @Query("genre") genre: String,
-        @Query("year") year: Int,
-        @Query("count") count: Int = 50,
-        @Query("offset") offset: Int = 0,
-        @Query("musicFolderId") musicFolderId: String? = null
-    ): Call<GetSongsByGenreResponse>
 
-    
     @GET("getSongsByCustom1.view")
     fun getSongsByCustom1(
         @Query("custom1") custom1: String,
@@ -333,15 +326,9 @@ interface SubsonicAPIDefinition {
     @GET("getSongsByMood.view")
     fun getSongsByMood(
         @Query("mood") mood: String,
-        @Query("count") count: Int = 50,
-        @Query("offset") offset: Int = 0,
-        @Query("musicFolderId") musicFolderId: String? = null
-    ): Call<GetSongsByMoodResponse>
-
-    @GET("getSongsByMoodAndYear.view")
-    fun getSongsByMoodAndYear(
-        @Query("mood") mood: String,
-        @Query("year") year: Int,
+        @Query("year") year: Int = -1,
+        @Query("ratingMin") ratingMin: Int = 0,
+        @Query("ratingMax") ratingMax: Int = 10,
         @Query("count") count: Int = 50,
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null

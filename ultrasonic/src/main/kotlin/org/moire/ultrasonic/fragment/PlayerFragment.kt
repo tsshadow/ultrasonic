@@ -151,6 +151,7 @@ class PlayerFragment :
     private lateinit var repeatButton: ImageView
     private lateinit var hollowStar: Drawable
     private lateinit var fullStar: Drawable
+    private lateinit var halfStar: Drawable
     private lateinit var progressBar: SeekBar
 
     internal val viewAdapter: BaseAdapter<Identifiable> by lazy {
@@ -229,12 +230,13 @@ class PlayerFragment :
         if (!useFiveStarRating) ratingLinearLayout.isVisible = false
         hollowStar = Util.getDrawableFromAttribute(view.context, R.attr.star_hollow)
         fullStar = Util.getDrawableFromAttribute(view.context, R.attr.star_full)
+        halfStar = Util.getDrawableFromAttribute(view.context, R.attr.star_half)
 
-        fiveStar1ImageView.setOnClickListener { setSongRating(1) }
-        fiveStar2ImageView.setOnClickListener { setSongRating(2) }
-        fiveStar3ImageView.setOnClickListener { setSongRating(3) }
-        fiveStar4ImageView.setOnClickListener { setSongRating(4) }
-        fiveStar5ImageView.setOnClickListener { setSongRating(5) }
+        fiveStar1ImageView.setOnClickListener { setSongRating(2) }
+        fiveStar2ImageView.setOnClickListener { setSongRating(4) }
+        fiveStar3ImageView.setOnClickListener { setSongRating(6) }
+        fiveStar4ImageView.setOnClickListener { setSongRating(8) }
+        fiveStar5ImageView.setOnClickListener { setSongRating(10) }
 
         albumArtImageView.setOnTouchListener { _, me ->
             gestureScanner.onTouchEvent(me)
@@ -1158,6 +1160,24 @@ class PlayerFragment :
         return false
     }
 
+    private fun setStar(aImage: ImageView, rating: Int)
+    {
+        when {
+            rating > 1 -> {
+                aImage.setImageDrawable(fullStar)
+                aImage.scaleX = 1f
+            }
+            rating == 1 -> {
+                aImage.setImageDrawable(halfStar)
+                aImage.scaleX = -1f //Mirror half star hotfix
+            }
+            else -> {
+                aImage.setImageDrawable(hollowStar)
+                aImage.scaleX = 1f
+            }
+        }
+    }
+
     private fun displaySongRating() {
         var rating = 0
 
@@ -1165,11 +1185,11 @@ class PlayerFragment :
             rating = currentSong!!.userRating!!
         }
 
-        fiveStar1ImageView.setImageDrawable(if (rating > 0) fullStar else hollowStar)
-        fiveStar2ImageView.setImageDrawable(if (rating > 1) fullStar else hollowStar)
-        fiveStar3ImageView.setImageDrawable(if (rating > 2) fullStar else hollowStar)
-        fiveStar4ImageView.setImageDrawable(if (rating > 3) fullStar else hollowStar)
-        fiveStar5ImageView.setImageDrawable(if (rating > 4) fullStar else hollowStar)
+        setStar(fiveStar1ImageView, rating)
+        setStar(fiveStar2ImageView, rating - 2)
+        setStar(fiveStar3ImageView, rating - 4)
+        setStar(fiveStar4ImageView, rating - 6)
+        setStar(fiveStar5ImageView, rating - 8)
     }
 
     private fun setSongRating(rating: Int) {

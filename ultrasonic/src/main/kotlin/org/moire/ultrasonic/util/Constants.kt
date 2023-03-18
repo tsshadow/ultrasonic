@@ -44,6 +44,8 @@ object Constants {
     const val INTENT_CUSTOM5_NAME = "subsonic.custom5"
     const val INTENT_MOOD_NAME = "subsonic.mood"
     const val INTENT_YEAR_NAME = "subsonic.year"
+    const val INTENT_RATING_MIN = "subsonic.ratingMin"
+    const val INTENT_RATING_MAX = "subsonic.ratingMax"
     const val INTENT_IS_ALBUM = "subsonic.isalbum"
     const val INTENT_VIDEOS = "subsonic.videos"
     const val INTENT_SHOW_PLAYER = "subsonic.showplayer"

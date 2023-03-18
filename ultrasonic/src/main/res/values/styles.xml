@@ -37,6 +37,7 @@
 
     <attr name="star_hollow" format="reference"/>
     <attr name="star_full" format="reference"/>
+    <attr name="star_half" format="reference"/>
     <attr name="about" format="reference"/>
     <attr name="select_all" format="reference"/>
     <attr name="browse" format="reference"/>

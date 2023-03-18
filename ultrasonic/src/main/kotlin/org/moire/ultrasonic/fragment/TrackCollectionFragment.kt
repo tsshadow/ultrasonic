@@ -566,6 +566,8 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         val genreName = args.getString(Constants.INTENT_GENRE_NAME)
         val moodName = args.getString(Constants.INTENT_MOOD_NAME)
         val yearName = args.getString(Constants.INTENT_YEAR_NAME)
+        val ratingMin = args.getString(Constants.INTENT_RATING_MIN)
+        val ratingMax = args.getString(Constants.INTENT_RATING_MAX)
 
         val getStarredTracks = args.getInt(Constants.INTENT_STARRED, 0)
         val getVideos = args.getInt(Constants.INTENT_VIDEOS, 0)
@@ -588,28 +590,22 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 listModel.getShare(shareId)
             } else if (genreName != null) {
                 setTitle(genreName)
-                if (yearName != null && yearName != "")
-                {
-                    listModel.getSongsByGenreAndYear(
-                        genreName,
-                        yearName.toInt(), albumListSize, albumListOffset)
-                }
-                else
-                {
-                    listModel.getSongsForGenre(genreName, albumListSize, albumListOffset)
-                }
+                listModel.getSongsForGenre(
+                    genreName,
+                    if (yearName != null && yearName != "")  yearName.toInt() else -1,
+                    if (ratingMin != null && ratingMin != "") ratingMin.toInt() else 0,
+                    if (ratingMax != null && ratingMax != "") ratingMax.toInt() else 10,
+                    albumListSize,
+                    albumListOffset)
             } else if (moodName != null) {
                 setTitle(moodName)
-                if (yearName != null && yearName != "")
-                {
-                    listModel.getSongsByMoodAndYear(
-                        moodName,
-                        yearName.toInt(), albumListSize, albumListOffset)
-                }
-                else
-                {
-                    listModel.getSongsByMood(moodName, albumListSize, albumListOffset)
-                }
+                listModel.getSongsByMood(
+                    moodName,
+                    if (yearName != null && yearName != "")  yearName.toInt() else -1,
+                    if (ratingMin != null && ratingMin != "") ratingMin.toInt() else 0,
+                    if (ratingMax != null && ratingMax != "") ratingMax.toInt() else 10,
+                    albumListSize,
+                    albumListOffset)
             } else if (yearName != null) {
                 setTitle(yearName)
                 listModel.getSongsByYear(yearName, albumListSize, albumListOffset)

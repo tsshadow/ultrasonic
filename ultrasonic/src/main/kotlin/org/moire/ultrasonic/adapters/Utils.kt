@@ -39,6 +39,7 @@ object Utils {
         lateinit var errorImage: Drawable
         lateinit var starHollowDrawable: Drawable
         lateinit var starDrawable: Drawable
+        lateinit var starHalfDrawable: Drawable
         lateinit var pinImage: Drawable
         lateinit var downloadedImage: Drawable
         lateinit var downloadingImage: Drawable
@@ -63,6 +64,7 @@ object Utils {
         private fun getDrawables(context: Context) {
             starHollowDrawable = Util.getDrawableFromAttribute(context, R.attr.star_hollow)
             starDrawable = Util.getDrawableFromAttribute(context, R.attr.star_full)
+            starHalfDrawable = Util.getDrawableFromAttribute(context, R.attr.star_half)
             pinImage = Util.getDrawableFromAttribute(context, R.attr.pin)
             downloadedImage = Util.getDrawableFromAttribute(context, R.attr.downloaded)
             errorImage = Util.getDrawableFromAttribute(context, R.attr.error)
