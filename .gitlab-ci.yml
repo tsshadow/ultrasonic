@@ -29,7 +29,7 @@ stages:
 
 Check Style:
   stage: Check
-  script: ./gradlew -Pqc ktlintCheck
+  script: echo $CI_PROJECT_ID && ./gradlew -Pqc ktlintCheck
   cache:
     # inherit all global cache settings
     <<: *global_cache
@@ -45,7 +45,7 @@ Static Analysis:
     <<: *global_cache
     policy: pull
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "developDIS" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
 Lint:
   stage: Check
@@ -55,7 +55,7 @@ Lint:
     <<: *global_cache
     policy: pull
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "developDIS" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
 Unit Tests:
   stage: Check
@@ -65,7 +65,7 @@ Unit Tests:
     <<: *global_cache
     policy: pull-push
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "developDIS" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
 Assemble Debug:
   stage: Assemble
