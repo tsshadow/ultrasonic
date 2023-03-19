@@ -18,6 +18,8 @@ variables:
   PACKAGE_APK: "ultrasonic-${CI_COMMIT_TAG}.apk"
   PACKAGE_APK_IDSIG: "ultrasonic-${CI_COMMIT_TAG}.apk.idsig"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+  # The project id of https://gitlab.com/ultrasonic/ultrasonic/
+  ROOT_PROJECT_ID: 37671564
 
 stages:
   - Check
@@ -29,13 +31,14 @@ stages:
 
 Check Style:
   stage: Check
-  script: echo $CI_PROJECT_ID && ./gradlew -Pqc ktlintCheck
+  script: ./gradlew -Pqc ktlintCheck
   cache:
     # inherit all global cache settings
     <<: *global_cache
     policy: pull
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 Static Analysis:
   stage: Check
@@ -45,7 +48,8 @@ Static Analysis:
     <<: *global_cache
     policy: pull
   rules:
-    - if: $CI_COMMIT_REF_NAME == "developDIS" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "developDIS" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 Lint:
   stage: Check
@@ -55,7 +59,8 @@ Lint:
     <<: *global_cache
     policy: pull
   rules:
-    - if: $CI_COMMIT_REF_NAME == "developDIS" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "developDIS" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 Unit Tests:
   stage: Check
@@ -65,13 +70,14 @@ Unit Tests:
     <<: *global_cache
     policy: pull-push
   rules:
-    - if: $CI_COMMIT_REF_NAME == "developDIS" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "developDIS" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 Assemble Debug:
   stage: Assemble
   script: ./gradlew assembleDebug
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
 
 Assemble Release:
   stage: Assemble
@@ -81,7 +87,7 @@ Assemble Release:
     paths:
       - ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
 
 Push Translations:
   stage: Translations
@@ -92,7 +98,7 @@ Push Translations:
     - mv /tmp/tx /usr/bin/tx
     - tx push -s
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == "37671564"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == $ROOT_PROJECT_ID
 
 Generate Signed Develop APK:
   stage: APK
@@ -107,7 +113,7 @@ Generate Signed Develop APK:
     paths:
       - ultrasonic-release/
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == "37671564"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == $ROOT_PROJECT_ID
 
 Generate Signed APK:
   stage: APK
@@ -122,7 +128,7 @@ Generate Signed APK:
     paths:
       - ultrasonic-release/
   rules:
-    - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == "37671564"
+    - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == $ROOT_PROJECT_ID
 
 Publish Signed APK:
   stage: Publish
@@ -133,7 +139,7 @@ Publish Signed APK:
     - |
       curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ultrasonic-release/${PACKAGE_APK_IDSIG} "${PACKAGE_REGISTRY_URL}/${PACKAGE_APK_IDSIG}"
   rules:
-    - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == "37671564"
+    - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == $ROOT_PROJECT_ID
 
 Release:
   stage: Release
@@ -143,4 +149,4 @@ Release:
       --assets-link "{\"name\":\"${PACKAGE_APK}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${PACKAGE_APK}\"}" \
       --assets-link "{\"name\":\"${PACKAGE_APK_IDSIG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${PACKAGE_APK_IDSIG}\"}"
   rules:
-    - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == "37671564"
+    - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == $ROOT_PROJECT_ID
