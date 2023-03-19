@@ -2,7 +2,7 @@ default:
   image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/jangrewe/gitlab-ci-android:33
   before_script:
     - echo "Setting Gradle Home" && export GRADLE_USER_HOME=`pwd`/.gradle
-  cache:
+  cache: &global_cache
     key:
       files:
         - gradle/wrapper/gradle-wrapper.properties
@@ -38,18 +38,30 @@ Check Style:
 Static Analysis:
   stage: Check
   script: ./gradlew -Pqc detekt
+  cache:
+    # inherit all global cache settings
+    <<: *global_cache
+    policy: pull
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
 Lint:
   stage: Check
   script: ./gradlew :ultrasonic:lintRelease
+  cache:
+    # inherit all global cache settings
+    <<: *global_cache
+    policy: pull
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
 Unit Tests:
   stage: Check
   script: ./gradlew ciTest testDebugUnitTest
+  cache:
+    # inherit all global cache settings
+    <<: *global_cache
+    policy: pull
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
