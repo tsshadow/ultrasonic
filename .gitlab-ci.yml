@@ -1,5 +1,7 @@
 default:
   image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/jangrewe/gitlab-ci-android:33
+  before_script:
+    - echo "Setting Gradle Home" && export GRADLE_USER_HOME=`pwd`/.gradle
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
