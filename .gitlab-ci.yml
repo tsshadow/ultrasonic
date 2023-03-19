@@ -30,6 +30,10 @@ stages:
 Check Style:
   stage: Check
   script: ./gradlew -Pqc ktlintCheck
+  cache:
+    # inherit all global cache settings
+    <<: *global_cache
+    policy: pull
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
@@ -59,7 +63,7 @@ Unit Tests:
   cache:
     # inherit all global cache settings
     <<: *global_cache
-    policy: pull
+    policy: pull-push
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
