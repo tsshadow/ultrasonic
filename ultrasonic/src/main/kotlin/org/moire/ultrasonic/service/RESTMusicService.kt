@@ -644,7 +644,7 @@ open class RESTMusicService(
         val response = API.getSongsByGenre(genre, year, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
-        result.addAll(response.body()!!.songsList.toDomainEntityList())
+        result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
 
         return result
     }
@@ -658,7 +658,7 @@ open class RESTMusicService(
         val response = API.getSongsByCustom1(custom1, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
-        result.addAll(response.body()!!.songsList.toDomainEntityList())
+        result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
 
         return result
     }
@@ -672,7 +672,7 @@ open class RESTMusicService(
         val response = API.getSongsByCustom2(custom2, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
-        result.addAll(response.body()!!.songsList.toDomainEntityList())
+        result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
 
         return result
     }
@@ -686,7 +686,7 @@ open class RESTMusicService(
         val response = API.getSongsByCustom3(custom3, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
-        result.addAll(response.body()!!.songsList.toDomainEntityList())
+        result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
 
         return result
     }
@@ -700,7 +700,7 @@ open class RESTMusicService(
         val response = API.getSongsByCustom4(custom4, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
-        result.addAll(response.body()!!.songsList.toDomainEntityList())
+        result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
 
         return result
     }
@@ -714,7 +714,7 @@ open class RESTMusicService(
         val response = API.getSongsByCustom5(custom5, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
-        result.addAll(response.body()!!.songsList.toDomainEntityList())
+        result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
 
         return result
     }
@@ -731,7 +731,7 @@ open class RESTMusicService(
         val response = API.getSongsByMood(mood, year, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
-        result.addAll(response.body()!!.songsList.toDomainEntityList())
+        result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
 
         return result
     }
