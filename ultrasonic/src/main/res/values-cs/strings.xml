@@ -15,6 +15,7 @@
     <string name="button_bar.chat">Chat</string>
     <string name="button_bar.home">Ultrasonic Menu</string>
     <string name="button_bar.now_playing">Právě hraje</string>
+    <string name="buttons.shuffle">Náhodně</string>
     <string name="podcasts.label">Podcasty</string>
     <string name="podcasts_channels.empty">Není registrován žádný podcast kanál</string>
     <string name="button_bar.podcasts">Podcasty</string>
@@ -43,6 +44,7 @@
     <string name="delete_playlist">Opravdu smazat %1$s</string>
     <string name="download.bookmark_removed" formatted="false">Záložka odstraněna.</string>
     <string name="download.bookmark_set_at_position" formatted="false">Záložka vytvořena na %s.</string>
+    <string name="playlist.empty">Playlist je prázdný</string>
     <string name="download.jukebox_not_authorized">Vzdálené ovládání není povoleno. Povolte jukebox mód v <b>Uživatelském &gt; Nastavení</b> na Subsonic serveru.</string>
     <string name="download.jukebox_off">Vzdálené ovládání vypnuto. Hudba je přehrávána na telefonu.</string>
     <string name="download.jukebox_offline">Vzdálené ovládání není dostupné v offline módu.</string>
@@ -59,10 +61,7 @@
     <string name="download.menu_screen_on">Obrazovka zapnuta</string>
     <string name="download.menu_show_album">Zobrazit album</string>
     <string name="download.menu_shuffle">Náhodně</string>
-    <string name="download.menu_shuffle_notification">Playlist byl náhodně zamíchán</string>
     <string name="download.menu_visualizer">Vizualizér</string>
-    <string name="download.playerstate_buffering">Načítám</string>
-    <string name="download.playerstate_downloading">Stahuji - %s</string>
     <string name="download.playerstate_playing_shuffle">Přehrávám mix</string>
     <string name="download.playlist_done">Playlist úspěšně uložen.</string>
     <string name="download.playlist_error">Chyba ukládání playlistu, zkuste později.</string>
@@ -78,7 +77,6 @@
     <string name="equalizer.label">Ekvalizér</string>
     <string name="equalizer.preset">Vybrat předvolbu</string>
     <string name="error.label">Chyba</string>
-    <string name="help.url">file:///android_asset/html/en/index.html</string>
     <string name="jukebox.is_default">Jukebox jako výchozí</string>
     <string name="lyrics.nomatch">Text skladby nenalezen</string>
     <string name="main.albums_alphaByArtist">Podle umělce</string>
@@ -94,7 +92,6 @@
     <string name="main.genres_title">Žánry</string>
     <string name="main.music">Hudba</string>
     <string name="main.offline">Bez připojení</string>
-    <string name="main.shuffle">Náhodné přehrávání</string>
     <string name="main.songs_random">Náhodné</string>
     <string name="main.songs_starred">Označené hvězdičkou</string>
     <string name="main.songs_title">Skladby</string>
@@ -105,37 +102,28 @@
     <string name="menu.deleted_playlist">Smazaný playlist %s</string>
     <string name="menu.deleted_playlist_error">Chyba smazání playlistu %s</string>
     <string name="menu.exit">Ukončit</string>
-    <string name="menu.navigation">Navigace</string>
     <string name="menu.settings">Nastavení</string>
     <string name="menu.refresh">Obnovit</string>
     <string name="music_library.label">Knihovna médií</string>
     <string name="music_library.label_offline">Offline média</string>
-    <string name="music_service.retry">Došlo k chybě sítě. Pokus %1$d z %2$d.</string>
-    <string name="parser.artist_count">Dostupných %d umělců.</string>
-    <string name="parser.reading">Načítání dat serveru.</string>
-    <string name="parser.reading_done">Načítání ze serveru. Hotovo!</string>
     <string name="playlist.label">Playlisty</string>
     <string name="playlist.update_info">Aktualizovat informace</string>
     <string name="playlist.updated_info">Aktualizované informace playlistu pro %s</string>
     <string name="playlist.updated_info_error">Chyba aktualizace informací playlistu %s</string>
-    <string name="progress.wait">Chvilku strpení&#8230;</string>
     <string name="search.albums">Alba</string>
     <string name="search.artists">Umělci</string>
     <string name="search.label">Vyhledávání</string>
     <string name="search.more">Zobrazit více</string>
     <string name="search.no_match">Nenalezeno, zkuste znovu</string>
-    <string name="search.search">Kliknout pro vyhledání</string>
     <string name="search.songs">Skladby</string>
     <string name="search.title">Hledat</string>
     <string name="select_album.empty">Média nenalezena</string>
-    <string name="select_album.no_network">Varování: Připojení nedostupné.</string>
     <string name="select_album.no_sdcard">Chyba: SD karta nedostupná.</string>
     <string name="select_album.play_all">Přehrát vše</string>
     <string name="select_artist.all_folders">Všechny adresáře</string>
     <string name="select_artist.folder">Vybrat adresář</string>
     <string name="select_genre.empty">Žánry nenalezeny</string>
     <string name="select_playlist.empty">Žádné uložené playlisty na serveru</string>
-    <string name="service.connecting">Kontaktuji server, chvilku strpení.</string>
     <string name="settings.appearance_title">Vzhled</string>
     <string name="settings.buffer_length">Délka bufferu</string>
     <string name="settings.buffer_length_0">Vypnuto</string>
@@ -175,8 +163,6 @@
     <string name="settings.chat_refresh">Interval obnovení chatu</string>
     <string name="settings.clear_bookmark">Zahodit záložku</string>
     <string name="settings.clear_bookmark_summary">Zahodit záložku po dokončení přehrávání skladby</string>
-    <string name="settings.clear_playlist">Zahození playlistu</string>
-    <string name="settings.clear_playlist_summary">Zahodit playlist po dokončení přehrávání všech skladeb</string>
     <string name="settings.clear_search_history">Vyčistit historii vyhledávání</string>
     <string name="settings.connection_failure">Chyba připojení.</string>
     <string name="settings.default_albums">Výchozí alba</string>
@@ -193,15 +179,11 @@
     <string name="settings.disc_sort">Řadit skladby podle čísla CD</string>
     <string name="settings.disc_sort_summary">Řadit seznam skladeb dle čísla CD a čísla skladby</string>
     <string name="settings.display_bitrate_summary">Připojovat jméno umělce, bitrate a příponu souboru</string>
-    <string name="settings.download_transition_summary">Při spuštění přehrávání přepnout na aktivitu stahování</string>
-    <string name="settings.gapless_playback">Přehrávání bez pauz</string>
-    <string name="settings.gapless_playback_summary">Zapnout přehrávání bez pauz</string>
     <string name="settings.hide_media_summary">Skrýt hudební soubory před ostatními aplikacemi.</string>
     <string name="settings.hide_media_title">Skrýt před ostatními</string>
     <string name="settings.hide_media_toast">Nabyde účinnosti při příštím skenování hudby systému Android.</string>
     <string name="settings.increment_time">Interval přeskočení</string>
     <string name="settings.invalid_url">Zadejte funkční adresu URL.</string>
-    <string name="settings.invalid_username">Zadejte správné uživatelské jméno (bez mezer za jménem).</string>
     <string name="settings.max_albums">Maximum alb</string>
     <string name="settings.max_artists">Maximum umělců</string>
     <string name="settings.max_bitrate_112">112 Kbps</string>
@@ -258,25 +240,13 @@
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">Historie hledání vyčištěna</string>
     <string name="settings.search_title">Nastavení vyhledávání</string>
-    <string name="settings.send_bluetooth_album_art_summary">Odesílat obrázky alb přes bluetooth (může způsobit selhávání bluetooth upozornění)</string>
-    <string name="settings.send_bluetooth_album_art">Obrázky alb přes bluetooth</string>
-    <string name="settings.send_bluetooth_notification_summary">Odesílat upozornění přehrávání přes bluetooth</string>
-    <string name="settings.send_bluetooth_notification">Odesílat bluetooth upozornění</string>
     <string name="settings.server_manage_servers">Spravovat servery</string>
     <string name="settings.server_address">Adresa serveru</string>
     <string name="settings.server_name">Název</string>
     <string name="settings.server_password">Heslo</string>
-    <string name="settings.server_remove_server">Vzdálený server</string>
     <string name="settings.server_scaling_summary">Stahovat škálované obrázky ze serveru místo plné velikosti (šetří přenos dat)</string>
     <string name="settings.server_scaling_title">Škálování obrázků alb na serveru</string>
-    <string name="settings.server_unused">Nepoužitý</string>
     <string name="settings.server_username">Uživatelské jméno</string>
-    <string name="settings.show_lockscreen_controls">Zobrazit ovládání na zamknuté obrazovce</string>
-    <string name="settings.show_lockscreen_controls_summary">Zobrazí ovládání přehrávače na zamknuté obrazovce</string>
-    <string name="settings.show_notification">Zobrazení upozornění</string>
-    <string name="settings.show_notification_always">Vždy zobrazovat upozornění</string>
-    <string name="settings.show_notification_always_summary">Vždy zobrazovat upozornění přehrávané skladby při vytvoření playlistu</string>
-    <string name="settings.show_notification_summary">Zobrazovat přehrávanou skladbu ve stavovém panelu</string>
     <string name="settings.show_now_playing">Zobrazovat přehrávanou skladbu</string>
     <string name="settings.show_now_playing_summary">Zobrazovat přehrávanou skladbu v aktivitách</string>
     <string name="settings.show_track_number">Zobrazovat číslo skladby</string>
@@ -290,8 +260,6 @@
     <string name="settings.theme_title">Vzhled</string>
     <string name="settings.title.allow_self_signed_certificate">Povolit HTTPS certifikáty podepsané samé sebou</string>
     <string name="settings.title.enable_ldap_users_support">Vynutit ověření nešifrovaným heslem</string>
-    <string name="settings.summary.enable_ldap_users_support">Toto vynutí zaslání hesla v nešifrované podobě.
-Šikovné pokud Subsonic server nepodporuje nové API ověřování uživatel.</string>
     <string name="settings.use_folder_for_album_artist">Jména adresářů jako jména umělců</string>
     <string name="settings.use_folder_for_album_artist_summary">Očekává jména hlavních adresářů obsahující jména umělců</string>
     <string name="settings.use_id3">Procházet za použití ID3 tagů</string>
@@ -299,7 +267,6 @@
     <string name="settings.show_artist_picture">Obrázek umělce v seznamu umělců</string>
     <string name="settings.show_artist_picture_summary">Zobrazí obrázek umělce v náhledu umělců pokud je dostupný</string>
     <string name="main.video" tools:ignore="UnusedResources">Video</string>
-    <string name="song_details.all">%1$s%2$s</string>
     <string name="song_details.kbps">%d kbps</string>
     <string name="util.bytes_format.byte">0 B</string>
     <string name="util.bytes_format.gigabyte">0.00 GB</string>
@@ -342,8 +309,6 @@
     <string name="share_default_greeting">Mrkni na hudbu sdílenou z %s</string>
     <string name="share_via">Sdílet skladby přes</string>
     <string name="menu.share">Sdílení</string>
-    <string name="settings.show_all_songs_by_artist">Zobrazit všechny skladby umělce</string>
-    <string name="settings.show_all_songs_by_artist_summary">Přidat nový zápis v náhledu umělců pro přístup ke všem skladbám umělce</string>
     <string name="download.menu_show_artist">Zobrazit umělce</string>
     <string name="albumArt">albumArt</string>
     <string name="common_multiple_years">Vícenásobné roky</string>
@@ -352,7 +317,6 @@
     <string name="settings.playback.bluetooth_all">Všechny bluetooth přístroje</string>
     <string name="settings.playback.bluetooth_a2dp">Pouze audio (A2DP) přístroje</string>
     <string name="settings.playback.bluetooth_disabled">Vypnuto</string>
-    <string name="settings.playback.single_button_bluetooth_device_summary">Povolení tohoto nastavení může pomoci zlepšit funkci spuštění/pozastavení přehrávání na starších bluetooth přístrojích</string>
     <string name="settings.debug.title">Možnosti ladění aplikace</string>
     <string name="settings.debug.log_to_file">Zapisovat logy ladění do souboru</string>
     <string name="settings.debug.log_path">Soubory logů jsou dostupné v %1$s/%2$s</string>
@@ -375,12 +339,8 @@
     <plurals name="select_album_n_songs">
         <item quantity="one">%d skladba</item>
         <item quantity="few">%d skladby</item>
+        <item quantity="many">%d skladeb</item>
         <item quantity="other">%d skladeb</item>
-    </plurals>
-    <plurals name="select_album_donate_dialog_n_trial_days_left">
-        <item quantity="one">Zbývá %d den zkušební doby</item>
-        <item quantity="few">Zbývají %d dny zkušební doby</item>
-        <item quantity="other">Zbývá %d dní zkušební doby</item>
     </plurals>
 
     <!-- Subsonic api errors -->
@@ -395,4 +355,6 @@
     <string name="api.subsonic.upgrade_client">Nekompatibilní verze. Aktualizujte prosím Ultrasonic Android aplikaci.</string>
     <string name="api.subsonic.upgrade_server">Nekompatibilní verze. Aktualizujte prosím Subsonic server.</string>
 
+    <!-- Subsonic features  -->
+    <string name="settings.five_star_rating_title">Používat pět hvězdiček pro hodnocení skladeb</string>
     </resources>

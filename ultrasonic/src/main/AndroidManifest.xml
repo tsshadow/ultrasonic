@@ -21,6 +21,8 @@
 
     <application
         android:allowBackup="false"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:dataExtractionRules="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/NoActionBar"
@@ -40,8 +42,8 @@
 
         <activity android:name=".activity.NavigationActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:label="@string/common.appname"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.SEARCH"/>
@@ -57,28 +59,25 @@
         </activity>
 
         <service
-            android:name=".service.MediaPlayerService"
+            android:name=".service.DownloadService"
             android:label="Ultrasonic Media Player Service"
             android:exported="false">
         </service>
 
-        <service
-            tools:ignore="ExportedService"
-            android:name=".service.AutoMediaBrowserService"
+        <!-- Needs to be exported: https://android.googlesource.com/platform/developers/build/+/4de32d4/prebuilts/gradle/MediaBrowserService/README.md -->
+        <service android:name=".playback.PlaybackService"
             android:label="@string/common.appname"
+            android:foregroundServiceType="mediaPlayback"
             android:exported="true">
 
             <intent-filter>
+                <action android:name="androidx.media3.session.MediaLibraryService" />
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
 
-        <receiver android:name=".receiver.MediaButtonIntentReceiver">
-            <intent-filter android:priority="2147483647">
-                <action android:name="android.intent.action.MEDIA_BUTTON"/>
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".receiver.UltrasonicIntentReceiver">
+        <receiver android:name=".receiver.UltrasonicIntentReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="org.moire.ultrasonic.CMD_TOGGLEPAUSE"/>
                 <action android:name="org.moire.ultrasonic.CMD_PLAY"/>
@@ -90,7 +89,8 @@
                 <action android:name="org.moire.ultrasonic.CMD_PROCESS_KEYCODE"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".receiver.BluetoothIntentReceiver">
+        <receiver android:name=".receiver.BluetoothIntentReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED"/>
                 <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED"/>
@@ -100,7 +100,8 @@
         </receiver>
         <receiver
             android:name=".provider.UltrasonicAppWidgetProvider4X1"
-            android:label="Ultrasonic (4x1)">
+            android:label="Ultrasonic (4x1)"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -111,7 +112,8 @@
         </receiver>
         <receiver
             android:name=".provider.UltrasonicAppWidgetProvider4X2"
-            android:label="Ultrasonic (4x2)">
+            android:label="Ultrasonic (4x2)"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -122,7 +124,8 @@
         </receiver>
         <receiver
             android:name=".provider.UltrasonicAppWidgetProvider4X3"
-            android:label="Ultrasonic (4x3)">
+            android:label="Ultrasonic (4x3)"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -133,7 +136,8 @@
         </receiver>
         <receiver
             android:name=".provider.UltrasonicAppWidgetProvider4X4"
-            android:label="Ultrasonic (4x4)">
+            android:label="Ultrasonic (4x4)"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -142,18 +146,17 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/appwidget_info_4x4"/>
         </receiver>
-
-        <provider
-            android:name=".provider.SearchSuggestionProvider"
-            android:authorities="org.moire.ultrasonic.provider.SearchSuggestionProvider"/>
-
-        <receiver
-            android:name=".receiver.A2dpIntentReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.android.music.playstatusrequest"/>
+        <receiver android:name=".receiver.MediaButtonIntentReceiver"
+            android:exported="true">
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
             </intent-filter>
         </receiver>
+        <provider
+            android:name=".provider.SearchSuggestionProvider"
+            android:authorities="org.moire.ultrasonic.provider.SearchSuggestionProvider"
+            android:exported="true" />
+
     </application>
 
 </manifest>

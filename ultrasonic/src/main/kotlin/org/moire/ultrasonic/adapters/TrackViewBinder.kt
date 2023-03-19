@@ -12,12 +12,12 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Identifiable
-import org.moire.ultrasonic.domain.MusicDirectory
+import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.DownloadFile
 import org.moire.ultrasonic.service.Downloader
 
 class TrackViewBinder(
-    val onItemClick: (DownloadFile) -> Unit,
+    val onItemClick: (DownloadFile, Int) -> Unit,
     val onContextMenuClick: ((MenuItem, DownloadFile) -> Boolean)? = null,
     val checkable: Boolean,
     val draggable: Boolean,
@@ -29,7 +29,7 @@ class TrackViewBinder(
 
     // Set our layout files
     val layout = R.layout.list_item_track
-    val contextMenuLayout = R.menu.context_menu_track
+    private val contextMenuLayout = R.menu.context_menu_track
 
     private val downloader: Downloader by inject()
     private val imageHelper: Utils.ImageHelper = Utils.ImageHelper(context)
@@ -41,15 +41,14 @@ class TrackViewBinder(
     @SuppressLint("ClickableViewAccessibility")
     @Suppress("LongMethod")
     override fun onBindViewHolder(holder: TrackViewHolder, item: Identifiable) {
-        val downloadFile: DownloadFile?
         val diffAdapter = adapter as BaseAdapter<*>
 
-        when (item) {
-            is MusicDirectory.Entry -> {
-                downloadFile = downloader.getDownloadFileForSong(item)
+        val downloadFile: DownloadFile = when (item) {
+            is Track -> {
+                downloader.getDownloadFileForSong(item)
             }
             is DownloadFile -> {
-                downloadFile = item
+                item
             }
             else -> {
                 return
@@ -77,7 +76,7 @@ class TrackViewBinder(
                 }
             } else {
                 // Minimize or maximize the Text view (if song title is very long)
-                if (!downloadFile.song.isDirectory) {
+                if (!downloadFile.track.isDirectory) {
                     holder.maximizeOrMinimize()
                 }
             }
@@ -86,11 +85,11 @@ class TrackViewBinder(
         }
 
         holder.itemView.setOnClickListener {
-            if (checkable && !downloadFile.song.isVideo) {
+            if (checkable && !downloadFile.track.isVideo) {
                 val nowChecked = !holder.check.isChecked
                 holder.isChecked = nowChecked
             } else {
-                onItemClick(downloadFile)
+                onItemClick(downloadFile, holder.bindingAdapterPosition)
             }
         }
 
@@ -103,41 +102,37 @@ class TrackViewBinder(
 
         // Notify the adapter of selection changes
         holder.observableChecked.observe(
-            lifecycleOwner,
-            { isCheckedNow ->
-                if (isCheckedNow) {
-                    diffAdapter.notifySelected(holder.entry!!.longId)
-                } else {
-                    diffAdapter.notifyUnselected(holder.entry!!.longId)
-                }
+            lifecycleOwner
+        ) { isCheckedNow ->
+            if (isCheckedNow) {
+                diffAdapter.notifySelected(holder.entry!!.longId)
+            } else {
+                diffAdapter.notifyUnselected(holder.entry!!.longId)
             }
-        )
+        }
 
         // Listen to changes in selection status and update ourselves
         diffAdapter.selectionRevision.observe(
-            lifecycleOwner,
-            {
-                val newStatus = diffAdapter.isSelected(item.longId)
+            lifecycleOwner
+        ) {
+            val newStatus = diffAdapter.isSelected(item.longId)
 
-                if (newStatus != holder.check.isChecked) holder.check.isChecked = newStatus
-            }
-        )
+            if (newStatus != holder.check.isChecked) holder.check.isChecked = newStatus
+        }
 
         // Observe download status
         downloadFile.status.observe(
-            lifecycleOwner,
-            {
-                holder.updateStatus(it)
-                diffAdapter.notifyChanged()
-            }
-        )
+            lifecycleOwner
+        ) {
+            holder.updateStatus(it)
+            diffAdapter.notifyChanged()
+        }
 
         downloadFile.progress.observe(
-            lifecycleOwner,
-            {
-                holder.updateProgress(it)
-            }
-        )
+            lifecycleOwner
+        ) {
+            holder.updateProgress(it)
+        }
     }
 
     override fun onViewRecycled(holder: TrackViewHolder) {

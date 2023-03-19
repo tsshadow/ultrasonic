@@ -1,12 +1,14 @@
 /*
  * NavigationActivity.kt
- * Copyright (C) 2009-2021 Ultrasonic developers
+ * Copyright (C) 2009-2022 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
 package org.moire.ultrasonic.activity
 
 import android.app.SearchManager
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Resources
@@ -25,6 +27,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentContainerView
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player.STATE_BUFFERING
+import androidx.media3.common.Player.STATE_READY
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -36,23 +41,24 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
-import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ServerSettingDao
-import org.moire.ultrasonic.domain.PlayerState
 import org.moire.ultrasonic.fragment.OnBackPressedHandler
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.provider.SearchSuggestionProvider
-import org.moire.ultrasonic.service.DownloadFile
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MediaPlayerLifecycleSupport
 import org.moire.ultrasonic.service.RxBus
+import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.InfoDialog
+import org.moire.ultrasonic.util.LocaleHelper
 import org.moire.ultrasonic.util.ServerColor
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Storage
@@ -61,7 +67,7 @@ import org.moire.ultrasonic.util.Util
 import timber.log.Timber
 
 /**
- * The main Activity of Ultrasonic which loads all other screens as Fragments
+ * The main (and only) Activity of Ultrasonic which loads all other screens as Fragments
  */
 @Suppress("TooManyFunctions")
 class NavigationActivity : AppCompatActivity() {
@@ -78,8 +84,8 @@ class NavigationActivity : AppCompatActivity() {
     private var headerBackgroundImage: ImageView? = null
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private var themeChangedEventSubscription: Disposable? = null
-    private var playerStateSubscription: Disposable? = null
+
+    private var rxBusSubscription: CompositeDisposable = CompositeDisposable()
 
     private val serverSettingsModel: ServerSettingsModel by viewModel()
     private val lifecycleSupport: MediaPlayerLifecycleSupport by inject()
@@ -93,6 +99,16 @@ class NavigationActivity : AppCompatActivity() {
     private var cachedServerCount: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.d("onCreate called")
+
+        // First check if Koin has been started
+        if (UApp.instance != null && !UApp.instance!!.initiated) {
+            Timber.d("Starting Koin")
+            UApp.instance!!.startKoin()
+        } else {
+            Timber.d("No need to start Koin")
+        }
+
         setUncaughtExceptionHandler()
         Util.applyTheme(this)
 
@@ -154,18 +170,14 @@ class NavigationActivity : AppCompatActivity() {
             setMenuForServerCapabilities()
         }
 
-        // Determine first run and migrate server settings to DB as early as possible
-        var showWelcomeScreen = Util.isFirstRun()
-        val areServersMigrated: Boolean = serverSettingsModel.migrateFromPreferences()
+        // Determine if this is a first run
+        val showWelcomeScreen = Util.isFirstRun()
 
         // Migrate Feature storage if needed
         // TODO: Remove in December 2022
         if (!Settings.hasKey(Constants.PREFERENCES_KEY_USE_FIVE_STAR_RATING)) {
             Settings.migrateFeatureStorage()
         }
-
-        // If there are any servers in the DB, do not show the welcome screen
-        showWelcomeScreen = showWelcomeScreen and !areServersMigrated
 
         loadSettings()
 
@@ -180,25 +192,25 @@ class NavigationActivity : AppCompatActivity() {
             hideNowPlaying()
         }
 
-        playerStateSubscription = RxBus.playerStateObservable.subscribe {
-            if (it.state === PlayerState.STARTED || it.state === PlayerState.PAUSED)
+        rxBusSubscription += RxBus.playerStateObservable.subscribe {
+            if (it.state == STATE_READY)
                 showNowPlaying()
             else
                 hideNowPlaying()
         }
 
-        themeChangedEventSubscription = RxBus.themeChangedEventObservable.subscribe {
+        rxBusSubscription += RxBus.themeChangedEventObservable.subscribe {
             recreate()
         }
 
-        serverRepository.liveServerCount().observe(
-            this,
-            { count ->
-                cachedServerCount = count ?: 0
-                updateNavigationHeaderForServer()
-            }
-        )
-        ActiveServerProvider.liveActiveServerId.observe(this, { updateNavigationHeaderForServer() })
+        rxBusSubscription += RxBus.activeServerChangeObservable.subscribe {
+            updateNavigationHeaderForServer()
+        }
+
+        serverRepository.liveServerCount().observe(this) { count ->
+            cachedServerCount = count ?: 0
+            updateNavigationHeaderForServer()
+        }
     }
 
     private fun updateNavigationHeaderForServer() {
@@ -224,6 +236,7 @@ class NavigationActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
+        Timber.d("onResume called")
         super.onResume()
 
         Storage.reset()
@@ -237,10 +250,11 @@ class NavigationActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        themeChangedEventSubscription?.dispose()
-        playerStateSubscription?.dispose()
+        Timber.d("onDestroy called")
+        rxBusSubscription.dispose()
         imageLoaderProvider.clearImageLoader()
+        UApp.instance!!.shutdownKoin()
+        super.onDestroy()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -351,18 +365,34 @@ class NavigationActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Apply the customized language settings if needed
+     */
+    override fun attachBaseContext(newBase: Context?) {
+        val locale = Settings.overrideLanguage
+        val localeUpdatedContext: ContextWrapper = LocaleHelper.wrap(newBase, locale)
+        super.attachBaseContext(localeUpdatedContext)
+    }
+
     private fun loadSettings() {
         PreferenceManager.setDefaultValues(this, R.xml.settings, false)
     }
 
     private fun exit() {
+        Timber.d("User choose to exit the app")
+
+        // Broadcast that the service is being shutdown
+        RxBus.stopCommandPublisher.onNext(Unit)
+
         lifecycleSupport.onDestroy()
-        finish()
+        finishAndRemoveTask()
     }
 
     private fun showWelcomeDialog() {
         if (!infoDialogDisplayed) {
             infoDialogDisplayed = true
+
+            Settings.firstInstalledVersion = Util.getVersionCode(UApp.applicationContext())
 
             InfoDialog.Builder(this)
                 .setTitle(R.string.main_welcome_title)
@@ -406,10 +436,10 @@ class NavigationActivity : AppCompatActivity() {
         }
 
         if (nowPlayingView != null) {
-            val playerState: PlayerState = mediaPlayerController.playerState
-            if (playerState == PlayerState.PAUSED || playerState == PlayerState.STARTED) {
-                val file: DownloadFile? = mediaPlayerController.currentPlaying
-                if (file != null) {
+            val playerState: Int = mediaPlayerController.playbackState
+            if (playerState == STATE_BUFFERING || playerState == STATE_READY) {
+                val item: MediaItem? = mediaPlayerController.currentMediaItem
+                if (item != null) {
                     nowPlayingView?.visibility = View.VISIBLE
                 }
             } else {
