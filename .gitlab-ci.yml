@@ -3,7 +3,9 @@ default:
   before_script:
     - echo "Setting Gradle Home" && export GRADLE_USER_HOME=`pwd`/.gradle
   cache:
-    key: ${CI_COMMIT_REF_SLUG}
+    key:
+      files:
+        - gradle/wrapper/gradle-wrapper.properties
     paths:
       - .gradle/
 
@@ -29,7 +31,7 @@ stages:
 
 Check Style:
   stage: Check
-  script: pwd && ls -lah && ls -lah ~ && ./gradlew -Pqc ktlintCheck && ls -lah /root/.gradle/ && ls -lah /root/.gradle/wrapper/dists
+  script: pwd && ls -lah && ls -lah ~ && ./gradlew -Pqc ktlintCheck && ls -lah ~ && ls -lah .gradle
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
