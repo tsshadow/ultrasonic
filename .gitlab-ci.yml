@@ -3,7 +3,7 @@ default:
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - .gradle/
+      - ~/.gradle/
 
 variables:
   CACHE_FALLBACK_KEY: develop-protected
@@ -26,7 +26,7 @@ stages:
 
 Check Style:
   stage: Check
-  script: ls -lah ~ && ./gradlew -Pqc ktlintCheck && ls -lah ~/.gradle/ && ls -lah ~/.gradle/wrapper/dists
+  script: pwd && ls -lah && ls -lah ~ && ./gradlew -Pqc ktlintCheck && ls -lah ~/.gradle/ && ls -lah ~/.gradle/wrapper/dists
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
