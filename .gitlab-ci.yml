@@ -1,7 +1,5 @@
 default:
   image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/jangrewe/gitlab-ci-android:33
-  before_script:
-    - echo "Setting Gradle Home" && export GRADLE_USER_HOME=`pwd`/.gradle
   cache: &global_cache
     key:
       files:
@@ -31,7 +29,7 @@ stages:
 
 Check Style:
   stage: Check
-  script: pwd && ls -lah && ls -lah ~ && ./gradlew -Pqc ktlintCheck && ls -lah ~ && ls -lah .gradle
+  script: ./gradlew -Pqc ktlintCheck
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
