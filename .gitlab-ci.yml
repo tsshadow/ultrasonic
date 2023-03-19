@@ -5,8 +5,7 @@ default:
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - ~/.gradle/
-      - /root/.gradle/
+      - .gradle/
 
 variables:
   CACHE_FALLBACK_KEY: develop-protected
@@ -18,6 +17,7 @@ variables:
   PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/Ultrasonic/${CI_COMMIT_TAG}"
   PACKAGE_APK: "ultrasonic-${CI_COMMIT_TAG}.apk"
   PACKAGE_APK_IDSIG: "ultrasonic-${CI_COMMIT_TAG}.apk.idsig"
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
 
 stages:
   - Check
