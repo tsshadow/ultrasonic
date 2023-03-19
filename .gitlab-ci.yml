@@ -26,7 +26,7 @@ stages:
 
 Check Style:
   stage: Check
-  script: ls -lah ~/.gradle/wrapper/dists && ./gradlew -Pqc ktlintCheck && ls -lah ~/.gradle/wrapper/dists
+  script: ls -lah ~ && ./gradlew -Pqc ktlintCheck && ls -lah ~/.gradle/ && ls -lah ~/.gradle/wrapper/dists
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
@@ -34,19 +34,19 @@ Static Analysis:
   stage: Check
   script: ./gradlew -Pqc detekt
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "developDISABLED" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
 Lint:
   stage: Check
   script: ./gradlew :ultrasonic:lintRelease
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "developDISABLED" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
 Unit Tests:
   stage: Check
   script: ./gradlew ciTest testDebugUnitTest
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
+    - if: $CI_COMMIT_REF_NAME == "developDISABLED" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != "37671564"
 
 Assemble Debug:
   stage: Assemble
