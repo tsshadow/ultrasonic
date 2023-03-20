@@ -102,6 +102,8 @@ Push Translations:
 
 Generate Signed Develop APK:
   stage: APK
+  # We don't need the gradle cache here
+  cache: []
   script:
     - openssl aes-256-cbc -K ${ULTRASONIC_KEYSTORE_KEY} -iv ${ULTRASONIC_KEYSTORE_IV} -in ultrasonic-keystore.enc -out ultrasonic-keystore -d
     - mkdir -p ${CI_PROJECT_DIR}/ultrasonic-release
@@ -117,6 +119,8 @@ Generate Signed Develop APK:
 
 Generate Signed APK:
   stage: APK
+  # We don't need the gradle cache here
+  cache: []
   script:
     - openssl aes-256-cbc -K ${ULTRASONIC_KEYSTORE_KEY} -iv ${ULTRASONIC_KEYSTORE_IV} -in ultrasonic-keystore.enc -out ultrasonic-keystore -d
     - mkdir -p ${CI_PROJECT_DIR}/ultrasonic-release
