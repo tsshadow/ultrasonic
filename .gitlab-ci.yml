@@ -1,5 +1,5 @@
 default:
-  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/jangrewe/gitlab-ci-android:33
+  image: 	${CUSTOM_IMAGE_PREFIX}birdbirdbyrd/gitlab-ci-android
   cache: &global_cache
     key:
       files:
@@ -57,7 +57,7 @@ Lint:
   cache:
     # inherit all global cache settings
     <<: *global_cache
-    policy: pull
+    policy: pull-push
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
