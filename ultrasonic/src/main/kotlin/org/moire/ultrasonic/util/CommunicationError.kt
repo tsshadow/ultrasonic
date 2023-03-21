@@ -39,14 +39,14 @@ object CommunicationError {
     }
 
     @JvmStatic
-    fun handleError(error: Throwable?, context: Context?) {
+    fun handleError(error: Throwable, context: Context?) {
         Timber.w(error)
 
         if (context == null) return
 
         ErrorDialog(
             context = context,
-            message = getErrorMessage(error!!, context)
+            message = getErrorMessage(error, context)
         ).show()
     }
 

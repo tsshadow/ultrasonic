@@ -600,14 +600,17 @@ open class TrackCollectionFragment(
                 listModel.getRandom(size, append)
             } else {
                 setTitle(name)
+                requireNotNull(id) {
+                    "ID must be set. NavArgs: ${navArgs.toBundle()}"
+                }
                 if (ActiveServerProvider.isID3Enabled()) {
                     if (isAlbum) {
-                        listModel.getAlbum(refresh2, id!!, name)
+                        listModel.getAlbum(refresh2, id, name)
                     } else {
                         throw IllegalAccessException("Use AlbumFragment instead!")
                     }
                 } else {
-                    listModel.getMusicDirectory(refresh2, id!!, name)
+                    listModel.getMusicDirectory(refresh2, id, name)
                 }
             }
 
