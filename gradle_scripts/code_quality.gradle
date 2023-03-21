@@ -31,5 +31,4 @@ if (isCodeQualityEnabled) {
         }
         tasks.detekt.jvmTarget = "11"
     }
-
 }
