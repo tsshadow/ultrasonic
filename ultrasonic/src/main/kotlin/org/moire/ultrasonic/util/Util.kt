@@ -775,4 +775,13 @@ object Util {
             stopForeground(true)
         }
     }
+
+    fun dumpSettingsToLog() {
+        Timber.d("Current user preferences")
+        Timber.d("========================")
+        val keys = Settings.preferences.all
+        keys.forEach {
+            Timber.d("${it.key}: ${it.value}")
+        }
+    }
 }

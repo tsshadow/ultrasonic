@@ -59,6 +59,7 @@ class UApp : MultiDexApplication() {
         ioScope.launch {
             if (Settings.debugLogToFile) {
                 FileLoggerTree.plantToTimberForest()
+                Util.dumpSettingsToLog()
             }
             isFirstRun = Util.isFirstRun()
         }
