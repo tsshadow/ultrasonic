@@ -24,7 +24,6 @@ variables:
 stages:
   - Check
   - Assemble
-  - Translations
   - APK
   - Publish
   - Release
@@ -88,17 +87,6 @@ Assemble Release:
       - ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
-
-Push Translations:
-  stage: Translations
-  image: alpine:latest
-  script:
-    - wget -O /tmp/tx-linux-amd64.tar.gz https://github.com/transifex/cli/releases/latest/download/tx-linux-amd64.tar.gz
-    - tar xf /tmp/tx-linux-amd64.tar.gz -C /tmp
-    - mv /tmp/tx /usr/bin/tx
-    - tx push -s
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == $ROOT_PROJECT_ID
 
 Generate Signed Develop APK:
   stage: APK
