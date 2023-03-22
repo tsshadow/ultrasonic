@@ -39,7 +39,7 @@
     <string name="chat.send_a_message">Send en melding</string>
     <string name="background_task.loading">Laster inn …</string>
     <string name="common.appname">Ultrasonic</string>
-    <string name="button_bar.browse">Mediabibliotek</string>
+    <string name="button_bar.browse">Mediebibliotek</string>
     <string name="buttons.play">Spill</string>
     <string name="buttons.previous">Forrige</string>
     <string name="podcasts.label">Nettradioopptak</string>
@@ -65,7 +65,7 @@
     <string name="playlist.empty">Spillelisten er tom</string>
     <string name="common.unpin">Løsne</string>
     <string name="settings.cache_size_9000">9 GB</string>
-    <string name="settings.clear_bookmark">Tøm bokmerke</string>
+    <string name="settings.clear_bookmark">Fjern bokmerke</string>
     <string name="main.albums_highest">Toppvurdert</string>
     <string name="language.default">Systemforvalg</string>
     <string name="settings.default_songs">Forvalgte spor</string>
@@ -86,7 +86,7 @@
     <string name="main.genres_title">Sjangere</string>
     <string name="settings.increment_time_12">12 sekunder</string>
     <string name="settings.increment_time_2">2 sekunder</string>
-    <string name="select_album.empty">Fant ingen media</string>
+    <string name="select_album.empty">Fant ingen mediefiler</string>
     <string name="select_album.n_selected">%d spor valgt</string>
     <string name="settings.increment_time_120">2 minutter</string>
     <string name="settings.increment_time_30">30 sekunder</string>
@@ -180,8 +180,8 @@
     <string name="menu.exit">Avslutt</string>
     <string name="menu.settings">Innstillinger</string>
     <string name="menu.refresh">Gjenoppfrisk</string>
-    <string name="music_library.label">Mediabibliotek</string>
-    <string name="music_library.label_offline">Frakoblet media</string>
+    <string name="music_library.label">Mediebibliotek</string>
+    <string name="music_library.label_offline">Frakoblede medier</string>
     <string name="playlist.label">Spillelister</string>
     <string name="playlist.update_info">Oppdater info</string>
     <string name="search.albums">Album</string>
@@ -220,7 +220,7 @@
     <string name="settings.invalid_url">Angi en gyldig nettadresse.</string>
     <string name="settings.max_artists">Maks. artister</string>
     <string name="settings.max_bitrate_unlimited">Ubegrenset</string>
-    <string name="settings.media_button_title">Mediaknapper</string>
+    <string name="settings.media_button_title">Medieknapper</string>
     <string name="settings.network_timeout">Nettverkstidsavbrudd</string>
     <string name="settings.network_timeout_90000">90 sekunder</string>
     <string name="settings.network_timeout_75000">75 sekunder</string>
@@ -307,4 +307,20 @@
         <item quantity="one">%d spor slettet</item>
         <item quantity="other">%d spor løsnet</item>
     </plurals>
+    <string name="about.text"><b>Ultrasonic</b> er en gratis og fri Android-musikkstrømmingsklient Subsonic-API-et (v 1.7.0 eller høyere) for kompatible tjenere.
+\n
+\nMed <b>Ultrasonic</b> kan du enkelt strømme eller laste ned musikk fra din PC eller Android-enhet til ved bruk av din Subsonic-kompatible musikktjener. Subsonic-tjenerprogramvaren krever ytterligere oppsett, som ikke har med Ultrasonic å gjøre.
+\n
+\nUltrasonic må settes opp når du har laget deg en tjener. Endre tjeneroppsettet slik at det kobler seg til din egen datamaskin.</string>
+    <string name="download.playlist_saving">Lagrer «%s»-spillelisten …</string>
+    <string name="equalizer.preset">Velg forhåndsinnstilling</string>
+    <string name="lyrics.nomatch">Fant ingen sangtekster</string>
+    <string name="menu.deleted_playlist_error">Klarte ikke å slette %s-spillelisten</string>
+    <string name="settings.download_transition_summary">Bytt til «Nå spilles» etter at avspilling startes i medievisning</string>
+    <string name="settings.hide_media_toast">Trer i effekt neste gang Android skanner enheten din for musikk.</string>
+    <string name="settings.media_button_summary">Svarer på enhets-, hodesett, og Blåtannsmedieknapper</string>
+    <string name="settings.wifi_required_summary">Kun last ned på ubegrensede tilkoblinger</string>
+    <string name="notification.downloading_title">Last ned medier i bakgrunnen …\?</string>
+    <string name="notification.permission_required">Merknader kreves for medieavspilling. Du kan innvilge tilgangen når som helst i Android-innstillingene.</string>
+    <string name="settings.use_hw_offload_description">Prøv å spille medier ved bruk av maskinvaredekoding på enheten din. Kan bruke mindre batteri.</string>
 </resources>
