@@ -72,12 +72,6 @@ Unit Tests:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-Assemble Debug:
-  stage: Assemble
-  script: ./gradlew assembleDebug
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
-
 Assemble Release:
   stage: Assemble
   script: ./gradlew assembleRelease
