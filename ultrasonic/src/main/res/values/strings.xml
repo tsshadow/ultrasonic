@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
-    <string name="background_task.loading">Loading&#8230;</string>
+    <string name="background_task.loading">Loading…</string>
     <string name="background_task.network_error">A network error occurred. Please check the server address or try again later.</string>
-    <string name="background_task.unsupported_api">Server api v%1$s does not support this function.</string>
+    <string name="background_task.unsupported_api">Server API v%1$s does not support this function.</string>
     <string name="background_task.no_network">This program requires network access. Please turn on Wi-Fi or mobile network.</string>
     <string name="background_task.not_found">Resource not found. Please check the server address.</string>
     <string name="background_task.parse_error">Didn\'t understand the reply. Please check the server address.</string>
     <string name="background_task.ssl_cert_error">HTTPS certificate error: %1$s.</string>
     <string name="background_task.ssl_error">SSL connection exception. Please check server certificate.</string>
-    <string name="background_task.wait">Please wait&#8230;</string>
+    <string name="background_task.wait">Please wait…</string>
     <string name="button_bar.bookmarks">Bookmarks</string>
     <string name="button_bar.browse">Media Library</string>
     <string name="button_bar.chat">Chat</string>
@@ -77,10 +76,10 @@
     <string name="download.menu_shuffle_off">Shuffle mode disabled</string>
     <string name="download.playerstate_loading">Buffering …</string>
     <string name="download.playerstate_playing_shuffle">Playing shuffle</string>
-    <string name="download.playlist_done">Playlist was successfully saved.</string>
+    <string name="download.playlist_done">Playlist saved.</string>
     <string name="download.playlist_error">Failed to save playlist, please try later.</string>
     <string name="download.playlist_name">Enter the playlist name:</string>
-    <string name="download.playlist_saving">Saving playlist \"%s\"&#8230;</string>
+    <string name="download.playlist_saving">Saving playlist \"%s\"…</string>
     <string name="download.playlist_title">Save Playlist</string>
     <string name="download.repeat_all">Repeat All</string>
     <string name="download.repeat_off">Repeat Off</string>
@@ -395,13 +394,11 @@
     <string name="server_editor.advanced">Advanced settings</string>
     <string name="server_editor.disabled_feature">One or more features were disabled because the server doesn\'t support them.\nYou can run this test again anytime.</string>
     <string name="server_menu.demo">Demo Server</string>
-
     <string name="about.webpage">Visit webpage</string>
     <string name="about.report">Report a bug</string>
     <string name="about.text"><b>Ultrasonic</b> is a free and open-source music streaming Android client for Subsonic API (version 1.7.0 or higher) compatible servers.\n\nWith <b>Ultrasonic</b> you can easily stream or download music from your home computer to your Android phone using your Subsonic compatible media server. The Subsonic server software requires additional configuration separate from Ultrasonic.\n\nBy default, Ultrasonic is not configured. Once you\'ve set up your own server, please change the server configuration so that it connects to your own computer.</string>
     <string name="about.webpage.url" translatable="false">https://ultrasonic.gitlab.io/</string>
     <string name="about.report.url" translatable="false">https://gitlab.com/ultrasonic/ultrasonic/issues</string>
-
     <plurals name="select_album_n_songs">
         <item quantity="one">%d song</item>
         <item quantity="other">%d songs</item>
@@ -430,9 +427,8 @@
         <item quantity="one">%d song inserted after current song</item>
         <item quantity="other">%d songs inserted after current song</item>
     </plurals>
-
     <!-- Subsonic api errors -->
-    <string name="api.subsonic.generic">Generic api error: %1$s</string>
+    <string name="api.subsonic.generic">Generic API error: %1$s</string>
     <string name="api.subsonic.generic.no.message">no message given from server</string>
     <string name="api.subsonic.token_auth_not_supported_for_ldap">Authentication by token is not supported for LDAP users.</string>
     <string name="api.subsonic.not_authenticated">Wrong username or password.</string>
@@ -442,7 +438,6 @@
     <string name="api.subsonic.trial_period_is_over">Trial period is over.</string>
     <string name="api.subsonic.upgrade_client">Incompatible versions. Please upgrade Ultrasonic Android app.</string>
     <string name="api.subsonic.upgrade_server">Incompatible versions. Please upgrade Subsonic server.</string>
-
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Use five star rating for songs</string>
     <string name="settings.five_star_rating_description">Use five star rating system for songs instead of simply starring/unstarring items.</string>
@@ -452,6 +447,4 @@
     <string name="grid_view">Cover</string>
     <string name="supported_server_features">Supported features</string>
     <string name="jukebox">Jukebox</string>
-
-
 </resources>
