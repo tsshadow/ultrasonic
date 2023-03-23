@@ -1,5 +1,5 @@
 default:
-  image: 	${CUSTOM_IMAGE_PREFIX}birdbirdbyrd/gitlab-ci-android
+  image: 	registry.gitlab.com/ultrasonic/ci-android:latest
   cache: &global_cache
     key:
       files:
