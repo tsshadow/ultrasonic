@@ -23,8 +23,8 @@ variables:
 
 stages:
   - Check
-  - Assemble
-  - APK
+  - Build
+  - Sign APK
   - Publish
   - Release
 
@@ -73,7 +73,7 @@ Unit Tests:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 Assemble Release:
-  stage: Assemble
+  stage: Build
   script: ./gradlew assembleRelease
   artifacts:
     name: ultrasonic-release-unsigned-${CI_COMMIT_SHA}
@@ -83,7 +83,7 @@ Assemble Release:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
 
 Generate Signed Develop APK:
-  stage: APK
+  stage: Sign APK
   # We don't need the gradle cache here
   cache: []
   script:
@@ -100,7 +100,7 @@ Generate Signed Develop APK:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == $ROOT_PROJECT_ID
 
 Generate Signed APK:
-  stage: APK
+  stage: Sign APK
   # We don't need the gradle cache here
   cache: []
   script:
