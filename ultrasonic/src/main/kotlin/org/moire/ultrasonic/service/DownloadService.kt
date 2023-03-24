@@ -8,8 +8,6 @@
 package org.moire.ultrasonic.service
 
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.net.wifi.WifiManager
@@ -82,8 +80,15 @@ class DownloadService : Service(), KoinComponent {
         val supervisor = SupervisorJob()
         scope = CoroutineScope(Dispatchers.IO + supervisor)
 
+        val notificationManagerCompat = NotificationManagerCompat.from(this)
+
         // Create Notification Channel
-        createNotificationChannel()
+        Util.ensureNotificationChannel(
+            id = NOTIFICATION_CHANNEL_ID,
+            name = NOTIFICATION_CHANNEL_NAME,
+            importance = 2,
+            notificationManager = notificationManagerCompat
+        )
         updateNotification()
 
         if (wifiLock == null) {
@@ -213,25 +218,6 @@ class DownloadService : Service(), KoinComponent {
         updateLiveData()
     }
 
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            // The suggested importance of a startForeground service notification is IMPORTANCE_LOW
-            val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_LOW
-            )
-
-            channel.lightColor = android.R.color.holo_blue_dark
-            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            channel.setShowBadge(false)
-
-            val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(channel)
-        }
-    }
-
     // We should use a single notification builder, otherwise the notification may not be updated
     // Set some values that never change
     private val notificationBuilder: NotificationCompat.Builder by lazy {
@@ -252,13 +238,8 @@ class DownloadService : Service(), KoinComponent {
         val notification = buildForegroundNotification()
 
         if (isInForeground) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                manager.notify(NOTIFICATION_ID, notification)
-            } else {
-                val manager = NotificationManagerCompat.from(this)
-                manager.notify(NOTIFICATION_ID, notification)
-            }
+            val manager = NotificationManagerCompat.from(this)
+            Util.postNotificationIfPermitted(manager, NOTIFICATION_ID, notification)
             Timber.v("Updated notification")
         } else {
             startForeground(NOTIFICATION_ID, notification)

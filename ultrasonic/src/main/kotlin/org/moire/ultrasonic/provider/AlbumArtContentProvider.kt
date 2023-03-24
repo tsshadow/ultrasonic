@@ -17,6 +17,7 @@ import java.io.File
 import java.util.Locale
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.imageloader.ImageLoader
 import org.moire.ultrasonic.util.FileUtil
@@ -29,9 +30,10 @@ class AlbumArtContentProvider : ContentProvider(), KoinComponent {
     companion object {
         fun mapArtworkToContentProviderUri(track: Track?): Uri? {
             if (track?.coverArt.isNullOrBlank()) return null
+            val domain = UApp.applicationContext().packageName + ".provider.AlbumArtContentProvider"
             return Uri.Builder()
                 .scheme(ContentResolver.SCHEME_CONTENT)
-                .authority("org.moire.ultrasonic.provider.AlbumArtContentProvider")
+                .authority(domain)
                 // currently only large files are cached
                 .path(
                     String.format(

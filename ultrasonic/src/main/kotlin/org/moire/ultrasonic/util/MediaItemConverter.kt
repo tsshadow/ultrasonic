@@ -7,12 +7,14 @@
 
 package org.moire.ultrasonic.util
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MediaMetadata.FOLDER_TYPE_NONE
 import androidx.media3.common.StarRating
 import java.text.DateFormat
 import org.moire.ultrasonic.domain.Track
@@ -204,19 +206,21 @@ fun MediaItem.shouldBePinned(): Boolean {
  * Build a new MediaItem from a list of attributes.
  * Especially useful to create folder entries in the Auto interface.
  */
+@SuppressLint("UnsafeOptInUsageError")
 @Suppress("LongParameterList")
 fun buildMediaItem(
     title: String,
     mediaId: String,
     isPlayable: Boolean,
-    @MediaMetadata.FolderType folderType: Int,
+    folderType: @MediaMetadata.FolderType Int,
     album: String? = null,
     artist: String? = null,
     genre: String? = null,
     sourceUri: Uri? = null,
     imageUri: Uri? = null,
     starred: Boolean = false,
-    group: String? = null
+    group: String? = null,
+    mediaType: @MediaMetadata.MediaType Int? = null,
 ): MediaItem {
 
     val metadataBuilder = MediaMetadata.Builder()
@@ -232,6 +236,14 @@ fun buildMediaItem(
 
     if (imageUri != null) {
         metadataBuilder.setArtworkUri(imageUri)
+    }
+
+    if (folderType > FOLDER_TYPE_NONE) {
+        metadataBuilder.setIsBrowsable(true)
+    }
+
+    if (mediaType != null) {
+        metadataBuilder.setMediaType(mediaType)
     }
 
     if (group != null) {

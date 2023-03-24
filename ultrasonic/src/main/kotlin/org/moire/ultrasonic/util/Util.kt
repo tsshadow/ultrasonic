@@ -10,6 +10,9 @@ package org.moire.ultrasonic.util
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.app.Service.STOP_FOREGROUND_REMOVE
@@ -34,6 +37,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.AnyRes
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -511,7 +515,33 @@ object Util {
         }
     }
 
-    fun ensurePermissionToPostNotification(fragment: ComponentActivity) {
+    fun ensureNotificationChannel(
+        id: String,
+        name: String,
+        importance: Int? = null,
+        notificationManager: NotificationManagerCompat
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            // The suggested importance of a startForeground service notification is IMPORTANCE_LOW
+            val channel = NotificationChannel(
+                id,
+                name,
+                importance ?: NotificationManager.IMPORTANCE_DEFAULT
+            )
+
+            channel.lightColor = android.R.color.holo_blue_dark
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            channel.setShowBadge(false)
+
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    fun ensurePermissionToPostNotification(
+        fragment: ComponentActivity,
+        onGranted: (() -> Unit)? = null
+    ) {
         if (ContextCompat.checkSelfPermission(
                 applicationContext(),
                 POST_NOTIFICATIONS,
@@ -527,9 +557,27 @@ object Util {
                 }
 
             requestPermissionLauncher.launch(POST_NOTIFICATIONS)
+        } else {
+            // Execute the closure
+            if (onGranted != null) {
+                onGranted()
+            }
         }
     }
-
+    fun postNotificationIfPermitted(
+        notificationManagerCompat: NotificationManagerCompat,
+        id: Int,
+        notification: Notification
+    ) {
+        if (ContextCompat.checkSelfPermission(
+                applicationContext(),
+                POST_NOTIFICATIONS,
+            ) == PackageManager.PERMISSION_GRANTED &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        ) {
+            notificationManagerCompat.notify(id, notification)
+        }
+    }
     @JvmStatic
     @Suppress("DEPRECATION")
     fun getVersionName(context: Context): String? {

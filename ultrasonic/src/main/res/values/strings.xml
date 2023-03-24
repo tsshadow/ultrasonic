@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+
     <string name="background_task.loading">Loading…</string>
     <string name="background_task.network_error">A network error occurred. Please check the server address or try again later.</string>
     <string name="background_task.unsupported_api">Server API v%1$s does not support this function.</string>
@@ -394,11 +395,13 @@
     <string name="server_editor.advanced">Advanced settings</string>
     <string name="server_editor.disabled_feature">One or more features were disabled because the server doesn\'t support them.\nYou can run this test again anytime.</string>
     <string name="server_menu.demo">Demo Server</string>
+
     <string name="about.webpage">Visit webpage</string>
     <string name="about.report">Report a bug</string>
     <string name="about.text"><b>Ultrasonic</b> is a free and open-source music streaming Android client for Subsonic API (version 1.7.0 or higher) compatible servers.\n\nWith <b>Ultrasonic</b> you can easily stream or download music from your home computer to your Android phone using your Subsonic compatible media server. The Subsonic server software requires additional configuration separate from Ultrasonic.\n\nBy default, Ultrasonic is not configured. Once you\'ve set up your own server, please change the server configuration so that it connects to your own computer.</string>
     <string name="about.webpage.url" translatable="false">https://ultrasonic.gitlab.io/</string>
     <string name="about.report.url" translatable="false">https://gitlab.com/ultrasonic/ultrasonic/issues</string>
+
     <plurals name="select_album_n_songs">
         <item quantity="one">%d song</item>
         <item quantity="other">%d songs</item>
@@ -427,6 +430,7 @@
         <item quantity="one">%d song inserted after current song</item>
         <item quantity="other">%d songs inserted after current song</item>
     </plurals>
+
     <!-- Subsonic api errors -->
     <string name="api.subsonic.generic">Generic API error: %1$s</string>
     <string name="api.subsonic.generic.no.message">no message given from server</string>
@@ -438,6 +442,7 @@
     <string name="api.subsonic.trial_period_is_over">Trial period is over.</string>
     <string name="api.subsonic.upgrade_client">Incompatible versions. Please upgrade Ultrasonic Android app.</string>
     <string name="api.subsonic.upgrade_server">Incompatible versions. Please upgrade Subsonic server.</string>
+
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Use five star rating for songs</string>
     <string name="settings.five_star_rating_description">Use five star rating system for songs instead of simply starring/unstarring items.</string>
@@ -447,4 +452,10 @@
     <string name="grid_view">Cover</string>
     <string name="supported_server_features">Supported features</string>
     <string name="jukebox">Jukebox</string>
+    <string name="foreground_exception_title">Playback cannot be resumed</string>
+    <string name="foreground_exception_text">Press on the play button on the media notification if it
+    is still present, otherwise please open the app to start the playback and re-connect the session
+    to the controller</string>
+
+
 </resources>
