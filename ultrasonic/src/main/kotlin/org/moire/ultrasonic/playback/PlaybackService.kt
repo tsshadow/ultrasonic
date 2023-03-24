@@ -8,8 +8,13 @@ package org.moire.ultrasonic.playback
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
 import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.TaskStackBuilder
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.C.USAGE_MEDIA
@@ -29,6 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.koin.core.component.KoinComponent
+import org.moire.ultrasonic.R
 import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.audiofx.EqualizerController
@@ -66,6 +72,7 @@ class PlaybackService :
         Timber.i("onCreate called")
         super.onCreate()
         initializeSessionAndPlayer()
+        setListener(MediaSessionServiceListener())
     }
 
     private fun getWakeModeFlag(): Int {
@@ -211,10 +218,10 @@ class PlaybackService :
     private fun getPendingIntentForContent(): PendingIntent {
         val intent = Intent(this, NavigationActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        var flags = PendingIntent.FLAG_UPDATE_CURRENT
+        var flags = FLAG_UPDATE_CURRENT
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // needed starting Android 12 (S = 31)
-            flags = flags or PendingIntent.FLAG_IMMUTABLE
+            flags = flags or FLAG_IMMUTABLE
         }
         intent.putExtra(Constants.INTENT_SHOW_PLAYER, true)
         return PendingIntent.getActivity(this, 0, intent, flags)
@@ -235,5 +242,57 @@ class PlaybackService :
     private fun updateWidgetPlayerState(isPlaying: Boolean) {
         val context = UApp.applicationContext()
         UltrasonicAppWidgetProvider.notifyPlayerStateChange(context, isPlaying)
+    }
+
+    private inner class MediaSessionServiceListener : Listener {
+
+        /**
+         * This method is only required to be implemented on Android 12 or above when an attempt is made
+         * by a media controller to resume playback when the {@link MediaSessionService} is in the
+         * background.
+         */
+        override fun onForegroundServiceStartNotAllowedException() {
+            val notificationManagerCompat = NotificationManagerCompat.from(this@PlaybackService)
+            Util.ensureNotificationChannel(
+                id = NOTIFICATION_CHANNEL_ID,
+                name = NOTIFICATION_CHANNEL_NAME,
+                notificationManager = notificationManagerCompat
+            )
+            val pendingIntent =
+                TaskStackBuilder.create(this@PlaybackService).run {
+                    addNextIntent(Intent(this@PlaybackService, NavigationActivity::class.java))
+
+                    val immutableFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        FLAG_IMMUTABLE
+                    } else {
+                        0
+                    }
+                    getPendingIntent(0, immutableFlag or FLAG_UPDATE_CURRENT)
+                }
+            val builder =
+                NotificationCompat.Builder(this@PlaybackService, NOTIFICATION_CHANNEL_ID)
+                    .setContentIntent(pendingIntent)
+                    .setSmallIcon(R.drawable.media3_notification_small_icon)
+                    .setContentTitle(getString(R.string.foreground_exception_title))
+                    .setStyle(
+                        NotificationCompat.BigTextStyle().bigText(
+                            getString(R.string.foreground_exception_text)
+                        )
+                    )
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setAutoCancel(true)
+
+            Util.postNotificationIfPermitted(
+                notificationManagerCompat,
+                NOTIFICATION_ID,
+                builder.build()
+            )
+        }
+    }
+
+    companion object {
+        private const val NOTIFICATION_CHANNEL_ID = "org.moire.ultrasonic.error"
+        private const val NOTIFICATION_CHANNEL_NAME = "Ultrasonic error messages"
+        private const val NOTIFICATION_ID = 3009
     }
 }

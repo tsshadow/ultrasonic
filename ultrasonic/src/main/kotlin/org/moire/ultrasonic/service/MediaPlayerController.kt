@@ -17,6 +17,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
+import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionResult
@@ -145,6 +146,20 @@ class MediaPlayerController(
                 )
             }
             isJukeboxEnabled = false
+        }
+
+        override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+            val timeline: Timeline = controller!!.currentTimeline
+            var windowIndex = timeline.getFirstWindowIndex( /* shuffleModeEnabled= */true)
+            var count = 0
+            Timber.d("Shuffle: windowIndex: $windowIndex, at: $count")
+            while (windowIndex != C.INDEX_UNSET) {
+                count++
+                windowIndex = timeline.getNextWindowIndex(
+                    windowIndex, REPEAT_MODE_OFF, /* shuffleModeEnabled= */true
+                )
+                Timber.d("Shuffle: windowIndex: $windowIndex, at: $count")
+            }
         }
     }
 
@@ -389,12 +404,18 @@ class MediaPlayerController(
         }
 
         if (shuffle) isShufflePlayEnabled = true
-
         controller?.addMediaItems(insertAt, mediaItems)
 
         prepare()
 
-        if (autoPlay) play()
+        // Playback doesn't start correctly when the player is in STATE_ENDED.
+        // So we need to call seek before (this is what play(0,0)) does.
+        // We can't just use play(0,0) then all random playlists will start with the first track.
+        // This means that we need to generate the random first track ourselves.
+        if (autoPlay) {
+            val start = controller?.currentTimeline?.getFirstWindowIndex(isShufflePlayEnabled) ?: 0
+            play(start)
+        }
     }
 
     @Synchronized

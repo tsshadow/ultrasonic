@@ -7,11 +7,13 @@
 
 package org.moire.ultrasonic.playback
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_ALBUMS
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_ARTISTS
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_MIXED
@@ -33,7 +35,7 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.guava.future
 import org.koin.core.component.KoinComponent
@@ -93,18 +95,20 @@ private const val SEARCH_LIMIT = 10
 
 // List of available custom SessionCommands
 const val SESSION_CUSTOM_SET_RATING = "SESSION_CUSTOM_SET_RATING"
+const val PLAY_COMMAND = "play "
 
 /**
  * MediaBrowserService implementation for e.g. Android Auto
  */
 @Suppress("TooManyFunctions", "LargeClass", "UnusedPrivateMember")
+@SuppressLint("UnsafeOptInUsageError")
 class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibraryService) :
     MediaLibraryService.MediaLibrarySession.Callback, KoinComponent {
 
     private val mediaPlayerController by inject<MediaPlayerController>()
     private val activeServerProvider: ActiveServerProvider by inject()
 
-    private val serviceJob = Job()
+    private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val mainScope = CoroutineScope(Dispatchers.Main)
 
@@ -152,13 +156,15 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         browser: MediaSession.ControllerInfo,
         params: MediaLibraryService.LibraryParams?
     ): ListenableFuture<LibraryResult<MediaItem>> {
+        Timber.i("onGetLibraryRoot")
         return Futures.immediateFuture(
             LibraryResult.ofItem(
                 buildMediaItem(
                     "Root Folder",
                     MEDIA_ROOT_ID,
                     isPlayable = false,
-                    folderType = FOLDER_TYPE_MIXED
+                    folderType = FOLDER_TYPE_MIXED,
+                    mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
                 ),
                 params
             )
@@ -169,6 +175,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         session: MediaSession,
         controller: MediaSession.ControllerInfo
     ): MediaSession.ConnectionResult {
+        Timber.i("onConnect")
         val connectionResult = super.onConnect(session, controller)
         val availableSessionCommands = connectionResult.availableSessionCommands.buildUpon()
 
@@ -189,14 +196,23 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         browser: MediaSession.ControllerInfo,
         mediaId: String
     ): ListenableFuture<LibraryResult<MediaItem>> {
-        playFromMediaId(mediaId)
+        Timber.i("onGetItem")
 
+        val tracks = tracksFromMediaId(mediaId)
+        val mediaItem = tracks?.firstOrNull()?.toMediaItem()
         // TODO:
         // Create LRU Cache of MediaItems, fill it in the other calls
         // and retrieve it here.
-        return Futures.immediateFuture(
-            LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
-        )
+
+        if (mediaItem != null) {
+            return Futures.immediateFuture(
+                LibraryResult.ofItem(mediaItem, null)
+            )
+        } else {
+            return Futures.immediateFuture(
+                LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
+            )
+        }
     }
 
     override fun onGetChildren(
@@ -207,7 +223,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         pageSize: Int,
         params: MediaLibraryService.LibraryParams?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        // TODO: params???
+        Timber.i("onLoadChildren")
         return onLoadChildren(parentId)
     }
 
@@ -217,7 +233,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         customCommand: SessionCommand,
         args: Bundle
     ): ListenableFuture<SessionResult> {
-
+        Timber.i("onCustomCommand")
         var customCommandFuture: ListenableFuture<SessionResult>? = null
 
         when (customCommand.customAction) {
@@ -313,61 +329,78 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
      * and thereby customarily it is required to rebuild it..
      * See also: https://stackoverflow.com/questions/70096715/adding-mediaitem-when-using-the-media3-library-caused-an-error
      */
-    @Suppress("MagicNumber", "ComplexMethod")
+
     override fun onAddMediaItems(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo,
         mediaItems: MutableList<MediaItem>
-    ): ListenableFuture<MutableList<MediaItem>> {
+    ): ListenableFuture<List<MediaItem>> {
 
-        if (!mediaItems.any()) return Futures.immediateFuture(mediaItems)
+        Timber.i("onAddMediaItems")
 
-        // Try to find out if the requester understands requestMetadata in the mediaItems
-        if (mediaItems.firstOrNull()?.requestMetadata?.mediaUri != null) {
-            val updatedMediaItems = mediaItems.map { mediaItem ->
-                mediaItem.buildUpon()
-                    .setUri(mediaItem.requestMetadata.mediaUri)
-                    .build()
+        if (mediaItems.isEmpty()) return Futures.immediateFuture(mediaItems)
+        // Return early if its a search
+        if (mediaItems[0].requestMetadata.searchQuery != null)
+            return playFromSearch(mediaItems[0].requestMetadata.searchQuery!!)
+
+        val updatedMediaItems: List<MediaItem> =
+            mediaItems.mapNotNull { mediaItem ->
+                if (mediaItem.requestMetadata.mediaUri != null)
+                    mediaItem.buildUpon()
+                        .setUri(mediaItem.requestMetadata.mediaUri)
+                        .build()
+                else
+                    null
             }
-            return Futures.immediateFuture(updatedMediaItems.toMutableList())
+
+        return if (updatedMediaItems.isNotEmpty()) {
+            Futures.immediateFuture(updatedMediaItems)
         } else {
             // Android Auto devices still only use the MediaId to identify the selected Items
             // They also only select a single item at once
-            val mediaIdParts = mediaItems.first().mediaId.split('|')
-
-            val tracks = when (mediaIdParts.first()) {
-                MEDIA_PLAYLIST_ITEM -> playPlaylist(mediaIdParts[1], mediaIdParts[2])
-                MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
-                    mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
-                )
-                MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[1], mediaIdParts[2])
-                MEDIA_ALBUM_SONG_ITEM -> playAlbumSong(
-                    mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
-                )
-                MEDIA_SONG_STARRED_ID -> playStarredSongs()
-                MEDIA_SONG_STARRED_ITEM -> playStarredSong(mediaIdParts[1])
-                MEDIA_SONG_RANDOM_ID -> playRandomSongs()
-                MEDIA_SONG_RANDOM_ITEM -> playRandomSong(mediaIdParts[1])
-                MEDIA_SHARE_ITEM -> playShare(mediaIdParts[1])
-                MEDIA_SHARE_SONG_ITEM -> playShareSong(mediaIdParts[1], mediaIdParts[2])
-                MEDIA_BOOKMARK_ITEM -> playBookmark(mediaIdParts[1])
-                MEDIA_PODCAST_ITEM -> playPodcast(mediaIdParts[1])
-                MEDIA_PODCAST_EPISODE_ITEM -> playPodcastEpisode(
-                    mediaIdParts[1], mediaIdParts[2]
-                )
-                MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
-                else -> null
-            }
-            if (tracks != null) {
-                return Futures.immediateFuture(
-                    tracks.map { track -> track.toMediaItem() }
-                        .toMutableList()
-                )
-            }
-
-            // Fallback to the original list
-            return Futures.immediateFuture(mediaItems)
+            onAddLegacyAutoItems(mediaItems)
         }
+    }
+
+    @Suppress("MagicNumber", "ComplexMethod")
+    private fun onAddLegacyAutoItems(
+        mediaItems: MutableList<MediaItem>
+    ): ListenableFuture<List<MediaItem>> {
+        val mediaIdParts = mediaItems.first().mediaId.split('|')
+
+        val tracks = when (mediaIdParts.first()) {
+            MEDIA_PLAYLIST_ITEM -> playPlaylist(mediaIdParts[1], mediaIdParts[2])
+            MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
+                mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
+            )
+            MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[1], mediaIdParts[2])
+            MEDIA_ALBUM_SONG_ITEM -> playAlbumSong(
+                mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
+            )
+            MEDIA_SONG_STARRED_ID -> playStarredSongs()
+            MEDIA_SONG_STARRED_ITEM -> playStarredSong(mediaIdParts[1])
+            MEDIA_SONG_RANDOM_ID -> playRandomSongs()
+            MEDIA_SONG_RANDOM_ITEM -> playRandomSong(mediaIdParts[1])
+            MEDIA_SHARE_ITEM -> playShare(mediaIdParts[1])
+            MEDIA_SHARE_SONG_ITEM -> playShareSong(mediaIdParts[1], mediaIdParts[2])
+            MEDIA_BOOKMARK_ITEM -> playBookmark(mediaIdParts[1])
+            MEDIA_PODCAST_ITEM -> playPodcast(mediaIdParts[1])
+            MEDIA_PODCAST_EPISODE_ITEM -> playPodcastEpisode(
+                mediaIdParts[1], mediaIdParts[2]
+            )
+            MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
+            else -> null
+        }
+
+        if (tracks != null) {
+            return Futures.immediateFuture(
+                tracks.map { track -> track.toMediaItem() }
+                    .toMutableList()
+            )
+        }
+
+        // Fallback to the original list
+        return Futures.immediateFuture(mediaItems)
     }
 
     @Suppress("ReturnCount", "ComplexMethod")
@@ -409,26 +442,27 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         }
     }
 
-    fun onSearch(
+    private fun playFromSearch(
         query: String,
-        extras: Bundle?,
-    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.d("AutoMediaBrowserService onSearch query: %s", query)
+    ): ListenableFuture<List<MediaItem>> {
+        Timber.i("AutoMediaBrowserService onSearch query: %s", query)
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
+        // Only accept query with pattern "play [Title]" or "[Title]"
+        // Where [Title]: must be exactly matched
+        // If no media with exact name found, play a random media instead
+        val mediaTitle = if (query.startsWith(PLAY_COMMAND, ignoreCase = true)) {
+            query.drop(PLAY_COMMAND.length)
+        } else {
+            query
+        }
+
         return serviceScope.future {
-            val criteria = SearchCriteria(query, SEARCH_LIMIT, SEARCH_LIMIT, SEARCH_LIMIT)
+            val criteria = SearchCriteria(mediaTitle, SEARCH_LIMIT, SEARCH_LIMIT, SEARCH_LIMIT)
             val searchResult = callWithErrorHandling { musicService.search(criteria) }
 
             // TODO Add More... button to categories
             if (searchResult != null) {
-                searchResult.artists.map { artist ->
-                    mediaItems.add(
-                        artist.name ?: "",
-                        listOf(MEDIA_ARTIST_ITEM, artist.id, artist.name).joinToString("|"),
-                        FOLDER_TYPE_ARTISTS
-                    )
-                }
 
                 searchResult.albums.map { album ->
                     mediaItems.add(
@@ -439,6 +473,15 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                     )
                 }
 
+                // TODO Commented out, as there is no playFromArtist function implemented yet.
+//                searchResult.artists.map { artist ->
+//                    mediaItems.add(
+//                        artist.name ?: "",
+//                        listOf(MEDIA_ARTIST_ITEM, artist.id, artist.name).joinToString("|"),
+//                        FOLDER_TYPE_ARTISTS
+//                    )
+//                }
+
                 searchSongsCache = searchResult.songs
                 searchResult.songs.map { song ->
                     mediaItems.add(
@@ -448,21 +491,30 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                     )
                 }
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+
+            // TODO This just picks the first result and plays it.
+            // We could make this more advanced.
+            val firstItem = mediaItems.first()
+            val tracks = tracksFromMediaId(firstItem.mediaId)
+            Timber.i("Found media id: %s", firstItem.mediaId)
+            val result = tracks?.map { it.toMediaItem() }
+            Timber.i("Result size: %d", result?.size ?: 0)
+            return@future result ?: listOf()
         }
     }
 
     @Suppress("MagicNumber", "ComplexMethod")
-    private fun playFromMediaId(mediaId: String?) {
+    private fun tracksFromMediaId(mediaId: String?): List<Track>? {
         Timber.d(
             "AutoMediaBrowserService onPlayFromMediaIdRequested called. mediaId: %s",
             mediaId
         )
 
-        if (mediaId == null) return
+        if (mediaId == null) return null
         val mediaIdParts = mediaId.split('|')
 
-        when (mediaIdParts.first()) {
+        // TODO Media Artist item is missing!!!
+        return when (mediaIdParts.first()) {
             MEDIA_PLAYLIST_ITEM -> playPlaylist(mediaIdParts[1], mediaIdParts[2])
             MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
                 mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
@@ -483,6 +535,9 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 mediaIdParts[1], mediaIdParts[2]
             )
             MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
+            else -> {
+                listOf()
+            }
         }
     }
 
@@ -503,6 +558,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 R.string.music_library_label,
                 MEDIA_LIBRARY_ID,
                 null,
+                folderType = FOLDER_TYPE_MIXED,
                 icon = R.drawable.ic_library
             )
 
@@ -849,13 +905,13 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         return null
     }
 
-    private fun playAlbum(id: String, name: String): List<Track>? {
+    private fun playAlbum(id: String, name: String?): List<Track>? {
         val songs = listSongsInMusicService(id, name)
         if (songs != null) return songs.getTracks()
         return null
     }
 
-    private fun playAlbumSong(id: String, name: String, songId: String): List<Track>? {
+    private fun playAlbumSong(id: String, name: String?, songId: String): List<Track>? {
         val songs = listSongsInMusicService(id, name)
         val song = songs?.getTracks()?.firstOrNull { x -> x.id == songId }
         if (song != null) return listOf(song)
@@ -1132,7 +1188,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         return null
     }
 
-    private fun listSongsInMusicService(id: String, name: String): MusicDirectory? {
+    private fun listSongsInMusicService(id: String, name: String?): MusicDirectory? {
         return serviceScope.future {
             if (!ActiveServerProvider.isOffline() && Settings.shouldUseId3Tags) {
                 callWithErrorHandling { musicService.getAlbumAsDir(id, name, false) }

@@ -77,7 +77,8 @@
         <service android:name=".playback.PlaybackService"
             android:label="@string/common.appname"
             android:foregroundServiceType="mediaPlayback"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="ExportedService">
 
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaLibraryService" />
@@ -86,7 +87,8 @@
         </service>
 
         <receiver android:name=".receiver.UltrasonicIntentReceiver"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
             <intent-filter>
                 <action android:name="org.moire.ultrasonic.CMD_TOGGLEPAUSE"/>
                 <action android:name="org.moire.ultrasonic.CMD_PLAY"/>
@@ -128,12 +130,14 @@
         <provider
             android:name=".provider.SearchSuggestionProvider"
             android:authorities="${applicationId}.provider.SearchSuggestionProvider"
-            android:exported="true" />
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
 
         <provider
             android:name=".provider.AlbumArtContentProvider"
             android:authorities="${applicationId}.provider.AlbumArtContentProvider"
-            android:exported="true" />
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
     </application>
 
 </manifest>
