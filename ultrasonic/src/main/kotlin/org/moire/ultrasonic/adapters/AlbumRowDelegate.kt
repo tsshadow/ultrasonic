@@ -18,10 +18,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.drakeet.multitype.ItemViewDelegate
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Album
-import org.moire.ultrasonic.imageloader.ImageLoader
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings.shouldUseId3Tags
 import timber.log.Timber
@@ -32,7 +33,6 @@ import timber.log.Timber
 open class AlbumRowDelegate(
     open val onItemClick: (Album) -> Unit,
     open val onContextMenuClick: (MenuItem, Album) -> Boolean,
-    private val imageLoader: ImageLoader
 ) : ItemViewDelegate<Album, AlbumRowDelegate.ListViewHolder>(), KoinComponent {
 
     private val starDrawable: Int = R.drawable.ic_star_full
@@ -58,10 +58,13 @@ open class AlbumRowDelegate(
         holder.star.setImageResource(if (item.starred) starDrawable else starHollowDrawable)
         holder.star.setOnClickListener { onStarClick(item, holder.star) }
 
-        imageLoader.loadImage(
-            holder.coverArt, item,
-            false, 0, R.drawable.unknown_album
-        )
+        val imageLoaderProvider: ImageLoaderProvider by inject()
+        imageLoaderProvider.executeOn {
+            it.loadImage(
+                holder.coverArt, item,
+                false, 0, R.drawable.unknown_album
+            )
+        }
     }
 
     /**
@@ -148,8 +151,7 @@ open class AlbumRowDelegate(
 
 class AlbumGridDelegate(
     onItemClick: (Album) -> Unit,
-    onContextMenuClick: (MenuItem, Album) -> Boolean,
-    imageLoader: ImageLoader
-) : AlbumRowDelegate(onItemClick, onContextMenuClick, imageLoader) {
+    onContextMenuClick: (MenuItem, Album) -> Boolean
+) : AlbumRowDelegate(onItemClick, onContextMenuClick) {
     override var layoutType = LayoutType.COVER
 }

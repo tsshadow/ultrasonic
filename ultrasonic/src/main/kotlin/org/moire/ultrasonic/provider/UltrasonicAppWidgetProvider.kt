@@ -23,7 +23,6 @@ import android.widget.RemoteViews
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.imageloader.BitmapUtils
 import org.moire.ultrasonic.receiver.MediaButtonIntentReceiver
 import org.moire.ultrasonic.util.Constants
 import timber.log.Timber
@@ -200,17 +199,8 @@ open class UltrasonicAppWidgetProvider : AppWidgetProvider() {
             }
             // Set the cover art
             try {
-                val bitmap =
-                    if (currentSong == null) null else BitmapUtils.getAlbumArtBitmapFromDisk(
-                        currentSong,
-                        240
-                    )
-                if (bitmap == null) {
-                    // Set default cover art
-                    views.setImageViewResource(R.id.appwidget_coverart, R.drawable.unknown_album)
-                } else {
-                    views.setImageViewBitmap(R.id.appwidget_coverart, bitmap)
-                }
+                val uri = AlbumArtContentProvider.mapArtworkToContentProviderUri(currentSong)
+                views.setImageViewUri(R.id.appwidget_coverart, uri)
             } catch (all: Exception) {
                 Timber.e(all, "Failed to load cover art")
                 views.setImageViewResource(R.id.appwidget_coverart, R.drawable.unknown_album)

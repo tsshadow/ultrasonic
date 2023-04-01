@@ -5,6 +5,7 @@ import androidx.core.content.res.ResourcesCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -14,11 +15,13 @@ import org.moire.ultrasonic.imageloader.ImageLoader
 import org.moire.ultrasonic.imageloader.ImageLoaderConfig
 import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.Util
+import timber.log.Timber
 
 /**
  * Handles the lifetime of the Image Loader
  */
-class ImageLoaderProvider(val context: Context) :
+class
+ImageLoaderProvider(val context: Context) :
     KoinComponent,
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private var imageLoader: ImageLoader? = null
@@ -29,20 +32,37 @@ class ImageLoaderProvider(val context: Context) :
         imageLoader = null
     }
 
+    init {
+        Timber.e("Prepping Loader")
+        // Populate the ImageLoader async & early
+        launch {
+            getImageLoader()
+        }
+    }
+
     @Synchronized
     fun getImageLoader(): ImageLoader {
         // We need to generate a new ImageLoader if the server has changed...
         val currentID = get<String>(named("ServerID"))
         if (imageLoader == null || currentID != serverID) {
-            imageLoader = get()
+            imageLoader = ImageLoader(UApp.applicationContext(), get(), config)
             serverID = currentID
-        }
 
-        launch {
-            FileUtil.ensureAlbumArtDirectory()
+            launch {
+                FileUtil.ensureAlbumArtDirectory()
+            }
         }
 
         return imageLoader!!
+    }
+
+    fun executeOn(cb: (iL: ImageLoader) -> Unit) {
+        launch {
+            val iL = getImageLoader()
+            withContext(Dispatchers.Main) {
+                cb(iL)
+            }
+        }
     }
 
     companion object {

@@ -1060,8 +1060,10 @@ class PlayerFragment :
 
             downloadTrackTextView.text = trackFormat
             downloadTotalDurationTextView.text = duration
-            imageLoaderProvider.getImageLoader()
-                .loadImage(albumArtImageView, currentSong, true, 0)
+            imageLoaderProvider.executeOn {
+                it.loadImage(albumArtImageView, currentSong, true, 0)
+            }
+
             displaySongRating()
         } else {
             currentSong = null
@@ -1072,8 +1074,9 @@ class PlayerFragment :
             bitrateFormatTextView.text = null
             downloadTrackTextView.text = null
             downloadTotalDurationTextView.text = null
-            imageLoaderProvider.getImageLoader()
-                .loadImage(albumArtImageView, null, true, 0)
+            imageLoaderProvider.executeOn {
+                it.loadImage(albumArtImageView, null, true, 0)
+            }
         }
     }
 

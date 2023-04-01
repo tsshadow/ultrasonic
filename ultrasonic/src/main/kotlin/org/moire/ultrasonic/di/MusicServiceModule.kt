@@ -11,14 +11,12 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions
 import org.moire.ultrasonic.api.subsonic.SubsonicClientConfiguration
 import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.imageloader.ImageLoader
 import org.moire.ultrasonic.log.TimberOkHttpLogger
 import org.moire.ultrasonic.service.CachedMusicService
 import org.moire.ultrasonic.service.MusicService
 import org.moire.ultrasonic.service.OfflineMusicService
 import org.moire.ultrasonic.service.RESTMusicService
 import org.moire.ultrasonic.subsonic.DownloadHandler
-import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
 import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.util.Constants
@@ -70,8 +68,6 @@ val musicServiceModule = module {
     single<MusicService>(named(OFFLINE_MUSIC_SERVICE)) {
         OfflineMusicService()
     }
-
-    single { ImageLoader(androidContext(), get(), ImageLoaderProvider.config) }
 
     single { DownloadHandler(get(), get()) }
     single { NetworkAndStorageChecker(androidContext()) }

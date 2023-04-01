@@ -19,13 +19,13 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.imageloader.ImageLoader
+import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.FileUtil
 import timber.log.Timber
 
 class AlbumArtContentProvider : ContentProvider(), KoinComponent {
 
-    private val imageLoader: ImageLoader by inject()
+    private val imageLoaderProvider: ImageLoaderProvider by inject()
 
     companion object {
         fun mapArtworkToContentProviderUri(track: Track?): Uri? {
@@ -56,7 +56,9 @@ class AlbumArtContentProvider : ContentProvider(), KoinComponent {
 
         val albumArtFile = FileUtil.getAlbumArtFile(parts[1])
         Timber.d("AlbumArtContentProvider openFile id: %s; file: %s", parts[0], albumArtFile)
-        imageLoader.cacheCoverArt(parts[0], albumArtFile)
+        imageLoaderProvider.executeOn {
+            it.cacheCoverArt(parts[0], albumArtFile)
+        }
         val file = File(albumArtFile)
         if (!file.exists()) return null
 

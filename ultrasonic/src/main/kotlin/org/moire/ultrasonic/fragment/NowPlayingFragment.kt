@@ -49,7 +49,7 @@ class NowPlayingFragment : Fragment() {
 
     private var rxBusSubscription: Disposable? = null
     private val mediaPlayerController: MediaPlayerController by inject()
-    private val imageLoader: ImageLoaderProvider by inject()
+    private val imageLoaderProvider: ImageLoaderProvider by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         applyTheme(this.context)
@@ -97,12 +97,14 @@ class NowPlayingFragment : Fragment() {
                 val title = file.title
                 val artist = file.artist
 
-                imageLoader.getImageLoader().loadImage(
-                    nowPlayingAlbumArtImage,
-                    file,
-                    false,
-                    getNotificationImageSize(requireContext())
-                )
+                imageLoaderProvider.executeOn {
+                    it.loadImage(
+                        nowPlayingAlbumArtImage,
+                        file,
+                        false,
+                        getNotificationImageSize(requireContext())
+                    )
+                }
 
                 nowPlayingTrack!!.text = title
                 nowPlayingArtist!!.text = artist

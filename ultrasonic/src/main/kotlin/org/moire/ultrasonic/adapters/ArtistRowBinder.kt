@@ -18,11 +18,12 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.drakeet.multitype.ItemViewBinder
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.ArtistOrIndex
 import org.moire.ultrasonic.domain.Identifiable
-import org.moire.ultrasonic.imageloader.ImageLoader
+import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
@@ -33,7 +34,6 @@ import org.moire.ultrasonic.util.Util
 class ArtistRowBinder(
     val onItemClick: (ArtistOrIndex) -> Unit,
     val onContextMenuClick: (MenuItem, ArtistOrIndex) -> Boolean,
-    private val imageLoader: ImageLoader,
     private val enableSections: Boolean = true
 ) : ItemViewBinder<ArtistOrIndex, ArtistRowBinder.ViewHolder>(),
     KoinComponent,
@@ -59,17 +59,21 @@ class ArtistRowBinder(
 
         holder.coverArtId = item.coverArt
 
+        val imageLoaderProvider: ImageLoaderProvider by inject()
+
         if (showArtistPicture()) {
             holder.coverArt.visibility = View.VISIBLE
             val key = FileUtil.getArtistArtKey(item.name, false)
-            imageLoader.loadImage(
-                view = holder.coverArt,
-                id = holder.coverArtId,
-                key = key,
-                large = false,
-                size = 0,
-                defaultResourceId = R.drawable.ic_contact_picture
-            )
+            imageLoaderProvider.executeOn {
+                it.loadImage(
+                    view = holder.coverArt,
+                    id = holder.coverArtId,
+                    key = key,
+                    large = false,
+                    size = 0,
+                    defaultResourceId = R.drawable.ic_contact_picture
+                )
+            }
         } else {
             holder.coverArt.visibility = View.GONE
         }

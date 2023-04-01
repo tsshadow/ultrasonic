@@ -204,14 +204,12 @@ class AlbumListFragment(
 
         setLayoutType(layoutType)
 
-        val imageLoader = imageLoaderProvider.getImageLoader()
-
         // Magic to switch between different view layouts:
         // We register two delegates, one which layouts grid items and one which layouts row items
         // Based on the current status of the ViewType, the right delegate is picked.
         viewAdapter.register(Album::class).to(
-            AlbumRowDelegate(::onItemClick, ::onContextMenuItemSelected, imageLoader),
-            AlbumGridDelegate(::onItemClick, ::onContextMenuItemSelected, imageLoader)
+            AlbumRowDelegate(::onItemClick, ::onContextMenuItemSelected),
+            AlbumGridDelegate(::onItemClick, ::onContextMenuItemSelected)
         ).withKotlinClassLinker { _, _ ->
             when (layoutType) {
                 LayoutType.COVER -> AlbumGridDelegate::class

@@ -52,10 +52,12 @@ class HeaderViewBinder(
 
         val artworkSelection = random.nextInt(item.childCount)
 
-        imageLoaderProvider.getImageLoader().loadImage(
-            holder.coverArtView, item.entries[artworkSelection], false,
-            Util.getAlbumImageSize(context)
-        )
+        imageLoaderProvider.executeOn {
+            it.loadImage(
+                holder.coverArtView, item.entries[artworkSelection], false,
+                Util.getAlbumImageSize(context)
+            )
+        }
 
         if (item.name != null) {
             holder.titleView.isVisible = true
