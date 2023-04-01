@@ -16,6 +16,8 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
@@ -33,8 +35,8 @@ import timber.log.Timber
 class ImageLoader(
     context: Context,
     apiClient: SubsonicAPIClient,
-    private val config: ImageLoaderConfig
-) {
+    private val config: ImageLoaderConfig,
+) : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private val cacheInProgress: ConcurrentHashMap<String, CountDownLatch> = ConcurrentHashMap()
 
     // Shortcut
@@ -126,6 +128,7 @@ class ImageLoader(
         defaultResourceId: Int = R.drawable.unknown_album
     ) {
         val id = entry?.coverArt
+        // TODO getAlbumArtKey() accesses the disk from the UI thread..
         val key = FileUtil.getAlbumArtKey(entry, large)
 
         loadImage(view, id, key, large, size, defaultResourceId)

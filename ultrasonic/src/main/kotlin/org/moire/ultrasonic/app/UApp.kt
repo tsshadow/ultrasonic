@@ -20,7 +20,9 @@ import org.moire.ultrasonic.di.mediaPlayerModule
 import org.moire.ultrasonic.di.musicServiceModule
 import org.moire.ultrasonic.log.FileLoggerTree
 import org.moire.ultrasonic.log.TimberKoinLogger
+import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.Util
 import timber.log.Timber
 import timber.log.Timber.DebugTree
@@ -61,6 +63,9 @@ class UApp : MultiDexApplication() {
                 FileLoggerTree.plantToTimberForest()
                 Util.dumpSettingsToLog()
             }
+            // Populate externalFilesDir early
+            FileUtil.cachedUltrasonicDirectory = FileUtil.ultrasonicDirectory
+            Storage.mediaRoot.value
             isFirstRun = Util.isFirstRun()
         }
 

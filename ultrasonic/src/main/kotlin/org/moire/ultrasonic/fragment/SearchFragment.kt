@@ -103,7 +103,6 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             ArtistRowBinder(
                 onItemClick = ::onItemClick,
                 onContextMenuClick = ::onContextMenuItemSelected,
-                imageLoader = imageLoaderProvider.getImageLoader(),
                 enableSections = false
             )
         )
@@ -111,8 +110,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         viewAdapter.register(
             AlbumRowDelegate(
                 onItemClick = ::onItemClick,
-                onContextMenuClick = ::onContextMenuItemSelected,
-                imageLoader = imageLoaderProvider.getImageLoader()
+                onContextMenuClick = ::onContextMenuItemSelected
             )
         )
 

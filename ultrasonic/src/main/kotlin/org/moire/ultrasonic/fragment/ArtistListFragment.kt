@@ -53,8 +53,7 @@ class ArtistListFragment : EntryListFragment<ArtistOrIndex>() {
         viewAdapter.register(
             ArtistRowBinder(
                 { entry -> onItemClick(entry) },
-                { menuItem, entry -> onContextMenuItemSelected(menuItem, entry) },
-                imageLoaderProvider.getImageLoader()
+                { menuItem, entry -> onContextMenuItemSelected(menuItem, entry) }
             )
         )
     }

@@ -249,17 +249,24 @@ object FileUtil {
         return dir
     }
 
+    var cachedUltrasonicDirectory: File? = null
+
     // After Android M, the location of the files must be queried differently.
     // GetExternalFilesDir will always return a directory which Ultrasonic
     // can access without any extra privileges.
     @JvmStatic
     val ultrasonicDirectory: File
         get() {
+            // Return cached if possible
+            if (cachedUltrasonicDirectory != null) return cachedUltrasonicDirectory!!
+
             @Suppress("DEPRECATION")
-            return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) File(
+            cachedUltrasonicDirectory = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) File(
                 Environment.getExternalStorageDirectory(),
                 "Android/data/org.moire.ultrasonic"
             ) else UApp.applicationContext().getExternalFilesDir(null)!!
+
+            return cachedUltrasonicDirectory!!
         }
 
     @JvmStatic

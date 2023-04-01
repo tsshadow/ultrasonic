@@ -146,8 +146,7 @@ open class TrackCollectionFragment(
         viewAdapter.register(
             AlbumRowDelegate(
                 { entry -> onItemClick(entry) },
-                { menuItem, entry -> onContextMenuItemSelected(menuItem, entry) },
-                imageLoaderProvider.getImageLoader()
+                { menuItem, entry -> onContextMenuItemSelected(menuItem, entry) }
             )
         )
 

@@ -257,12 +257,12 @@ class DownloadTask(
         offlineDB.trackDao().insert(this)
 
         // Download the largest size that we can display in the UI
-        val imageLoader = imageLoaderProvider.getImageLoader()
-        imageLoader.cacheCoverArt(this)
-
-        // Cache small copies of the Artist picture
-        directArtist?.let { imageLoader.cacheArtistPicture(it) }
-        compilationArtist?.let { imageLoader.cacheArtistPicture(it) }
+        imageLoaderProvider.executeOn { imageLoader ->
+            imageLoader.cacheCoverArt(this)
+            // Cache small copies of the Artist picture
+            directArtist?.let { imageLoader.cacheArtistPicture(it) }
+            compilationArtist?.let { imageLoader.cacheArtistPicture(it) }
+        }
     }
 
     private fun cacheArtist(

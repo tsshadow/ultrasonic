@@ -2,9 +2,16 @@ package org.moire.ultrasonic.log
 
 import java.io.File
 import java.io.FileWriter
+import java.io.PrintWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.Util.safeClose
 import timber.log.Timber
@@ -14,33 +21,58 @@ import timber.log.Timber
  * Subclass of the DebugTree so it inherits the Tag handling
  */
 @Suppress("MagicNumber")
-class FileLoggerTree : Timber.DebugTree() {
+class FileLoggerTree : Timber.DebugTree(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private val dateFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
+
+    @OptIn(ObsoleteCoroutinesApi::class)
+    private val logMessageActor = actor<LogMessage> {
+        for (msg in channel)
+            writeLogToFile(msg.file, msg.priority, msg.tag, msg.message, msg.t)
+    }
+
+    data class LogMessage(
+        val file: File?,
+        val priority: Int,
+        val tag: String?,
+        val message: String,
+        val t: Throwable?
+    )
 
     /**
      * Writes a log entry to file
-     *
-     * TODO: This seems to be writing in the main thread. Should be done in background...
+     * This methods sends the log entry to the coroutine actor, which then processes the entries
+     * in FIFO order on an IO-Thread
      */
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        var writer: FileWriter? = null
-        callNum++
-        try {
+        launch {
             getNextLogFile()
-            writer = FileWriter(file, true)
-            val exceptionString = t?.toString() ?: ""
-            val time: String = dateFormat.format(Date())
-            synchronized(file!!) {
-                writer.write(
-                    "$time: ${logLevelToString(priority)} $tag $message $exceptionString\n"
-                )
-                writer.flush()
+            logMessageActor.send(
+                LogMessage(file, priority, tag, message, t)
+            )
+        }
+    }
+
+    private suspend fun writeLogToFile(
+        file: File?,
+        priority: Int,
+        tag: String?,
+        message: String,
+        t: Throwable?
+    ) {
+        val time: String = dateFormat.format(Date())
+        val exceptionString = t?.toString() ?: ""
+        withContext(Dispatchers.IO) {
+            var pw: PrintWriter? = null
+            try {
+                pw = PrintWriter(FileWriter(file, true))
+                pw.println("$time: ${logLevelToString(priority)} $tag $message $exceptionString\n")
+                t?.printStackTrace(pw)
+            } catch (all: Throwable) {
+                // Using base class DebugTree here, we don't want to try to log this into file
+                super.log(6, TAG, String.format("Failed to write log to %s", file), all)
+            } finally {
+                pw?.safeClose()
             }
-        } catch (all: Throwable) {
-            // Using base class DebugTree here, we don't want to try to log this into file
-            super.log(6, TAG, String.format("Failed to write log to %s", file), all)
-        } finally {
-            writer.safeClose()
         }
     }
 
