@@ -1,0 +1,7 @@
+Corrección de errores
+- #831: Versión 4.1.1 y desarrollo: 'jukebox on/off' ya no se muestra en 'Reproduciendo ahora'.
+
+Mejoras
+- #827: Hacer aplicación completamente compatible con Android Auto para publicar en Play Store.
+- #878: "Reproducir aleatoriamente" ya no siempre comienza con la primera pista.
+- #891: Volcado de configuración al archivo de registro cuando el registro está habilitado.
