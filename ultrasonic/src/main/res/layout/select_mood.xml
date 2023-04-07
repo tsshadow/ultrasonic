@@ -23,10 +23,10 @@
             a:layout_weight=".20"
             a:text="Year" />
 
-        <EditText
+        <Spinner
             a:id="@+id/selectYear"
             a:layout_width="0dp"
-            a:layout_height="wrap_content"
+            a:layout_height="40dp"
             a:layout_weight=".80"
             a:inputType="text" />
     </LinearLayout>

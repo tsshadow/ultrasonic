@@ -5,8 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,7 +40,7 @@ public class SelectGenreFragment extends Fragment {
 
     private SwipeRefreshLayout refreshGenreListView;
     private ListView genreListView;
-    private EditText yearEditBox;
+    private Spinner yearEditBox;
     private EditText ratingMin;
     private EditText ratingMax;
     private View emptyView;
@@ -80,7 +82,7 @@ public class SelectGenreFragment extends Fragment {
                 {
                     Bundle bundle = new Bundle();
                     bundle.putString(Constants.INTENT_GENRE_NAME, genre.getName());
-                    bundle.putString(Constants.INTENT_YEAR_NAME, yearEditBox.getText().toString());
+                    bundle.putString(Constants.INTENT_YEAR_NAME, yearEditBox.getSelectedItem().toString());
                     bundle.putString(Constants.INTENT_RATING_MIN, ratingMin.getText().toString());
                     bundle.putString(Constants.INTENT_RATING_MAX, ratingMax.getText().toString());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.getMaxSongs());
@@ -92,7 +94,15 @@ public class SelectGenreFragment extends Fragment {
 
         emptyView = view.findViewById(R.id.select_genre_empty);
         registerForContextMenu(genreListView);
-        yearEditBox = (EditText)view.findViewById(R.id.selectYear);
+        yearEditBox = (Spinner)view.findViewById(R.id.selectYear);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(),
+        R.array.year_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        yearEditBox.setAdapter(adapter);
+
         ratingMin = (EditText)view.findViewById(R.id.ratingMin);
         ratingMax = (EditText)view.findViewById(R.id.ratingMax);
 
