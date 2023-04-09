@@ -173,13 +173,9 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     private fun setStar(aImage: ImageView, rating: Int)
     {
         when {
-            rating > 1 -> {
+            rating >= 1 -> {
                 aImage.setImageDrawable(imageHelper.starDrawable)
                 aImage.scaleX = 1f
-            }
-            rating == 1 -> {
-                aImage.setImageDrawable(imageHelper.starHalfDrawable)
-                aImage.scaleX = -1f //Mirror half star hotfix
             }
             else -> {
                 aImage.setImageDrawable(imageHelper.starHollowDrawable)
@@ -191,10 +187,10 @@ class TrackViewHolder(val view: View) : RecyclerView.ViewHolder(view), Checkable
     @Suppress("MagicNumber")
     private fun setFiveStars(rating: Int) {
         setStar(fiveStar1, rating)
-        setStar(fiveStar2, rating - 2)
-        setStar(fiveStar3, rating - 4)
-        setStar(fiveStar4, rating - 6)
-        setStar(fiveStar5, rating - 8)
+        setStar(fiveStar2, rating - 1)
+        setStar(fiveStar3, rating - 2)
+        setStar(fiveStar4, rating - 3)
+        setStar(fiveStar5, rating - 4)
     }
 
     private fun setSingleStar(starred: Boolean) {

@@ -236,11 +236,11 @@ class PlayerFragment :
         fullStar = Util.getDrawableFromAttribute(view.context, R.attr.star_full)
         halfStar = Util.getDrawableFromAttribute(view.context, R.attr.star_half)
 
-        fiveStar1ImageView.setOnClickListener { setSongRating(2) }
-        fiveStar2ImageView.setOnClickListener { setSongRating(4) }
-        fiveStar3ImageView.setOnClickListener { setSongRating(6) }
-        fiveStar4ImageView.setOnClickListener { setSongRating(8) }
-        fiveStar5ImageView.setOnClickListener { setSongRating(10) }
+        fiveStar1ImageView.setOnClickListener { setSongRating(1) }
+        fiveStar2ImageView.setOnClickListener { setSongRating(2) }
+        fiveStar3ImageView.setOnClickListener { setSongRating(3) }
+        fiveStar4ImageView.setOnClickListener { setSongRating(4) }
+        fiveStar5ImageView.setOnClickListener { setSongRating(5) }
 
         albumArtImageView.setOnTouchListener { _, me ->
             gestureScanner.onTouchEvent(me)
@@ -1225,13 +1225,9 @@ class PlayerFragment :
     private fun setStar(aImage: ImageView, rating: Int)
     {
         when {
-            rating > 1 -> {
+            rating >= 1 -> {
                 aImage.setImageDrawable(fullStar)
                 aImage.scaleX = 1f
-            }
-            rating == 1 -> {
-                aImage.setImageDrawable(halfStar)
-                aImage.scaleX = -1f //Mirror half star hotfix
             }
             else -> {
                 aImage.setImageDrawable(hollowStar)
@@ -1248,10 +1244,10 @@ class PlayerFragment :
         }
 
         setStar(fiveStar1ImageView, rating)
-        setStar(fiveStar2ImageView, rating - 2)
-        setStar(fiveStar3ImageView, rating - 4)
-        setStar(fiveStar4ImageView, rating - 6)
-        setStar(fiveStar5ImageView, rating - 8)
+        setStar(fiveStar2ImageView, rating - 1)
+        setStar(fiveStar3ImageView, rating - 2)
+        setStar(fiveStar4ImageView, rating - 3)
+        setStar(fiveStar5ImageView, rating - 4)
     }
 
     private fun setSongRating(rating: Int) {
