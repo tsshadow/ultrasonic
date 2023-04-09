@@ -616,9 +616,10 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun getMoods(
-            refresh: Boolean
+            refresh: Boolean,
+            year: String,
     ): List<Mood>? {
-        val response = API.getMoods().execute().throwOnFailure()
+        val response = API.getMoods(year).execute().throwOnFailure()
 
         return response.body()!!.moodList.toDomainEntityList()
     }

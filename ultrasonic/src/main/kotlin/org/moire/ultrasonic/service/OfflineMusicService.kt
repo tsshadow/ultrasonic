@@ -444,7 +444,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(Exception::class)
-    override fun getMoods(refresh: Boolean): List<Mood>? {
+    override fun getMoods(refresh: Boolean, year: String): List<Mood>? {
         throw OfflineException("Getting Mood tags not available in offline mode")
     }
 

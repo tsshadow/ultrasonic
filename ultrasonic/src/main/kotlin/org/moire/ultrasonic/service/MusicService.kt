@@ -60,7 +60,7 @@ interface MusicService {
     fun getCustom5(refresh: Boolean): List<Custom5>?
 
     @Throws(Exception::class)
-    fun getMoods(refresh: Boolean): List<Mood>?
+    fun getMoods(refresh: Boolean, year: String): List<Mood>?
     
     @Throws(Exception::class)
     fun getYears(refresh: Boolean): List<Year>?

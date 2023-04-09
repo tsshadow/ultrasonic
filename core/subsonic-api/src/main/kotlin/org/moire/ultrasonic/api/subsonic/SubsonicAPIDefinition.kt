@@ -263,7 +263,8 @@ interface SubsonicAPIDefinition {
     fun getCustom5(): Call<Custom5Response>
 
     @GET("getMoods.view")
-    fun getMoods(): Call<MoodResponse>
+    fun getMoods(
+        @Query("year") year: String): Call<MoodResponse>
 
     @GET("getYears.view")
     fun getYears(): Call<YearResponse>

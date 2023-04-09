@@ -516,14 +516,14 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun getMoods(refresh: Boolean): List<Mood>? {
+    override fun getMoods(refresh: Boolean, year: String): List<Mood>? {
         checkSettingsChanged()
         if (refresh) {
             cachedMood.clear()
         }
         var result = cachedMood.get()
         if (result == null) {
-            result = musicService.getMoods(refresh)
+            result = musicService.getMoods(refresh, year)
             cachedMood.set(result)
         }
 

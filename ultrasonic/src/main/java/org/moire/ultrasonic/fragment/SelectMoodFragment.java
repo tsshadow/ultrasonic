@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -58,6 +59,24 @@ public class SelectMoodFragment extends Fragment {
         return inflater.inflate(R.layout.select_mood, container, false);
     }
 
+    public static class onYearChangedListener implements AdapterView.OnItemSelectedListener {
+
+        private final SelectMoodFragment fragment;
+
+        public onYearChangedListener(SelectMoodFragment selectMoodFragment) {
+            this.fragment = selectMoodFragment;
+        }
+
+        public void onItemSelected(AdapterView<?> parent,
+                                   View view, int pos, long id) {
+            fragment.load(true, parent.getItemAtPosition(pos).toString());
+        }
+
+        public void onNothingSelected(AdapterView parent) {
+            // Do nothing.
+        }
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         cancellationToken = new CancellationToken();
@@ -69,7 +88,7 @@ public class SelectMoodFragment extends Fragment {
             @Override
             public void onRefresh()
             {
-                load(true);
+                load(true, "");
             }
         });
 
@@ -94,6 +113,7 @@ public class SelectMoodFragment extends Fragment {
 
         emptyView = view.findViewById(R.id.select_mood_empty);
         registerForContextMenu(moodListView);
+
         yearEditBox = (Spinner)view.findViewById(R.id.selectYear);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(),
@@ -102,11 +122,14 @@ public class SelectMoodFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         yearEditBox.setAdapter(adapter);
+
+        yearEditBox.setOnItemSelectedListener(new onYearChangedListener(this));
+
         ratingMin = (EditText)view.findViewById(R.id.ratingMin);
         ratingMax = (EditText)view.findViewById(R.id.ratingMax);
 
         FragmentTitle.Companion.setTitle(this, R.string.main_mood_title);
-        load(false);
+        load(false, "");
     }
 
     @Override
@@ -115,7 +138,7 @@ public class SelectMoodFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private void load(final boolean refresh)
+    public void load(final boolean refresh, String year)
     {
         BackgroundTask<List<Mood>> task = new FragmentBackgroundTask<List<Mood>>(getActivity(), true, refreshMoodListView, cancellationToken)
         {
@@ -128,7 +151,7 @@ public class SelectMoodFragment extends Fragment {
 
                 try
                 {
-                    mood = musicService.getMoods(refresh);
+                    mood = musicService.getMoods(refresh, year);
                 }
                 catch (Exception x)
                 {
