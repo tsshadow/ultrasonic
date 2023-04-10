@@ -42,7 +42,7 @@ interface MusicService {
     fun isLicenseValid(): Boolean
 
     @Throws(Exception::class)
-    fun getGenres(refresh: Boolean): List<Genre>?
+    fun getGenres(refresh: Boolean, year: String): List<Genre>?
 
     @Throws(Exception::class)
     fun getCustom1(refresh: Boolean): List<Custom1>?

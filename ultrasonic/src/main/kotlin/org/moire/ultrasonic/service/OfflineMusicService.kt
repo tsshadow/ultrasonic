@@ -414,7 +414,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(Exception::class)
-    override fun getGenres(refresh: Boolean): List<Genre>? {
+    override fun getGenres(refresh: Boolean, year: String): List<Genre>? {
         throw OfflineException("Getting Genres not available in offline mode")
     }
 

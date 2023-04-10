@@ -383,14 +383,14 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun getGenres(refresh: Boolean): List<Genre> {
+    override fun getGenres(refresh: Boolean, year: String): List<Genre> {
         checkSettingsChanged()
         if (refresh) {
             cachedGenres.clear()
         }
         var result = cachedGenres.get()
         if (result == null) {
-            result = musicService.getGenres(refresh)
+            result = musicService.getGenres(refresh, year)
             cachedGenres.set(result!!)
         }
 

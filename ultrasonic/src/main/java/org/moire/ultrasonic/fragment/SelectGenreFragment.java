@@ -41,8 +41,8 @@ public class SelectGenreFragment extends Fragment {
     private SwipeRefreshLayout refreshGenreListView;
     private ListView genreListView;
     private Spinner yearEditBox;
-    private EditText ratingMin;
-    private EditText ratingMax;
+    private Spinner ratingMin;
+    private Spinner ratingMax;
     private View emptyView;
     private CancellationToken cancellationToken;
 
@@ -56,6 +56,24 @@ public class SelectGenreFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.select_genre, container, false);
+    }
+
+    public static class onYearChangedListener implements AdapterView.OnItemSelectedListener {
+
+        private final SelectGenreFragment fragment;
+
+        public onYearChangedListener(SelectGenreFragment fragment) {
+            this.fragment = fragment;
+        }
+
+        public void onItemSelected(AdapterView<?> parent,
+                                   View view, int pos, long id) {
+            fragment.load(true, parent.getItemAtPosition(pos).toString());
+        }
+
+        public void onNothingSelected(AdapterView parent) {
+            // Do nothing.
+        }
     }
 
     @Override
@@ -83,8 +101,8 @@ public class SelectGenreFragment extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putString(Constants.INTENT_GENRE_NAME, genre.getName());
                     bundle.putString(Constants.INTENT_YEAR_NAME, yearEditBox.getSelectedItem().toString());
-                    bundle.putString(Constants.INTENT_RATING_MIN, ratingMin.getText().toString());
-                    bundle.putString(Constants.INTENT_RATING_MAX, ratingMax.getText().toString());
+                    bundle.putString(Constants.INTENT_RATING_MIN, ratingMin.getSelectedItem().toString());
+                    bundle.putString(Constants.INTENT_RATING_MAX, ratingMax.getSelectedItem().toString());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.getMaxSongs());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0);
                     Navigation.findNavController(view).navigate(R.id.trackCollectionFragment, bundle);
@@ -94,17 +112,30 @@ public class SelectGenreFragment extends Fragment {
 
         emptyView = view.findViewById(R.id.select_genre_empty);
         registerForContextMenu(genreListView);
+
         yearEditBox = (Spinner)view.findViewById(R.id.selectYear);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(),
-        R.array.year_array, android.R.layout.simple_spinner_item);
+                R.array.year_array, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         yearEditBox.setAdapter(adapter);
 
-        ratingMin = (EditText)view.findViewById(R.id.ratingMin);
-        ratingMax = (EditText)view.findViewById(R.id.ratingMax);
+        yearEditBox.setOnItemSelectedListener(new SelectGenreFragment.onYearChangedListener(this));
+
+        ratingMin = (Spinner)view.findViewById(R.id.ratingMin);
+        ratingMax = (Spinner)view.findViewById(R.id.ratingMax);
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> ratingAdapter = ArrayAdapter.createFromResource(this.getContext(),
+                R.array.rating_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        ratingMin.setAdapter(ratingAdapter);
+        ratingMax.setAdapter(ratingAdapter);
+        ratingMax.setSelection(5);
 
         FragmentTitle.Companion.setTitle(this, R.string.main_genres_title);
         load(false);
@@ -116,7 +147,11 @@ public class SelectGenreFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private void load(final boolean refresh)
+    private void load (final boolean refresh)
+    {
+        load(refresh, "");
+    }
+    public void load(final boolean refresh, String year)
     {
         BackgroundTask<List<Genre>> task = new FragmentBackgroundTask<List<Genre>>(getActivity(), true, refreshGenreListView, cancellationToken)
         {
@@ -129,7 +164,7 @@ public class SelectGenreFragment extends Fragment {
 
                 try
                 {
-                    genres = musicService.getGenres(refresh);
+                    genres = musicService.getGenres(refresh, year);
                 }
                 catch (Exception x)
                 {
