@@ -17,6 +17,8 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_NONE
 import androidx.media3.common.StarRating
 import java.text.DateFormat
+import java.text.ParseException
+import java.util.Date
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.provider.AlbumArtContentProvider
 
@@ -144,7 +146,7 @@ fun MediaItem.toTrack(): Track {
 
     // No cache hit, generate it
     val created = mediaMetadata.extras?.getString("created")
-    val createdDate = if (created != null) DateFormat.getDateInstance().parse(created) else null
+    val createdDate = safeParseDate(created)
 
     val track = Track(
         mediaId,
@@ -192,6 +194,14 @@ fun MediaItem.toTrack(): Track {
     MediaItemConverter.addToCache(mediaId, this)
 
     return track
+}
+
+private fun safeParseDate(created: String?): Date? {
+    return if (created != null) try {
+        DateFormat.getDateInstance().parse(created)
+    } catch (_: ParseException) {
+        null
+    } else null
 }
 
 fun MediaItem.setPin(pin: Boolean) {

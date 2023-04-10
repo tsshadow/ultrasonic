@@ -7,19 +7,24 @@
 
 package org.moire.ultrasonic.subsonic
 
-import android.app.Activity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import java.util.Collections
 import java.util.LinkedList
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.util.CommunicationError
 import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
-import org.moire.ultrasonic.util.ModalBackgroundTask
+import org.moire.ultrasonic.util.InfoDialog
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 
@@ -30,7 +35,7 @@ import org.moire.ultrasonic.util.Util
 class DownloadHandler(
     val mediaPlayerController: MediaPlayerController,
     val networkAndStorageChecker: NetworkAndStorageChecker
-) {
+) : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private val maxSongs = 500
 
     fun download(
@@ -203,137 +208,176 @@ class DownloadHandler(
         unpin: Boolean,
         isArtist: Boolean
     ) {
-        val activity = fragment.activity as Activity
-        val task = object : ModalBackgroundTask<List<Track>>(
-            activity,
-            false
-        ) {
+        // Launch the Job
+        val job = launch {
+            val songs: MutableList<Track> =
+                getTracksFromServer(isArtist, id, isDirectory, name, isShare)
 
-            @Throws(Throwable::class)
-            override fun doInBackground(): List<Track> {
-                val musicService = getMusicService()
-                val songs: MutableList<Track> = LinkedList()
-                val root: MusicDirectory
-                if (!isOffline() && isArtist && Settings.shouldUseId3Tags) {
-                    getSongsForArtist(id, songs)
-                } else {
-                    if (isDirectory) {
-                        root = if (!isOffline() && Settings.shouldUseId3Tags)
-                            musicService.getAlbumAsDir(id, name, false)
-                        else
-                            musicService.getMusicDirectory(id, name, false)
-                    } else if (isShare) {
-                        root = MusicDirectory()
-                        val shares = musicService.getShares(true)
-                        for (share in shares) {
-                            if (share.id == id) {
-                                for (entry in share.getEntries()) {
-                                    root.add(entry)
-                                }
-                                break
-                            }
-                        }
-                    } else {
-                        root = musicService.getPlaylist(id, name!!)
-                    }
-                    getSongsRecursively(root, songs)
-                }
-                return songs
+            withContext(Dispatchers.Main) {
+                addTracksToMediaController(
+                    songs,
+                    background,
+                    unpin,
+                    append,
+                    playNext,
+                    save,
+                    autoPlay,
+                    shuffle,
+                    fragment
+                )
             }
+        }
 
-            @Suppress("DestructuringDeclarationWithTooManyEntries")
-            @Throws(Exception::class)
-            private fun getSongsRecursively(
-                parent: MusicDirectory,
-                songs: MutableList<Track>
-            ) {
-                if (songs.size > maxSongs) {
-                    return
-                }
-                for (song in parent.getTracks()) {
-                    if (!song.isVideo) {
-                        songs.add(song)
-                    }
-                }
-                val musicService = getMusicService()
-                for ((id1, _, _, title) in parent.getAlbums()) {
-                    val root: MusicDirectory = if (
-                        !isOffline() &&
-                        Settings.shouldUseId3Tags
-                    ) musicService.getAlbumAsDir(id1, title, false)
-                    else musicService.getMusicDirectory(id1, title, false)
-                    getSongsRecursively(root, songs)
-                }
+        // Create the dialog
+        val builder = InfoDialog.Builder(fragment.requireContext())
+        builder.setTitle(R.string.background_task_wait)
+        builder.setMessage(R.string.background_task_loading)
+        builder.setOnCancelListener { job.cancel() }
+        builder.setPositiveButton(R.string.common_cancel) { _, i -> job.cancel() }
+        val dialog = builder.create()
+        dialog.show()
+
+        job.invokeOnCompletion {
+            dialog.dismiss()
+            if (it != null && it !is CancellationException) {
+                Util.toast(
+                    fragment.requireContext(),
+                    CommunicationError.getErrorMessage(it, fragment.requireContext())
+                )
             }
+        }
+    }
 
-            @Throws(Exception::class)
-            private fun getSongsForArtist(
-                id: String,
-                songs: MutableCollection<Track>
-            ) {
-                if (songs.size > maxSongs) {
-                    return
+    private fun addTracksToMediaController(
+        songs: MutableList<Track>,
+        background: Boolean,
+        unpin: Boolean,
+        append: Boolean,
+        playNext: Boolean,
+        save: Boolean,
+        autoPlay: Boolean,
+        shuffle: Boolean,
+        fragment: Fragment
+    ) {
+        if (songs.isEmpty()) return
+        if (Settings.shouldSortByDisc) {
+            Collections.sort(songs, EntryByDiscAndTrackComparator())
+        }
+        networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
+        if (!background) {
+            if (unpin) {
+                mediaPlayerController.unpin(songs)
+            } else {
+                val insertionMode = when {
+                    append -> MediaPlayerController.InsertionMode.APPEND
+                    playNext -> MediaPlayerController.InsertionMode.AFTER_CURRENT
+                    else -> MediaPlayerController.InsertionMode.CLEAR
                 }
-                val musicService = getMusicService()
-                val artist = musicService.getAlbumsOfArtist(id, "", false)
-                for ((id1) in artist) {
-                    val albumDirectory = musicService.getAlbumAsDir(
-                        id1,
-                        "",
-                        false
+                mediaPlayerController.addToPlaylist(
+                    songs,
+                    save,
+                    autoPlay,
+                    shuffle,
+                    insertionMode
+                )
+                if (
+                    !append &&
+                    Settings.shouldTransitionOnPlayback
+                ) {
+                    fragment.findNavController().popBackStack(
+                        R.id.playerFragment,
+                        true
                     )
-                    for (song in albumDirectory.getTracks()) {
-                        if (!song.isVideo) {
-                            songs.add(song)
-                        }
-                    }
+                    fragment.findNavController().navigate(R.id.playerFragment)
                 }
             }
+        } else {
+            if (unpin) {
+                mediaPlayerController.unpin(songs)
+            } else {
+                mediaPlayerController.downloadBackground(songs, save)
+            }
+        }
+    }
 
-            // Called when we have collected the tracks
-            override fun done(songs: List<Track>) {
-                if (Settings.shouldSortByDisc) {
-                    Collections.sort(songs, EntryByDiscAndTrackComparator())
-                }
-                if (songs.isNotEmpty()) {
-                    networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-                    if (!background) {
-                        if (unpin) {
-                            mediaPlayerController.unpin(songs)
-                        } else {
-                            val insertionMode = when {
-                                append -> MediaPlayerController.InsertionMode.APPEND
-                                playNext -> MediaPlayerController.InsertionMode.AFTER_CURRENT
-                                else -> MediaPlayerController.InsertionMode.CLEAR
-                            }
-                            mediaPlayerController.addToPlaylist(
-                                songs,
-                                save,
-                                autoPlay,
-                                shuffle,
-                                insertionMode
-                            )
-                            if (
-                                !append &&
-                                Settings.shouldTransitionOnPlayback
-                            ) {
-                                fragment.findNavController().popBackStack(
-                                    R.id.playerFragment,
-                                    true
-                                )
-                                fragment.findNavController().navigate(R.id.playerFragment)
-                            }
-                        }
-                    } else {
-                        if (unpin) {
-                            mediaPlayerController.unpin(songs)
-                        } else {
-                            mediaPlayerController.downloadBackground(songs, save)
-                        }
-                    }
+    private fun getTracksFromServer(
+        isArtist: Boolean,
+        id: String,
+        isDirectory: Boolean,
+        name: String?,
+        isShare: Boolean
+    ): MutableList<Track> {
+        val musicService = getMusicService()
+        val songs: MutableList<Track> = LinkedList()
+        val root: MusicDirectory
+        if (!isOffline() && isArtist && Settings.shouldUseId3Tags) {
+            getSongsForArtist(id, songs)
+        } else {
+            if (isDirectory) {
+                root = if (!isOffline() && Settings.shouldUseId3Tags)
+                    musicService.getAlbumAsDir(id, name, false)
+                else
+                    musicService.getMusicDirectory(id, name, false)
+            } else if (isShare) {
+                root = MusicDirectory()
+                val shares = musicService.getShares(true)
+                // Filter the received shares by the given id, and get their entries
+                val entries = shares.filter { it.id == id }.flatMap { it.getEntries() }
+                root.addAll(entries)
+            } else {
+                root = musicService.getPlaylist(id, name!!)
+            }
+            getSongsRecursively(root, songs)
+        }
+        return songs
+    }
+
+    @Suppress("DestructuringDeclarationWithTooManyEntries")
+    @Throws(Exception::class)
+    private fun getSongsRecursively(
+        parent: MusicDirectory,
+        songs: MutableList<Track>
+    ) {
+        if (songs.size > maxSongs) {
+            return
+        }
+        for (song in parent.getTracks()) {
+            if (!song.isVideo) {
+                songs.add(song)
+            }
+        }
+        val musicService = getMusicService()
+        for ((id1, _, _, title) in parent.getAlbums()) {
+            val root: MusicDirectory = if (
+                !isOffline() &&
+                Settings.shouldUseId3Tags
+            ) musicService.getAlbumAsDir(id1, title, false)
+            else musicService.getMusicDirectory(id1, title, false)
+            getSongsRecursively(root, songs)
+        }
+    }
+
+    @Throws(Exception::class)
+    private fun getSongsForArtist(
+        id: String,
+        songs: MutableCollection<Track>
+    ) {
+        if (songs.size > maxSongs) {
+            return
+        }
+        val musicService = getMusicService()
+        val artist = musicService.getAlbumsOfArtist(id, "", false)
+        for ((id1) in artist) {
+            val albumDirectory = musicService.getAlbumAsDir(
+                id1,
+                "",
+                false
+            )
+            for (song in albumDirectory.getTracks()) {
+                if (!song.isVideo) {
+                    songs.add(song)
                 }
             }
         }
-        task.execute()
     }
 }
