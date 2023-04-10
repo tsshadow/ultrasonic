@@ -72,7 +72,7 @@ interface MusicService {
     fun unstar(id: String?, albumId: String?, artistId: String?)
 
     @Throws(Exception::class)
-    fun setRating(id: String, rating: Int)
+    fun setRating(id: String, rating: Int, artist: String, title: String)
 
     @Throws(Exception::class)
     fun getMusicFolders(refresh: Boolean): List<MusicFolder>

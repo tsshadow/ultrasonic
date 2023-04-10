@@ -378,8 +378,8 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun setRating(id: String, rating: Int) {
-        musicService.setRating(id, rating)
+    override fun setRating(id: String, rating: Int, artist: String, title: String) {
+        musicService.setRating(id, rating, artist, title)
     }
 
     @Throws(Exception::class)

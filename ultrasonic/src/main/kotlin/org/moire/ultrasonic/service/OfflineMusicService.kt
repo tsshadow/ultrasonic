@@ -594,7 +594,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(OfflineException::class)
-    override fun setRating(id: String, rating: Int) {
+    override fun setRating(id: String, rating: Int, artist: String, title: String) {
         throw OfflineException("setRating isn't available in offline mode")
     }
 

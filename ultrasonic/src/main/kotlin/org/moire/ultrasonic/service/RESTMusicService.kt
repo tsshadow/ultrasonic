@@ -134,9 +134,11 @@ open class RESTMusicService(
     @Throws(Exception::class)
     override fun setRating(
         id: String,
-        rating: Int
+        rating: Int,
+        artist: String,
+        title: String,
     ) {
-        API.setRating(id, rating).execute().throwOnFailure()
+        API.setRating(id, rating, artist, title).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)

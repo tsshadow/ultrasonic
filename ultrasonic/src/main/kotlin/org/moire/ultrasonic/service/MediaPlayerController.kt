@@ -619,7 +619,7 @@ class MediaPlayerController(
         song.userRating = rating
         Thread {
             try {
-                getMusicService().setRating(song.id, rating)
+                getMusicService().setRating(song.id, rating, song.artist!!, song.title!!)
             } catch (e: Exception) {
                 Timber.e(e)
             }

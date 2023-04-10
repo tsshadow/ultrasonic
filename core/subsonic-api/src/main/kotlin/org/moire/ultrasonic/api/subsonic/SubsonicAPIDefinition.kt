@@ -55,7 +55,10 @@ interface SubsonicAPIDefinition {
     @GET("setRating.view")
     fun setRating(
         @Query("id") id: String,
-        @Query("rating") rating: Int
+        @Query("rating") rating: Int,
+        @Query("artist") artist: String,
+        @Query("title") title: String,
+
     ): Call<SubsonicResponse>
 
     @GET("getArtist.view")
