@@ -14,7 +14,7 @@
 
     <LinearLayout
         a:layout_width="match_parent"
-        a:layout_height="30dp"
+        a:layout_height="50dp"
         a:orientation="horizontal">
         <TextView
             a:id="@+id/textView"
@@ -35,7 +35,7 @@
 
     <LinearLayout
         a:layout_width="match_parent"
-        a:layout_height="30dp"
+        a:layout_height="50dp"
         a:orientation="horizontal">
 
         <TextView
