@@ -14,57 +14,63 @@
 
     <LinearLayout
         a:layout_width="match_parent"
-        a:layout_height="wrap_content"
+        a:layout_height="30dp"
         a:orientation="horizontal">
         <TextView
             a:id="@+id/textView"
             a:layout_width="0dp"
-            a:layout_height="wrap_content"
+            a:layout_height="match_parent"
             a:layout_weight=".20"
+            a:gravity="center"
             a:text="Year" />
 
         <Spinner
             a:id="@+id/selectYear"
             a:layout_width="0dp"
-            a:layout_height="40dp"
+            a:layout_height="match_parent"
             a:layout_weight=".80"
+            a:gravity="center"
             a:inputType="text" />
     </LinearLayout>
 
     <LinearLayout
         a:layout_width="match_parent"
-        a:layout_height="wrap_content"
+        a:layout_height="30dp"
         a:orientation="horizontal">
 
         <TextView
             a:id="@+id/textView"
             a:layout_width="0dp"
-            a:layout_height="wrap_content"
+            a:layout_height="match_parent"
             a:layout_weight=".20"
+            a:gravity="center"
             a:text="Rating" />
         <TextView
             a:id="@+id/textView"
             a:layout_width="0dp"
-            a:layout_height="wrap_content"
+            a:layout_height="match_parent"
             a:layout_weight=".10"
+            a:gravity="center"
             a:text="From" />
-        <EditText
+        <Spinner
             a:id="@+id/ratingMin"
             a:layout_width="0dp"
-            a:layout_height="wrap_content"
+            a:layout_height="match_parent"
             a:layout_weight=".30"
+            a:gravity="center"
             a:inputType="text" />
 
         <TextView
             a:id="@+id/textView"
             a:layout_width="0dp"
-            a:layout_height="wrap_content"
+            a:layout_height="match_parent"
             a:layout_weight=".10"
+            a:gravity="center"
             a:text="To" />
-        <EditText
+        <Spinner
             a:id="@+id/ratingMax"
             a:layout_width="0dp"
-            a:layout_height="wrap_content"
+            a:layout_height="match_parent"
             a:layout_weight=".30"
             a:inputType="text" />
     </LinearLayout>

@@ -42,8 +42,8 @@ public class SelectMoodFragment extends Fragment {
     private SwipeRefreshLayout refreshMoodListView;
     private ListView moodListView;
     private Spinner yearEditBox;
-    private EditText ratingMin;
-    private EditText ratingMax;
+    private Spinner ratingMin;
+    private Spinner ratingMax;
     private View emptyView;
     private CancellationToken cancellationToken;
 
@@ -102,8 +102,8 @@ public class SelectMoodFragment extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putString(Constants.INTENT_MOOD_NAME, mood.getName());
                     bundle.putString(Constants.INTENT_YEAR_NAME, yearEditBox.getSelectedItem().toString());
-                    bundle.putString(Constants.INTENT_RATING_MIN, ratingMin.getText().toString());
-                    bundle.putString(Constants.INTENT_RATING_MAX, ratingMax.getText().toString());
+                    bundle.putString(Constants.INTENT_RATING_MIN, ratingMin.getSelectedItem().toString());
+                    bundle.putString(Constants.INTENT_RATING_MAX, ratingMax.getSelectedItem().toString());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.getMaxSongs());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0);
                     Navigation.findNavController(view).navigate(R.id.trackCollectionFragment, bundle);
@@ -125,8 +125,18 @@ public class SelectMoodFragment extends Fragment {
 
         yearEditBox.setOnItemSelectedListener(new onYearChangedListener(this));
 
-        ratingMin = (EditText)view.findViewById(R.id.ratingMin);
-        ratingMax = (EditText)view.findViewById(R.id.ratingMax);
+        ratingMin = (Spinner)view.findViewById(R.id.ratingMin);
+        ratingMax = (Spinner)view.findViewById(R.id.ratingMax);
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> ratingAdapter = ArrayAdapter.createFromResource(this.getContext(),
+                R.array.rating_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        ratingMin.setAdapter(ratingAdapter);
+        ratingMax.setAdapter(ratingAdapter);
+        ratingMax.setSelection(5);
 
         FragmentTitle.Companion.setTitle(this, R.string.main_mood_title);
         load(false, "");
