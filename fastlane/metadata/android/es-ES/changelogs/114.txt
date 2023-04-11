@@ -1,0 +1,4 @@
+Corrección de errores
+- Corrección de un fallo cuando la fecha de una etiqueta ID3 tiene un formato incorrecto.
+- Corrección de un fallo en la API 31 (versión de Android más reciente).
+- Corrección de resultados de búsqueda vacíos.
