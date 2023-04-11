@@ -1,4 +1,4 @@
-Bug fixes:
-- Fix a crash when a ID3 tag date is in a wrong format
-- Fix a crash on API 31 (newest Android)
-- Fix empty search results
+Bug fixes
+- Fix a crash when a ID3 tag date is in a wrong format.
+- Fix a crash on API 31 (newest Android).
+- Fix empty search results.
