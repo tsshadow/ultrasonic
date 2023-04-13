@@ -33,7 +33,7 @@ ImageLoaderProvider(val context: Context) :
     }
 
     init {
-        Timber.e("Prepping Loader")
+        Timber.d("Prepping Loader")
         // Populate the ImageLoader async & early
         launch {
             getImageLoader()

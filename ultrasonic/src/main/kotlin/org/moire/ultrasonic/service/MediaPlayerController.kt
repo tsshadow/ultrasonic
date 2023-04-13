@@ -418,13 +418,6 @@ class MediaPlayerController(
         }
     }
 
-    @Synchronized
-    fun downloadBackground(songs: List<Track?>?, save: Boolean) {
-        if (songs == null) return
-        val filteredSongs = songs.filterNotNull()
-        DownloadService.download(filteredSongs, save)
-    }
-
     @set:Synchronized
     var isShufflePlayEnabled: Boolean
         get() = controller?.shuffleModeEnabled == true
@@ -498,22 +491,6 @@ class MediaPlayerController(
             isShufflePlayEnabled,
             repeatMode
         )
-    }
-
-    @Synchronized
-    // TODO: Make it require not null
-    fun delete(tracks: List<Track?>) {
-        for (track in tracks.filterNotNull()) {
-            DownloadService.delete(track)
-        }
-    }
-
-    @Synchronized
-    // TODO: Make it require not null
-    fun unpin(tracks: List<Track?>) {
-        for (track in tracks.filterNotNull()) {
-            DownloadService.unpin(track)
-        }
     }
 
     @Synchronized
