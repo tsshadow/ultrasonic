@@ -1,0 +1,3 @@
+Bug fixes
+- Fix a crash when downloading the album art
+
