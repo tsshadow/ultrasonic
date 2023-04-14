@@ -20,6 +20,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
+import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.CommunicationError
@@ -266,7 +267,7 @@ class DownloadHandler(
         networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
         if (!background) {
             if (unpin) {
-                mediaPlayerController.unpin(songs)
+                DownloadService.unpin(songs)
             } else {
                 val insertionMode = when {
                     append -> MediaPlayerController.InsertionMode.APPEND
@@ -293,9 +294,9 @@ class DownloadHandler(
             }
         } else {
             if (unpin) {
-                mediaPlayerController.unpin(songs)
+                DownloadService.unpin(songs)
             } else {
-                mediaPlayerController.downloadBackground(songs, save)
+                DownloadService.download(songs, save)
             }
         }
     }

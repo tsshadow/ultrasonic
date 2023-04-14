@@ -19,11 +19,12 @@ import java.io.IOException
 import java.util.concurrent.Executors
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 
 @SuppressLint("UnsafeOptInUsageError")
 class ArtworkBitmapLoader : BitmapLoader, KoinComponent {
 
-    private val imageLoader: ImageLoader by inject()
+    private val imageLoaderProvider: ImageLoaderProvider by inject()
 
     private val executorService: ListeningExecutorService by lazy {
         MoreExecutors.listeningDecorator(
@@ -55,6 +56,6 @@ class ArtworkBitmapLoader : BitmapLoader, KoinComponent {
         val parts = uri.path?.trim('/')?.split('|')
 
         require(parts!!.count() == 2) { "Invalid bitmap Uri" }
-        return imageLoader.getImage(parts[0], parts[1], false, 0)
+        return imageLoaderProvider.getImageLoader().getImage(parts[0], parts[1], false, 0)
     }
 }

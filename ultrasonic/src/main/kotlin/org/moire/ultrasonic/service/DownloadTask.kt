@@ -36,7 +36,7 @@ private const val MAX_RETRIES = 5
 private const val REFRESH_INTERVAL = 50
 
 class DownloadTask(
-    private val item: DownloadableTrack,
+    val downloadTrack: DownloadableTrack,
     private val scope: CoroutineScope,
     private val stateChangedCallback: (DownloadableTrack, DownloadState, progress: Int?) -> Unit
 ) : KoinComponent {
@@ -49,38 +49,35 @@ class DownloadTask(
     private var outputStream: OutputStream? = null
     private var lastPostTime: Long = 0
 
-    val track: DownloadableTrack
-        get() = item
-
     private fun checkIfExists(): Boolean {
-        if (Storage.isPathExists(item.pinnedFile)) {
-            Timber.i("%s already exists. Skipping.", item.pinnedFile)
-            stateChangedCallback(item, DownloadState.PINNED, null)
+        if (Storage.isPathExists(downloadTrack.pinnedFile)) {
+            Timber.i("%s already exists. Skipping.", downloadTrack.pinnedFile)
+            stateChangedCallback(downloadTrack, DownloadState.PINNED, null)
             return true
         }
 
-        if (Storage.isPathExists(item.completeFile)) {
+        if (Storage.isPathExists(downloadTrack.completeFile)) {
             var newStatus: DownloadState = DownloadState.DONE
-            if (item.pinned) {
+            if (downloadTrack.pinned) {
                 Storage.rename(
-                    item.completeFile,
-                    item.pinnedFile
+                    downloadTrack.completeFile,
+                    downloadTrack.pinnedFile
                 )
                 newStatus = DownloadState.PINNED
             } else {
                 Timber.i(
                     "%s already exists. Skipping.",
-                    item.completeFile
+                    downloadTrack.completeFile
                 )
             }
 
             // Hidden feature: If track is toggled between pinned/saved, refresh the metadata..
             try {
-                item.track.cacheMetadataAndArtwork()
+                downloadTrack.track.cacheMetadataAndArtwork()
             } catch (ignore: Exception) {
                 Timber.w(ignore)
             }
-            stateChangedCallback(item, newStatus, null)
+            stateChangedCallback(downloadTrack, newStatus, null)
             return true
         }
 
@@ -88,15 +85,15 @@ class DownloadTask(
     }
 
     fun download() {
-        stateChangedCallback(item, DownloadState.DOWNLOADING, null)
+        stateChangedCallback(downloadTrack, DownloadState.DOWNLOADING, null)
 
-        val fileLength = Storage.getFromPath(item.partialFile)?.length ?: 0
+        val fileLength = Storage.getFromPath(downloadTrack.partialFile)?.length ?: 0
 
         // Attempt partial HTTP GET, appending to the file if it exists.
         val (inStream, isPartial) = musicService.getDownloadInputStream(
-            item.track, fileLength,
+            downloadTrack.track, fileLength,
             Settings.maxBitRate,
-            item.pinned
+            downloadTrack.pinned
         )
 
         inputStream = inStream
@@ -105,7 +102,7 @@ class DownloadTask(
             Timber.i("Executed partial HTTP GET, skipping %d bytes", fileLength)
         }
 
-        outputStream = Storage.getOrCreateFileFromPath(item.partialFile)
+        outputStream = Storage.getOrCreateFileFromPath(downloadTrack.partialFile)
             .getFileOutputStream(isPartial)
 
         val len = inputStream!!.copyWithProgress(outputStream!!) { totalBytesCopied ->
@@ -113,7 +110,7 @@ class DownloadTask(
             publishProgressUpdate(fileLength + totalBytesCopied)
         }
 
-        Timber.i("Downloaded %d bytes to %s", len, item.partialFile)
+        Timber.i("Downloaded %d bytes to %s", len, downloadTrack.partialFile)
 
         inputStream?.close()
         outputStream?.flush()
@@ -131,7 +128,7 @@ class DownloadTask(
             lastPostTime = SystemClock.elapsedRealtime()
 
             // If the file size is unknown we can only provide null as the progress
-            val size = item.track.size ?: 0
+            val size = downloadTrack.track.size ?: 0
             val progress = if (size <= 0) {
                 null
             } else {
@@ -139,7 +136,7 @@ class DownloadTask(
             }
 
             stateChangedCallback(
-                item,
+                downloadTrack,
                 DownloadState.DOWNLOADING,
                 progress
             )
@@ -148,39 +145,39 @@ class DownloadTask(
 
     private fun afterDownload() {
         try {
-            item.track.cacheMetadataAndArtwork()
+            downloadTrack.track.cacheMetadataAndArtwork()
         } catch (ignore: Exception) {
             Timber.w(ignore)
         }
 
-        if (item.pinned) {
+        if (downloadTrack.pinned) {
             Storage.rename(
-                item.partialFile,
-                item.pinnedFile
+                downloadTrack.partialFile,
+                downloadTrack.pinnedFile
             )
-            Timber.i("Renamed file to ${item.pinnedFile}")
-            stateChangedCallback(item, DownloadState.PINNED, null)
-            Util.scanMedia(item.pinnedFile)
+            Timber.i("Renamed file to ${downloadTrack.pinnedFile}")
+            stateChangedCallback(downloadTrack, DownloadState.PINNED, null)
+            Util.scanMedia(downloadTrack.pinnedFile)
         } else {
             Storage.rename(
-                item.partialFile,
-                item.completeFile
+                downloadTrack.partialFile,
+                downloadTrack.completeFile
             )
-            Timber.i("Renamed file to ${item.completeFile}")
-            stateChangedCallback(item, DownloadState.DONE, null)
+            Timber.i("Renamed file to ${downloadTrack.completeFile}")
+            stateChangedCallback(downloadTrack, DownloadState.DONE, null)
         }
     }
 
     private fun onCompletion(e: Throwable?) {
         if (e is CancellationException) {
-            Timber.w(e, "CompletionHandler ${item.pinnedFile}")
-            stateChangedCallback(item, DownloadState.CANCELLED, null)
+            Timber.w(e, "CompletionHandler ${downloadTrack.pinnedFile}")
+            stateChangedCallback(downloadTrack, DownloadState.CANCELLED, null)
         } else if (e != null) {
-            Timber.w(e, "CompletionHandler ${item.pinnedFile}")
-            if (item.tryCount < MAX_RETRIES) {
-                stateChangedCallback(item, DownloadState.RETRYING, null)
+            Timber.w(e, "CompletionHandler ${downloadTrack.pinnedFile}")
+            if (downloadTrack.tryCount < MAX_RETRIES) {
+                stateChangedCallback(downloadTrack, DownloadState.RETRYING, null)
             } else {
-                stateChangedCallback(item, DownloadState.FAILED, null)
+                stateChangedCallback(downloadTrack, DownloadState.FAILED, null)
             }
         }
         inputStream.safeClose()
@@ -189,15 +186,16 @@ class DownloadTask(
 
     private fun exceptionHandler(): CoroutineExceptionHandler {
         return CoroutineExceptionHandler { _, exception ->
-            Timber.w(exception, "Exception in DownloadTask ${item.pinnedFile}")
-            Storage.delete(item.completeFile)
-            Storage.delete(item.pinnedFile)
+            Timber.w(exception, "Exception in DownloadTask ${downloadTrack.pinnedFile}")
+            Storage.delete(downloadTrack.completeFile)
+            Storage.delete(downloadTrack.pinnedFile)
         }
     }
 
     fun start() {
-        Timber.i("Launching new Job ${item.pinnedFile}")
+        Timber.i("Launching new Job ${downloadTrack.pinnedFile}")
         job = scope.launch(exceptionHandler()) {
+            FileUtil.createDirectoryForParent(downloadTrack.pinnedFile)
             if (!checkIfExists() && isActive) {
                 download()
                 afterDownload()

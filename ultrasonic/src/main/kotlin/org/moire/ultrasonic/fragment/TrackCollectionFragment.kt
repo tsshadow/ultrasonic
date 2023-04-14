@@ -40,6 +40,7 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.TrackCollectionModel
+import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
@@ -429,7 +430,7 @@ open class TrackCollectionFragment(
     ) {
         val onValid = Runnable {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.downloadBackground(songs, save)
+            DownloadService.download(songs.filterNotNull(), save)
 
             if (save) {
                 Util.toast(
@@ -458,7 +459,7 @@ open class TrackCollectionFragment(
             )
         )
 
-        mediaPlayerController.delete(songs)
+        DownloadService.delete(songs)
     }
 
     internal fun unpin(songs: List<Track> = getSelectedSongs()) {
@@ -468,7 +469,7 @@ open class TrackCollectionFragment(
                 R.plurals.select_album_n_songs_unpinned, songs.size, songs.size
             )
         )
-        mediaPlayerController.unpin(songs)
+        DownloadService.unpin(songs)
     }
 
     override val defaultObserver: (List<MusicDirectory.Child>) -> Unit = {

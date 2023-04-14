@@ -18,6 +18,9 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
@@ -36,7 +39,7 @@ class ImageLoader(
     context: Context,
     apiClient: SubsonicAPIClient,
     private val config: ImageLoaderConfig,
-) : CoroutineScope by CoroutineScope(Dispatchers.IO) {
+) : CoroutineScope by CoroutineScope(Dispatchers.Main + SupervisorJob()) {
     private val cacheInProgress: ConcurrentHashMap<String, CountDownLatch> = ConcurrentHashMap()
 
     // Shortcut
@@ -126,10 +129,13 @@ class ImageLoader(
         large: Boolean,
         size: Int,
         defaultResourceId: Int = R.drawable.unknown_album
-    ) {
+    ) = launch {
         val id = entry?.coverArt
-        // TODO getAlbumArtKey() accesses the disk from the UI thread..
-        val key = FileUtil.getAlbumArtKey(entry, large)
+        val key: String?
+
+        withContext(Dispatchers.IO) {
+            key = FileUtil.getAlbumArtKey(entry, large)
+        }
 
         loadImage(view, id, key, large, size, defaultResourceId)
     }
@@ -194,48 +200,49 @@ class ImageLoader(
         cacheCoverArt(track.coverArt!!, FileUtil.getAlbumArtFile(track))
     }
 
-    fun cacheCoverArt(id: String, file: String) {
-        if (id.isBlank()) return
-        // Return if have a cache hit
-        if (File(file).exists()) return
+    fun cacheCoverArt(id: String, file: String) = launch {
+        if (id.isBlank()) return@launch
 
-        // If another thread has started caching, wait until it finishes
-        val latch = cacheInProgress.putIfAbsent(file, CountDownLatch(1))
-        if (latch != null) {
-            latch.await()
-            return
-        }
+        withContext(Dispatchers.IO) {
+            // Return if have a cache hit
+            if (File(file).exists()) return@withContext
 
-        try {
+            // If another coroutine has started caching, abort
+            if (cacheInProgress[file] != null) return@withContext
+
             // Always download the large size..
             val size = config.largeSize
+
             File(file).createNewFile()
 
             // Query the API
             Timber.d("Loading cover art for: %s", id)
-            val response = API.getCoverArt(id, size.toLong()).execute().toStreamResponse()
-            response.throwOnFailure()
-
-            // Check for failure
-            if (response.stream == null) return
-
-            // Write Response stream to file
-            var inputStream: InputStream? = null
             try {
-                inputStream = response.stream
-                val bytes = inputStream!!.readBytes()
-                var outputStream: OutputStream? = null
+                val response = API.getCoverArt(id, size.toLong()).execute().toStreamResponse()
+
+                response.throwOnFailure()
+
+                // Check for failure
+                if (response.stream == null) return@withContext
+
+                // Write Response stream to file
+                var inputStream: InputStream? = null
                 try {
-                    outputStream = FileOutputStream(file)
-                    outputStream.write(bytes)
+                    inputStream = response.stream
+                    val bytes = inputStream!!.readBytes()
+                    var outputStream: OutputStream? = null
+                    try {
+                        outputStream = FileOutputStream(file)
+                        outputStream.write(bytes)
+                    } finally {
+                        outputStream.safeClose()
+                    }
                 } finally {
-                    outputStream.safeClose()
+                    inputStream.safeClose()
                 }
             } finally {
-                inputStream.safeClose()
+                cacheInProgress.remove(file)?.countDown()
             }
-        } finally {
-            cacheInProgress.remove(file)?.countDown()
         }
     }
 

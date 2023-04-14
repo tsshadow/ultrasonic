@@ -41,6 +41,7 @@ import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.SearchListModel
+import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
 import org.moire.ultrasonic.subsonic.ShareHandler
@@ -203,7 +204,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     private fun downloadBackground(save: Boolean, songs: List<Track?>) {
         val onValid = Runnable {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.downloadBackground(songs, save)
+            DownloadService.download(songs.filterNotNull(), save)
         }
         onValid.run()
     }
@@ -437,7 +438,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                         songs.size
                     )
                 )
-                mediaPlayerController.unpin(songs)
+                DownloadService.unpin(songs)
             }
             R.id.song_menu_share -> {
                 songs.add(item)

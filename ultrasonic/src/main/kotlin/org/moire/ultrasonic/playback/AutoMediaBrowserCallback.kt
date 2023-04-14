@@ -445,6 +445,9 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
     private fun playFromSearch(
         query: String,
     ): ListenableFuture<List<MediaItem>> {
+
+        Timber.w("App state: %s", UApp.instance != null)
+
         Timber.i("AutoMediaBrowserService onSearch query: %s", query)
         val mediaItems: MutableList<MediaItem> = ArrayList()
 

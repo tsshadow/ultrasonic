@@ -27,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
@@ -34,7 +35,6 @@ import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.DownloadState.Companion.isFinalState
 import org.moire.ultrasonic.util.CacheCleaner
-import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.FileUtil.getCompleteFile
 import org.moire.ultrasonic.util.FileUtil.getPartialFile
 import org.moire.ultrasonic.util.FileUtil.getPinnedFile
@@ -77,8 +77,7 @@ class DownloadService : Service(), KoinComponent {
 
         // Create Coroutine lifecycle scope. We use a SupervisorJob(), otherwise the failure of one
         // would mean the failure of all jobs!
-        val supervisor = SupervisorJob()
-        scope = CoroutineScope(Dispatchers.IO + supervisor)
+        scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
         val notificationManagerCompat = NotificationManagerCompat.from(this)
 
@@ -147,7 +146,7 @@ class DownloadService : Service(), KoinComponent {
 
             val downloadTask = DownloadTask(track, scope!!, ::downloadStateChangedCallback)
             activeDownloads[track.id] = downloadTask
-            FileUtil.createDirectoryForParent(track.pinnedFile)
+
             downloadTask.start()
             listChanged = true
         }
@@ -200,7 +199,7 @@ class DownloadService : Service(), KoinComponent {
 
     private fun updateLiveData() {
         val temp: MutableList<Track> = ArrayList()
-        temp.addAll(activeDownloads.values.map { it.track.track })
+        temp.addAll(activeDownloads.values.map { it.downloadTrack.track })
         temp.addAll(downloadQueue.map { x -> x.track })
         observableDownloads.postValue(temp.distinct().sorted())
     }
@@ -257,7 +256,7 @@ class DownloadService : Service(), KoinComponent {
         return notificationBuilder.build()
     }
 
-    @Suppress("MagicNumber", "NestedBlockDepth")
+    @Suppress("MagicNumber", "NestedBlockDepth", "TooManyFunctions")
     companion object {
 
         private var startFuture: SettableFuture<DownloadService>? = null
@@ -278,57 +277,60 @@ class DownloadService : Service(), KoinComponent {
             save: Boolean,
             isHighPriority: Boolean = false
         ) {
-            // First handle and filter out those tracks that are already completed
-            var filteredTracks: List<Track>
-            if (save) {
-                tracks.filter { Storage.isPathExists(it.getCompleteFile()) }.forEach { track ->
-                    Storage.getFromPath(track.getCompleteFile())?.let {
-                        Storage.renameOrDeleteIfAlreadyExists(it, track.getPinnedFile())
-                        postState(track, DownloadState.PINNED)
+            CoroutineScope(Dispatchers.IO).launch {
+
+                // First handle and filter out those tracks that are already completed
+                var filteredTracks: List<Track>
+                if (save) {
+                    tracks.filter { Storage.isPathExists(it.getCompleteFile()) }.forEach { track ->
+                        Storage.getFromPath(track.getCompleteFile())?.let {
+                            Storage.renameOrDeleteIfAlreadyExists(it, track.getPinnedFile())
+                            postState(track, DownloadState.PINNED)
+                        }
                     }
-                }
-                filteredTracks = tracks.filter { !Storage.isPathExists(it.getPinnedFile()) }
-            } else {
-                tracks.filter { Storage.isPathExists(it.getPinnedFile()) }.forEach { track ->
-                    Storage.getFromPath(track.getPinnedFile())?.let {
-                        Storage.renameOrDeleteIfAlreadyExists(it, track.getCompleteFile())
-                        postState(track, DownloadState.DONE)
+                    filteredTracks = tracks.filter { !Storage.isPathExists(it.getPinnedFile()) }
+                } else {
+                    tracks.filter { Storage.isPathExists(it.getPinnedFile()) }.forEach { track ->
+                        Storage.getFromPath(track.getPinnedFile())?.let {
+                            Storage.renameOrDeleteIfAlreadyExists(it, track.getCompleteFile())
+                            postState(track, DownloadState.DONE)
+                        }
                     }
-                }
-                filteredTracks = tracks.filter { !Storage.isPathExists(it.getCompleteFile()) }
-            }
-
-            // Update Pinned flag of items in progress
-            downloadQueue.filter { item -> tracks.any { it.id == item.id } }
-                .forEach { it.pinned = save }
-            tracks.forEach {
-                activeDownloads[it.id]?.track?.pinned = save
-            }
-            tracks.forEach {
-                failedList[it.id]?.pinned = save
-            }
-
-            filteredTracks = filteredTracks.filter {
-                !downloadQueue.any { i -> i.id == it.id } && !activeDownloads.containsKey(it.id)
-            }
-
-            // The remainder tracks should be added to the download queue
-            // By using the counter we ensure that the songs are added in the correct order
-            var priority = 0
-            val tracksToDownload =
-                filteredTracks.map {
-                    DownloadableTrack(
-                        it,
-                        save,
-                        0,
-                        if (isHighPriority) priority++ else backgroundPriorityCounter++
-                    )
+                    filteredTracks = tracks.filter { !Storage.isPathExists(it.getCompleteFile()) }
                 }
 
-            if (tracksToDownload.isNotEmpty()) {
-                downloadQueue.addAll(tracksToDownload)
-                tracksToDownload.forEach { postState(it.track, DownloadState.QUEUED) }
-                processNextTracksOnService()
+                // Update Pinned flag of items in progress
+                downloadQueue.filter { item -> tracks.any { it.id == item.id } }
+                    .forEach { it.pinned = save }
+                tracks.forEach {
+                    activeDownloads[it.id]?.downloadTrack?.pinned = save
+                }
+                tracks.forEach {
+                    failedList[it.id]?.pinned = save
+                }
+
+                filteredTracks = filteredTracks.filter {
+                    !downloadQueue.any { i -> i.id == it.id } && !activeDownloads.containsKey(it.id)
+                }
+
+                // The remainder tracks should be added to the download queue
+                // By using the counter we ensure that the songs are added in the correct order
+                var priority = 0
+                val tracksToDownload =
+                    filteredTracks.map {
+                        DownloadableTrack(
+                            it,
+                            save,
+                            0,
+                            if (isHighPriority) priority++ else backgroundPriorityCounter++
+                        )
+                    }
+
+                if (tracksToDownload.isNotEmpty()) {
+                    downloadQueue.addAll(tracksToDownload)
+                    tracksToDownload.forEach { postState(it.track, DownloadState.QUEUED) }
+                    processNextTracksOnService()
+                }
             }
         }
 
@@ -340,23 +342,34 @@ class DownloadService : Service(), KoinComponent {
         }
 
         fun delete(track: Track) {
+            CoroutineScope(Dispatchers.IO).launch {
+                downloadQueue.get(track.id)?.let { downloadQueue.remove(it) }
+                failedList[track.id]?.let { downloadQueue.remove(it) }
+                cancelDownload(track)
 
-            downloadQueue.get(track.id)?.let { downloadQueue.remove(it) }
-            failedList[track.id]?.let { downloadQueue.remove(it) }
-            cancelDownload(track)
+                Storage.delete(track.getPartialFile())
+                Storage.delete(track.getCompleteFile())
+                Storage.delete(track.getPinnedFile())
+                postState(track, DownloadState.IDLE)
+                CacheCleaner().cleanDatabaseSelective(track)
+                Util.scanMedia(track.getPinnedFile())
+            }
+        }
 
-            Storage.delete(track.getPartialFile())
-            Storage.delete(track.getCompleteFile())
-            Storage.delete(track.getPinnedFile())
-            postState(track, DownloadState.IDLE)
-            CacheCleaner().cleanDatabaseSelective(track)
-            Util.scanMedia(track.getPinnedFile())
+        @Synchronized
+        fun unpin(tracks: List<Track>) {
+            tracks.forEach(::unpin)
+        }
+
+        @Synchronized
+        fun delete(tracks: List<Track>) {
+            tracks.forEach(::delete)
         }
 
         fun unpin(track: Track) {
             // Update Pinned flag of items in progress
             downloadQueue.get(track.id)?.pinned = false
-            activeDownloads[track.id]?.track?.pinned = false
+            activeDownloads[track.id]?.downloadTrack?.pinned = false
             failedList[track.id]?.pinned = false
 
             val pinnedFile = track.getPinnedFile()
@@ -376,7 +389,7 @@ class DownloadService : Service(), KoinComponent {
             if (activeDownloads.contains(track.id)) return DownloadState.QUEUED
             if (downloadQueue.contains(track.id)) return DownloadState.QUEUED
 
-            val downloadableTrack = activeDownloads[track.id]?.track
+            val downloadableTrack = activeDownloads[track.id]?.downloadTrack
             if (downloadableTrack != null) {
                 if (downloadableTrack.tryCount > 0) return DownloadState.RETRYING
                 return DownloadState.DOWNLOADING
