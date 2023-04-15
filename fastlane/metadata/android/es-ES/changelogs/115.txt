@@ -1,0 +1,2 @@
+Corrección de errores
+- Corrección de un fallo al descargar la carátula del álbum.
