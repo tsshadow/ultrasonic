@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
-    <string name="background_task.loading">Ładowanie&#8230;</string>
+    <string name="background_task.loading">Ładowanie…</string>
     <string name="background_task.network_error">Wystąpił błąd sieci. Proszę sprawdzić adres serwera i spróbować później.</string>
     <string name="background_task.unsupported_api">Server api v%1$s does not support this function.</string>
     <string name="background_task.no_network">Ta aplikacja wymaga dostępu do sieci. Proszę włączyć wi-fi lub dane komórkowe.</string>
@@ -9,7 +8,7 @@
     <string name="background_task.parse_error">Brak prawidłowej odpowiedzi. Proszę sprawdzić adres serwera.</string>
     <string name="background_task.ssl_cert_error">Błąd certyfikatu HTTPS: %1$s.</string>
     <string name="background_task.ssl_error">Błąd połączenia SSL. Proszę sprawdzić certyfikat serwera.</string>
-    <string name="background_task.wait">Proszę czekać&#8230;</string>
+    <string name="background_task.wait">Proszę czekać…</string>
     <string name="button_bar.bookmarks">Zakładki</string>
     <string name="button_bar.browse">Biblioteka</string>
     <string name="button_bar.chat">Czat</string>
@@ -39,7 +38,7 @@
     <string name="common.save">Zapisz</string>
     <string name="common.unpin">Odepnij</string>
     <string name="common.various_artists">Różni artyści</string>
-    <string name="delete_playlist">Czy chcesz usunąć %1$s?</string>
+    <string name="delete_playlist">Czy chcesz usunąć %1$s</string>
     <string name="download.bookmark_removed" formatted="false">Zakładka usunięta.</string>
     <string name="download.bookmark_set_at_position" formatted="false">Zakładka ustawiona na %s.</string>
     <string name="playlist.empty">Playlista jest pusta</string>
@@ -62,7 +61,7 @@
     <string name="download.playlist_done">Playlista została zapisana.</string>
     <string name="download.playlist_error">Błąd zapisu playlisty. Proszę spróbować później.</string>
     <string name="download.playlist_name">Wprowadź nazwę playlisty:</string>
-    <string name="download.playlist_saving">Trwa zapis playlisty \"%s\"&#8230;</string>
+    <string name="download.playlist_saving">Trwa zapis playlisty \"%s\"…</string>
     <string name="download.playlist_title">Zapisz playlistę</string>
     <string name="download.repeat_all">Powtarzaj wszystko</string>
     <string name="download.repeat_off">Powtarzanie wyłączone</string>
@@ -96,7 +95,7 @@
     <string name="menu.deleted_playlist_error">Usunięcie playlisty %s nie powiodło się</string>
     <string name="menu.exit">Zakończ</string>
     <string name="menu.settings">Ustawienia</string>
-    <string name="menu.refresh">Refresh</string>
+    <string name="menu.refresh">Odśwież</string>
     <string name="music_library.label">Biblioteka mediów</string>
     <string name="music_library.label_offline">Media offline</string>
     <string name="playlist.label">Playlisty</string>
@@ -172,8 +171,8 @@
     <string name="settings.display_bitrate_summary">Dołącza bitrate i typ pliku do nazwy artysty</string>
     <string name="settings.hide_media_summary">Ukrywa pliki muzyczne przed innymi aplikacjami.</string>
     <string name="settings.hide_media_title">Ukryj pliki</string>
-    <string name="settings.hide_media_toast">Efekt widoczny będzie po następnym skanowaniu muzyki przez system Android</string>
-    <string name="settings.invalid_url">Proszę wprowadzić prawidłowy URL</string>
+    <string name="settings.hide_media_toast">Efekt widoczny będzie po następnym skanowaniu muzyki przez system Android.</string>
+    <string name="settings.invalid_url">Proszę wprowadzić prawidłowy URL.</string>
     <string name="settings.max_albums">Maksymalna ilość wyników - albumy</string>
     <string name="settings.max_artists">Maksymalna ilość wyników - artyści</string>
     <string name="settings.max_bitrate_112">112 Kbps</string>
@@ -205,10 +204,10 @@
     <string name="settings.network_title">Sieć</string>
     <string name="settings.other_title">Inne ustawienia</string>
     <string name="settings.playback_control_title">Ustawienia sterowania odtwarzaniem</string>
-    <string name="settings.playback.resume_on_bluetooth_device">Resume when a Bluetooth device is connected</string>
-    <string name="settings.playback.pause_on_bluetooth_device">Pause when a Bluetooth device is disconnected</string>
-    <string name="settings.playback.bluetooth_all">All Bluetooth devices</string>
-    <string name="settings.playback.bluetooth_a2dp">Only audio (A2DP) devices</string>
+    <string name="settings.playback.resume_on_bluetooth_device">Wznów po podłączeniu urządzenia Bluetooth</string>
+    <string name="settings.playback.pause_on_bluetooth_device">Wstrzymaj, gdy urządzenie Bluetooth jest odłączone</string>
+    <string name="settings.playback.bluetooth_all">Wszystkie urządzenia Bluetooth</string>
+    <string name="settings.playback.bluetooth_a2dp">Tylko urządzenia audio (A2DP)</string>
     <string name="settings.playback.bluetooth_disabled">Wyłączone</string>
     <string name="settings.playback.resume_play_on_headphones_plug.title">Wznawiaj po podłączeniu słuchawek</string>
     <string name="settings.playback.resume_play_on_headphones_plug.summary">Aplikacja wznowi zatrzymane odtwarzanie po podpięciu słuchawek.</string>
@@ -298,18 +297,18 @@
     <string name="menu.share">Udostępnianie</string>
     <string name="download.menu_show_artist">Wyświetlaj artystę</string>
     <string name="common_multiple_years">Z różnych lat</string>
-    <string name="server_selector.label">Configured servers</string>
-    <string name="server_selector.delete_confirmation">Are you sure you want to delete the server?</string>
-    <string name="server_editor.label">Editing server</string>
+    <string name="server_selector.label">Skonfigurowane serwery</string>
+    <string name="server_selector.delete_confirmation">Czy na pewno chcesz usunąć ten serwer\?</string>
+    <string name="server_editor.label">Edycja serwera</string>
     <string name="server_editor.new_label">Dodaj serwer</string>
-    <string name="server_editor.leave_confirmation">Are you sure you want to leave and lose your changes?</string>
-    <string name="server_editor.required">This field is required</string>
-    <string name="server_menu.edit">Edit</string>
+    <string name="server_editor.leave_confirmation">Czy na pewno chcesz wyjść i utracić dokonane zmiany\?</string>
+    <string name="server_editor.required">To pole jest wymagane</string>
+    <string name="server_menu.edit">Edytuj</string>
     <string name="server_menu.delete">Usuń</string>
-    <string name="server_menu.move_up">Move up</string>
-    <string name="server_menu.move_down">Move down</string>
+    <string name="server_menu.move_up">Przesuń się w górę</string>
+    <string name="server_menu.move_down">Przesuń się w dół</string>
     <string name="server_editor.authentication">Authentication</string>
-    <string name="server_editor.advanced">Advanced settings</string>
+    <string name="server_editor.advanced">Ustawienia zaawansowane</string>
     <plurals name="select_album_n_songs">
         <item quantity="one">%d utwór</item>
         <item quantity="few">%d utwory</item>
@@ -327,7 +326,148 @@
     <string name="api.subsonic.trial_period_is_over">Okres próbny się zakończył.</string>
     <string name="api.subsonic.upgrade_client">Brak zgodności wersji. Uaktualnij aplikację Ultrasonic na Androida.</string>
     <string name="api.subsonic.upgrade_server">Brak zgodności wersji. Uaktualnij serwer Subsonic.</string>
-
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Użyj pięciu gwiazdek dla utworów</string>
-    </resources>
+    <string name="settings.show_confirmation_dialog_summary">Pokaż okno potwierdzające usunięcie lub odpięcie utworów</string>
+    <string name="language.en">Angielski</string>
+    <string name="settings.scrobble_summary">Pamiętaj o ustawieniu nazwy użytkownika i hasła do usługi Scrobble na serwerze</string>
+    <string name="settings.use_id3_offline">Użyj metody ID3 także kiedy nie masz połączenia</string>
+    <string name="settings.debug.log_keep">Zatrzymaj pliki</string>
+    <string name="download.menu_shuffle_off">Wyłączony tryb losowy</string>
+    <string name="buttons.stop">Zatrzymaj</string>
+    <string name="language.fr">Francuski</string>
+    <string name="common.unpin_selection_confirmation">Czy na pewno chcesz odpiąć zaznaczone pozycje\?</string>
+    <string name="settings.custom_cache_location">Użyj niestandardowej lokacji pamięci podręcznej</string>
+    <string name="common.select_all">Wybierz wszystko</string>
+    <string name="download.menu_shuffle_on">Włączony tryb losowy</string>
+    <string name="buttons.next">Następne</string>
+    <string name="main.albums_by_year">Chronologicznie</string>
+    <string name="main.welcome_cancel">Otwórz ustawienia</string>
+    <string name="language.cs">Czeski</string>
+    <string name="chat.send_button">Wyślij</string>
+    <string name="select_album.n_selected">Zaznaczono %d utworów</string>
+    <string name="share_on_server">Stwórz udostępnienie na serwerze</string>
+    <string name="language.de">Niemiecki</string>
+    <string name="about.report">Zgłoś błąd</string>
+    <string name="notification.downloading_title">Pobieranie w tle…</string>
+    <string name="settings.preload_1000">1000 piosenek</string>
+    <string name="supported_server_features">Wspierane funkcje</string>
+    <string name="language.pl">Polski</string>
+    <string name="common.artist">Artysta</string>
+    <string name="language.nl">Holenderski</string>
+    <string name="language.hu">Węgierski</string>
+    <string name="settings.debug.log_summary">Zapisanych jest %1$s plików z logami, które zajmują ~%2$s MB miejsca w katalogu %3$s. Czy chcesz je zachować\?</string>
+    <string name="buttons.previous">Poprzednie</string>
+    <plurals name="select_album_n_songs_deleted">
+        <item quantity="one">Usunięto %d utwór</item>
+        <item quantity="few">Usunięto %d utwory</item>
+        <item quantity="many">Usunięto %d utworów</item>
+        <item quantity="other">Usunięto %d utworów</item>
+    </plurals>
+    <string name="buttons.repeat">Powtarzaj</string>
+    <string name="download.empty">Nic nie jest pobierane</string>
+    <string name="language.ru">Rosyjski</string>
+    <string name="download.playerstate_loading">Byforowanie…</string>
+    <string name="main.setup_server">%s - Ustaw serwer</string>
+    <string name="settings.preload_50">50 piosenek</string>
+    <string name="language.zh_CN">Chiński (Chiny)</string>
+    <string name="settings.override_language">Nadpisz język</string>
+    <string name="buttons.play">Odtwórz</string>
+    <string name="language.default">Domyślne systemowe</string>
+    <string name="menu.downloads">Pobrane</string>
+    <string name="settings.display_bitrate">Wyświetlaj bitrate i typ pliku</string>
+    <string name="language.pt_BR">Portugalski (Brazylia)</string>
+    <string name="settings.debug.log_path">Plik z logami jest dostępny w %1$s/%2$s</string>
+    <string name="settings.debug.log_deleted">Usunięte pliki z logami.</string>
+    <string name="foreground_exception_text">Naciśnij przycisk odtwarzania na powiadomieniu o mediach, jeśli jest ono nadal obecne, w przeciwnym razie otwórz aplikację, aby rozpocząć odtwarzanie i ponownie podłącz sesję do kontrolera</string>
+    <string name="language.it">Włoski</string>
+    <string name="language.pt">Portugalski</string>
+    <string name="settings.server_color">Kolor serwera</string>
+    <string name="buttons.pause">Pauza</string>
+    <string name="settings.show_artist_picture">Pokaż obraz wykonawcy na liście</string>
+    <string name="common.title">Tytuł</string>
+    <string name="common.delete_selection_confirmation">Czy na pewno chcesz usunąć zaznaczone pozycje\?</string>
+    <string name="albumArt">Okładka albumu</string>
+    <string name="common.album">Album</string>
+    <string name="settings.preload_500">500 piosenek</string>
+    <string name="settings.share_on_server_summary">Udostępnianie spowoduje utworzenie go na serwerze i udostępnienie jego adresu URL. Jeśli ta opcja jest wyłączona, udostępniane są tylko szczegóły utworu</string>
+    <string name="settings.download_transition">Pokaż Obecnie odtwarzane po kliknięciu przycisku Odtwarzaj</string>
+    <string name="language.es">Hiszpański</string>
+    <string name="settings.override_language_summary">Wymagane jest ponowne uruchomienie aplikacji po zmianie języka</string>
+    <string name="foreground_exception_title">Nie można wznowić odtwarzania</string>
+    <string name="chat.user_avatar">Awatar</string>
+    <string name="language.zh_TW">Chiński (Tajwan)</string>
+    <string name="settings.theme_day_night">Dzień i noc</string>
+    <string name="settings.theme_black">Czarny</string>
+    <string name="settings.summary.force_plain_text_password">Zmusza to aplikację do wysyłania hasła w postaci niezaszyfrowanej. Przydatne, jeśli serwer Subsonic nie obsługuje nowego interfejsu API uwierzytelniania dla użytkowników.</string>
+    <string name="settings.show_now_playing_details_summary">Pokaż więcej informacji o utworze w sekcji Obecnie odtwarzane (gatunek, rok, przepustowość)</string>
+    <string name="settings.show_now_playing_details">Pokaż szczegóły w sekcji Obecnie odtwarzane</string>
+    <string name="settings.wifi_required_title">Pobieraj tylko przez Wi-Fi</string>
+    <string name="settings.sharing_always_ask_for_details_summary">Zawsze pytaj o opis i czas wygaśnięcia podczas tworzenia udostępnienia na serwerze</string>
+    <string name="settings.debug.log_delete">Usuń pliki</string>
+    <plurals name="select_album_n_songs_pinned">
+        <item quantity="one">%d utwór zaznaczony do przypięcia</item>
+        <item quantity="few">%d utwory zaznaczone do przypięcia</item>
+        <item quantity="many">%d utworów zaznaczonych do przypięcia</item>
+        <item quantity="other">%d utworów zaznaczonych do przypięcia</item>
+    </plurals>
+    <plurals name="select_album_n_songs_downloaded">
+        <item quantity="one">%d utworów zaznaczonych do pobrania</item>
+        <item quantity="few">%d utwory zaznaczone do pobrania</item>
+        <item quantity="many">%d utworów zaznaczonych do pobrania</item>
+        <item quantity="other">%d utworów zaznaczonych do pobrania</item>
+    </plurals>
+    <string name="about.webpage">Odwiedź stronę internetową</string>
+    <plurals name="select_album_n_songs_unpinned">
+        <item quantity="one">Odpięto %d utwór</item>
+        <item quantity="few">Odpięto %d utwory</item>
+        <item quantity="many">Odpięto %d utworów</item>
+        <item quantity="other">Odpięto %d utworów</item>
+    </plurals>
+    <string name="settings.use_hw_offload_title">Użyj odtwarzania sprzętowwego (eksperymentalne)</string>
+    <string name="jukebox">Jukebox</string>
+    <string name="select_album.no_network">Uwaga: Brak dostępnych sieci do użycia.
+\n Jeżeli używasz danych mobilnych, potrzebne może być włączenie płatnych połączeń w ustawieniach.</string>
+    <string name="settings.download_transition_summary">Przełącz na Obecnie odtwarzane po rozpoczęciu odtwarzania w widoku multimediów</string>
+    <string name="settings.increment_time">Odstępy między wyszukaniami</string>
+    <string name="settings.parallel_downloads">Ilość równocześnie pobieranych piosenek</string>
+    <string name="settings.preload_100">100 piosenek</string>
+    <string name="settings.scrobble_title">Scrobbluj moje odtworzenia</string>
+    <string name="settings.use_id3_offline_summary">Jeśli włączysz to ustawienie, będzie ono wyświetlać tylko muzykę pobraną za pomocą Ultrasonic w wersji 4.0 lub nowszej. Wcześniejsze pobrane pliki nie zawierają wymaganych metadanych. Możesz przełączać się między trybami Przypinania i Zapisywania, aby wyzwolić pobieranie brakujących metadanych.</string>
+    <string name="settings.show_artist_picture_summary">Wyświetla obraz wykonawcy na liście wykonawców, jeśli jest dostępny</string>
+    <string name="settings.wifi_required_summary">Pobieraj tylko podczas połączeń niepłatnuch</string>
+    <string name="download.share_song">Udostępnij obecnie odtwarzaną piosenkę</string>
+    <string name="settings.show_confirmation_dialog">Pokaż okno potwierdzające</string>
+    <string name="settings.debug.title">Opcje debugowania</string>
+    <string name="settings.debug.log_to_file">Zapisz logi debugowania do pliku</string>
+    <string name="notification.permission_required">Powiadomienia są wymagane do odtwarzania multimediów. Możesz przyznać uprawnienie do nich w dowolnym momencie w ustawieniach Androida.</string>
+    <string name="server_editor.disabled_feature">Jedna lub więcej funkcji zostało wyłączonych ponieważ serwer ich nie obsługiwał.
+\nMożesz uruchomić ten test ponownie kiedykolwiek.</string>
+    <string name="server_menu.demo">Serwer demonstracyjny</string>
+    <string name="settings.five_star_rating_description">Użyj systemu pięciu gwiazdek do oceniania utworów zamiast po prostu dodawać lub usuwać utwory z ulubionych.</string>
+    <string name="list_view">Lista</string>
+    <string name="grid_view">Okładka</string>
+    <string name="settings.use_hw_offload_description">Spróbuj odtworzyć pliki multimedialne za pomocą układu dekodującego w telefonie. Może to zmniejszyć zużycie baterii!</string>
+    <plurals name="select_album_n_songs_added">
+        <item quantity="one">Dodano %d utwór na koniec kolejki odtwarzania</item>
+        <item quantity="few">Dodano %d utwory na koniec kolejki odtwarzania</item>
+        <item quantity="many">Dodano %d utworów na koniec kolejki odtwarzania</item>
+        <item quantity="other">Dodano %d utworów na koniec kolejki odtwarzania</item>
+    </plurals>
+    <plurals name="select_album_n_songs_play_next">
+        <item quantity="one">Wstawiono %d utwór po bieżącym utworze</item>
+        <item quantity="few">Wstawiono %d utwory po bieżącym utworze</item>
+        <item quantity="many">Wstawiono %d utworów po bieżącym utworze</item>
+        <item quantity="other">Wstawiono %d utworów po bieżącym utworze</item>
+    </plurals>
+    <string name="about.text"><b>Ultrasonic</b> to darmowy i otwarty klient strumieniowego przesyłania muzyki dla serwerów kompatybilnych z API Subsonic (wersja 1.7.0 lub nowsza).
+\n
+\nDzięki <b>Ultrasonic</b> możesz łatwo przesyłać strumieniowo lub pobierać muzykę z komputera domowego na telefon za pomocą serwera multimediów kompatybilnego z Subsonic. Oprogramowanie serwera Subsonic wymaga oddzielnej konfiguracji od Ultrasonic.
+\n
+\nDomyślnie Ultrasonic nie jest skonfigurowane. Po skonfigurowaniu własnego serwera zmień ustawienia serwera, aby połączyć się z komputerem.</string>
+    <string name="main.welcome_text_demo">Aby używać Ultrasonic z własną muzyką, potrzebujesz <b>własnego serwera</b>.
+\n
+\n➤ Jeśli chcesz najpierw wypróbować aplikację, możesz teraz dodać serwer demonstracyjny.
+\n
+\n➤ W przeciwnym razie możesz skonfigurować serwer w <b>ustawieniach</b>.</string>
+</resources>
