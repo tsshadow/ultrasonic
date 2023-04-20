@@ -62,8 +62,6 @@ class TrackViewBinder(
             diffAdapter.isSelected(item.longId)
         )
 
-        // Timber.v("Setting listeners")
-
         holder.itemView.setOnLongClickListener {
             if (onContextMenuClick != null) {
                 val popup = createContextMenu(holder.itemView, track)
@@ -116,8 +114,6 @@ class TrackViewBinder(
 
             if (newStatus != holder.check.isChecked) holder.check.isChecked = newStatus
         }
-
-        // Timber.v("Setting listeners done")
     }
 
     override fun onViewRecycled(holder: TrackViewHolder) {

@@ -182,8 +182,8 @@ class MediaPlayerLifecycleSupport : KoinComponent {
             when (keyCode) {
                 KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
                 KeyEvent.KEYCODE_HEADSETHOOK -> mediaPlayerController.togglePlayPause()
-                KeyEvent.KEYCODE_MEDIA_PREVIOUS -> mediaPlayerController.previous()
-                KeyEvent.KEYCODE_MEDIA_NEXT -> mediaPlayerController.next()
+                KeyEvent.KEYCODE_MEDIA_PREVIOUS -> mediaPlayerController.seekToPrevious()
+                KeyEvent.KEYCODE_MEDIA_NEXT -> mediaPlayerController.seekToNext()
                 KeyEvent.KEYCODE_MEDIA_STOP -> mediaPlayerController.stop()
                 KeyEvent.KEYCODE_MEDIA_PLAY -> mediaPlayerController.play()
                 KeyEvent.KEYCODE_MEDIA_PAUSE -> mediaPlayerController.pause()
@@ -226,8 +226,8 @@ class MediaPlayerLifecycleSupport : KoinComponent {
                     // no need to call anything
                     if (isRunning) mediaPlayerController.resumeOrPlay()
 
-                Constants.CMD_NEXT -> mediaPlayerController.next()
-                Constants.CMD_PREVIOUS -> mediaPlayerController.previous()
+                Constants.CMD_NEXT -> mediaPlayerController.seekToNext()
+                Constants.CMD_PREVIOUS -> mediaPlayerController.seekToPrevious()
                 Constants.CMD_TOGGLEPAUSE -> mediaPlayerController.togglePlayPause()
                 Constants.CMD_STOP -> mediaPlayerController.stop()
                 Constants.CMD_PAUSE -> mediaPlayerController.pause()

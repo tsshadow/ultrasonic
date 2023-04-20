@@ -154,6 +154,8 @@ class PlayerFragment :
     private lateinit var pauseButton: View
     private lateinit var stopButton: View
     private lateinit var playButton: View
+    private lateinit var previousButton: MaterialButton
+    private lateinit var nextButton: MaterialButton
     private lateinit var shuffleButton: View
     private lateinit var repeatButton: MaterialButton
     private lateinit var progressBar: SeekBar
@@ -196,6 +198,8 @@ class PlayerFragment :
         pauseButton = view.findViewById(R.id.button_pause)
         stopButton = view.findViewById(R.id.button_stop)
         playButton = view.findViewById(R.id.button_start)
+        nextButton = view.findViewById(R.id.button_next)
+        previousButton = view.findViewById(R.id.button_previous)
         repeatButton = view.findViewById(R.id.button_repeat)
         fiveStar1ImageView = view.findViewById(R.id.song_five_star_1)
         fiveStar2ImageView = view.findViewById(R.id.song_five_star_2)
@@ -259,9 +263,7 @@ class PlayerFragment :
         previousButton.setOnClickListener {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             launch(CommunicationError.getHandler(context)) {
-                mediaPlayerController.previous()
-                onCurrentChanged()
-                onSliderProgressChanged()
+                mediaPlayerController.seekToPrevious()
             }
         }
 
@@ -272,9 +274,7 @@ class PlayerFragment :
         nextButton.setOnClickListener {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             launch(CommunicationError.getHandler(context)) {
-                mediaPlayerController.next()
-                onCurrentChanged()
-                onSliderProgressChanged()
+                mediaPlayerController.seekToNext()
             }
         }
 
@@ -285,16 +285,12 @@ class PlayerFragment :
         pauseButton.setOnClickListener {
             launch(CommunicationError.getHandler(context)) {
                 mediaPlayerController.pause()
-                onCurrentChanged()
-                onSliderProgressChanged()
             }
         }
 
         stopButton.setOnClickListener {
             launch(CommunicationError.getHandler(context)) {
                 mediaPlayerController.reset()
-                onCurrentChanged()
-                onSliderProgressChanged()
             }
         }
 
@@ -304,8 +300,6 @@ class PlayerFragment :
 
             launch(CommunicationError.getHandler(context)) {
                 mediaPlayerController.play()
-                onCurrentChanged()
-                onSliderProgressChanged()
             }
         }
 
@@ -342,7 +336,6 @@ class PlayerFragment :
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 launch(CommunicationError.getHandler(context)) {
                     mediaPlayerController.seekTo(progressBar.progress)
-                    onSliderProgressChanged()
                 }
             }
 
@@ -367,11 +360,13 @@ class PlayerFragment :
         // Observe playlist changes and update the UI
         rxBusSubscription += RxBus.playlistObservable.subscribe {
             onPlaylistChanged()
-            onSliderProgressChanged()
+            updateSeekBar()
         }
 
         rxBusSubscription += RxBus.playerStateObservable.subscribe {
             update()
+            updateTitle(it.state)
+            updateButtonStates(it.state)
         }
 
         // Query the Jukebox state in an IO Context
@@ -432,7 +427,7 @@ class PlayerFragment :
         } else {
             // Download list and Album art must be updated when resumed
             onPlaylistChanged()
-            onCurrentChanged()
+            onTrackChanged()
         }
 
         val handler = Handler(Looper.getMainLooper())
@@ -764,10 +759,9 @@ class PlayerFragment :
         if (cancel?.isCancellationRequested == true) return
         val mediaPlayerController = mediaPlayerController
         if (currentSong?.id != mediaPlayerController.currentMediaItem?.mediaId) {
-            onCurrentChanged()
+            onTrackChanged()
         }
-        onSliderProgressChanged()
-        requireActivity().invalidateOptionsMenu()
+        updateSeekBar()
     }
 
     private fun savePlaylistInBackground(playlistName: String) {
@@ -827,12 +821,9 @@ class PlayerFragment :
         }
 
         // Create listener
-        val clickHandler: ((Track, Int) -> Unit) = { _, pos ->
-            mediaPlayerController.seekTo(pos, 0)
-            mediaPlayerController.prepare()
-            mediaPlayerController.play()
-            onCurrentChanged()
-            onSliderProgressChanged()
+        val clickHandler: ((Track, Int) -> Unit) = { _, listPos ->
+            val mediaIndex = mediaPlayerController.getUnshuffledIndexOf(listPos)
+            mediaPlayerController.play(mediaIndex)
         }
 
         viewAdapter.register(
@@ -931,6 +922,7 @@ class PlayerFragment :
                 if (actionState == ACTION_STATE_IDLE && dragging) {
                     dragging = false
                     // Move the item in the playlist separately
+                    Timber.i("Moving item %s to %s", startPosition, endPosition)
                     mediaPlayerController.moveItemInPlaylist(startPosition, endPosition)
                 }
             }
@@ -1010,7 +1002,8 @@ class PlayerFragment :
 
     private fun onPlaylistChanged() {
         val mediaPlayerController = mediaPlayerController
-        val list = mediaPlayerController.playlist
+        // Try to display playlist in play order
+        val list = mediaPlayerController.playlistInPlayOrder
         emptyTextView.setText(R.string.playlist_empty)
 
         viewAdapter.submitList(list.map(MediaItem::toTrack))
@@ -1020,7 +1013,7 @@ class PlayerFragment :
         updateRepeatButtonState(mediaPlayerController.repeatMode)
     }
 
-    private fun onCurrentChanged() {
+    private fun onTrackChanged() {
         currentSong = mediaPlayerController.currentMediaItem?.toTrack()
 
         scrollToCurrent()
@@ -1064,7 +1057,7 @@ class PlayerFragment :
                 it.loadImage(albumArtImageView, currentSong, true, 0)
             }
 
-            displaySongRating()
+            updateSongRating()
         } else {
             currentSong = null
             songTitleTextView.text = null
@@ -1078,24 +1071,27 @@ class PlayerFragment :
                 it.loadImage(albumArtImageView, null, true, 0)
             }
         }
+
+        // TODO: It would be a lot nicer if MediaPlayerController would send an event
+        // when this is necessary instead of updating every time
+        updateSongRating()
+
+        nextButton.isEnabled = mediaPlayerController.canSeekToNext()
+        previousButton.isEnabled = mediaPlayerController.canSeekToPrevious()
     }
 
-    @Suppress("LongMethod")
     @Synchronized
-    private fun onSliderProgressChanged() {
-
+    private fun updateSeekBar() {
+        Timber.i("Calling updateSeekBar")
         val isJukeboxEnabled: Boolean = mediaPlayerController.isJukeboxEnabled
         val millisPlayed: Int = max(0, mediaPlayerController.playerPosition)
         val duration: Int = mediaPlayerController.playerDuration
         val playbackState: Int = mediaPlayerController.playbackState
-        val isPlaying = mediaPlayerController.isPlaying
 
-        if (cancellationToken.isCancellationRequested) return
         if (currentSong != null) {
             positionTextView.text = Util.formatTotalDuration(millisPlayed.toLong(), true)
             durationTextView.text = Util.formatTotalDuration(duration.toLong(), true)
-            progressBar.max =
-                if (duration == 0) 100 else duration // Work-around for apparent bug.
+            progressBar.max = if (duration == 0) 100 else duration // Work-around for apparent bug.
             progressBar.progress = millisPlayed
             progressBar.isEnabled = mediaPlayerController.isPlaying || isJukeboxEnabled
         } else {
@@ -1107,18 +1103,18 @@ class PlayerFragment :
         }
 
         val progress = mediaPlayerController.bufferedPercentage
+        updateBufferProgress(playbackState, progress)
+    }
 
+    private fun updateTitle(playbackState: Int) {
         when (playbackState) {
             Player.STATE_BUFFERING -> {
-
                 val downloadStatus = resources.getString(
                     R.string.download_playerstate_loading
                 )
-                progressBar.secondaryProgress = progress
                 setTitle(this@PlayerFragment, downloadStatus)
             }
             Player.STATE_READY -> {
-                progressBar.secondaryProgress = progress
                 if (mediaPlayerController.isShufflePlayEnabled) {
                     setTitle(
                         this@PlayerFragment,
@@ -1128,13 +1124,22 @@ class PlayerFragment :
                     setTitle(this@PlayerFragment, R.string.common_appname)
                 }
             }
-            Player.STATE_IDLE,
-            Player.STATE_ENDED,
-            -> {
-            }
+            Player.STATE_IDLE, Player.STATE_ENDED -> {}
             else -> setTitle(this@PlayerFragment, R.string.common_appname)
         }
+    }
 
+    private fun updateBufferProgress(playbackState: Int, progress: Int) {
+        when (playbackState) {
+            Player.STATE_BUFFERING, Player.STATE_READY -> {
+                progressBar.secondaryProgress = progress
+            }
+            else -> { }
+        }
+    }
+
+    private fun updateButtonStates(playbackState: Int) {
+        val isPlaying = mediaPlayerController.isPlaying
         when (playbackState) {
             Player.STATE_READY -> {
                 pauseButton.isVisible = isPlaying
@@ -1152,10 +1157,6 @@ class PlayerFragment :
                 playButton.isVisible = true
             }
         }
-
-        // TODO: It would be a lot nicer if MediaPlayerController would send an event
-        // when this is necessary instead of updating every time
-        displaySongRating()
     }
 
     private fun seek(forward: Boolean) {
@@ -1189,18 +1190,14 @@ class PlayerFragment :
         // Right to Left swipe
         if (e1X - e2X > swipeDistance && absX > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.next()
-            onCurrentChanged()
-            onSliderProgressChanged()
+            mediaPlayerController.seekToNext()
             return true
         }
 
         // Left to Right swipe
         if (e2X - e1X > swipeDistance && absX > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.previous()
-            onCurrentChanged()
-            onSliderProgressChanged()
+            mediaPlayerController.seekToPrevious()
             return true
         }
 
@@ -1208,7 +1205,6 @@ class PlayerFragment :
         if (e2Y - e1Y > swipeDistance && absY > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             mediaPlayerController.seekTo(mediaPlayerController.playerPosition + 30000)
-            onSliderProgressChanged()
             return true
         }
 
@@ -1216,7 +1212,6 @@ class PlayerFragment :
         if (e1Y - e2Y > swipeDistance && absY > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             mediaPlayerController.seekTo(mediaPlayerController.playerPosition - 8000)
-            onSliderProgressChanged()
             return true
         }
         return false
@@ -1237,7 +1232,7 @@ class PlayerFragment :
         return false
     }
 
-    private fun displaySongRating() {
+    private fun updateSongRating() {
         var rating = 0
 
         if (currentSong?.userRating != null) {
@@ -1253,7 +1248,7 @@ class PlayerFragment :
 
     private fun setSongRating(rating: Int) {
         if (currentSong == null) return
-        displaySongRating()
+        updateSongRating()
         mediaPlayerController.setSongRating(rating)
     }
 
