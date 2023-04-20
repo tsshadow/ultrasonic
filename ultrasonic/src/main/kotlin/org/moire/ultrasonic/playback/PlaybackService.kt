@@ -26,9 +26,12 @@ import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
+import androidx.media3.exoplayer.source.ShuffleOrder.UnshuffledShuffleOrder
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import java.util.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -175,6 +178,27 @@ class PlaybackService :
             player.setWakeMode(getWakeModeFlag())
         }
 
+        // Set a listener to reset the ShuffleOrder
+        rxBusSubscription += RxBus.shufflePlayObservable.subscribe { shuffle ->
+            val len = player.currentTimeline.windowCount
+
+            Timber.i("Resetting shuffle order, isShuffled: %s", shuffle)
+
+            // If disabling Shuffle return early
+            if (!shuffle) {
+                return@subscribe player.setShuffleOrder(UnshuffledShuffleOrder(len))
+            }
+
+            // Get the position of the current track in the unshuffled order
+            val cur = player.currentMediaItemIndex
+            val seed = System.currentTimeMillis()
+            val random = Random(seed)
+
+            val list = createShuffleListFromCurrentIndex(cur, len, random)
+            Timber.i("New Shuffle order: %s", list.joinToString { it.toString() })
+            player.setShuffleOrder(DefaultShuffleOrder(list, seed))
+        }
+
         // Listen to the shutdown command
         rxBusSubscription += RxBus.shutdownCommandObservable.subscribe {
             Timber.i("Received destroy command via Rx")
@@ -183,6 +207,24 @@ class PlaybackService :
 
         player.addListener(listener)
         isStarted = true
+    }
+
+    fun createShuffleListFromCurrentIndex(
+        currentIndex: Int,
+        length: Int,
+        random: Random
+    ): IntArray {
+        val list = IntArray(length) { it }
+
+        // Shuffle the remaining items using a swapping algorithm
+        for (i in currentIndex + 1 until length) {
+            val swapIndex = (currentIndex + 1) + random.nextInt(i - currentIndex)
+            val swapItem = list[i]
+            list[i] = list[swapIndex]
+            list[swapIndex] = swapItem
+        }
+
+        return list
     }
 
     private val listener: Player.Listener = object : Player.Listener {

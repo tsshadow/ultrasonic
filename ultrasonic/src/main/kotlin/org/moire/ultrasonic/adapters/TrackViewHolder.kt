@@ -131,7 +131,7 @@ class TrackViewHolder(val view: View) :
         // Create new Disposable for the new Subscriptions
         rxBusSubscription = CompositeDisposable()
         rxBusSubscription!! += RxBus.playerStateObservable.subscribe {
-            setPlayIcon(it.index == bindingAdapterPosition && it.track?.id == song.id)
+            setPlayIcon(it.track?.id == song.id && it.index == bindingAdapterPosition)
         }
 
         rxBusSubscription!! += RxBus.trackDownloadStateObservable.subscribe {

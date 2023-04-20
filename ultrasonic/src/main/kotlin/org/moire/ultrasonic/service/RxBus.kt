@@ -20,9 +20,13 @@ class RxBus {
 
         private fun mainThread() = AndroidSchedulers.from(Looper.getMainLooper())
 
+        val shufflePlayPublisher: PublishSubject<Boolean> =
+            PublishSubject.create()
+        val shufflePlayObservable: Observable<Boolean> =
+            shufflePlayPublisher
+
         var activeServerChangingPublisher: PublishSubject<Int> =
             PublishSubject.create()
-
         // Subscribers should be called synchronously, not on another thread
         var activeServerChangingObservable: Observable<Int> =
             activeServerChangingPublisher

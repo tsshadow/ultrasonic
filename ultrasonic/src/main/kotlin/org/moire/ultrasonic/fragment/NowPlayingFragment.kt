@@ -148,10 +148,10 @@ class NowPlayingFragment : Fragment() {
                 if (abs(deltaX) > MIN_DISTANCE) {
                     // left or right
                     if (deltaX < 0) {
-                        mediaPlayerController.previous()
+                        mediaPlayerController.seekToPrevious()
                     }
                     if (deltaX > 0) {
-                        mediaPlayerController.next()
+                        mediaPlayerController.seekToNext()
                     }
                 } else if (abs(deltaY) > MIN_DISTANCE) {
                     if (deltaY < 0) {
