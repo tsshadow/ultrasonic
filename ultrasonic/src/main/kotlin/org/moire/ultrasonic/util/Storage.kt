@@ -16,7 +16,8 @@ import timber.log.Timber
 
 /**
  * Provides filesystem access abstraction which works
- * both on File based paths and Storage Access Framework Uris
+ * both on File based paths (when using the internal directory for storing media files)
+ * and Storage Access Framework Uris (when using a custom directory)
  */
 object Storage {
 
