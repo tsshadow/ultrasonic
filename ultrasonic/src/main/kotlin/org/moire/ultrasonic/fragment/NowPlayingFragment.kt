@@ -96,13 +96,14 @@ class NowPlayingFragment : Fragment() {
             if (file != null) {
                 val title = file.title
                 val artist = file.artist
+                val size = getNotificationImageSize(requireContext())
 
                 imageLoaderProvider.executeOn {
                     it.loadImage(
                         nowPlayingAlbumArtImage,
                         file,
                         false,
-                        getNotificationImageSize(requireContext())
+                        size
                     )
                 }
 

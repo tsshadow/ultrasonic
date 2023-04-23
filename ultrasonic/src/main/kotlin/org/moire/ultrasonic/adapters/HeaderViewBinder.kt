@@ -51,11 +51,14 @@ class HeaderViewBinder(
         val resources = context.resources
 
         val artworkSelection = random.nextInt(item.childCount)
+        val size = Util.getAlbumImageSize(context)
 
         imageLoaderProvider.executeOn {
             it.loadImage(
-                holder.coverArtView, item.entries[artworkSelection], false,
-                Util.getAlbumImageSize(context)
+                holder.coverArtView,
+                item.entries[artworkSelection],
+                false,
+                size
             )
         }
 
