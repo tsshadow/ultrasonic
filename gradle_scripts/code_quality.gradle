@@ -29,6 +29,6 @@ if (isCodeQualityEnabled) {
                 config = files("${rootProject.projectDir}/detekt-config.yml")
             }
         }
-        tasks.detekt.jvmTarget = "11"
+        tasks.detekt.jvmTarget = "17"
     }
 }
