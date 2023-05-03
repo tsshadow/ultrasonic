@@ -228,4 +228,9 @@
     <string name="select_artist.all_folders">所有資料夾</string>
     <string name="select_artist.folder">選擇資料夾</string>
     <string name="select_playlist.empty">伺服器上沒有已保存的播放清單</string>
+    <string name="settings.hide_media_title">隱藏其他來源</string>
+    <string name="settings.hide_media_summary">隱藏來自其他應用程式的音樂檔案。</string>
+    <string name="settings.hide_media_toast">在 Android 系統下次掃描裝置內音樂時生效。</string>
+    <string name="settings.download_transition">播放時顯示正在播放介面</string>
+    <string name="settings.download_transition_summary">在媒體庫介面開始播放後切換到正在播放介面</string>
 </resources>
