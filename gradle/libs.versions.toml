@@ -23,7 +23,8 @@ viewModelKtx           = "2.6.1"
 swipeRefresh           = "1.1.0"
 
 retrofit               = "2.9.0"
-jackson                = "2.14.2"
+## KEEP ON 2.13 branch (https://github.com/FasterXML/jackson-databind/issues/3658#issuecomment-1312633064) for compatibility with API 24
+jackson                = "2.13.5"
 okhttp                 = "4.10.0"
 koin                   = "3.3.2"
 picasso                = "2.8"
