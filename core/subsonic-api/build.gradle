@@ -13,7 +13,6 @@ dependencies {
 
     testImplementation libs.kotlinJunit
     testImplementation libs.mockito
-    testImplementation libs.mockitoInline
     testImplementation libs.mockitoKotlin
     testImplementation libs.kluent
     testImplementation libs.mockWebServer

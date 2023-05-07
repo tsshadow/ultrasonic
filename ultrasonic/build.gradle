@@ -137,7 +137,6 @@ dependencies {
     testImplementation libs.kotlinJunit
     testImplementation libs.kluent
     testImplementation libs.mockito
-    testImplementation libs.mockitoInline
     testImplementation libs.mockitoKotlin
     testImplementation libs.robolectric
 
