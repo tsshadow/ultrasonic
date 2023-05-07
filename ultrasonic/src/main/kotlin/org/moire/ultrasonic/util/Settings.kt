@@ -181,7 +181,7 @@ object Settings {
     var firstRunExecuted by BooleanSetting(getKey(R.string.setting_key_first_run_executed), false)
 
     val shouldShowArtistPicture
-        by BooleanSetting(getKey(R.string.setting_key_show_artist_picture), false)
+        by BooleanSetting(getKey(R.string.setting_key_show_artist_picture), true)
 
     @JvmStatic
     var chatRefreshInterval by StringIntSetting(
