@@ -46,7 +46,7 @@ public class GenreAdapter extends ArrayAdapter<Genre> implements SectionIndexer
 	private final Object[] sections;
 	private final Integer[] positions;
 
-	public GenreAdapter(Context context, List<Genre> genres)
+	public GenreAdapter(@NonNull Context context, List<Genre> genres)
 	{
 		super(context, R.layout.list_item_generic, genres);
 

@@ -133,19 +133,24 @@ object Util {
     @JvmStatic
     @SuppressLint("ShowToast") // Invalid warning
     fun toast(context: Context?, message: CharSequence?, shortDuration: Boolean) {
-        if (toast == null) {
-            toast = Toast.makeText(
-                context,
-                message,
-                if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
-            )
-            toast!!.setGravity(Gravity.CENTER, 0, 0)
-        } else {
-            toast!!.setText(message)
-            toast!!.duration =
-                if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
+        // If called after doing some background processing, our context might have expired!
+        try {
+            if (toast == null) {
+                toast = Toast.makeText(
+                    context,
+                    message,
+                    if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
+                )
+                toast!!.setGravity(Gravity.CENTER, 0, 0)
+            } else {
+                toast!!.setText(message)
+                toast!!.duration =
+                    if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
+            }
+            toast!!.show()
+        } catch (_: Exception) {
+            // Ignore
         }
-        toast!!.show()
     }
 
     /**

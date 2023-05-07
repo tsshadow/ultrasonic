@@ -240,6 +240,8 @@ class ImageLoader(
                 } finally {
                     inputStream.safeClose()
                 }
+            } catch (all: Exception) {
+                Timber.w(all)
             } finally {
                 cacheInProgress.remove(file)?.countDown()
             }

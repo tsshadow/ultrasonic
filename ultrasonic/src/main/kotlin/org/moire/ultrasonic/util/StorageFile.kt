@@ -273,7 +273,7 @@ class StorageFile(
         }
 
         private fun getStorageFileForParentDirectory(path: String): StorageFile? {
-            val parentPath = FileUtil.getParentPath(path)!!
+            val parentPath = FileUtil.getParentPath(path) ?: return null
             if (storageFilePathDictionary.containsKey(parentPath))
                 return storageFilePathDictionary[parentPath]!!
             if (notExistingPathDictionary.contains(parentPath)) return null
