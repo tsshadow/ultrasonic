@@ -7,11 +7,14 @@
 
 package org.moire.ultrasonic.subsonic
 
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import java.util.Collections
 import java.util.LinkedList
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,6 +31,7 @@ import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
 import org.moire.ultrasonic.util.InfoDialog
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
+import timber.log.Timber
 
 /**
  * Retrieves a list of songs and adds them to the now playing list
@@ -39,6 +43,16 @@ class DownloadHandler(
 ) : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private val maxSongs = 500
 
+    /**
+     * Exception Handler for Coroutines
+     */
+    val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Handler(Looper.getMainLooper()).post {
+            Timber.w(exception)
+        }
+    }
+
+    // TODO: Use coroutine here (with proper exception handler)
     fun download(
         fragment: Fragment,
         append: Boolean,
@@ -210,7 +224,7 @@ class DownloadHandler(
         isArtist: Boolean
     ) {
         // Launch the Job
-        val job = launch {
+        val job = launch(exceptionHandler) {
             val songs: MutableList<Track> =
                 getTracksFromServer(isArtist, id, isDirectory, name, isShare)
 
