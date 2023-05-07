@@ -16,6 +16,13 @@
         a:title="@string/download.menu_star"/>
 
     <item
+        a:id="@+id/menu_show_artist"
+        a:title="@string/download.menu_show_artist"/>
+    <item
+        a:id="@+id/menu_show_album"
+        a:title="@string/download.menu_show_album"/>
+
+    <item
         a:id="@+id/menu_item_share_song"
         a:icon="@drawable/ic_menu_share"
         app:showAsAction="ifRoom|withText"

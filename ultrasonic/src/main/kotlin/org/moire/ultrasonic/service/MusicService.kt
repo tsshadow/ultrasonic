@@ -39,10 +39,10 @@ interface MusicService {
     fun getGenres(refresh: Boolean): List<Genre>
 
     @Throws(Exception::class)
-    fun star(id: String?, albumId: String?, artistId: String?)
+    fun star(id: String?, albumId: String? = null, artistId: String? = null)
 
     @Throws(Exception::class)
-    fun unstar(id: String?, albumId: String?, artistId: String?)
+    fun unstar(id: String?, albumId: String? = null, artistId: String? = null)
 
     @Throws(Exception::class)
     fun setRating(id: String, rating: Int)

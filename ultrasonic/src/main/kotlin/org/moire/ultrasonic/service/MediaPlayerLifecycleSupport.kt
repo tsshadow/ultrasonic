@@ -30,6 +30,7 @@ import timber.log.Timber
  * This class is responsible for handling received events for the Media Player implementation
  */
 class MediaPlayerLifecycleSupport : KoinComponent {
+    private lateinit var ratingManager: RatingManager
     private val playbackStateSerializer by inject<PlaybackStateSerializer>()
     private val mediaPlayerController by inject<MediaPlayerController>()
     private val imageLoaderProvider: ImageLoaderProvider by inject()
@@ -71,6 +72,7 @@ class MediaPlayerLifecycleSupport : KoinComponent {
 
         CacheCleaner().clean()
         created = true
+        ratingManager = RatingManager.instance
         Timber.i("LifecycleSupport created")
     }
 
@@ -187,12 +189,12 @@ class MediaPlayerLifecycleSupport : KoinComponent {
                 KeyEvent.KEYCODE_MEDIA_STOP -> mediaPlayerController.stop()
                 KeyEvent.KEYCODE_MEDIA_PLAY -> mediaPlayerController.play()
                 KeyEvent.KEYCODE_MEDIA_PAUSE -> mediaPlayerController.pause()
-                KeyEvent.KEYCODE_1 -> mediaPlayerController.setSongRating(1)
-                KeyEvent.KEYCODE_2 -> mediaPlayerController.setSongRating(2)
-                KeyEvent.KEYCODE_3 -> mediaPlayerController.setSongRating(3)
-                KeyEvent.KEYCODE_4 -> mediaPlayerController.setSongRating(4)
-                KeyEvent.KEYCODE_5 -> mediaPlayerController.setSongRating(5)
-                KeyEvent.KEYCODE_STAR -> mediaPlayerController.toggleSongStarred()
+                KeyEvent.KEYCODE_1 -> mediaPlayerController.legacySetRating(1)
+                KeyEvent.KEYCODE_2 -> mediaPlayerController.legacySetRating(2)
+                KeyEvent.KEYCODE_3 -> mediaPlayerController.legacySetRating(3)
+                KeyEvent.KEYCODE_4 -> mediaPlayerController.legacySetRating(4)
+                KeyEvent.KEYCODE_5 -> mediaPlayerController.legacySetRating(5)
+                KeyEvent.KEYCODE_STAR -> mediaPlayerController.legacyToggleStar()
                 else -> {
                 }
             }

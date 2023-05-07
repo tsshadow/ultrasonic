@@ -10,7 +10,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
 import androidx.annotation.IntRange
 import androidx.media3.common.C
 import androidx.media3.common.HeartRating
@@ -21,28 +20,26 @@ import androidx.media3.common.Player.COMMAND_SEEK_TO_NEXT
 import androidx.media3.common.Player.COMMAND_SEEK_TO_PREVIOUS
 import androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
 import androidx.media3.common.Player.REPEAT_MODE_OFF
+import androidx.media3.common.Rating
+import androidx.media3.common.StarRating
 import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
-import androidx.media3.session.SessionResult
 import androidx.media3.session.SessionToken
-import com.google.common.util.concurrent.FutureCallback
-import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
+import org.moire.ultrasonic.data.RatingUpdate
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.playback.PlaybackService
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.util.MainThreadExecutor
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.setPin
@@ -231,9 +228,19 @@ class MediaPlayerController(
             clear(false)
             onDestroy()
         }
+
         rxBusSubscription += RxBus.stopServiceCommandObservable.subscribe {
             clear(false)
             onDestroy()
+        }
+
+        rxBusSubscription += RxBus.ratingSubmitterObservable.subscribe {
+            // Ensure correct thread
+            mainScope.launch {
+                // This deals only with the current track!
+                if (it.id != currentMediaItem?.toTrack()?.id) return@launch
+                setRating(it.rating)
+            }
         }
 
         created = true
@@ -701,52 +708,49 @@ class MediaPlayerController(
         controller?.volume = volume
     }
 
-    fun toggleSongStarred(): ListenableFuture<SessionResult>? {
-        if (currentMediaItem == null) return null
-        val song = currentMediaItem!!.toTrack()
-
-        return (controller as? MediaController)?.setRating(
-            HeartRating(!song.starred)
-        )?.let {
-            Futures.addCallback(
-                it,
-                object : FutureCallback<SessionResult> {
-                    override fun onSuccess(result: SessionResult?) {
-                        // Trigger an update
-                        // TODO Update Metadata of MediaItem...
-                        // localMediaPlayer.setCurrentPlaying(localMediaPlayer.currentPlaying)
-                        song.starred = !song.starred
-                    }
-
-                    override fun onFailure(t: Throwable) {
-                        Toast.makeText(
-                            context,
-                            "There was an error updating the rating",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                },
-                MainThreadExecutor()
-            )
-            it
+    /*
+    * Sets the rating of the current track
+    */
+    fun setRating(rating: Rating) {
+        if (controller is MediaController) {
+            (controller as MediaController).setRating(rating)
         }
     }
 
-    @Suppress("TooGenericExceptionCaught") // The interface throws only generic exceptions
-    fun setSongRating(rating: Int) {
-        if (!Settings.useFiveStarRating) return
+    /*
+    * This legacy function simply emits a rating update,
+    * which will then be processed by both the RatingManager as well as the controller
+    */
+    fun legacyToggleStar() {
         if (currentMediaItem == null) return
-        val song = currentMediaItem!!.toTrack()
-        song.userRating = rating
-        mainScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    getMusicService().setRating(song.id, rating)
-                } catch (e: Exception) {
-                    Timber.e(e)
-                }
-            }
-        }
+        val track = currentMediaItem!!.toTrack()
+        track.starred = !track.starred
+        val rating = HeartRating(track.starred)
+
+        RxBus.ratingSubmitter.onNext(
+            RatingUpdate(
+                track.id,
+                rating
+            )
+        )
+    }
+
+    /*
+     * This legacy function simply emits a rating update,
+     * which will then be processed by both the RatingManager as well as the controller
+     */
+    fun legacySetRating(num: Int) {
+        if (currentMediaItem == null) return
+        val track = currentMediaItem!!.toTrack()
+        track.userRating = num
+        val rating = StarRating(5, num.toFloat())
+
+        RxBus.ratingSubmitter.onNext(
+            RatingUpdate(
+                track.id,
+                rating
+            )
+        )
     }
 
     val currentMediaItem: MediaItem?
@@ -764,7 +768,6 @@ class MediaPlayerController(
      * Loops over the timeline windows to find the entry which matches the given closure.
      *
      * @param searchClosure Determines the condition which the searched for window needs to match.
-     * @param timeline the timeline to search in.
      * @return the index of the window that satisfies the search condition,
      * or [C.INDEX_UNSET] if not found.
      */

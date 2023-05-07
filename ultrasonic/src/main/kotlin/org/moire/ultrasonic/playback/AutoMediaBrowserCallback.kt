@@ -26,8 +26,6 @@ import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
-import androidx.media3.session.SessionResult.RESULT_ERROR_BAD_VALUE
-import androidx.media3.session.SessionResult.RESULT_ERROR_UNKNOWN
 import androidx.media3.session.SessionResult.RESULT_SUCCESS
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.FutureCallback
@@ -44,12 +42,14 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.data.RatingUpdate
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MusicServiceFactory
+import org.moire.ultrasonic.service.RatingManager
 import org.moire.ultrasonic.util.MainThreadExecutor
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
@@ -306,21 +306,18 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         rating: Rating
     ): ListenableFuture<SessionResult> {
         return serviceScope.future {
-            if (rating is HeartRating) {
-                try {
-                    if (rating.isHeart) {
-                        musicService.star(mediaId, null, null)
-                    } else {
-                        musicService.unstar(mediaId, null, null)
-                    }
-                } catch (all: Exception) {
-                    Timber.e(all)
-                    // TODO: Better handle exception
-                    return@future SessionResult(RESULT_ERROR_UNKNOWN)
-                }
-                return@future SessionResult(RESULT_SUCCESS)
-            }
-            return@future SessionResult(RESULT_ERROR_BAD_VALUE)
+            Timber.i(controller.packageName)
+            // This function even though its declared in AutoMediaBrowserCallback.kt is
+            // actually called every time we set the rating on an MediaItem.
+            // To avoid an event loop it does not emit a RatingUpdate event,
+            // but calls the Manager directly
+            RatingManager.instance.submitRating(
+                RatingUpdate(
+                    id = mediaId,
+                    rating = rating
+                )
+            )
+            return@future SessionResult(RESULT_SUCCESS)
         }
     }
 

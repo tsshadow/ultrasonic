@@ -35,11 +35,15 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.ViewFlipper
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.session.SessionResult
+import androidx.media3.common.StarRating
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -49,8 +53,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
-import com.google.common.util.concurrent.FutureCallback
-import com.google.common.util.concurrent.Futures
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -76,6 +78,7 @@ import org.moire.ultrasonic.adapters.TrackViewBinder
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
+import org.moire.ultrasonic.data.RatingUpdate
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
@@ -98,7 +101,7 @@ import timber.log.Timber
 
 /**
  * Contains the Music Player screen of Ultrasonic with playback controls and the playlist
- * TODO: Add timeline lister -> updateProgressBar().
+ *
  */
 @Suppress("LargeClass", "TooManyFunctions", "MagicNumber")
 class PlayerFragment :
@@ -132,7 +135,6 @@ class PlayerFragment :
 
     // Views and UI Elements
     private lateinit var playlistNameView: EditText
-    private lateinit var starMenuItem: MenuItem
     private lateinit var fiveStar1ImageView: ImageView
     private lateinit var fiveStar2ImageView: ImageView
     private lateinit var fiveStar3ImageView: ImageView
@@ -230,7 +232,13 @@ class PlayerFragment :
             height = size.y
         }
 
-        setHasOptionsMenu(true)
+        // Register our options menu
+        (requireActivity() as MenuHost).addMenuProvider(
+            menuProvider,
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
+
         useFiveStarRating = Settings.useFiveStarRating
         swipeDistance = (width + height) * PERCENTAGE_OF_SCREEN_FOR_SWIPE / 100
         swipeVelocity = swipeDistance
@@ -467,22 +475,54 @@ class PlayerFragment :
         super.onDestroyView()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.nowplaying, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+    private val menuProvider: MenuProvider = object : MenuProvider {
+        override fun onPrepareMenu(menu: Menu) {
+            setupOptionsMenu(menu)
+        }
+
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.nowplaying, menu)
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+            return menuItemSelected(menuItem.itemId, currentSong)
+        }
     }
 
     @Suppress("ComplexMethod", "LongMethod", "NestedBlockDepth")
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
+    fun setupOptionsMenu(menu: Menu) {
+        // Seems there is nothing like ViewBinding for Menus
         val screenOption = menu.findItem(R.id.menu_item_screen_on_off)
+        val goToAlbum = menu.findItem(R.id.menu_show_album)
+        val goToArtist = menu.findItem(R.id.menu_show_artist)
         val jukeboxOption = menu.findItem(R.id.menu_item_jukebox)
         val equalizerMenuItem = menu.findItem(R.id.menu_item_equalizer)
         val shareMenuItem = menu.findItem(R.id.menu_item_share)
         val shareSongMenuItem = menu.findItem(R.id.menu_item_share_song)
-        starMenuItem = menu.findItem(R.id.menu_item_star)
+        val starMenuItem = menu.findItem(R.id.menu_item_star)
         val bookmarkMenuItem = menu.findItem(R.id.menu_item_bookmark_set)
         val bookmarkRemoveMenuItem = menu.findItem(R.id.menu_item_bookmark_delete)
+
+        // Listen to rating changes and update the UI
+        rxBusSubscription += RxBus.ratingPublishedObservable.subscribe { update ->
+
+            // Ignore updates which are not for the current song
+            if (update.id != currentSong?.id) return@subscribe
+
+            // Ensure UI thread
+            launch {
+                if (update.success == true && update.rating is HeartRating) {
+                    if (update.rating.isHeart) {
+                        starMenuItem.setIcon(fullStar)
+                    } else {
+                        starMenuItem.setIcon(hollowStar)
+                    }
+                } else if (update.success == false) {
+                    Toast.makeText(context, "Setting rating failed", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
 
         if (isOffline()) {
             if (shareMenuItem != null) {
@@ -500,6 +540,7 @@ class PlayerFragment :
             equalizerMenuItem.isEnabled = isEqualizerAvailable
             equalizerMenuItem.isVisible = isEqualizerAvailable
         }
+
         val mediaPlayerController = mediaPlayerController
         val track = mediaPlayerController.currentMediaItem?.toTrack()
 
@@ -512,9 +553,13 @@ class PlayerFragment :
         if (currentSong != null) {
             starMenuItem.setIcon(if (currentSong!!.starred) fullStar else hollowStar)
             shareSongMenuItem.isVisible = true
+            goToAlbum.isVisible = true
+            goToArtist.isVisible = true
         } else {
             starMenuItem.setIcon(hollowStar)
             shareSongMenuItem.isVisible = false
+            goToAlbum.isVisible = false
+            goToArtist.isVisible = false
         }
 
         if (mediaPlayerController.keepScreenOn) {
@@ -553,10 +598,6 @@ class PlayerFragment :
         popup.menu.findItem(R.id.menu_lyrics)?.isVisible = !isOffline()
         popup.show()
         return popup
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return menuItemSelected(item.itemId, currentSong) || super.onOptionsItemSelected(item)
     }
 
     private fun onContextMenuItemSelected(
@@ -655,31 +696,11 @@ class PlayerFragment :
             }
             R.id.menu_item_star -> {
                 if (track == null) return true
+                track.starred = !track.starred
 
-                val isStarred = track.starred
-
-                mediaPlayerController.toggleSongStarred()?.let {
-                    Futures.addCallback(
-                        it,
-                        object : FutureCallback<SessionResult> {
-                            override fun onSuccess(result: SessionResult?) {
-                                if (isStarred) {
-                                    starMenuItem.setIcon(hollowStar)
-                                    track.starred = false
-                                } else {
-                                    starMenuItem.setIcon(fullStar)
-                                    track.starred = true
-                                }
-                            }
-
-                            override fun onFailure(t: Throwable) {
-                                Toast.makeText(context, "SetRating failed", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        },
-                        this.executorService
-                    )
-                }
+                RxBus.ratingSubmitter.onNext(
+                    RatingUpdate(track.id, HeartRating(track.starred))
+                )
 
                 return true
             }
@@ -1072,8 +1093,6 @@ class PlayerFragment :
             }
         }
 
-        // TODO: It would be a lot nicer if MediaPlayerController would send an event
-        // when this is necessary instead of updating every time
         updateSongRating()
 
         nextButton.isEnabled = mediaPlayerController.canSeekToNext()
@@ -1082,7 +1101,6 @@ class PlayerFragment :
 
     @Synchronized
     private fun updateSeekBar() {
-        Timber.i("Calling updateSeekBar")
         val isJukeboxEnabled: Boolean = mediaPlayerController.isJukeboxEnabled
         val millisPlayed: Int = max(0, mediaPlayerController.playerPosition)
         val duration: Int = mediaPlayerController.playerDuration
@@ -1233,11 +1251,7 @@ class PlayerFragment :
     }
 
     private fun updateSongRating() {
-        var rating = 0
-
-        if (currentSong?.userRating != null) {
-            rating = currentSong!!.userRating!!
-        }
+        val rating = currentSong?.userRating ?: 0
 
         fiveStar1ImageView.setImageResource(if (rating > 0) fullStar else hollowStar)
         fiveStar2ImageView.setImageResource(if (rating > 1) fullStar else hollowStar)
@@ -1248,8 +1262,15 @@ class PlayerFragment :
 
     private fun setSongRating(rating: Int) {
         if (currentSong == null) return
+        currentSong?.userRating = rating
         updateSongRating()
-        mediaPlayerController.setSongRating(rating)
+
+        RxBus.ratingSubmitter.onNext(
+            RatingUpdate(
+                currentSong!!.id,
+                StarRating(5, rating.toFloat())
+            )
+        )
     }
 
     @SuppressLint("InflateParams")
