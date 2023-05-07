@@ -401,6 +401,8 @@ open class TrackCollectionFragment(
     ) {
         // We are coming back from unknown context
         // and need to ensure Main Thread in order to manipulate the UI
+        // If view is null, our view was disposed in the meantime
+        if (view == null) return
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
             val multipleSelection = viewAdapter.hasMultipleSelection()
 

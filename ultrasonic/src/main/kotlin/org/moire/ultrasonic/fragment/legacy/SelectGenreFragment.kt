@@ -102,7 +102,9 @@ class SelectGenreFragment : Fragment() {
 
             override fun done(result: List<Genre>) {
                 emptyView!!.isVisible = result.isEmpty()
-                genreListView!!.adapter = GenreAdapter(context, result)
+                if (context != null) {
+                    genreListView!!.adapter = GenreAdapter(context!!, result)
+                }
             }
         }
         task.execute()

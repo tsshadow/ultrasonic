@@ -10,7 +10,9 @@ package org.moire.ultrasonic.util
 import android.app.Activity
 import android.content.Context
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.lang.ref.WeakReference
 import org.moire.ultrasonic.R
+import timber.log.Timber
 
 /*
  * InfoDialog can be used to show some information to the user. Typically it cannot be cancelled,
@@ -19,24 +21,30 @@ import org.moire.ultrasonic.R
 open class InfoDialog(
     context: Context,
     message: CharSequence?,
-    private val activity: Activity? = null,
+    activity: Activity? = null,
     private val finishActivityOnClose: Boolean = false
 ) {
-
-    open var builder: MaterialAlertDialogBuilder = Builder(activity ?: context, message)
+    private val activityRef: WeakReference<Activity?> = WeakReference(activity)
+    open var builder: MaterialAlertDialogBuilder = Builder(activityRef.get() ?: context, message)
 
     fun show() {
         builder.setOnCancelListener {
             if (finishActivityOnClose) {
-                activity!!.finish()
+                activityRef.get()?.finish()
             }
         }
         builder.setPositiveButton(R.string.common_ok) { _, _ ->
             if (finishActivityOnClose) {
-                activity!!.finish()
+                activityRef.get()?.finish()
             }
         }
-        builder.create().show()
+
+        // If the app was put into the background in the meantime this would fail
+        try {
+            builder.create().show()
+        } catch (all: Exception) {
+            Timber.w(all, "Failed to create dialog")
+        }
     }
 
     class Builder(context: Context) : MaterialAlertDialogBuilder(context) {
@@ -93,7 +101,6 @@ class ConfirmationDialog(
     activity: Activity? = null,
     finishActivityOnClose: Boolean = false
 ) : InfoDialog(context, message, activity, finishActivityOnClose) {
-
     override var builder: MaterialAlertDialogBuilder = Builder(activity ?: context, message)
 
     class Builder(context: Context) : MaterialAlertDialogBuilder(context) {

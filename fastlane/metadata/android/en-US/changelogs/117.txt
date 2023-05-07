@@ -1,0 +1,8 @@
+Bug fixes
+- Fix more exceptions
+
+Changes since 4.2.0
+- #827: Make app full compliant Android Auto to publish in Play Store.
+- #878: "Play shuffled" option for playlists always begins with the first track.
+- #891: Dump config to log file when logging is enabled.
+- #854: Remove Videos menu option for servers which don't support it.
