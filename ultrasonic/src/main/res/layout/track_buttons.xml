@@ -7,7 +7,7 @@
     android:orientation="horizontal"
     android:padding="6dp" >
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/select_album_select"
         style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
@@ -20,7 +20,7 @@
         app:iconGravity="textEnd"
         app:iconSize="26dp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/select_album_play_now"
         style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
@@ -31,9 +31,10 @@
         android:contentDescription="@string/common.play_now"
         app:icon="@drawable/media_start"
         app:iconGravity="textEnd"
-        app:iconSize="26dp" />
+        app:iconSize="26dp"
+        android:scrollbars="none" />
     
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/select_album_play_next"
         style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
@@ -44,9 +45,10 @@
         android:contentDescription="@string/common.play_next"
         app:icon="@drawable/ic_play_next"
         app:iconGravity="textEnd"
-        app:iconSize="26dp" />
+        app:iconSize="26dp"
+        android:scrollbars="none" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/select_album_play_last"
         style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
@@ -57,9 +59,11 @@
         android:contentDescription="@string/common.play_last"
         app:icon="@drawable/ic_play_last"
         app:iconGravity="textEnd"
-        app:iconSize="26dp" />
+        app:iconSize="26dp"
+        android:scrollbars="none"
+        />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/select_album_pin"
         style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
@@ -70,9 +74,11 @@
         android:contentDescription="@string/common.pin"
         app:icon="@drawable/ic_menu_pin"
         app:iconGravity="textEnd"
-        app:iconSize="26dp" />
+        app:iconSize="26dp"
+        android:scrollbars="none"
+        />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/select_album_unpin"
         style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
@@ -83,9 +89,11 @@
         android:contentDescription="@string/common.unpin"
         app:icon="@drawable/ic_menu_unpin"
         app:iconGravity="textEnd"
-        app:iconSize="26dp" />
+        app:iconSize="26dp"
+        android:scrollbars="none"
+        />
     
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/select_album_download"
         style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
@@ -96,9 +104,11 @@
         android:contentDescription="@string/common.download"
         app:icon="@drawable/ic_menu_download"
         app:iconGravity="textEnd"
-        app:iconSize="26dp" />
+        app:iconSize="26dp"
+        android:scrollbars="none"
+        />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/select_album_delete"
         style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
@@ -109,9 +119,11 @@
         android:contentDescription="@string/common.delete"
         app:icon="@drawable/ic_menu_close"
         app:iconGravity="textEnd"
-        app:iconSize="26dp" />
+        app:iconSize="26dp"
+        android:scrollbars="none"
+        />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/select_album_more"
         style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="0dp"
@@ -122,6 +134,8 @@
         android:contentDescription="@string/search.more"
         app:icon="@drawable/media_forward"
         app:iconGravity="textEnd"
-        app:iconSize="26dp" />
+        app:iconSize="26dp"
+        android:scrollbars="none"
+        />
 
 </LinearLayout>
