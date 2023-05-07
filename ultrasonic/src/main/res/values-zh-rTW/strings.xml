@@ -213,4 +213,24 @@
     <string name="music_library.label_offline">離線媒體</string>
     <string name="playlist.update_info">更新資訊</string>
     <string name="download.jukebox_not_authorized">不允許遠端控制。請在您在 Subsonic 伺服器上的 <b>使用者 &gt; 設定</b> 中啟用點唱機模式。</string>
+    <string name="settings.directory_cache_time">目錄快取時間</string>
+    <string name="settings.disc_sort_summary">依光碟編號和曲目編號對歌曲清單進行排序</string>
+    <string name="settings.clear_search_history">清空搜尋記錄</string>
+    <string name="settings.chat_refresh">聊天訊息刷新時間間隔</string>
+    <string name="settings.display_bitrate_summary">在藝術家名稱後附加位元速率和檔案後綴</string>
+    <string name="settings.appearance_title">外觀</string>
+    <string name="settings.clear_bookmark_summary">歌曲播放完畢後清除書籤</string>
+    <string name="settings.disc_sort">依光碟排序歌曲</string>
+    <string name="select_album.no_sdcard">錯誤：無可用的 SD 卡。</string>
+    <string name="select_album.no_network">警告：目前沒有可用的網路。
+\n 如果您要使用行動數據，您需要在設定中允許使用計量付費網路連線下載。</string>
+    <string name="select_album.play_all">播放全部</string>
+    <string name="select_artist.all_folders">所有資料夾</string>
+    <string name="select_artist.folder">選擇資料夾</string>
+    <string name="select_playlist.empty">伺服器上沒有已保存的播放清單</string>
+    <string name="settings.hide_media_title">隱藏其他來源</string>
+    <string name="settings.hide_media_summary">隱藏來自其他應用程式的音樂檔案。</string>
+    <string name="settings.hide_media_toast">在 Android 系統下次掃描裝置內音樂時生效。</string>
+    <string name="settings.download_transition">播放時顯示正在播放介面</string>
+    <string name="settings.download_transition_summary">在媒體庫介面開始播放後切換到正在播放介面</string>
 </resources>
