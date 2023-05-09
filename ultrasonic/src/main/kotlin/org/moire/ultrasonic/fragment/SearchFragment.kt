@@ -309,7 +309,6 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         }
         mediaPlayerController.addToPlaylist(
             listOf(song),
-            cachePermanently = false,
             autoPlay = false,
             shuffle = false,
             insertionMode = MediaPlayerController.InsertionMode.APPEND
@@ -367,40 +366,37 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         when (menuItem.itemId) {
             R.id.song_menu_play_now -> {
                 songs.add(item)
-                downloadHandler.download(
-                    fragment = this,
-                    append = false,
-                    save = false,
-                    autoPlay = true,
-                    playNext = false,
-                    shuffle = false,
+                downloadHandler.addTracksToMediaController(
                     songs = songs,
+                    append = false,
+                    playNext = false,
+                    autoPlay = true,
+                    shuffle = false,
+                    fragment = this,
                     playlistName = null
                 )
             }
             R.id.song_menu_play_next -> {
                 songs.add(item)
-                downloadHandler.download(
-                    fragment = this,
-                    append = true,
-                    save = false,
-                    autoPlay = false,
-                    playNext = true,
-                    shuffle = false,
+                downloadHandler.addTracksToMediaController(
                     songs = songs,
+                    append = true,
+                    playNext = true,
+                    autoPlay = false,
+                    shuffle = false,
+                    fragment = this,
                     playlistName = null
                 )
             }
             R.id.song_menu_play_last -> {
                 songs.add(item)
-                downloadHandler.download(
-                    fragment = this,
-                    append = true,
-                    save = false,
-                    autoPlay = false,
-                    playNext = false,
-                    shuffle = false,
+                downloadHandler.addTracksToMediaController(
                     songs = songs,
+                    append = true,
+                    playNext = false,
+                    autoPlay = false,
+                    shuffle = false,
+                    fragment = this,
                     playlistName = null
                 )
             }

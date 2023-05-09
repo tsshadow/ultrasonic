@@ -28,7 +28,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.util.Locale
-import org.koin.java.KoinJavaComponent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
@@ -36,6 +37,7 @@ import org.moire.ultrasonic.domain.Share
 import org.moire.ultrasonic.fragment.FragmentTitle
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.OfflineException
+import org.moire.ultrasonic.subsonic.DownloadAction
 import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.util.BackgroundTask
 import org.moire.ultrasonic.util.CancellationToken
@@ -50,14 +52,12 @@ import org.moire.ultrasonic.view.ShareAdapter
  *
  * TODO: This file has been converted from Java, but not modernized yet.
  */
-class SharesFragment : Fragment() {
+class SharesFragment : Fragment(), KoinComponent {
     private var refreshSharesListView: SwipeRefreshLayout? = null
     private var sharesListView: ListView? = null
     private var emptyTextView: View? = null
     private var shareAdapter: ShareAdapter? = null
-    private val downloadHandler = KoinJavaComponent.inject<DownloadHandler>(
-        DownloadHandler::class.java
-    )
+    private val downloadHandler = inject<DownloadHandler>()
     private var cancellationToken: CancellationToken? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         Util.applyTheme(this.context)
@@ -72,7 +72,6 @@ class SharesFragment : Fragment() {
         return inflater.inflate(R.layout.select_share, container, false)
     }
 
-    @Suppress("NAME_SHADOWING")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         cancellationToken = CancellationToken()
         refreshSharesListView = view.findViewById(R.id.select_share_refresh)
@@ -132,73 +131,55 @@ class SharesFragment : Fragment() {
         val share = sharesListView!!.getItemAtPosition(info.position) as Share
         when (menuItem.itemId) {
             R.id.share_menu_pin -> {
-                downloadHandler.value.downloadShare(
-                    this,
-                    share.id,
-                    share.name,
-                    save = true,
-                    append = true,
-                    autoplay = false,
-                    shuffle = false,
-                    background = true,
-                    playNext = false,
-                    unpin = false
+                downloadHandler.value.justDownload(
+                    DownloadAction.PIN,
+                    fragment = this,
+                    id = share.id,
+                    name = share.name,
+                    isShare = true,
+                    isDirectory = false
                 )
             }
             R.id.share_menu_unpin -> {
-                downloadHandler.value.downloadShare(
-                    this,
-                    share.id,
-                    share.name,
-                    save = false,
-                    append = false,
-                    autoplay = false,
-                    shuffle = false,
-                    background = true,
-                    playNext = false,
-                    unpin = true
+                downloadHandler.value.justDownload(
+                    DownloadAction.UNPIN,
+                    fragment = this,
+                    id = share.id,
+                    name = share.name,
+                    isShare = true,
+                    isDirectory = false
                 )
             }
             R.id.share_menu_download -> {
-                downloadHandler.value.downloadShare(
-                    this,
-                    share.id,
-                    share.name,
-                    save = false,
-                    append = false,
-                    autoplay = false,
-                    shuffle = false,
-                    background = true,
-                    playNext = false,
-                    unpin = false
+                downloadHandler.value.justDownload(
+                    DownloadAction.DOWNLOAD,
+                    fragment = this,
+                    id = share.id,
+                    name = share.name,
+                    isShare = true,
+                    isDirectory = false
                 )
             }
             R.id.share_menu_play_now -> {
-                downloadHandler.value.downloadShare(
+                downloadHandler.value.fetchTracksAndAddToController(
                     this,
                     share.id,
                     share.name,
-                    save = false,
                     append = false,
-                    autoplay = true,
+                    autoPlay = true,
                     shuffle = false,
-                    background = false,
                     playNext = false,
-                    unpin = false
                 )
             }
             R.id.share_menu_play_shuffled -> {
-                downloadHandler.value.downloadShare(
+                downloadHandler.value.fetchTracksAndAddToController(
                     this,
                     share.id,
                     share.name,
-                    save = false,
                     append = false,
-                    autoplay = true,
+                    autoPlay = true,
                     shuffle = true,
-                    background = false,
                     playNext = false,
-                    unpin = false
                 )
             }
             R.id.share_menu_delete -> {

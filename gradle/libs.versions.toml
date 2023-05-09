@@ -1,6 +1,6 @@
 [versions]
 # You need to run ./gradlew wrapper after updating the version
-gradle                 = "7.6"
+gradle                 = "8.1.1"
 
 navigation             = "2.5.3"
 gradlePlugin           = "8.0.1"

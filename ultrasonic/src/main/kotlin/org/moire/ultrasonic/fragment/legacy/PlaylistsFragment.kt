@@ -38,6 +38,7 @@ import org.moire.ultrasonic.domain.Playlist
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.OfflineException
+import org.moire.ultrasonic.subsonic.DownloadAction
 import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.util.BackgroundTask
 import org.moire.ultrasonic.util.CacheCleaner
@@ -147,45 +148,33 @@ class PlaylistsFragment : Fragment() {
         val playlist = playlistsListView!!.getItemAtPosition(info.position) as Playlist
         when (menuItem.itemId) {
             R.id.playlist_menu_pin -> {
-                downloadHandler.value.downloadPlaylist(
-                    this,
+                downloadHandler.value.justDownload(
+                    DownloadAction.PIN,
+                    fragment = this,
                     id = playlist.id,
                     name = playlist.name,
-                    save = true,
-                    append = true,
-                    autoplay = false,
-                    shuffle = false,
-                    background = true,
-                    playNext = false,
-                    unpin = false
+                    isShare = false,
+                    isDirectory = false
                 )
             }
             R.id.playlist_menu_unpin -> {
-                downloadHandler.value.downloadPlaylist(
-                    this,
+                downloadHandler.value.justDownload(
+                    DownloadAction.UNPIN,
+                    fragment = this,
                     id = playlist.id,
                     name = playlist.name,
-                    save = false,
-                    append = false,
-                    autoplay = false,
-                    shuffle = false,
-                    background = true,
-                    playNext = false,
-                    unpin = true
+                    isShare = false,
+                    isDirectory = false
                 )
             }
             R.id.playlist_menu_download -> {
-                downloadHandler.value.downloadPlaylist(
-                    this,
+                downloadHandler.value.justDownload(
+                    DownloadAction.DOWNLOAD,
+                    fragment = this,
                     id = playlist.id,
                     name = playlist.name,
-                    save = false,
-                    append = false,
-                    autoplay = false,
-                    shuffle = false,
-                    background = true,
-                    playNext = false,
-                    unpin = false
+                    isShare = false,
+                    isDirectory = false
                 )
             }
             R.id.playlist_menu_play_now -> {

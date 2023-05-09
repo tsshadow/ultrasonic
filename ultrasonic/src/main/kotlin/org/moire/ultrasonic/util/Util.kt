@@ -148,8 +148,8 @@ object Util {
                     if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
             }
             toast!!.show()
-        } catch (_: Exception) {
-            // Ignore
+        } catch (all: Exception) {
+            Timber.w(all)
         }
     }
 
