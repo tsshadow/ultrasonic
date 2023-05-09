@@ -70,7 +70,7 @@
     <string name="download.menu_save">Guardar lista de reproducción</string>
     <string name="download.menu_screen_off">Pantalla apagada</string>
     <string name="download.menu_screen_on">Pantalla encendida</string>
-    <string name="download.menu_show_album">Mostrar Álbum</string>
+    <string name="download.menu_show_album">Ir al álbum</string>
     <string name="download.menu_shuffle">Aleatorio</string>
     <string name="download.menu_shuffle_on">Modo aleatorio activado</string>
     <string name="download.menu_shuffle_off">Modo aleatorio desactivado</string>
@@ -361,7 +361,7 @@
     <string name="share_default_greeting">Echa un vistazo a esta música que te comparto desde %s</string>
     <string name="share_via">Compartir canciones vía</string>
     <string name="menu.share">Compartir</string>
-    <string name="download.menu_show_artist">Mostrar artista</string>
+    <string name="download.menu_show_artist">Ir al artista</string>
     <string name="albumArt">Portadas de álbumes</string>
     <string name="common_multiple_years">Múltiples años</string>
     <string name="settings.show_confirmation_dialog">Mostrar diálogo de confirmación</string>
