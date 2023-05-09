@@ -574,14 +574,14 @@ open class TrackCollectionFragment(
             } else if (getVideos) {
                 setTitle(R.string.main_videos)
                 listModel.getVideos(refresh2)
-            } else if (getRandomTracks) {
+            } else if (id == null || getRandomTracks) {
+                // There seems to be a bug in ViewPager when resuming the Actitivy that subfragments
+                // arguments are empty. If we have no id, just show some random tracks
                 setTitle(R.string.main_songs_random)
                 listModel.getRandom(size, append)
             } else {
                 setTitle(name)
-                requireNotNull(id) {
-                    "ID must be set. NavArgs: ${navArgs.toBundle()}"
-                }
+
                 if (ActiveServerProvider.isID3Enabled()) {
                     if (isAlbum) {
                         listModel.getAlbum(refresh2, id, name)
