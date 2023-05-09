@@ -42,7 +42,6 @@ import org.moire.ultrasonic.playback.PlaybackService
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
-import org.moire.ultrasonic.util.setPin
 import org.moire.ultrasonic.util.toMediaItem
 import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
@@ -314,7 +313,6 @@ class MediaPlayerController(
 
         addToPlaylist(
             state.songs,
-            cachePermanently = false,
             autoPlay = false,
             shuffle = false,
             insertionMode = insertionMode
@@ -408,7 +406,6 @@ class MediaPlayerController(
     @Synchronized
     fun addToPlaylist(
         songs: List<Track>,
-        cachePermanently: Boolean,
         autoPlay: Boolean,
         shuffle: Boolean,
         insertionMode: InsertionMode
@@ -423,7 +420,6 @@ class MediaPlayerController(
 
         val mediaItems: List<MediaItem> = songs.map {
             val result = it.toMediaItem()
-            if (cachePermanently) result.setPin(true)
             result
         }
 

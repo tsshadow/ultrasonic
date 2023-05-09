@@ -40,11 +40,10 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.TrackCollectionModel
-import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
-import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
+import org.moire.ultrasonic.subsonic.DownloadAction
 import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.subsonic.VideoPlayer
 import org.moire.ultrasonic.util.CancellationToken
@@ -84,7 +83,6 @@ open class TrackCollectionFragment(
     private var shareButton: MenuItem? = null
 
     internal val mediaPlayerController: MediaPlayerController by inject()
-    private val networkAndStorageChecker: NetworkAndStorageChecker by inject()
     private val shareHandler: ShareHandler by inject()
     internal var cancellationToken: CancellationToken? = null
 
@@ -211,11 +209,14 @@ open class TrackCollectionFragment(
         }
 
         playNextButton?.setOnClickListener {
-            downloadHandler.download(
-                this@TrackCollectionFragment, append = true,
-                save = false, autoPlay = false, playNext = true, shuffle = false,
+            downloadHandler.addTracksToMediaController(
                 songs = getSelectedSongs(),
-                playlistName = navArgs.playlistName
+                append = true,
+                playNext = true,
+                autoPlay = false,
+                shuffle = false,
+                playlistName = navArgs.playlistName,
+                this@TrackCollectionFragment
             )
         }
 
@@ -304,9 +305,14 @@ open class TrackCollectionFragment(
         selectedSongs: List<Track> = getSelectedSongs()
     ) {
         if (selectedSongs.isNotEmpty()) {
-            downloadHandler.download(
-                this, append, false, !append, playNext = false,
-                shuffle = false, songs = selectedSongs, null
+            downloadHandler.addTracksToMediaController(
+                songs = selectedSongs,
+                append = append,
+                playNext = false,
+                autoPlay = !append,
+                shuffle = false,
+                playlistName = null,
+                fragment = this
             )
         } else {
             playAll(false, append)
@@ -337,31 +343,29 @@ open class TrackCollectionFragment(
         }
 
         val isArtist = navArgs.isArtist
-        val id = navArgs.id
+
+        // Need a valid id to download stuff
+        val id = navArgs.id ?: return
 
         if (hasSubFolders) {
-            downloadHandler.downloadRecursively(
+            downloadHandler.fetchTracksAndAddToController(
                 fragment = this,
                 id = id,
-                save = false,
                 append = append,
                 autoPlay = !append,
                 shuffle = shuffle,
-                background = false,
                 playNext = false,
-                unpin = false,
                 isArtist = isArtist
             )
         } else {
-            downloadHandler.download(
-                fragment = this,
-                append = append,
-                save = false,
-                autoPlay = !append,
-                playNext = false,
-                shuffle = shuffle,
+            downloadHandler.addTracksToMediaController(
                 songs = getAllSongs(),
-                playlistName = navArgs.playlistName
+                append = append,
+                playNext = false,
+                autoPlay = !append,
+                shuffle = shuffle,
+                playlistName = navArgs.playlistName,
+                fragment = this
             )
         }
     }
@@ -416,62 +420,35 @@ open class TrackCollectionFragment(
         }
     }
 
-    private fun downloadBackground(save: Boolean) {
-        var songs = getSelectedSongs()
+    private fun downloadBackground(save: Boolean, tracks: List<Track> = getSelectedSongs()) {
+        var songs = tracks
 
         if (songs.isEmpty()) {
             songs = getAllSongs()
         }
 
-        downloadBackground(save, songs)
-    }
-
-    private fun downloadBackground(
-        save: Boolean,
-        songs: List<Track?>
-    ) {
-        val onValid = Runnable {
-            networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            DownloadService.download(songs.filterNotNull(), save)
-
-            if (save) {
-                Util.toast(
-                    context,
-                    resources.getQuantityString(
-                        R.plurals.select_album_n_songs_pinned, songs.size, songs.size
-                    )
-                )
-            } else {
-                Util.toast(
-                    context,
-                    resources.getQuantityString(
-                        R.plurals.select_album_n_songs_downloaded, songs.size, songs.size
-                    )
-                )
-            }
-        }
-        onValid.run()
+        val action = if (save) DownloadAction.PIN else DownloadAction.DOWNLOAD
+        downloadHandler.justDownload(
+            action = action,
+            fragment = this,
+            tracks = songs
+        )
     }
 
     internal fun delete(songs: List<Track> = getSelectedSongs()) {
-        Util.toast(
-            context,
-            resources.getQuantityString(
-                R.plurals.select_album_n_songs_deleted, songs.size, songs.size
-            )
+        downloadHandler.justDownload(
+            action = DownloadAction.DELETE,
+            fragment = this,
+            tracks = songs
         )
-
-        DownloadService.delete(songs)
     }
 
     internal fun unpin(songs: List<Track> = getSelectedSongs()) {
-        Util.toast(
-            context,
-            resources.getQuantityString(
-                R.plurals.select_album_n_songs_unpinned, songs.size, songs.size
-            )
+        downloadHandler.justDownload(
+            action = DownloadAction.UNPIN,
+            fragment = this,
+            tracks = songs
         )
-        DownloadService.unpin(songs)
     }
 
     override val defaultObserver: (List<MusicDirectory.Child>) -> Unit = {
@@ -637,15 +614,14 @@ open class TrackCollectionFragment(
                 playNow(false, songs)
             }
             R.id.song_menu_play_next -> {
-                downloadHandler.download(
-                    fragment = this@TrackCollectionFragment,
-                    append = true,
-                    save = false,
-                    autoPlay = false,
-                    playNext = true,
-                    shuffle = false,
+                downloadHandler.addTracksToMediaController(
                     songs = songs,
-                    playlistName = navArgs.playlistName
+                    append = true,
+                    playNext = true,
+                    autoPlay = false,
+                    shuffle = false,
+                    playlistName = navArgs.playlistName,
+                    fragment = this@TrackCollectionFragment
                 )
             }
             R.id.song_menu_play_last -> {
