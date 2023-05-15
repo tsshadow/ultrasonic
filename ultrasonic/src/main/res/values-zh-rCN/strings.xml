@@ -3,11 +3,11 @@
     <string name="background_task.loading">加载中…</string>
     <string name="background_task.network_error">发生网络错误。请检查服务器地址或稍后重试。</string>
     <string name="background_task.unsupported_api">服务端 API v%1$s 不支持此功能。</string>
-    <string name="background_task.no_network">此软件需要连接网络，请打开Wi-Fi或移动网络。</string>
+    <string name="background_task.no_network">此软件需要连接网络，请打开 Wi-Fi 或移动网络。</string>
     <string name="background_task.not_found">未找到资源，请检查服务器地址。</string>
-    <string name="background_task.parse_error">未知回复内容，请检查服务器地址</string>
-    <string name="background_task.ssl_cert_error">HTTPS 证书错误： %1$s.</string>
-    <string name="background_task.ssl_error">SSL连接异常。请检查服务器证书。</string>
+    <string name="background_task.parse_error">未知回复内容，请检查服务器地址。</string>
+    <string name="background_task.ssl_cert_error">HTTPS 证书错误：%1$s.</string>
+    <string name="background_task.ssl_error">SSL 连接异常。请检查服务器证书。</string>
     <string name="background_task.wait">请稍等…</string>
     <string name="button_bar.bookmarks">书签</string>
     <string name="button_bar.browse">媒体库</string>
@@ -50,20 +50,20 @@
     <string name="common.unpin">取消固定</string>
     <string name="common.delete_selection_confirmation">您真的要删除当前选择吗？</string>
     <string name="common.various_artists">群星</string>
-    <string name="delete_playlist">确定要删除 %1$s吗</string>
+    <string name="delete_playlist">确定要删除 %1$s 吗</string>
     <string name="download.bookmark_removed" formatted="false">书签已删除。</string>
-    <string name="download.bookmark_set_at_position" formatted="false">书签设置为 %s。</string>
+    <string name="download.bookmark_set_at_position" formatted="false">书签设置在 %s。</string>
     <string name="download.empty">未下载任何内容</string>
     <string name="playlist.empty">空的播放列表</string>
-    <string name="download.jukebox_not_authorized">不允许远程控制. 请在您的服务器上的 <b>Users &gt; Settings</b> 打开点唱机模式。</string>
-    <string name="download.jukebox_off">关闭远程控制，音乐将在手机上播放</string>
-    <string name="download.jukebox_offline">离线模式不支持远程控制</string>
-    <string name="download.jukebox_on">打开远程控制，音乐将在服务端播放。</string>
-    <string name="download.jukebox_server_too_old">远程控制不支持，请升级您的 Subsonic服务器。</string>
+    <string name="download.jukebox_not_authorized">不允许远程控制. 请在您 Subsonic 服务器上的 <b>用户 &gt; 设置</b> 中打开点唱机模式。</string>
+    <string name="download.jukebox_off">已关闭远程控制，音乐将在手机上播放。</string>
+    <string name="download.jukebox_offline">离线模式不支持远程控制。</string>
+    <string name="download.jukebox_on">已打开远程控制，音乐将在服务端播放。</string>
+    <string name="download.jukebox_server_too_old">远程控制不支持，请升级您的 Subsonic 服务器。</string>
     <string name="download.jukebox_volume">远程音量</string>
     <string name="download.menu_equalizer">均衡器</string>
-    <string name="download.menu_jukebox_off">关闭 Jukebox</string>
-    <string name="download.menu_jukebox_on">开启 Jukebox</string>
+    <string name="download.menu_jukebox_off">关闭点唱机</string>
+    <string name="download.menu_jukebox_on">开启点唱机</string>
     <string name="download.menu_lyrics">歌词</string>
     <string name="download.menu_save">保存播放列表</string>
     <string name="download.menu_screen_off">关闭屏幕常亮</string>
@@ -86,7 +86,7 @@
     <string name="equalizer.label">均衡器</string>
     <string name="equalizer.preset">选择预设</string>
     <string name="error.label">错误</string>
-    <string name="jukebox.is_default">默认自动点唱机</string>
+    <string name="jukebox.is_default">默认使用点唱机</string>
     <string name="lyrics.nomatch">找不到歌词</string>
     <string name="language.default">系统默认</string>
     <string name="main.albums_alphaByArtist">按艺术家排序</string>
@@ -101,7 +101,7 @@
     <string name="main.artists_title">艺术家</string>
     <string name="main.genres_title">流派</string>
     <string name="main.offline">离线</string>
-    <string name="main.setup_server">%s - 已设置服务器</string>
+    <string name="main.setup_server">%s - 设置服务器</string>
     <string name="main.songs_random">随机</string>
     <string name="main.songs_starred">收藏夹</string>
     <string name="main.songs_title">歌曲</string>
@@ -110,13 +110,13 @@
 \n
 \n➤ 如果您想试试此应用， 可以添加试用服务器。
 \n
-\n➤ 可在 <b>设置</b>中编辑服务器配置信息。</string>
+\n➤ 可在 <b>设置</b> 中编辑服务器配置信息。</string>
     <string name="main.welcome_title">欢迎！</string>
     <string name="main.welcome_cancel">点击前往设置</string>
     <string name="menu.about">关于</string>
     <string name="menu.common">公共</string>
     <string name="menu.deleted_playlist">已删除播放列表 %s</string>
-    <string name="menu.deleted_playlist_error">播放列表删除失败%s</string>
+    <string name="menu.deleted_playlist_error">播放列表删除失败 %s</string>
     <string name="menu.downloads">下载</string>
     <string name="menu.exit">退出</string>
     <string name="menu.settings">设置</string>
@@ -136,8 +136,9 @@
     <string name="search.title">搜索</string>
     <string name="select_album.empty">找不到歌曲</string>
     <string name="select_album.n_selected">已选择 %d 首曲目</string>
-    <string name="select_album.no_network">警告：当前没有可用的网络.\n 如果您要使用移动数据，您需要在设置中允许使用流量进行下载</string>
-    <string name="select_album.no_sdcard">错误：没有SD卡</string>
+    <string name="select_album.no_network">警告：当前没有可用的网络。
+\n 如果您要使用移动数据，您需要在设置中允许使用流量进行下载。</string>
+    <string name="select_album.no_sdcard">错误：没有SD卡。</string>
     <string name="select_album.play_all">播放全部</string>
     <string name="select_artist.all_folders">所有文件夹</string>
     <string name="select_artist.folder">选择文件夹</string>
@@ -198,11 +199,11 @@
     <string name="settings.disc_sort_summary">按光盘编号和曲目编号对歌曲列表进行排序</string>
     <string name="settings.display_bitrate">展示比特率和文件后缀</string>
     <string name="settings.display_bitrate_summary">在艺术家姓名后追加比特率和文件后缀</string>
-    <string name="settings.download_transition">正在播放</string>
-    <string name="settings.hide_media_summary">隐藏来自其他应用的音乐</string>
+    <string name="settings.download_transition">播放时显示正在播放界面</string>
+    <string name="settings.hide_media_summary">隐藏来自其他应用的音乐。</string>
     <string name="settings.hide_media_title">隐藏其他来源</string>
     <string name="settings.hide_media_toast">在安卓系统下次扫描音乐时生效。</string>
-    <string name="settings.invalid_url">请填写有效的URL。</string>
+    <string name="settings.invalid_url">请填写有效的 URL。</string>
     <string name="settings.max_albums">最大专辑</string>
     <string name="settings.max_artists">最大艺术家</string>
     <string name="settings.max_bitrate_112">112 Kbps</string>
@@ -215,9 +216,9 @@
     <string name="settings.max_bitrate_64">64 Kbps</string>
     <string name="settings.max_bitrate_80">80 Kbps</string>
     <string name="settings.max_bitrate_96">96 Kbps</string>
-    <string name="settings.max_bitrate_mobile">最大比特率-移动网络</string>
+    <string name="settings.max_bitrate_mobile">最大比特率 - 移动网络</string>
     <string name="settings.max_bitrate_unlimited">不限制</string>
-    <string name="settings.max_bitrate_wifi">最大比特率-WIFI</string>
+    <string name="settings.max_bitrate_wifi">最大比特率 - WIFI</string>
     <string name="settings.max_songs">最大歌曲</string>
     <string name="settings.media_button_summary">响应手机、耳机和蓝牙设备的媒体按钮</string>
     <string name="settings.media_button_title">媒体按钮</string>
@@ -249,7 +250,7 @@
     <string name="settings.preload_5">5 首歌</string>
     <string name="settings.preload_unlimited">不限制</string>
     <string name="settings.scrobble_summary">请记得在服务器上的 Scrobble 服务中设置您的用户名和密码</string>
-    <string name="settings.scrobble_title">Scrobble我的播放列表</string>
+    <string name="settings.scrobble_title">Scrobble 我的播放列表</string>
     <string name="settings.search_1">1</string>
     <string name="settings.search_10">10</string>
     <string name="settings.search_100">100</string>
@@ -278,8 +279,8 @@
     <string name="settings.show_track_number">显示曲目编号</string>
     <string name="settings.show_track_number_summary">显示歌曲时包括曲目编号</string>
     <string name="settings.test_connection_title">测试连接</string>
-    <string name="settings.theme_light">Light</string>
-    <string name="settings.theme_dark">Dark</string>
+    <string name="settings.theme_light">亮色</string>
+    <string name="settings.theme_dark">暗色</string>
     <string name="settings.theme_black">Black</string>
     <string name="settings.theme_title">主题</string>
     <string name="settings.title.allow_self_signed_certificate">允许自签名 HTTPS 证书</string>
@@ -292,7 +293,7 @@
     <string name="settings.show_artist_picture_summary">如果可用，在艺术家列表中显示艺术家图片</string>
     <string name="main.video" tools:ignore="UnusedResources">视频</string>
     <string name="settings.wifi_required_summary">仅未计量的网络用于下载媒体</string>
-    <string name="settings.wifi_required_title">仅使用Wi-Fi进行下载</string>
+    <string name="settings.wifi_required_title">仅使用 Wi-Fi 进行下载</string>
     <string name="song_details.kbps">%d kbps</string>
     <string name="util.bytes_format.byte">0 B</string>
     <string name="util.bytes_format.gigabyte">0.00 GB</string>
@@ -330,7 +331,7 @@
     <string name="save_as_defaults">保存为默认</string>
     <string name="share_comment">评论</string>
     <string name="settings.share_expiration">有效期</string>
-    <string name="download_song_removed">%s已从播放列表中移除</string>
+    <string name="download_song_removed">%s 已从播放列表中移除</string>
     <string name="download.share_playlist">分享播放列表</string>
     <string name="download.share_song">分享当前曲目</string>
     <string name="settings.share_greeting_default">默认分享问候语</string>
@@ -338,14 +339,14 @@
     <string name="share_via">分享歌曲通过</string>
     <string name="menu.share">分享</string>
     <string name="download.menu_show_artist">显示艺术家</string>
-    <string name="common_multiple_years">Multiple Years</string>
+    <string name="common_multiple_years">数年</string>
     <string name="settings.debug.title">调试选项</string>
     <string name="settings.debug.log_to_file">将调试日志写入文件</string>
     <string name="settings.debug.log_path">日志文件可在 %1$s/%2$s 获取</string>
     <string name="settings.debug.log_summary">%3$s 目录中有 %1$s 个日志文件占用了 ~%2$s MB 空间。您想保留这些吗？</string>
     <string name="settings.debug.log_keep">保留文件</string>
     <string name="settings.debug.log_delete">删除文件</string>
-    <string name="settings.debug.log_deleted">删除日志文件</string>
+    <string name="settings.debug.log_deleted">删除日志文件。</string>
     <string name="notification.downloading_title">在后台下载媒体…</string>
     <string name="server_selector.label">配置服务器</string>
     <string name="server_selector.delete_confirmation">您确定要删除此服务器吗？</string>
@@ -373,45 +374,45 @@
         <item quantity="other">%d 首曲目</item>
     </plurals>
     <plurals name="select_album_n_songs_pinned">
-        <item quantity="other">已选择 %d 首歌曲进行固定。</item>
+        <item quantity="other">已选择 %d 首歌曲进行固定</item>
     </plurals>
     <plurals name="select_album_n_songs_downloaded">
-        <item quantity="other">已选择要下载 %d 首歌曲。</item>
+        <item quantity="other">已选择要下载 %d 首歌曲</item>
     </plurals>
     <plurals name="select_album_n_songs_unpinned">
-        <item quantity="other">已选择 %d 首歌曲取消固定。</item>
+        <item quantity="other">已选择 %d 首歌曲取消固定</item>
     </plurals>
     <plurals name="select_album_n_songs_deleted">
         <item quantity="other">%d 首歌曲被删除</item>
     </plurals>
     <plurals name="select_album_n_songs_added">
-        <item quantity="other">已将 %d 首歌曲添加到播放队列的末尾。</item>
+        <item quantity="other">已将 %d 首歌曲添加到播放队列的末尾</item>
     </plurals>
     <plurals name="select_album_n_songs_play_next">
-        <item quantity="other">在当前歌曲之后插入了 %d 首歌曲。</item>
+        <item quantity="other">在当前歌曲之后插入了 %d 首歌曲</item>
     </plurals>
     <!-- Subsonic api errors -->
-    <string name="api.subsonic.generic">一般 API 错误: %1$s</string>
+    <string name="api.subsonic.generic">一般 API 错误：%1$s</string>
     <string name="api.subsonic.generic.no.message">服务器未发送任何信息</string>
-    <string name="api.subsonic.token_auth_not_supported_for_ldap">LDAP用户不支持以token形式授权连接。</string>
-    <string name="api.subsonic.not_authenticated">用户名或密码错误</string>
-    <string name="api.subsonic.not_authorized">授权失败，请在 Subsonic server 检查用户权限。</string>
+    <string name="api.subsonic.token_auth_not_supported_for_ldap">LDAP 用户不支持以 token 形式授权连接。</string>
+    <string name="api.subsonic.not_authenticated">用户名或密码错误。</string>
+    <string name="api.subsonic.not_authorized">授权失败，请在 Subsonic 服务器上检查用户权限。</string>
     <string name="api.subsonic.param_missing">缺少必需的参数。</string>
     <string name="api.subsonic.requested_data_was_not_found">未找到请求的数据。</string>
-    <string name="api.subsonic.trial_period_is_over">试用期结束</string>
+    <string name="api.subsonic.trial_period_is_over">试用期结束。</string>
     <string name="api.subsonic.upgrade_client">版本不兼容，请升级 Ultrasonic 应用。</string>
-    <string name="api.subsonic.upgrade_server">不兼容的版本。请升级Subsonic 服务。</string>
+    <string name="api.subsonic.upgrade_server">版本不兼容，请升级 Subsonic 服务器。</string>
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">为歌曲使用五星评分</string>
     <string name="settings.preload_500">500 首歌</string>
-    <string name="settings.use_id3_offline_summary">如果您启用此设置，它将只显示您使用 Ultrasonic 4.0 或更高版本下载的音乐。较早的下载没有下载必要的元数据。您可以在 Pin 和 Save 模式之间切换，以触发缺失元数据的下载。</string>
+    <string name="settings.use_id3_offline_summary">如果您启用此设置，它将只显示您使用 Ultrasonic 4.0 或更高版本下载的音乐。较早的下载没有下载必要的元数据。您可以在固定和保存模式之间切换，以触发缺失元数据的下载。</string>
     <string name="foreground_exception_text">如果媒体通知仍然存在，请按媒体通知中的播放按钮；否则请打开应用程序开始播放，并重新连接会话到控制器</string>
     <string name="foreground_exception_title">无法恢复播放</string>
     <string name="chat.user_avatar">头像图片</string>
     <string name="common.unpin_selection_confirmation">你真的想取消固定当前选择吗\?</string>
     <string name="language.zh_CN">简体中文（中国大陆）</string>
     <string name="language.zh_TW">繁体中文（中国台湾）</string>
-    <string name="language.en"></string>
+    <string name="language.en">英语</string>
     <string name="main.albums_by_year">按时间排序</string>
     <string name="settings.download_transition_summary">在媒体库中开始播放后切换到正在播放页面</string>
     <string name="settings.increment_time">快进/快退间隔</string>
@@ -421,7 +422,7 @@
     <string name="settings.preload_50">50 首歌</string>
     <string name="settings.preload_100">100 首歌</string>
     <string name="settings.preload_1000">1000 首歌</string>
-    <string name="settings.summary.force_plain_text_password">这会强制应用程序始终以未加密的方式发送密码。如果 Subsonic 服务器不支持新的用户身份验证 API，则该选项非常有用。</string>
+    <string name="settings.summary.force_plain_text_password">这会强制应用程序始终以未加密的方式发送密码。如果此 Subsonic 服务器不支持新的用户身份验证 API，则该选项非常有用。</string>
     <string name="settings.show_now_playing_details_summary">在正在播放中展示更多歌曲细节（流派，年份，比特率）</string>
     <string name="settings.show_now_playing_details">在正在播放中展示更多歌曲细节</string>
     <string name="settings.use_id3_offline">离线时也使用 ID3 方法</string>
@@ -431,8 +432,21 @@
     <string name="notification.permission_required">需要通知权限才能进行媒体播放。您可以随时在 Android 设置中授予权限。</string>
     <string name="settings.five_star_rating_description">对歌曲使用五星评级系统，而不是简单的星标/取消星标。</string>
     <string name="settings.use_hw_offload_title">使用硬件回放(实验性)</string>
-    <string name="settings.use_hw_offload_description">尝试使用手机上的媒体解码器芯片来播放媒体。这可以改善电池使用情况。</string>
+    <string name="settings.use_hw_offload_description">尝试使用手机上的媒体解码器芯片来播放媒体。这可以改善电池使用情况。部分用户报告启用该选项后播放会有问题！</string>
     <string name="list_view">列表</string>
     <string name="grid_view">封面</string>
     <string name="supported_server_features">已支持的功能</string>
+    <string name="language.es">西班牙语</string>
+    <string name="language.fr">法语</string>
+    <string name="language.it">意大利语</string>
+    <string name="language.ru">俄语</string>
+    <string name="language.nl">荷兰语</string>
+    <string name="settings.theme_day_night">日与夜</string>
+    <string name="language.hu">匈牙利语</string>
+    <string name="language.pl">波兰语</string>
+    <string name="jukebox">点唱机</string>
+    <string name="language.pt">葡萄牙语</string>
+    <string name="language.cs">捷克语</string>
+    <string name="language.de">德语</string>
+    <string name="language.pt_BR">葡萄牙语（巴西）</string>
 </resources>

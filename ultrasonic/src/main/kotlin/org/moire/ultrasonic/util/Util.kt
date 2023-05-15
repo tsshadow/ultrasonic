@@ -148,8 +148,8 @@ object Util {
                     if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
             }
             toast!!.show()
-        } catch (_: Exception) {
-            // Ignore
+        } catch (all: Exception) {
+            Timber.w(all)
         }
     }
 
@@ -762,7 +762,7 @@ object Util {
 
     fun getPlayListFromTimeline(
         timeline: Timeline?,
-        shuffle: Boolean,
+        isShuffled: Boolean,
         firstIndex: Int? = null,
         count: Int? = null
     ): List<MediaItem> {
@@ -770,13 +770,13 @@ object Util {
         if (timeline.windowCount < 1) return emptyList()
 
         val playlist: MutableList<MediaItem> = mutableListOf()
-        var i = firstIndex ?: timeline.getFirstWindowIndex(false)
+        var i = firstIndex ?: timeline.getFirstWindowIndex(isShuffled)
         if (i == C.INDEX_UNSET) return emptyList()
 
         while (i != C.INDEX_UNSET && (count != playlist.count())) {
             val window = timeline.getWindow(i, Timeline.Window())
             playlist.add(window.mediaItem)
-            i = timeline.getNextWindowIndex(i, Player.REPEAT_MODE_OFF, shuffle)
+            i = timeline.getNextWindowIndex(i, Player.REPEAT_MODE_OFF, isShuffled)
         }
         return playlist
     }

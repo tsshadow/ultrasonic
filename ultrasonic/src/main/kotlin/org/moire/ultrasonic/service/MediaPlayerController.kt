@@ -10,20 +10,21 @@ import android.content.ComponentName
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
+import androidx.annotation.IntRange
 import androidx.media3.common.C
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.Player.COMMAND_SEEK_TO_NEXT
+import androidx.media3.common.Player.COMMAND_SEEK_TO_PREVIOUS
 import androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
 import androidx.media3.common.Player.REPEAT_MODE_OFF
+import androidx.media3.common.Rating
+import androidx.media3.common.StarRating
 import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
-import androidx.media3.session.SessionResult
 import androidx.media3.session.SessionToken
-import com.google.common.util.concurrent.FutureCallback
-import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -35,13 +36,12 @@ import org.koin.core.component.inject
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
+import org.moire.ultrasonic.data.RatingUpdate
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.playback.PlaybackService
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.util.MainThreadExecutor
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
-import org.moire.ultrasonic.util.setPin
 import org.moire.ultrasonic.util.toMediaItem
 import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
@@ -60,6 +60,7 @@ class MediaPlayerController(
     private val externalStorageMonitor: ExternalStorageMonitor,
     val context: Context
 ) : KoinComponent {
+
     private val activeServerProvider: ActiveServerProvider by inject()
 
     private var created = false
@@ -96,6 +97,14 @@ class MediaPlayerController(
          * We run the event through RxBus in order to throttle them
          */
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+            val start = controller?.currentTimeline?.getFirstWindowIndex(isShufflePlayEnabled)
+            Timber.w("On timeline changed. First shuffle play at index: %s", start)
+            deferredPlay?.let {
+                Timber.w("Executing deferred shuffle play")
+                it()
+                deferredPlay = null
+            }
+
             RxBus.playlistPublisher.onNext(playlist.map(MediaItem::toTrack))
         }
 
@@ -150,18 +159,20 @@ class MediaPlayerController(
 
         override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
             val timeline: Timeline = controller!!.currentTimeline
-            var windowIndex = timeline.getFirstWindowIndex( /* shuffleModeEnabled= */true)
+            var windowIndex = timeline.getFirstWindowIndex(true)
             var count = 0
             Timber.d("Shuffle: windowIndex: $windowIndex, at: $count")
             while (windowIndex != C.INDEX_UNSET) {
                 count++
                 windowIndex = timeline.getNextWindowIndex(
-                    windowIndex, REPEAT_MODE_OFF, /* shuffleModeEnabled= */true
+                    windowIndex, REPEAT_MODE_OFF, true
                 )
                 Timber.d("Shuffle: windowIndex: $windowIndex, at: $count")
             }
         }
     }
+
+    private var deferredPlay: (() -> Unit)? = null
 
     private var cachedMediaItem: MediaItem? = null
 
@@ -216,9 +227,19 @@ class MediaPlayerController(
             clear(false)
             onDestroy()
         }
+
         rxBusSubscription += RxBus.stopServiceCommandObservable.subscribe {
             clear(false)
             onDestroy()
+        }
+
+        rxBusSubscription += RxBus.ratingSubmitterObservable.subscribe {
+            // Ensure correct thread
+            mainScope.launch {
+                // This deals only with the current track!
+                if (it.id != currentMediaItem?.toTrack()?.id) return@launch
+                setRating(it.rating)
+            }
         }
 
         created = true
@@ -259,7 +280,7 @@ class MediaPlayerController(
     private fun publishPlaybackState() {
         val newState = RxBus.StateWithTrack(
             track = currentMediaItem?.toTrack(),
-            index = currentMediaItemIndex,
+            index = if (isShufflePlayEnabled) getCurrentShuffleIndex() else currentMediaItemIndex,
             isPlaying = isPlaying,
             state = playbackState
         )
@@ -292,7 +313,6 @@ class MediaPlayerController(
 
         addToPlaylist(
             state.songs,
-            cachePermanently = false,
             autoPlay = false,
             shuffle = false,
             insertionMode = insertionMode
@@ -316,6 +336,8 @@ class MediaPlayerController(
     @Synchronized
     fun play(index: Int) {
         controller?.seekTo(index, 0L)
+        // FIXME CHECK ITS NOT MAKING PROBLEMS
+        controller?.prepare()
         controller?.play()
     }
 
@@ -384,7 +406,6 @@ class MediaPlayerController(
     @Synchronized
     fun addToPlaylist(
         songs: List<Track>,
-        cachePermanently: Boolean,
         autoPlay: Boolean,
         shuffle: Boolean,
         insertionMode: InsertionMode
@@ -399,11 +420,11 @@ class MediaPlayerController(
 
         val mediaItems: List<MediaItem> = songs.map {
             val result = it.toMediaItem()
-            if (cachePermanently) result.setPin(true)
             result
         }
 
         if (shuffle) isShufflePlayEnabled = true
+        Timber.w("Adding ${mediaItems.size} media items")
         controller?.addMediaItems(insertAt, mediaItems)
 
         prepare()
@@ -411,10 +432,19 @@ class MediaPlayerController(
         // Playback doesn't start correctly when the player is in STATE_ENDED.
         // So we need to call seek before (this is what play(0,0)) does.
         // We can't just use play(0,0) then all random playlists will start with the first track.
-        // This means that we need to generate the random first track ourselves.
+        // Additionally the shuffle order becomes clear on after some time, so we need to wait for
+        // the right event, and can start playback only then.
         if (autoPlay) {
-            val start = controller?.currentTimeline?.getFirstWindowIndex(isShufflePlayEnabled) ?: 0
-            play(start)
+            if (isShufflePlayEnabled) {
+                deferredPlay = {
+                    val start = controller?.currentTimeline
+                        ?.getFirstWindowIndex(isShufflePlayEnabled) ?: 0
+                    Timber.i("Deferred shuffle play starting now at index: %s", start)
+                    play(start)
+                }
+            } else {
+                play(0)
+            }
         }
     }
 
@@ -422,6 +452,8 @@ class MediaPlayerController(
     var isShufflePlayEnabled: Boolean
         get() = controller?.shuffleModeEnabled == true
         set(enabled) {
+            Timber.i("Shuffle is now enabled: %s", enabled)
+            RxBus.shufflePlayPublisher.onNext(enabled)
             controller?.shuffleModeEnabled = enabled
         }
 
@@ -431,11 +463,17 @@ class MediaPlayerController(
         return isShufflePlayEnabled
     }
 
+    /**
+     * Returns an estimate of the percentage in the current content up to which data is
+     * buffered, or 0 if no estimate is available.
+     */
+    @get:IntRange(from = 0, to = 100)
     val bufferedPercentage: Int
         get() = controller?.bufferedPercentage ?: 0
 
     @Synchronized
     fun moveItemInPlaylist(oldPos: Int, newPos: Int) {
+        // TODO: This currently does not care about shuffle position.
         controller?.moveMediaItem(oldPos, newPos)
     }
 
@@ -494,13 +532,23 @@ class MediaPlayerController(
     }
 
     @Synchronized
-    fun previous() {
+    fun seekToPrevious() {
         controller?.seekToPrevious()
     }
 
     @Synchronized
-    operator fun next() {
+    fun canSeekToPrevious(): Boolean {
+        return controller?.isCommandAvailable(COMMAND_SEEK_TO_PREVIOUS) == true
+    }
+
+    @Synchronized
+    fun seekToNext() {
         controller?.seekToNext()
+    }
+
+    @Synchronized
+    fun canSeekToNext(): Boolean {
+        return controller?.isCommandAvailable(COMMAND_SEEK_TO_NEXT) == true
     }
 
     @Synchronized
@@ -656,52 +704,49 @@ class MediaPlayerController(
         controller?.volume = volume
     }
 
-    fun toggleSongStarred(): ListenableFuture<SessionResult>? {
-        if (currentMediaItem == null) return null
-        val song = currentMediaItem!!.toTrack()
-
-        return (controller as? MediaController)?.setRating(
-            HeartRating(!song.starred)
-        )?.let {
-            Futures.addCallback(
-                it,
-                object : FutureCallback<SessionResult> {
-                    override fun onSuccess(result: SessionResult?) {
-                        // Trigger an update
-                        // TODO Update Metadata of MediaItem...
-                        // localMediaPlayer.setCurrentPlaying(localMediaPlayer.currentPlaying)
-                        song.starred = !song.starred
-                    }
-
-                    override fun onFailure(t: Throwable) {
-                        Toast.makeText(
-                            context,
-                            "There was an error updating the rating",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                },
-                MainThreadExecutor()
-            )
-            it
+    /*
+    * Sets the rating of the current track
+    */
+    fun setRating(rating: Rating) {
+        if (controller is MediaController) {
+            (controller as MediaController).setRating(rating)
         }
     }
 
-    @Suppress("TooGenericExceptionCaught") // The interface throws only generic exceptions
-    fun setSongRating(rating: Int) {
-        if (!Settings.useFiveStarRating) return
+    /*
+    * This legacy function simply emits a rating update,
+    * which will then be processed by both the RatingManager as well as the controller
+    */
+    fun legacyToggleStar() {
         if (currentMediaItem == null) return
-        val song = currentMediaItem!!.toTrack()
-        song.userRating = rating
-        Thread {
-            try {
-                getMusicService().setRating(song.id, rating)
-            } catch (e: Exception) {
-                Timber.e(e)
-            }
-        }.start()
-        // TODO this would be better handled with a Rx command
-        // updateNotification()
+        val track = currentMediaItem!!.toTrack()
+        track.starred = !track.starred
+        val rating = HeartRating(track.starred)
+
+        RxBus.ratingSubmitter.onNext(
+            RatingUpdate(
+                track.id,
+                rating
+            )
+        )
+    }
+
+    /*
+     * This legacy function simply emits a rating update,
+     * which will then be processed by both the RatingManager as well as the controller
+     */
+    fun legacySetRating(num: Int) {
+        if (currentMediaItem == null) return
+        val track = currentMediaItem!!.toTrack()
+        track.userRating = num
+        val rating = StarRating(5, num.toFloat())
+
+        RxBus.ratingSubmitter.onNext(
+            RatingUpdate(
+                track.id,
+                rating
+            )
+        )
     }
 
     val currentMediaItem: MediaItem?
@@ -710,8 +755,63 @@ class MediaPlayerController(
     val currentMediaItemIndex: Int
         get() = controller?.currentMediaItemIndex ?: -1
 
+    fun getCurrentShuffleIndex(): Int {
+        val currentMediaItemIndex = controller?.currentMediaItemIndex ?: return -1
+        return getShuffledIndexOf(currentMediaItemIndex)
+    }
+
+    /**
+     * Loops over the timeline windows to find the entry which matches the given closure.
+     *
+     * @param searchClosure Determines the condition which the searched for window needs to match.
+     * @return the index of the window that satisfies the search condition,
+     * or [C.INDEX_UNSET] if not found.
+     */
+    private fun getWindowIndexWhere(searchClosure: (Int, Int) -> Boolean): Int {
+        val timeline = controller?.currentTimeline!!
+        var windowIndex = timeline.getFirstWindowIndex(true)
+        var count = 0
+        while (windowIndex != C.INDEX_UNSET) {
+            if (searchClosure(count, windowIndex)) return count
+            count++
+            windowIndex = timeline.getNextWindowIndex(
+                windowIndex, REPEAT_MODE_OFF, true
+            )
+        }
+
+        return C.INDEX_UNSET
+    }
+
+    /**
+     * Returns the index of the shuffled position of the current playback item given its original
+     * position in the unshuffled timeline.
+     *
+     * @param searchPosition The index of the item in the unshuffled timeline to search for
+     * in the shuffled timeline.
+     * @return The index of the item in the shuffled timeline, or [C.INDEX_UNSET] if not found.
+     */
+    fun getShuffledIndexOf(searchPosition: Int): Int {
+        return getWindowIndexWhere { _, windowIndex -> windowIndex == searchPosition }
+    }
+
+    /**
+     * Returns the index of the unshuffled position of the current playback item given its shuffled
+     * position in the shuffled timeline.
+     *
+     * @param shufflePosition the index of the item in the shuffled timeline to search for in the
+     * unshuffled timeline.
+     * @return the index of the item in the unshuffled timeline, or [C.INDEX_UNSET] if not found.
+     */
+    fun getUnshuffledIndexOf(shufflePosition: Int): Int {
+        return getWindowIndexWhere { count, _ -> count == shufflePosition }
+    }
+
     val mediaItemCount: Int
         get() = controller?.mediaItemCount ?: 0
+
+    fun getMediaItemAt(index: Int): MediaItem? {
+        return controller?.getMediaItemAt(index)
+    }
 
     val playlistSize: Int
         get() = controller?.currentTimeline?.windowCount ?: 0
@@ -720,10 +820,6 @@ class MediaPlayerController(
         get() {
             return Util.getPlayListFromTimeline(controller?.currentTimeline, false)
         }
-
-    fun getMediaItemAt(index: Int): MediaItem? {
-        return controller?.getMediaItemAt(index)
-    }
 
     val playlistInPlayOrder: List<MediaItem>
         get() {

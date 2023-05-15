@@ -71,7 +71,7 @@
     <string name="download.menu_save">Save Playlist</string>
     <string name="download.menu_screen_off">Screen Off</string>
     <string name="download.menu_screen_on">Screen On</string>
-    <string name="download.menu_show_album">Show Album</string>
+    <string name="download.menu_show_album">Go to Album</string>
     <string name="download.menu_shuffle">Shuffle</string>
     <string name="download.menu_shuffle_on">Shuffle mode enabled</string>
     <string name="download.menu_shuffle_off">Shuffle mode disabled</string>
@@ -367,7 +367,7 @@
     <string name="share_default_greeting">Check out this music I shared from %s</string>
     <string name="share_via">Share songs via</string>
     <string name="menu.share">Share</string>
-    <string name="download.menu_show_artist">Show Artist</string>
+    <string name="download.menu_show_artist">Go to Artist</string>
     <string name="albumArt">Album artwork</string>
     <string name="common_multiple_years">Multiple Years</string>
     <string name="settings.show_confirmation_dialog">Show confirmation dialog</string>

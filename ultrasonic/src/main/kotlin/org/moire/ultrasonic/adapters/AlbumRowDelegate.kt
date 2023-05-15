@@ -15,17 +15,17 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.media3.common.HeartRating
 import androidx.recyclerview.widget.RecyclerView
 import com.drakeet.multitype.ItemViewDelegate
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.data.RatingUpdate
 import org.moire.ultrasonic.domain.Album
-import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.LayoutType
-import org.moire.ultrasonic.util.Settings.shouldUseId3Tags
-import timber.log.Timber
 
 /**
  * Creates a Row in a RecyclerView which contains the details of an Album
@@ -112,27 +112,13 @@ open class AlbumRowDelegate(
     private fun onStarClick(entry: Album, star: ImageView) {
         entry.starred = !entry.starred
         star.setImageResource(if (entry.starred) starDrawable else starHollowDrawable)
-        val musicService = getMusicService()
-        Thread {
-            val useId3 = shouldUseId3Tags
-            try {
-                if (entry.starred) {
-                    musicService.star(
-                        if (!useId3) entry.id else null,
-                        if (useId3) entry.id else null,
-                        null
-                    )
-                } else {
-                    musicService.unstar(
-                        if (!useId3) entry.id else null,
-                        if (useId3) entry.id else null,
-                        null
-                    )
-                }
-            } catch (all: Exception) {
-                Timber.e(all)
-            }
-        }.start()
+
+        RxBus.ratingSubmitter.onNext(
+            RatingUpdate(
+                entry.id,
+                HeartRating(entry.starred)
+            )
+        )
     }
 
     override fun onCreateViewHolder(context: Context, parent: ViewGroup): ListViewHolder {

@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
+import androidx.media3.common.HeartRating
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -19,10 +20,10 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.data.RatingUpdate
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.DownloadState
-import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.Settings
@@ -81,7 +82,6 @@ class TrackViewHolder(val view: View) :
         draggable: Boolean,
         isSelected: Boolean = false
     ) {
-        // Timber.v("Setting song")
         val useFiveStarRating = Settings.useFiveStarRating
         entry = song
 
@@ -118,9 +118,9 @@ class TrackViewHolder(val view: View) :
         }
 
         if (useFiveStarRating) {
-            setFiveStars(entry?.userRating ?: 0)
+            updateFiveStars(entry?.userRating ?: 0)
         } else {
-            setSingleStar(entry!!.starred)
+            updateSingleStar(entry!!.starred)
         }
 
         if (song.isVideo) {
@@ -131,7 +131,7 @@ class TrackViewHolder(val view: View) :
         // Create new Disposable for the new Subscriptions
         rxBusSubscription = CompositeDisposable()
         rxBusSubscription!! += RxBus.playerStateObservable.subscribe {
-            setPlayIcon(it.index == bindingAdapterPosition && it.track?.id == song.id)
+            setPlayIcon(it.track?.id == song.id && it.index == bindingAdapterPosition)
         }
 
         rxBusSubscription!! += RxBus.trackDownloadStateObservable.subscribe {
@@ -165,48 +165,32 @@ class TrackViewHolder(val view: View) :
         }
     }
 
-    private fun setupStarButtons(song: Track, useFiveStarRating: Boolean) {
+    private fun setupStarButtons(track: Track, useFiveStarRating: Boolean) {
         if (useFiveStarRating) {
             // Hide single star
             star.isGone = true
             rating.isVisible = true
-            val rating = if (song.userRating == null) 0 else song.userRating!!
-            setFiveStars(rating)
+            val rating = if (track.userRating == null) 0 else track.userRating!!
+            updateFiveStars(rating)
+
+            // Five star rating has no click handler because in the
+            // track view theres not enough space
         } else {
             star.isVisible = true
             rating.isGone = true
-            setSingleStar(song.starred)
+            updateSingleStar(track.starred)
             star.setOnClickListener {
-                val isStarred = song.starred
-                val id = song.id
-
-                if (!isStarred) {
-                    star.setImageResource(R.drawable.ic_star_full)
-                    song.starred = true
-                } else {
-                    star.setImageResource(R.drawable.ic_star_hollow)
-                    song.starred = false
-                }
-
-                // Should this be done here ?
-                Thread {
-                    val musicService = MusicServiceFactory.getMusicService()
-                    try {
-                        if (!isStarred) {
-                            musicService.star(id, null, null)
-                        } else {
-                            musicService.unstar(id, null, null)
-                        }
-                    } catch (all: Exception) {
-                        Timber.e(all)
-                    }
-                }.start()
+                track.starred = !track.starred
+                updateSingleStar(track.starred)
+                RxBus.ratingSubmitter.onNext(
+                    RatingUpdate(track.id, HeartRating(track.starred))
+                )
             }
         }
     }
 
     @Suppress("MagicNumber")
-    private fun setFiveStars(rating: Int) {
+    private fun updateFiveStars(rating: Int) {
         fiveStar1.setImageResource(
             if (rating > 0) R.drawable.ic_star_full else R.drawable.ic_star_hollow
         )
@@ -224,7 +208,7 @@ class TrackViewHolder(val view: View) :
         )
     }
 
-    private fun setSingleStar(starred: Boolean) {
+    private fun updateSingleStar(starred: Boolean) {
         if (starred) {
             star.setImageResource(R.drawable.ic_star_full)
         } else {

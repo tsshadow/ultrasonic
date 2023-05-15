@@ -21,6 +21,7 @@ import org.moire.ultrasonic.domain.GenericEntry
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
+import org.moire.ultrasonic.subsonic.DownloadAction
 import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.util.Settings
 
@@ -129,81 +130,54 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
         ): Boolean {
             when (menuItem.itemId) {
                 R.id.menu_play_now ->
-                    downloadHandler.downloadRecursively(
+                    downloadHandler.fetchTracksAndAddToController(
                         fragment,
                         item.id,
-                        save = false,
                         append = false,
                         autoPlay = true,
                         shuffle = false,
-                        background = false,
                         playNext = false,
-                        unpin = false,
                         isArtist = isArtist
                     )
                 R.id.menu_play_next ->
-                    downloadHandler.downloadRecursively(
+                    downloadHandler.fetchTracksAndAddToController(
                         fragment,
                         item.id,
-                        save = false,
                         append = false,
                         autoPlay = true,
                         shuffle = true,
-                        background = false,
                         playNext = true,
-                        unpin = false,
                         isArtist = isArtist
                     )
                 R.id.menu_play_last ->
-                    downloadHandler.downloadRecursively(
+                    downloadHandler.fetchTracksAndAddToController(
                         fragment,
                         item.id,
-                        save = false,
                         append = true,
                         autoPlay = false,
                         shuffle = false,
-                        background = false,
                         playNext = false,
-                        unpin = false,
                         isArtist = isArtist
                     )
                 R.id.menu_pin ->
-                    downloadHandler.downloadRecursively(
+                    downloadHandler.justDownload(
+                        action = DownloadAction.PIN,
                         fragment,
                         item.id,
-                        save = true,
-                        append = true,
-                        autoPlay = false,
-                        shuffle = false,
-                        background = false,
-                        playNext = false,
-                        unpin = false,
                         isArtist = isArtist
                     )
                 R.id.menu_unpin ->
-                    downloadHandler.downloadRecursively(
+                    downloadHandler.justDownload(
+                        action = DownloadAction.UNPIN,
                         fragment,
                         item.id,
-                        save = false,
-                        append = false,
-                        autoPlay = false,
-                        shuffle = false,
-                        background = false,
-                        playNext = false,
-                        unpin = true,
                         isArtist = isArtist
                     )
                 R.id.menu_download ->
-                    downloadHandler.downloadRecursively(
+                    downloadHandler.justDownload(
+                        action = DownloadAction.DOWNLOAD,
                         fragment,
                         item.id,
-                        save = false,
-                        append = false,
-                        autoPlay = false,
-                        shuffle = false,
-                        background = true,
-                        playNext = false,
-                        unpin = false,
                         isArtist = isArtist
                     )
                 else -> return false
