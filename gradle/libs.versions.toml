@@ -12,7 +12,7 @@ preferences            = "1.2.0"
 media3                 = "1.0.1"
 
 androidSupport         = "1.6.0"
-materialDesign         = "1.8.0"
+materialDesign         = "1.9.0"
 constraintLayout       = "2.1.4"
 multidex               = "2.0.1"
 room                   = "2.5.1"
