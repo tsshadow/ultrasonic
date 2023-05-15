@@ -1,2 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="background_task.loading">Cargando…</string>
+    <string name="background_task.network_error">Ocorreu un erro de rede. Por favor comproba a dirección do servidor ou téntao de novo mais tarde.</string>
+    <string name="background_task.unsupported_api">A API do servidor v%1$s non admite esta función.</string>
+    <string name="background_task.no_network">Este programa require acceso á rede. Por favor acende a Wi-Fi ou a rede móbil.</string>
+    <string name="background_task.not_found">Recurso non atopado. Por favor comproba a dirección do servidor.</string>
+    <string name="background_task.parse_error">Non se entende a resposta. Por favor comproba a dirección do servidor.</string>
+    <string name="background_task.ssl_cert_error">Erro do certificado HTTPS: %1$s.</string>
+    <string name="background_task.ssl_error">Excepción de conexión SSL. Comprobe o certificado do servidor.</string>
+    <string name="background_task.wait">Por favor agarde…</string>
+    <string name="button_bar.browse">Biblioteca</string>
+    <string name="button_bar.chat">Chat</string>
+    <string name="button_bar.now_playing">Reproducindo agora</string>
+    <string name="buttons.play">Reproducir</string>
+    <string name="buttons.pause">Pausar</string>
+    <string name="buttons.repeat">Repetir</string>
+    <string name="buttons.shuffle">Mesturar</string>
+    <string name="buttons.stop">Parar</string>
+    <string name="buttons.next">Seguinte</string>
+    <string name="buttons.previous">Anterior</string>
+    <string name="podcasts.label">Podcast</string>
+    <string name="podcasts_channels.empty">Non hai canles de Podcasts rexistrados</string>
+    <string name="button_bar.podcasts">Podcast</string>
+    <string name="button_bar.search">Buscar</string>
+    <string name="chat.send_a_message">Enviar unha mensaxe</string>
+</resources>

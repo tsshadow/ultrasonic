@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
+import org.moire.ultrasonic.data.RatingUpdate
 import org.moire.ultrasonic.domain.Track
 
 class RxBus {
@@ -20,9 +21,13 @@ class RxBus {
 
         private fun mainThread() = AndroidSchedulers.from(Looper.getMainLooper())
 
+        val shufflePlayPublisher: PublishSubject<Boolean> =
+            PublishSubject.create()
+        val shufflePlayObservable: Observable<Boolean> =
+            shufflePlayPublisher
+
         var activeServerChangingPublisher: PublishSubject<Int> =
             PublishSubject.create()
-
         // Subscribers should be called synchronously, not on another thread
         var activeServerChangingObservable: Observable<Int> =
             activeServerChangingPublisher
@@ -70,6 +75,18 @@ class RxBus {
             PublishSubject.create()
         val trackDownloadStateObservable: Observable<TrackDownloadState> =
             trackDownloadStatePublisher.observeOn(mainThread())
+
+        // Sends a RatingUpdate which was just triggered by the user
+        val ratingSubmitter: PublishSubject<RatingUpdate> =
+            PublishSubject.create()
+        val ratingSubmitterObservable: Observable<RatingUpdate> =
+            ratingSubmitter
+
+        // Sends a RatingUpdate which was successfully submitted to the server or database
+        val ratingPublished: PublishSubject<RatingUpdate> =
+            PublishSubject.create()
+        val ratingPublishedObservable: Observable<RatingUpdate> =
+            ratingPublished
 
         // Commands
         val dismissNowPlayingCommandPublisher: PublishSubject<Unit> =

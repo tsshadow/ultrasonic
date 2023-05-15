@@ -35,11 +35,15 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.ViewFlipper
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.session.SessionResult
+import androidx.media3.common.StarRating
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -49,8 +53,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
-import com.google.common.util.concurrent.FutureCallback
-import com.google.common.util.concurrent.Futures
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -76,6 +78,7 @@ import org.moire.ultrasonic.adapters.TrackViewBinder
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
+import org.moire.ultrasonic.data.RatingUpdate
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
@@ -98,7 +101,7 @@ import timber.log.Timber
 
 /**
  * Contains the Music Player screen of Ultrasonic with playback controls and the playlist
- * TODO: Add timeline lister -> updateProgressBar().
+ *
  */
 @Suppress("LargeClass", "TooManyFunctions", "MagicNumber")
 class PlayerFragment :
@@ -132,7 +135,6 @@ class PlayerFragment :
 
     // Views and UI Elements
     private lateinit var playlistNameView: EditText
-    private lateinit var starMenuItem: MenuItem
     private lateinit var fiveStar1ImageView: ImageView
     private lateinit var fiveStar2ImageView: ImageView
     private lateinit var fiveStar3ImageView: ImageView
@@ -154,6 +156,8 @@ class PlayerFragment :
     private lateinit var pauseButton: View
     private lateinit var stopButton: View
     private lateinit var playButton: View
+    private lateinit var previousButton: MaterialButton
+    private lateinit var nextButton: MaterialButton
     private lateinit var shuffleButton: View
     private lateinit var repeatButton: MaterialButton
     private lateinit var progressBar: SeekBar
@@ -196,6 +200,8 @@ class PlayerFragment :
         pauseButton = view.findViewById(R.id.button_pause)
         stopButton = view.findViewById(R.id.button_stop)
         playButton = view.findViewById(R.id.button_start)
+        nextButton = view.findViewById(R.id.button_next)
+        previousButton = view.findViewById(R.id.button_previous)
         repeatButton = view.findViewById(R.id.button_repeat)
         fiveStar1ImageView = view.findViewById(R.id.song_five_star_1)
         fiveStar2ImageView = view.findViewById(R.id.song_five_star_2)
@@ -226,7 +232,13 @@ class PlayerFragment :
             height = size.y
         }
 
-        setHasOptionsMenu(true)
+        // Register our options menu
+        (requireActivity() as MenuHost).addMenuProvider(
+            menuProvider,
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
+
         useFiveStarRating = Settings.useFiveStarRating
         swipeDistance = (width + height) * PERCENTAGE_OF_SCREEN_FOR_SWIPE / 100
         swipeVelocity = swipeDistance
@@ -259,9 +271,7 @@ class PlayerFragment :
         previousButton.setOnClickListener {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             launch(CommunicationError.getHandler(context)) {
-                mediaPlayerController.previous()
-                onCurrentChanged()
-                onSliderProgressChanged()
+                mediaPlayerController.seekToPrevious()
             }
         }
 
@@ -272,9 +282,7 @@ class PlayerFragment :
         nextButton.setOnClickListener {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             launch(CommunicationError.getHandler(context)) {
-                mediaPlayerController.next()
-                onCurrentChanged()
-                onSliderProgressChanged()
+                mediaPlayerController.seekToNext()
             }
         }
 
@@ -285,16 +293,12 @@ class PlayerFragment :
         pauseButton.setOnClickListener {
             launch(CommunicationError.getHandler(context)) {
                 mediaPlayerController.pause()
-                onCurrentChanged()
-                onSliderProgressChanged()
             }
         }
 
         stopButton.setOnClickListener {
             launch(CommunicationError.getHandler(context)) {
                 mediaPlayerController.reset()
-                onCurrentChanged()
-                onSliderProgressChanged()
             }
         }
 
@@ -304,8 +308,6 @@ class PlayerFragment :
 
             launch(CommunicationError.getHandler(context)) {
                 mediaPlayerController.play()
-                onCurrentChanged()
-                onSliderProgressChanged()
             }
         }
 
@@ -342,7 +344,6 @@ class PlayerFragment :
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 launch(CommunicationError.getHandler(context)) {
                     mediaPlayerController.seekTo(progressBar.progress)
-                    onSliderProgressChanged()
                 }
             }
 
@@ -367,11 +368,13 @@ class PlayerFragment :
         // Observe playlist changes and update the UI
         rxBusSubscription += RxBus.playlistObservable.subscribe {
             onPlaylistChanged()
-            onSliderProgressChanged()
+            updateSeekBar()
         }
 
         rxBusSubscription += RxBus.playerStateObservable.subscribe {
             update()
+            updateTitle(it.state)
+            updateButtonStates(it.state)
         }
 
         // Query the Jukebox state in an IO Context
@@ -432,7 +435,7 @@ class PlayerFragment :
         } else {
             // Download list and Album art must be updated when resumed
             onPlaylistChanged()
-            onCurrentChanged()
+            onTrackChanged()
         }
 
         val handler = Handler(Looper.getMainLooper())
@@ -472,22 +475,54 @@ class PlayerFragment :
         super.onDestroyView()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.nowplaying, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+    private val menuProvider: MenuProvider = object : MenuProvider {
+        override fun onPrepareMenu(menu: Menu) {
+            setupOptionsMenu(menu)
+        }
+
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.nowplaying, menu)
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+            return menuItemSelected(menuItem.itemId, currentSong)
+        }
     }
 
     @Suppress("ComplexMethod", "LongMethod", "NestedBlockDepth")
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
+    fun setupOptionsMenu(menu: Menu) {
+        // Seems there is nothing like ViewBinding for Menus
         val screenOption = menu.findItem(R.id.menu_item_screen_on_off)
+        val goToAlbum = menu.findItem(R.id.menu_show_album)
+        val goToArtist = menu.findItem(R.id.menu_show_artist)
         val jukeboxOption = menu.findItem(R.id.menu_item_jukebox)
         val equalizerMenuItem = menu.findItem(R.id.menu_item_equalizer)
         val shareMenuItem = menu.findItem(R.id.menu_item_share)
         val shareSongMenuItem = menu.findItem(R.id.menu_item_share_song)
-        starMenuItem = menu.findItem(R.id.menu_item_star)
+        val starMenuItem = menu.findItem(R.id.menu_item_star)
         val bookmarkMenuItem = menu.findItem(R.id.menu_item_bookmark_set)
         val bookmarkRemoveMenuItem = menu.findItem(R.id.menu_item_bookmark_delete)
+
+        // Listen to rating changes and update the UI
+        rxBusSubscription += RxBus.ratingPublishedObservable.subscribe { update ->
+
+            // Ignore updates which are not for the current song
+            if (update.id != currentSong?.id) return@subscribe
+
+            // Ensure UI thread
+            launch {
+                if (update.success == true && update.rating is HeartRating) {
+                    if (update.rating.isHeart) {
+                        starMenuItem.setIcon(fullStar)
+                    } else {
+                        starMenuItem.setIcon(hollowStar)
+                    }
+                } else if (update.success == false) {
+                    Toast.makeText(context, "Setting rating failed", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
 
         if (isOffline()) {
             if (shareMenuItem != null) {
@@ -505,6 +540,7 @@ class PlayerFragment :
             equalizerMenuItem.isEnabled = isEqualizerAvailable
             equalizerMenuItem.isVisible = isEqualizerAvailable
         }
+
         val mediaPlayerController = mediaPlayerController
         val track = mediaPlayerController.currentMediaItem?.toTrack()
 
@@ -517,9 +553,13 @@ class PlayerFragment :
         if (currentSong != null) {
             starMenuItem.setIcon(if (currentSong!!.starred) fullStar else hollowStar)
             shareSongMenuItem.isVisible = true
+            goToAlbum.isVisible = true
+            goToArtist.isVisible = true
         } else {
             starMenuItem.setIcon(hollowStar)
             shareSongMenuItem.isVisible = false
+            goToAlbum.isVisible = false
+            goToArtist.isVisible = false
         }
 
         if (mediaPlayerController.keepScreenOn) {
@@ -558,10 +598,6 @@ class PlayerFragment :
         popup.menu.findItem(R.id.menu_lyrics)?.isVisible = !isOffline()
         popup.show()
         return popup
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return menuItemSelected(item.itemId, currentSong) || super.onOptionsItemSelected(item)
     }
 
     private fun onContextMenuItemSelected(
@@ -660,31 +696,11 @@ class PlayerFragment :
             }
             R.id.menu_item_star -> {
                 if (track == null) return true
+                track.starred = !track.starred
 
-                val isStarred = track.starred
-
-                mediaPlayerController.toggleSongStarred()?.let {
-                    Futures.addCallback(
-                        it,
-                        object : FutureCallback<SessionResult> {
-                            override fun onSuccess(result: SessionResult?) {
-                                if (isStarred) {
-                                    starMenuItem.setIcon(hollowStar)
-                                    track.starred = false
-                                } else {
-                                    starMenuItem.setIcon(fullStar)
-                                    track.starred = true
-                                }
-                            }
-
-                            override fun onFailure(t: Throwable) {
-                                Toast.makeText(context, "SetRating failed", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        },
-                        this.executorService
-                    )
-                }
+                RxBus.ratingSubmitter.onNext(
+                    RatingUpdate(track.id, HeartRating(track.starred))
+                )
 
                 return true
             }
@@ -764,10 +780,9 @@ class PlayerFragment :
         if (cancel?.isCancellationRequested == true) return
         val mediaPlayerController = mediaPlayerController
         if (currentSong?.id != mediaPlayerController.currentMediaItem?.mediaId) {
-            onCurrentChanged()
+            onTrackChanged()
         }
-        onSliderProgressChanged()
-        requireActivity().invalidateOptionsMenu()
+        updateSeekBar()
     }
 
     private fun savePlaylistInBackground(playlistName: String) {
@@ -827,12 +842,9 @@ class PlayerFragment :
         }
 
         // Create listener
-        val clickHandler: ((Track, Int) -> Unit) = { _, pos ->
-            mediaPlayerController.seekTo(pos, 0)
-            mediaPlayerController.prepare()
-            mediaPlayerController.play()
-            onCurrentChanged()
-            onSliderProgressChanged()
+        val clickHandler: ((Track, Int) -> Unit) = { _, listPos ->
+            val mediaIndex = mediaPlayerController.getUnshuffledIndexOf(listPos)
+            mediaPlayerController.play(mediaIndex)
         }
 
         viewAdapter.register(
@@ -931,6 +943,7 @@ class PlayerFragment :
                 if (actionState == ACTION_STATE_IDLE && dragging) {
                     dragging = false
                     // Move the item in the playlist separately
+                    Timber.i("Moving item %s to %s", startPosition, endPosition)
                     mediaPlayerController.moveItemInPlaylist(startPosition, endPosition)
                 }
             }
@@ -1010,7 +1023,8 @@ class PlayerFragment :
 
     private fun onPlaylistChanged() {
         val mediaPlayerController = mediaPlayerController
-        val list = mediaPlayerController.playlist
+        // Try to display playlist in play order
+        val list = mediaPlayerController.playlistInPlayOrder
         emptyTextView.setText(R.string.playlist_empty)
 
         viewAdapter.submitList(list.map(MediaItem::toTrack))
@@ -1020,7 +1034,7 @@ class PlayerFragment :
         updateRepeatButtonState(mediaPlayerController.repeatMode)
     }
 
-    private fun onCurrentChanged() {
+    private fun onTrackChanged() {
         currentSong = mediaPlayerController.currentMediaItem?.toTrack()
 
         scrollToCurrent()
@@ -1064,7 +1078,7 @@ class PlayerFragment :
                 it.loadImage(albumArtImageView, currentSong, true, 0)
             }
 
-            displaySongRating()
+            updateSongRating()
         } else {
             currentSong = null
             songTitleTextView.text = null
@@ -1078,24 +1092,24 @@ class PlayerFragment :
                 it.loadImage(albumArtImageView, null, true, 0)
             }
         }
+
+        updateSongRating()
+
+        nextButton.isEnabled = mediaPlayerController.canSeekToNext()
+        previousButton.isEnabled = mediaPlayerController.canSeekToPrevious()
     }
 
-    @Suppress("LongMethod")
     @Synchronized
-    private fun onSliderProgressChanged() {
-
+    private fun updateSeekBar() {
         val isJukeboxEnabled: Boolean = mediaPlayerController.isJukeboxEnabled
         val millisPlayed: Int = max(0, mediaPlayerController.playerPosition)
         val duration: Int = mediaPlayerController.playerDuration
         val playbackState: Int = mediaPlayerController.playbackState
-        val isPlaying = mediaPlayerController.isPlaying
 
-        if (cancellationToken.isCancellationRequested) return
         if (currentSong != null) {
             positionTextView.text = Util.formatTotalDuration(millisPlayed.toLong(), true)
             durationTextView.text = Util.formatTotalDuration(duration.toLong(), true)
-            progressBar.max =
-                if (duration == 0) 100 else duration // Work-around for apparent bug.
+            progressBar.max = if (duration == 0) 100 else duration // Work-around for apparent bug.
             progressBar.progress = millisPlayed
             progressBar.isEnabled = mediaPlayerController.isPlaying || isJukeboxEnabled
         } else {
@@ -1107,18 +1121,18 @@ class PlayerFragment :
         }
 
         val progress = mediaPlayerController.bufferedPercentage
+        updateBufferProgress(playbackState, progress)
+    }
 
+    private fun updateTitle(playbackState: Int) {
         when (playbackState) {
             Player.STATE_BUFFERING -> {
-
                 val downloadStatus = resources.getString(
                     R.string.download_playerstate_loading
                 )
-                progressBar.secondaryProgress = progress
                 setTitle(this@PlayerFragment, downloadStatus)
             }
             Player.STATE_READY -> {
-                progressBar.secondaryProgress = progress
                 if (mediaPlayerController.isShufflePlayEnabled) {
                     setTitle(
                         this@PlayerFragment,
@@ -1128,13 +1142,22 @@ class PlayerFragment :
                     setTitle(this@PlayerFragment, R.string.common_appname)
                 }
             }
-            Player.STATE_IDLE,
-            Player.STATE_ENDED,
-            -> {
-            }
+            Player.STATE_IDLE, Player.STATE_ENDED -> {}
             else -> setTitle(this@PlayerFragment, R.string.common_appname)
         }
+    }
 
+    private fun updateBufferProgress(playbackState: Int, progress: Int) {
+        when (playbackState) {
+            Player.STATE_BUFFERING, Player.STATE_READY -> {
+                progressBar.secondaryProgress = progress
+            }
+            else -> { }
+        }
+    }
+
+    private fun updateButtonStates(playbackState: Int) {
+        val isPlaying = mediaPlayerController.isPlaying
         when (playbackState) {
             Player.STATE_READY -> {
                 pauseButton.isVisible = isPlaying
@@ -1152,10 +1175,6 @@ class PlayerFragment :
                 playButton.isVisible = true
             }
         }
-
-        // TODO: It would be a lot nicer if MediaPlayerController would send an event
-        // when this is necessary instead of updating every time
-        displaySongRating()
     }
 
     private fun seek(forward: Boolean) {
@@ -1189,18 +1208,14 @@ class PlayerFragment :
         // Right to Left swipe
         if (e1X - e2X > swipeDistance && absX > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.next()
-            onCurrentChanged()
-            onSliderProgressChanged()
+            mediaPlayerController.seekToNext()
             return true
         }
 
         // Left to Right swipe
         if (e2X - e1X > swipeDistance && absX > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.previous()
-            onCurrentChanged()
-            onSliderProgressChanged()
+            mediaPlayerController.seekToPrevious()
             return true
         }
 
@@ -1208,7 +1223,6 @@ class PlayerFragment :
         if (e2Y - e1Y > swipeDistance && absY > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             mediaPlayerController.seekTo(mediaPlayerController.playerPosition + 30000)
-            onSliderProgressChanged()
             return true
         }
 
@@ -1216,7 +1230,6 @@ class PlayerFragment :
         if (e1Y - e2Y > swipeDistance && absY > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             mediaPlayerController.seekTo(mediaPlayerController.playerPosition - 8000)
-            onSliderProgressChanged()
             return true
         }
         return false
@@ -1237,12 +1250,8 @@ class PlayerFragment :
         return false
     }
 
-    private fun displaySongRating() {
-        var rating = 0
-
-        if (currentSong?.userRating != null) {
-            rating = currentSong!!.userRating!!
-        }
+    private fun updateSongRating() {
+        val rating = currentSong?.userRating ?: 0
 
         fiveStar1ImageView.setImageResource(if (rating > 0) fullStar else hollowStar)
         fiveStar2ImageView.setImageResource(if (rating > 1) fullStar else hollowStar)
@@ -1253,8 +1262,15 @@ class PlayerFragment :
 
     private fun setSongRating(rating: Int) {
         if (currentSong == null) return
-        displaySongRating()
-        mediaPlayerController.setSongRating(rating)
+        currentSong?.userRating = rating
+        updateSongRating()
+
+        RxBus.ratingSubmitter.onNext(
+            RatingUpdate(
+                currentSong!!.id,
+                StarRating(5, rating.toFloat())
+            )
+        )
     }
 
     @SuppressLint("InflateParams")

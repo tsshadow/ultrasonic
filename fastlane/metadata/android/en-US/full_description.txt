@@ -3,12 +3,12 @@ Ultrasonic is a Subsonic (and compatible servers) client to Android. You can use
 Main features:
 * Thin
 * Fast
-* Dark and light theme
+* Material theme with dark and light variants
 * Multiple server support
 * Offline Mode
 * Bookmarks
 * Playlists on server
-* Ramdom play
+* Random play
 * Jukebox mode
 * Server chat
 * And much more!!!

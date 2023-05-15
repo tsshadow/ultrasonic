@@ -9,8 +9,8 @@ android {
 
     defaultConfig {
         applicationId "org.moire.ultrasonic"
-        versionCode 117
-        versionName "4.3.4"
+        versionCode 119
+        versionName "4.4.0"
 
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
@@ -34,7 +34,7 @@ android {
             minifyEnabled false
             multiDexEnabled true
             testCoverageEnabled true
-            applicationIdSuffix ".debug"
+            applicationIdSuffix '.debug'
         }
     }
 
@@ -56,6 +56,7 @@ android {
     buildFeatures {
         viewBinding true
         dataBinding true
+        buildConfig true
     }
 
     compileOptions {
@@ -136,7 +137,6 @@ dependencies {
     testImplementation libs.kotlinJunit
     testImplementation libs.kluent
     testImplementation libs.mockito
-    testImplementation libs.mockitoInline
     testImplementation libs.mockitoKotlin
     testImplementation libs.robolectric
 
