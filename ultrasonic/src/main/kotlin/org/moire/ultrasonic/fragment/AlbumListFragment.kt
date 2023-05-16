@@ -138,8 +138,8 @@ class AlbumListFragment(
     )
 
     private fun getListOfSortOrders(): List<SortOrder> {
-        val useId3 = Settings.shouldUseId3Tags
-        val useId3Offline = Settings.useId3TagsOffline
+        val useId3 = Settings.id3TagsEnabledOnline
+        val useId3Offline = Settings.id3TagsEnabledOffline
         val isOnline = !ActiveServerProvider.isOffline()
 
         val supported = mutableListOf<SortOrder>()

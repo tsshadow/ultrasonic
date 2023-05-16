@@ -78,6 +78,7 @@ import org.moire.ultrasonic.adapters.TrackViewBinder
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
+import org.moire.ultrasonic.data.ActiveServerProvider.Companion.shouldUseId3Tags
 import org.moire.ultrasonic.data.RatingUpdate
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
@@ -591,10 +592,10 @@ class PlayerFragment :
             }
         }
 
-        if (isOffline() || !Settings.shouldUseId3Tags) {
-            popup.menu.findItem(R.id.menu_show_artist)?.isVisible = false
-        }
+        // Only show the menu if the ID3 tags are available
+        popup.menu.findItem(R.id.menu_show_artist)?.isVisible = shouldUseId3Tags()
 
+        // Only show the lyrics when the user is online
         popup.menu.findItem(R.id.menu_lyrics)?.isVisible = !isOffline()
         popup.show()
         return popup
@@ -614,7 +615,7 @@ class PlayerFragment :
             R.id.menu_show_artist -> {
                 if (track == null) return false
 
-                if (Settings.shouldUseId3Tags) {
+                if (Settings.id3TagsEnabledOnline) {
                     val action = PlayerFragmentDirections.playerToAlbumsList(
                         type = AlbumListType.SORTED_BY_NAME,
                         byArtist = true,
@@ -630,7 +631,7 @@ class PlayerFragment :
             R.id.menu_show_album -> {
                 if (track == null) return false
 
-                val albumId = if (Settings.shouldUseId3Tags) track.albumId else track.parent
+                val albumId = if (shouldUseId3Tags()) track.albumId else track.parent
 
                 val action = PlayerFragmentDirections.playerToSelectAlbum(
                     id = albumId,

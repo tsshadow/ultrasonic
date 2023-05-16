@@ -111,7 +111,7 @@ class NowPlayingFragment : Fragment() {
                 nowPlayingArtist!!.text = artist
 
                 nowPlayingAlbumArtImage!!.setOnClickListener {
-                    val id3 = Settings.shouldUseId3Tags
+                    val id3 = Settings.id3TagsEnabledOnline
                     val action = NavigationGraphDirections.toTrackCollection(
                         isAlbum = id3,
                         id = if (id3) file.albumId else file.parent,

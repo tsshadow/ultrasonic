@@ -51,7 +51,6 @@ import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RatingManager
 import org.moire.ultrasonic.util.MainThreadExecutor
-import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.buildMediaItem
 import org.moire.ultrasonic.util.toMediaItem
@@ -119,7 +118,6 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
     private val musicService get() = MusicServiceFactory.getMusicService()
     private val isOffline get() = ActiveServerProvider.isOffline()
-    private val useId3Tags get() = Settings.shouldUseId3Tags
     private val musicFolderId get() = activeServerProvider.getActiveServer().musicFolderId
 
     /**
@@ -661,7 +659,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
             var childMediaId: String = MEDIA_ARTIST_ITEM
 
             var artists = serviceScope.future {
-                if (!isOffline && useId3Tags) {
+                if (ActiveServerProvider.shouldUseId3Tags()) {
                     // TODO this list can be big so we're not refreshing.
                     //  Maybe a refresh menu item can be added
                     callWithErrorHandling { musicService.getArtists(false) }
@@ -716,7 +714,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
         return mainScope.future {
             val albums = serviceScope.future {
-                if (!isOffline && useId3Tags) {
+                if (ActiveServerProvider.shouldUseId3Tags()) {
                     callWithErrorHandling { musicService.getAlbumsOfArtist(id, name, false) }
                 } else {
                     callWithErrorHandling {
@@ -788,7 +786,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
             val offset = (page ?: 0) * DISPLAY_LIMIT
 
             val albums = serviceScope.future {
-                if (useId3Tags) {
+                if (ActiveServerProvider.shouldUseId3Tags()) {
                     callWithErrorHandling {
                         musicService.getAlbumList2(
                             type, DISPLAY_LIMIT, offset, null
@@ -1190,7 +1188,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
     private fun listSongsInMusicService(id: String, name: String?): MusicDirectory? {
         return serviceScope.future {
-            if (!ActiveServerProvider.isOffline() && Settings.shouldUseId3Tags) {
+            if (ActiveServerProvider.shouldUseId3Tags()) {
                 callWithErrorHandling { musicService.getAlbumAsDir(id, name, false) }
             } else {
                 callWithErrorHandling { musicService.getMusicDirectory(id, name, false) }
@@ -1200,7 +1198,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
     private fun listStarredSongsInMusicService(): SearchResult? {
         return serviceScope.future {
-            if (Settings.shouldUseId3Tags) {
+            if (ActiveServerProvider.shouldUseId3Tags()) {
                 callWithErrorHandling { musicService.getStarred2() }
             } else {
                 callWithErrorHandling { musicService.getStarred() }

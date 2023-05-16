@@ -18,7 +18,7 @@ import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
 import org.moire.ultrasonic.api.subsonic.toStreamResponse
 import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
+import org.moire.ultrasonic.data.ActiveServerProvider.Companion.shouldUseId3Tags
 import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.Bookmark
@@ -44,7 +44,6 @@ import org.moire.ultrasonic.domain.toIndexList
 import org.moire.ultrasonic.domain.toMusicDirectoryDomainEntity
 import org.moire.ultrasonic.domain.toTrackEntity
 import org.moire.ultrasonic.util.FileUtil
-import org.moire.ultrasonic.util.Settings
 import timber.log.Timber
 
 /**
@@ -181,7 +180,7 @@ open class RESTMusicService(
         criteria: SearchCriteria
     ): SearchResult {
         return try {
-            if (!isOffline() && Settings.shouldUseId3Tags) {
+            if (shouldUseId3Tags()) {
                 search3(criteria)
             } else {
                 search2(criteria)

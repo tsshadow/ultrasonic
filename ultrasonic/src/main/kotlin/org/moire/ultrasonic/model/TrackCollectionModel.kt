@@ -13,12 +13,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.DownloadState
 import org.moire.ultrasonic.service.MusicServiceFactory
-import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 
 /*
@@ -72,7 +72,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory: MusicDirectory
 
-            musicDirectory = if (Settings.shouldUseId3Tags) {
+            musicDirectory = if (ActiveServerProvider.shouldUseId3Tags()) {
                 Util.getSongsFromSearchResult(service.getStarred2())
             } else {
                 Util.getSongsFromSearchResult(service.getStarred())

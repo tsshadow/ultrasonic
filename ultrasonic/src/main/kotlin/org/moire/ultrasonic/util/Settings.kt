@@ -168,11 +168,11 @@ object Settings {
     // Normally you don't need to use these Settings directly,
     // use ActiveServerProvider.isID3Enabled() instead
     @JvmStatic
-    var shouldUseId3Tags by BooleanSetting(getKey(R.string.setting_key_id3_tags), true)
+    var id3TagsEnabledOnline by BooleanSetting(getKey(R.string.setting_key_id3_tags), true)
 
     // See comment above.
     @JvmStatic
-    var useId3TagsOffline by BooleanSetting(getKey(R.string.setting_key_id3_tags_offline), true)
+    var id3TagsEnabledOffline by BooleanSetting(getKey(R.string.setting_key_id3_tags_offline), true)
 
     var activeServer by IntSetting(getKey(R.string.setting_key_server_instance), -1)
 

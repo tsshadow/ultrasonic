@@ -582,7 +582,7 @@ open class TrackCollectionFragment(
             } else {
                 setTitle(name)
 
-                if (ActiveServerProvider.isID3Enabled()) {
+                if (ActiveServerProvider.shouldUseId3Tags()) {
                     if (isAlbum) {
                         listModel.getAlbum(refresh2, id, name)
                     } else {
