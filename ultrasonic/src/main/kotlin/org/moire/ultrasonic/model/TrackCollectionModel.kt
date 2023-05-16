@@ -40,7 +40,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getMusicDirectory(id, name, refresh)
-
+            currentListIsSortable = true
             updateList(musicDirectory)
         }
     }
@@ -51,7 +51,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory: MusicDirectory = service.getAlbumAsDir(id, name, refresh)
-
+            currentListIsSortable = true
             updateList(musicDirectory)
         }
     }
@@ -60,6 +60,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getSongsByGenre(genre, count, offset)
+            currentListIsSortable = false
             updateList(musicDirectory, append)
         }
     }
@@ -76,7 +77,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
             } else {
                 Util.getSongsFromSearchResult(service.getStarred())
             }
-
+            currentListIsSortable = false
             updateList(musicDirectory)
         }
     }
@@ -87,8 +88,8 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val videos = service.getVideos(refresh)
-
             if (videos != null) {
+                currentListIsSortable = false
                 updateList(videos)
             }
         }
@@ -99,19 +100,16 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getRandomSongs(size)
-
             currentListIsSortable = false
-
             updateList(musicDirectory, append)
         }
     }
 
     suspend fun getPlaylist(playlistId: String, playlistName: String) {
-
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getPlaylist(playlistId, playlistName)
-
+            currentListIsSortable = false
             updateList(musicDirectory)
         }
     }
@@ -121,8 +119,8 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getPodcastEpisodes(podcastChannelId)
-
             if (musicDirectory != null) {
+                currentListIsSortable = false
                 updateList(musicDirectory)
             }
         }
@@ -144,7 +142,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
                     break
                 }
             }
-
+            currentListIsSortable = false
             updateList(musicDirectory)
         }
     }
@@ -153,7 +151,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = Util.getSongsFromBookmarks(service.getBookmarks())
-
+            currentListIsSortable = false
             updateList(musicDirectory)
         }
     }
