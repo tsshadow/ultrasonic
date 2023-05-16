@@ -29,7 +29,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.util.Locale
-import org.koin.java.KoinJavaComponent.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
@@ -55,15 +56,13 @@ import org.moire.ultrasonic.util.Util.toast
  *
  * TODO: This file has been converted from Java, but not modernized yet.
  */
-class PlaylistsFragment : Fragment() {
+class PlaylistsFragment : Fragment(), KoinComponent {
     private var refreshPlaylistsListView: SwipeRefreshLayout? = null
     private var playlistsListView: ListView? = null
     private var emptyTextView: View? = null
     private var playlistAdapter: ArrayAdapter<Playlist>? = null
 
-    private val downloadHandler = inject<DownloadHandler>(
-        DownloadHandler::class.java
-    )
+    private val downloadHandler by inject<DownloadHandler>()
 
     private var cancellationToken: CancellationToken? = null
 
@@ -148,7 +147,7 @@ class PlaylistsFragment : Fragment() {
         val playlist = playlistsListView!!.getItemAtPosition(info.position) as Playlist
         when (menuItem.itemId) {
             R.id.playlist_menu_pin -> {
-                downloadHandler.value.justDownload(
+                downloadHandler.justDownload(
                     DownloadAction.PIN,
                     fragment = this,
                     id = playlist.id,
@@ -158,7 +157,7 @@ class PlaylistsFragment : Fragment() {
                 )
             }
             R.id.playlist_menu_unpin -> {
-                downloadHandler.value.justDownload(
+                downloadHandler.justDownload(
                     DownloadAction.UNPIN,
                     fragment = this,
                     id = playlist.id,
@@ -168,7 +167,7 @@ class PlaylistsFragment : Fragment() {
                 )
             }
             R.id.playlist_menu_download -> {
-                downloadHandler.value.justDownload(
+                downloadHandler.justDownload(
                     DownloadAction.DOWNLOAD,
                     fragment = this,
                     id = playlist.id,
