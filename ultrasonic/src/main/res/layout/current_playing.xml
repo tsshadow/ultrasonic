@@ -112,7 +112,7 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <include layout="@layout/current_playlist" />
+        <include layout="@layout/current_playlist" a:id="@+id/playlist"/>
     </ViewFlipper>
 
     <include layout="@layout/player_media_info" />

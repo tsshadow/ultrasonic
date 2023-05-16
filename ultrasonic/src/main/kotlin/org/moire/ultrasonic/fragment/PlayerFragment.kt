@@ -34,6 +34,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ViewFlipper
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -53,6 +54,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -80,6 +82,7 @@ import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.shouldUseId3Tags
 import org.moire.ultrasonic.data.RatingUpdate
+import org.moire.ultrasonic.databinding.CurrentPlayingBinding
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
@@ -143,6 +146,7 @@ class PlayerFragment :
     private lateinit var fiveStar5ImageView: ImageView
     private lateinit var playlistFlipper: ViewFlipper
     private lateinit var emptyTextView: TextView
+    private lateinit var emptyView: ConstraintLayout
     private lateinit var songTitleTextView: TextView
     private lateinit var artistTextView: TextView
     private lateinit var albumTextView: TextView
@@ -162,8 +166,14 @@ class PlayerFragment :
     private lateinit var shuffleButton: View
     private lateinit var repeatButton: MaterialButton
     private lateinit var progressBar: SeekBar
+    private lateinit var progressIndicator: CircularProgressIndicator
     private val hollowStar = R.drawable.ic_star_hollow
     private val fullStar = R.drawable.ic_star_full
+
+    private var _binding: CurrentPlayingBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     private val viewAdapter: BaseAdapter<Identifiable> by lazy {
         BaseAdapter()
@@ -178,13 +188,17 @@ class PlayerFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.current_playing, container, false)
+    ): View {
+        _binding = CurrentPlayingBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
+    // TODO: Switch them all over to use the view binding
     private fun findViews(view: View) {
         playlistFlipper = view.findViewById(R.id.current_playing_playlist_flipper)
-        emptyTextView = view.findViewById(R.id.playlist_empty)
+        emptyTextView = view.findViewById(R.id.empty_list_text)
+        emptyView = view.findViewById(R.id.emptyListView)
+        progressIndicator = view.findViewById(R.id.progress_indicator)
         songTitleTextView = view.findViewById(R.id.current_playing_song)
         artistTextView = view.findViewById(R.id.current_playing_artist)
         albumTextView = view.findViewById(R.id.current_playing_album)
@@ -473,6 +487,7 @@ class PlayerFragment :
         rxBusSubscription.dispose()
         cancel("CoroutineScope cancelled because the view was destroyed")
         cancellationToken.cancel()
+        _binding = null
         super.onDestroyView()
     }
 
@@ -1027,10 +1042,9 @@ class PlayerFragment :
         // Try to display playlist in play order
         val list = mediaPlayerController.playlistInPlayOrder
         emptyTextView.setText(R.string.playlist_empty)
-
         viewAdapter.submitList(list.map(MediaItem::toTrack))
-
-        emptyTextView.isVisible = list.isEmpty()
+        progressIndicator.isVisible = false
+        emptyView.isVisible = list.isEmpty()
 
         updateRepeatButtonState(mediaPlayerController.repeatMode)
     }

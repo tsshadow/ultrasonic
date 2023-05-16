@@ -5,13 +5,17 @@
     a:layout_height="fill_parent"
     a:orientation="vertical">
 
-    <TextView
-        a:id="@+id/playlist_empty"
-        a:layout_width="fill_parent"
-        a:layout_height="wrap_content"
-        a:padding="10dip"
-        a:text="@string/playlist.empty" />
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        a:id="@+id/progress_indicator"
+        a:layout_width="wrap_content"
+        a:layout_height="0dip"
+        a:indeterminate="true"
+        a:layout_weight="1"
+        a:layout_gravity="center|center_horizontal|center_vertical" />
 
+    <include
+        a:id="@+id/emptyListView"
+        layout="@layout/list_parts_empty_view" />
 
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         a:id="@+id/playlist_view"
