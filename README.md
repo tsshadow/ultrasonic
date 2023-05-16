@@ -31,12 +31,6 @@ If you want to use the version downloaded from F-Droid or from GitLab with
 First, see if your issue haven’t been yet reported [here][issues], otherwise
 open [a new issue][newissue].
 
-### Known (not our) bugs
-
-If you are using *Madsonic 5.1.X* several sections of Ultrasonic will not
-work. This is caused by bad implementation of Subsonic API by Madsonic. For
-more info about this you can read [this bug][madbug].
-
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md).
@@ -62,7 +56,6 @@ Full text of the license is available in the [LICENSE](LICENSE) file and
 [wikiaa]: https://gitlab.com/ultrasonic/ultrasonic/-/wikis/Using-Ultrasonic-with-Android-Auto
 [issues]: https://gitlab.com/ultrasonic/ultrasonic/-/issues
 [newissue]: https://gitlab.com/ultrasonic/ultrasonic/-/issues/new
-[madbug]: https://gitlab.com/ultrasonic/ultrasonic/-/issues/129
 [subsonic]: http://www.subsonic.org/
 [subapi]: http://www.subsonic.org/pages/api.jsp
 [airsonic]: https://github.com/airsonic-advanced/airsonic-advanced
