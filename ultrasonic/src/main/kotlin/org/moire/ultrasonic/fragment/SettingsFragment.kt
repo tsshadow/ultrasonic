@@ -39,8 +39,8 @@ import org.moire.ultrasonic.util.ErrorDialog
 import org.moire.ultrasonic.util.FileUtil.ultrasonicDirectory
 import org.moire.ultrasonic.util.InfoDialog
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.Settings.id3TagsEnabledOnline
 import org.moire.ultrasonic.util.Settings.preferences
-import org.moire.ultrasonic.util.Settings.shouldUseId3Tags
 import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.TimeSpanPreference
 import org.moire.ultrasonic.util.TimeSpanPreferenceDialogFragmentCompat
@@ -354,8 +354,8 @@ class SettingsFragment :
             debugLogToFile?.summary = ""
         }
 
-        showArtistPicture?.isEnabled = shouldUseId3Tags
-        useId3TagsOffline?.isEnabled = shouldUseId3Tags
+        showArtistPicture?.isEnabled = id3TagsEnabledOnline
+        useId3TagsOffline?.isEnabled = id3TagsEnabledOnline
     }
 
     private fun setHideMedia(hide: Boolean) {

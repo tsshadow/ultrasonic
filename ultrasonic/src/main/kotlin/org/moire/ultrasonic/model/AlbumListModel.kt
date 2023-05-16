@@ -12,9 +12,9 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
+import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.service.MusicServiceFactory
-import org.moire.ultrasonic.util.Settings
 
 class AlbumListModel(application: Application) : GenericListModel(application) {
 
@@ -69,7 +69,7 @@ class AlbumListModel(application: Application) : GenericListModel(application) {
             // If appending the existing list, set the offset from where to load
             if (append) offset += (size + loadedUntil)
 
-            musicDirectory = if (Settings.shouldUseId3Tags) {
+            musicDirectory = if (ActiveServerProvider.shouldUseId3Tags()) {
                 service.getAlbumList2(
                     albumListType, size,
                     offset, musicFolderId
@@ -119,7 +119,7 @@ class AlbumListModel(application: Application) : GenericListModel(application) {
         val isAlphabetical = (lastType == AlbumListType.SORTED_BY_NAME) ||
             (lastType == AlbumListType.SORTED_BY_ARTIST)
 
-        return !isOffline() && !Settings.shouldUseId3Tags && isAlphabetical
+        return !isOffline() && !ActiveServerProvider.shouldUseId3Tags() && isAlphabetical
     }
 
     private fun isCollectionSortable(albumListType: AlbumListType): Boolean {
