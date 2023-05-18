@@ -48,7 +48,6 @@ object Settings {
     @JvmStatic
     val preloadCount: Int
         get() {
-            val preferences = preferences
             val preloadCount =
                 preferences.getString(getKey(R.string.setting_key_preload_count), "-1")!!
                     .toInt()
@@ -60,7 +59,6 @@ object Settings {
     @JvmStatic
     val cacheSizeMB: Int
         get() {
-            val preferences = preferences
             val cacheSize = preferences.getString(
                 getKey(R.string.setting_key_cache_size),
                 "-1"
@@ -209,7 +207,6 @@ object Settings {
     @JvmStatic
     val shareGreeting: String?
         get() {
-            val preferences = preferences
             val context = Util.appContext()
             val defaultVal = String.format(
                 context.resources.getString(R.string.share_default_greeting),
@@ -278,8 +275,7 @@ object Settings {
     }
 
     fun getAllKeys(): List<String> {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(UApp.applicationContext())
-        return prefs.all.keys.toList()
+        return preferences.all.keys.toList()
     }
 
     private val appContext: Context
