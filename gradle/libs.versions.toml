@@ -9,7 +9,7 @@ ktlint                 = "0.43.2"
 ktlintGradle           = "11.3.2"
 detekt                 = "1.22.0"
 preferences            = "1.2.0"
-media3                 = "1.0.1"
+media3                 = "1.0.2"
 
 androidSupport         = "1.6.0"
 materialDesign         = "1.8.0"
