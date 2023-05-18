@@ -13,7 +13,7 @@ import static org.koin.java.KoinJavaComponent.inject;
 
 public class UltrasonicIntentReceiver extends BroadcastReceiver
 {
-	private Lazy<MediaPlayerLifecycleSupport> lifecycleSupport = inject(MediaPlayerLifecycleSupport.class);
+	private final Lazy<MediaPlayerLifecycleSupport> lifecycleSupport = inject(MediaPlayerLifecycleSupport.class);
 
 	@Override
 	public void onReceive(Context context, Intent intent)
