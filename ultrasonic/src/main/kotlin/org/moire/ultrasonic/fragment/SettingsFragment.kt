@@ -1,14 +1,11 @@
 package org.moire.ultrasonic.fragment
 
-import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.provider.SearchRecentSuggestions
 import android.view.View
 import androidx.annotation.StringRes
@@ -38,6 +35,7 @@ import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.ErrorDialog
 import org.moire.ultrasonic.util.FileUtil.ultrasonicDirectory
 import org.moire.ultrasonic.util.InfoDialog
+import org.moire.ultrasonic.util.SelectCacheActivityContract
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Settings.id3TagsEnabledOnline
 import org.moire.ultrasonic.util.Settings.preferences
@@ -100,64 +98,14 @@ class SettingsFragment :
         updateCustomPreferences()
     }
 
-    /**
-     * This function will be called when we return from the file picker
-     * with a new custom cache location
-     *
-     * TODO: This method has been deprecated in favor of using the Activity Result API
-     * which brings increased type safety via an ActivityResultContract and the prebuilt
-     * contracts for common intents available in
-     * androidx.activity.result.contract.ActivityResultContracts,
-     * provides hooks for testing, and allow receiving results in separate,
-     * testable classes independent from your fragment.
-     * Use registerForActivityResult(ActivityResultContract, ActivityResultCallback) with the
-     * appropriate ActivityResultContract and handling the result in the callback.
-     */
-    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-        if (
-            requestCode == SELECT_CACHE_ACTIVITY &&
-            resultCode == Activity.RESULT_OK &&
-            resultData != null
-        ) {
-            val read = (resultData.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION) != 0
-            val write = (resultData.flags and Intent.FLAG_GRANT_WRITE_URI_PERMISSION) != 0
-            val persist = (resultData.flags and Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) != 0
-
-            if (read && write && persist) {
-                if (resultData.data != null) {
-                    // The result data contains a URI for the document or directory that
-                    // the user selected.
-                    val uri = resultData.data!!
-                    val contentResolver = UApp.applicationContext().contentResolver
-
-                    contentResolver.takePersistableUriPermission(uri, RW_FLAG)
-                    setCacheLocation(uri.toString())
-                    setupCacheLocationPreference()
-                    return
-                }
-            }
-            ErrorDialog.Builder(requireContext())
-                .setMessage(R.string.settings_cache_location_error)
-                .show()
-        }
-
-        if (Settings.cacheLocationUri == "") {
-            Settings.customCacheLocation = false
-            customCacheLocation?.isChecked = false
-            setupCacheLocationPreference()
-        }
-    }
-
     override fun onResume() {
         super.onResume()
-        val preferences = preferences
         preferences.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onPause() {
         super.onPause()
-        val prefs = preferences
-        prefs.unregisterOnSharedPreferenceChangeListener(this)
+        preferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
@@ -249,18 +197,30 @@ class SettingsFragment :
     }
 
     private fun selectCacheLocation() {
-        // Choose a directory using the system's file picker.
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-
-        if (Settings.cacheLocationUri != "" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Settings.cacheLocationUri)
-        }
-
-        intent.addFlags(RW_FLAG)
-        intent.addFlags(PERSISTABLE_FLAG)
-
-        startActivityForResult(intent, SELECT_CACHE_ACTIVITY)
+        // Start the activity to pick a directory using the system's file picker.
+        selectCacheActivityContract.launch(Settings.cacheLocationUri)
     }
+
+    // Custom activity result contract
+    private val selectCacheActivityContract =
+        registerForActivityResult(SelectCacheActivityContract()) { uri ->
+            // parseResult will return the chosen path as an Uri
+            if (uri != null) {
+                val contentResolver = UApp.applicationContext().contentResolver
+                contentResolver.takePersistableUriPermission(uri, RW_FLAG)
+                setCacheLocation(uri.toString())
+                setupCacheLocationPreference()
+            } else {
+                ErrorDialog.Builder(requireContext())
+                    .setMessage(R.string.settings_cache_location_error)
+                    .show()
+                if (Settings.cacheLocationUri == "") {
+                    Settings.customCacheLocation = false
+                    customCacheLocation?.isChecked = false
+                    setupCacheLocationPreference()
+                }
+            }
+        }
 
     private fun setupBluetoothDevicePreferences() {
         val resumeSetting = Settings.resumeOnBluetoothDevice
@@ -425,7 +385,6 @@ class SettingsFragment :
     }
 
     companion object {
-        const val SELECT_CACHE_ACTIVITY = 161161
         const val RW_FLAG = Intent.FLAG_GRANT_READ_URI_PERMISSION or
             Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         const val PERSISTABLE_FLAG = Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
