@@ -28,7 +28,7 @@ import org.moire.ultrasonic.log.FileLoggerTree.Companion.getLogFileSizes
 import org.moire.ultrasonic.log.FileLoggerTree.Companion.plantToTimberForest
 import org.moire.ultrasonic.log.FileLoggerTree.Companion.uprootFromTimberForest
 import org.moire.ultrasonic.provider.SearchSuggestionProvider
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.util.ConfirmationDialog
 import org.moire.ultrasonic.util.Constants
@@ -62,7 +62,7 @@ class SettingsFragment :
     private var debugLogToFile: CheckBoxPreference? = null
     private var customCacheLocation: CheckBoxPreference? = null
 
-    private val mediaPlayerController: MediaPlayerController by inject()
+    private val mediaPlayerManager: MediaPlayerManager by inject()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, rootKey)
@@ -342,7 +342,7 @@ class SettingsFragment :
         Settings.cacheLocationUri = path
 
         // Clear download queue.
-        mediaPlayerController.clear()
+        mediaPlayerManager.clear()
         Storage.reset()
         Storage.ensureRootIsAvailable()
     }

@@ -42,7 +42,7 @@ import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.SearchListModel
 import org.moire.ultrasonic.service.DownloadService
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
 import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.subsonic.VideoPlayer.Companion.playVideo
@@ -63,7 +63,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     private var searchRefresh: SwipeRefreshLayout? = null
     private var searchView: SearchView? = null
 
-    private val mediaPlayerController: MediaPlayerController by inject()
+    private val mediaPlayerManager: MediaPlayerManager by inject()
 
     private val shareHandler: ShareHandler by inject()
     private val networkAndStorageChecker: NetworkAndStorageChecker by inject()
@@ -305,15 +305,15 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
 
     private fun onSongSelected(song: Track, append: Boolean) {
         if (!append) {
-            mediaPlayerController.clear()
+            mediaPlayerManager.clear()
         }
-        mediaPlayerController.addToPlaylist(
+        mediaPlayerManager.addToPlaylist(
             listOf(song),
             autoPlay = false,
             shuffle = false,
-            insertionMode = MediaPlayerController.InsertionMode.APPEND
+            insertionMode = MediaPlayerManager.InsertionMode.APPEND
         )
-        mediaPlayerController.play(mediaPlayerController.mediaItemCount - 1)
+        mediaPlayerManager.play(mediaPlayerManager.mediaItemCount - 1)
         toast(context, resources.getQuantityString(R.plurals.select_album_n_songs_added, 1, 1))
     }
 

@@ -141,7 +141,6 @@
     <string name="common.pin">固定</string>
     <string name="chat.send_button">傳送</string>
     <string name="button_bar.chat">聊天</string>
-    <string name="download.jukebox_volume">遠端音量</string>
     <string name="chat.user_avatar">頭像</string>
     <string name="common.delete_selection_confirmation">您真的要刪除目前選取的項目嗎？</string>
     <string name="background_task.parse_error">無法理解答覆，請檢查伺服器位址。</string>

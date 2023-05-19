@@ -59,7 +59,6 @@
     <string name="download.jukebox_offline">Пульт дистанционного управления недоступен в автономном режиме.</string>
     <string name="download.jukebox_on">Включен пульт управления. Музыка играет на сервере.</string>
     <string name="download.jukebox_server_too_old">Пульт дистанционного управления не поддерживается. Пожалуйста, обновите ваш дозвуковой сервер.</string>
-    <string name="download.jukebox_volume">Удаленная громкость</string>
     <string name="download.menu_equalizer">Эквалайзер</string>
     <string name="download.menu_jukebox_off">Jukebox выключен</string>
     <string name="download.menu_jukebox_on">Jukebox включен</string>

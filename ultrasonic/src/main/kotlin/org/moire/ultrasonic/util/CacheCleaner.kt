@@ -19,7 +19,7 @@ import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Playlist
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.util.FileUtil.getAlbumArtFile
 import org.moire.ultrasonic.util.FileUtil.getCompleteFile
 import org.moire.ultrasonic.util.FileUtil.getPartialFile
@@ -235,8 +235,8 @@ class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO), KoinCompo
 
     private fun findFilesToNotDelete(): Set<String> {
         val filesToNotDelete: MutableSet<String> = HashSet(5)
-        val mediaController = inject<MediaPlayerController>(
-            MediaPlayerController::class.java
+        val mediaController = inject<MediaPlayerManager>(
+            MediaPlayerManager::class.java
         )
 
         val playlist = mainScope.future { mediaController.value.playlist }.get()

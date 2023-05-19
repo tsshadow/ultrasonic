@@ -72,7 +72,7 @@ class BookmarksFragment : TrackCollectionFragment() {
                 currentPlayingPosition = songs[0].bookmarkPosition
             )
 
-            mediaPlayerController.restore(
+            mediaPlayerManager.restore(
                 state = state,
                 autoPlay = true,
                 newPlaylist = true

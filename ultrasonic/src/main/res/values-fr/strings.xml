@@ -61,7 +61,6 @@
     <string name="download.jukebox_offline">Le mode jukebox n\'est pas disponible en mode déconnecté.</string>
     <string name="download.jukebox_on">Mode jukebox activé. La musique est jouée sur le serveur</string>
     <string name="download.jukebox_server_too_old">Le mode jukebox n\'est pas pris en charge. Mise à jour du serveur Subsonic requise.</string>
-    <string name="download.jukebox_volume">Volume sur serveur distant</string>
     <string name="download.menu_equalizer">Égaliseur</string>
     <string name="download.menu_jukebox_off">Désactiver le mode jukebox</string>
     <string name="download.menu_jukebox_on">Activer le mode jukebox</string>

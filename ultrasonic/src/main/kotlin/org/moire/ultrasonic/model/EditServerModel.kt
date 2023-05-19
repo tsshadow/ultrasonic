@@ -10,7 +10,7 @@ package org.moire.ultrasonic.model
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import java.io.IOException
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapMerge
@@ -90,7 +90,7 @@ class EditServerModel(val app: Application) : AndroidViewModel(app), KoinCompone
         }
     }
 
-    @OptIn(FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun queryFeatureSupport(currentServerSetting: ServerSetting): Flow<FeatureSupport> {
         val client = buildTestClient(currentServerSetting)
         // One line of magic:

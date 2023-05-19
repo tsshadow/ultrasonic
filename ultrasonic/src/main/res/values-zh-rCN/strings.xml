@@ -60,7 +60,6 @@
     <string name="download.jukebox_offline">离线模式不支持远程控制。</string>
     <string name="download.jukebox_on">已打开远程控制，音乐将在服务端播放。</string>
     <string name="download.jukebox_server_too_old">远程控制不支持，请升级您的 Subsonic 服务器。</string>
-    <string name="download.jukebox_volume">远程音量</string>
     <string name="download.menu_equalizer">均衡器</string>
     <string name="download.menu_jukebox_off">关闭点唱机</string>
     <string name="download.menu_jukebox_on">开启点唱机</string>

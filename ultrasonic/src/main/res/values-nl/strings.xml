@@ -63,7 +63,6 @@
     <string name="download.jukebox_offline">Afstandsbediening is niet beschikbaar in offline-modus.</string>
     <string name="download.jukebox_on">Afstandsbediening ingeschakeld; muziek wordt afgespeeld op de server.</string>
     <string name="download.jukebox_server_too_old">Afstandsbediening wordt niet ondersteund. Werk je Subsonic-server bij.</string>
-    <string name="download.jukebox_volume">Afstandsbedieningvolume</string>
     <string name="download.menu_equalizer">Equalizer</string>
     <string name="download.menu_jukebox_off">Jukebox uitgeschakeld</string>
     <string name="download.menu_jukebox_on">Jukebox ingeschakeld</string>

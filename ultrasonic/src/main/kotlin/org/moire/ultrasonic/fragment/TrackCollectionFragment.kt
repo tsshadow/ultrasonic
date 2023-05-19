@@ -40,7 +40,7 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.TrackCollectionModel
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.subsonic.DownloadAction
@@ -82,7 +82,7 @@ open class TrackCollectionFragment(
     private var playAllButton: MenuItem? = null
     private var shareButton: MenuItem? = null
 
-    internal val mediaPlayerController: MediaPlayerController by inject()
+    internal val mediaPlayerManager: MediaPlayerManager by inject()
     private val shareHandler: ShareHandler by inject()
     internal var cancellationToken: CancellationToken? = null
 

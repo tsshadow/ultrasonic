@@ -18,7 +18,7 @@ import org.moire.ultrasonic.data.ActiveServerProvider.Companion.shouldUseId3Tags
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.DownloadService
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.executeTaskWithToast
@@ -28,7 +28,7 @@ import org.moire.ultrasonic.util.executeTaskWithToast
  */
 @Suppress("LongParameterList")
 class DownloadHandler(
-    val mediaPlayerController: MediaPlayerController,
+    val mediaPlayerManager: MediaPlayerManager,
     private val networkAndStorageChecker: NetworkAndStorageChecker
 ) : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private val maxSongs = 500
@@ -150,16 +150,16 @@ class DownloadHandler(
         networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
 
         val insertionMode = when {
-            append -> MediaPlayerController.InsertionMode.APPEND
-            playNext -> MediaPlayerController.InsertionMode.AFTER_CURRENT
-            else -> MediaPlayerController.InsertionMode.CLEAR
+            append -> MediaPlayerManager.InsertionMode.APPEND
+            playNext -> MediaPlayerManager.InsertionMode.AFTER_CURRENT
+            else -> MediaPlayerManager.InsertionMode.CLEAR
         }
 
         if (playlistName != null) {
-            mediaPlayerController.suggestedPlaylistName = playlistName
+            mediaPlayerManager.suggestedPlaylistName = playlistName
         }
 
-        mediaPlayerController.addToPlaylist(
+        mediaPlayerManager.addToPlaylist(
             songs,
             autoPlay,
             shuffle,

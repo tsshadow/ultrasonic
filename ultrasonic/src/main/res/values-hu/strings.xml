@@ -54,7 +54,6 @@
     <string name="download.jukebox_offline">A távvezérlés nem lehetséges kapcsolat nélküli módban!</string>
     <string name="download.jukebox_on">Távvezérlés bekapcsolása. A zenelejátszás a kiszolgálón történik.</string>
     <string name="download.jukebox_server_too_old">A távvezérlés nem támogatott. Kérjük, frissítse a Subsonic kiszolgálót!</string>
-    <string name="download.jukebox_volume">Hangerő távvezérlése</string>
     <string name="download.menu_equalizer">Equalizer</string>
     <string name="download.menu_jukebox_off">Jukebox ki</string>
     <string name="download.menu_jukebox_on">Jukebox be</string>
