@@ -339,7 +339,6 @@
     <string name="download.jukebox_not_authorized">Fjernkontroll er avskrudd. Skru på jukebox-modus i <b>Brukere &gt; Innstillinger</b> på din Subsonic-tjener.</string>
     <string name="download.jukebox_off">Fjernkontroll avskrudd. Musikk spilles på enheten.</string>
     <string name="download.jukebox_server_too_old">Fjernkontroll støttes ikke. Oppgrader din Subsonic-tjener.</string>
-    <string name="download.jukebox_volume">Fjernkontroll</string>
     <string name="download.menu_jukebox_off">Jukebox avslått</string>
     <string name="download.menu_jukebox_on">Jukebox påslått</string>
     <string name="download.menu_shuffle">Omstokking</string>

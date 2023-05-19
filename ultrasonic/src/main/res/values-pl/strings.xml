@@ -47,7 +47,6 @@
     <string name="download.jukebox_offline">Pilot jest niedostępny w trybie offline.</string>
     <string name="download.jukebox_on">Tryb pilota jest włączony. Muzyka jest odtwarzana na serwerze.</string>
     <string name="download.jukebox_server_too_old">Tryb pilota jest niedostępny. Proszę uaktualnić serwer Subsonic.</string>
-    <string name="download.jukebox_volume">Zdalna głośność</string>
     <string name="download.menu_equalizer">Korektor dźwięku</string>
     <string name="download.menu_jukebox_off">Jukebox wyłączony</string>
     <string name="download.menu_jukebox_on">Jukebox włączony</string>

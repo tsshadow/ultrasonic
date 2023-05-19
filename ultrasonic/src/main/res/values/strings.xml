@@ -63,7 +63,6 @@
     <string name="download.jukebox_offline">Remote control is not available in offline mode.</string>
     <string name="download.jukebox_on">Turned on remote control. Music is played on server.</string>
     <string name="download.jukebox_server_too_old">Remote control is not supported. Please upgrade your Subsonic server.</string>
-    <string name="download.jukebox_volume">Remote Volume</string>
     <string name="download.menu_equalizer">Equalizer</string>
     <string name="download.menu_jukebox_off">Jukebox Off</string>
     <string name="download.menu_jukebox_on">Jukebox On</string>

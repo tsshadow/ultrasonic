@@ -25,7 +25,7 @@ import kotlin.math.abs
 import org.koin.android.ext.android.inject
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.Settings
@@ -48,7 +48,7 @@ class NowPlayingFragment : Fragment() {
     private var nowPlayingArtist: TextView? = null
 
     private var rxBusSubscription: Disposable? = null
-    private val mediaPlayerController: MediaPlayerController by inject()
+    private val mediaPlayerManager: MediaPlayerManager by inject()
     private val imageLoaderProvider: ImageLoaderProvider by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,13 +85,13 @@ class NowPlayingFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     private fun update() {
         try {
-            if (mediaPlayerController.isPlaying) {
+            if (mediaPlayerManager.isPlaying) {
                 playButton!!.setIconResource(R.drawable.media_pause)
             } else {
                 playButton!!.setIconResource(R.drawable.media_start)
             }
 
-            val file = mediaPlayerController.currentMediaItem?.toTrack()
+            val file = mediaPlayerManager.currentMediaItem?.toTrack()
 
             if (file != null) {
                 val title = file.title
@@ -127,7 +127,7 @@ class NowPlayingFragment : Fragment() {
 
             // This empty onClickListener is necessary for the onTouchListener to work
             requireView().setOnClickListener { }
-            playButton!!.setOnClickListener { mediaPlayerController.togglePlayPause() }
+            playButton!!.setOnClickListener { mediaPlayerManager.togglePlayPause() }
         } catch (all: Exception) {
             Timber.w(all, "Failed to get notification cover art")
         }
@@ -149,10 +149,10 @@ class NowPlayingFragment : Fragment() {
                 if (abs(deltaX) > MIN_DISTANCE) {
                     // left or right
                     if (deltaX < 0) {
-                        mediaPlayerController.seekToPrevious()
+                        mediaPlayerManager.seekToPrevious()
                     }
                     if (deltaX > 0) {
-                        mediaPlayerController.seekToNext()
+                        mediaPlayerManager.seekToNext()
                     }
                 } else if (abs(deltaY) > MIN_DISTANCE) {
                     if (deltaY < 0) {

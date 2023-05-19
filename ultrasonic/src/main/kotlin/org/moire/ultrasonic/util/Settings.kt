@@ -128,6 +128,9 @@ object Settings {
     var seekInterval
         by StringIntSetting(getKey(R.string.setting_key_increment_time), 5000)
 
+    val seekIntervalMillis: Long
+        get() = (seekInterval / 1000).toLong()
+
     @JvmStatic
     var mediaButtonsEnabled
         by BooleanSetting(getKey(R.string.setting_key_media_buttons), true)

@@ -61,7 +61,6 @@
     <string name="download.jukebox_offline">Fernbedienungs-Modus is Offline nicht verfügbar.</string>
     <string name="download.jukebox_on">Fernbedienung ausgeschaltet. Musik wird auf dem Server wiedergegeben.</string>
     <string name="download.jukebox_server_too_old">Fernbedienungs Modus wird nicht unterstützt. Bitte den Subsonic Server aktualisieren.</string>
-    <string name="download.jukebox_volume">Entfernte Lautstärke</string>
     <string name="download.menu_equalizer">Equalizer</string>
     <string name="download.menu_jukebox_off">Jukebox Aus</string>
     <string name="download.menu_jukebox_on">Jukebox An</string>

@@ -62,7 +62,6 @@
     <string name="download.jukebox_offline">Control remoto no disponible en modo fuera de línea.</string>
     <string name="download.jukebox_on">Control remoto encendido. La música se reproduce en el servidor.</string>
     <string name="download.jukebox_server_too_old">Control remoto no soportado. Por favor actualiza tu servidor de Subsonic.</string>
-    <string name="download.jukebox_volume">Volumen remoto</string>
     <string name="download.menu_equalizer">Ecualizador</string>
     <string name="download.menu_jukebox_off">Apagar Jukebox</string>
     <string name="download.menu_jukebox_on">Encender Jukebox</string>

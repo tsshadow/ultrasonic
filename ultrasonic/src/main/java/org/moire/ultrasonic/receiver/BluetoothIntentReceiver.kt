@@ -122,6 +122,7 @@ private fun Intent.getBluetoothDevice(): BluetoothDevice? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
     } else {
+        @Suppress("DEPRECATION")
         getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
     }
 }

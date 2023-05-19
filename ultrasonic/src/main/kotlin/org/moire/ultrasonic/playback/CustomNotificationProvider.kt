@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableList
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.util.toTrack
 
 @UnstableApi
@@ -33,7 +33,7 @@ class CustomNotificationProvider(ctx: Context) :
     * is stored in the track.starred value. See https://github.com/androidx/media/issues/33
     * TODO: Once the bug is fixed remove this circular reference!
     */
-    private val mediaPlayerController by inject<MediaPlayerController>()
+    private val mediaPlayerManager by inject<MediaPlayerManager>()
 
     override fun addNotificationActions(
         mediaSession: MediaSession,
@@ -48,7 +48,7 @@ class CustomNotificationProvider(ctx: Context) :
         * is stored in the track.starred value
         * See https://github.com/androidx/media/issues/33
         */
-        val rating = mediaPlayerController.currentMediaItem?.toTrack()?.starred?.let {
+        val rating = mediaPlayerManager.currentMediaItem?.toTrack()?.starred?.let {
             HeartRating(
                 it
             )

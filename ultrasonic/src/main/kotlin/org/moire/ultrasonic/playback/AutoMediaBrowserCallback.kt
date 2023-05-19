@@ -19,7 +19,6 @@ import androidx.media3.common.MediaMetadata.FOLDER_TYPE_ARTISTS
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_MIXED
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_PLAYLISTS
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_TITLES
-import androidx.media3.common.Player
 import androidx.media3.common.Rating
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
@@ -47,7 +46,7 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RatingManager
 import org.moire.ultrasonic.util.MainThreadExecutor
@@ -101,10 +100,10 @@ const val PLAY_COMMAND = "play "
  */
 @Suppress("TooManyFunctions", "LargeClass", "UnusedPrivateMember")
 @SuppressLint("UnsafeOptInUsageError")
-class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibraryService) :
+class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
     MediaLibraryService.MediaLibrarySession.Callback, KoinComponent {
 
-    private val mediaPlayerController by inject<MediaPlayerController>()
+    private val mediaPlayerManager by inject<MediaPlayerManager>()
     private val activeServerProvider: ActiveServerProvider by inject()
 
     private val serviceJob = SupervisorJob()
@@ -241,7 +240,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                 * is stored in the track.starred value
                 * See https://github.com/androidx/media/issues/33
                 */
-                val track = mediaPlayerController.currentMediaItem?.toTrack()
+                val track = mediaPlayerManager.currentMediaItem?.toTrack()
                 if (track != null) {
                     customCommandFuture = onSetRating(
                         session,
@@ -254,12 +253,13 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
                             override fun onSuccess(result: SessionResult) {
                                 track.starred = !track.starred
                                 // This needs to be called on the main Thread
+                                // TODO: This is a looping reference
                                 libraryService.onUpdateNotification(session)
                             }
 
                             override fun onFailure(t: Throwable) {
                                 Toast.makeText(
-                                    mediaPlayerController.context,
+                                    mediaPlayerManager.context,
                                     "There was an error updating the rating",
                                     LENGTH_SHORT
                                 ).show()
