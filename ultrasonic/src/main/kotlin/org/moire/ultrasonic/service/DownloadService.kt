@@ -11,6 +11,7 @@ import android.app.Notification
 import android.app.Service
 import android.content.Intent
 import android.net.wifi.WifiManager
+import android.os.Binder
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -39,7 +40,6 @@ import org.moire.ultrasonic.util.FileUtil.getCompleteFile
 import org.moire.ultrasonic.util.FileUtil.getPartialFile
 import org.moire.ultrasonic.util.FileUtil.getPinnedFile
 import org.moire.ultrasonic.util.Settings
-import org.moire.ultrasonic.util.SimpleServiceBinder
 import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.stopForegroundRemoveNotification
@@ -452,3 +452,5 @@ class DownloadService : Service(), KoinComponent {
         }
     }
 }
+
+class SimpleServiceBinder<S>(val service: S) : Binder()

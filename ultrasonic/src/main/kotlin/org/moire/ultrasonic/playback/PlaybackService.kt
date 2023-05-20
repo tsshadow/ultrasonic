@@ -68,7 +68,7 @@ class PlaybackService :
     private var equalizer: EqualizerController? = null
     private val activeServerProvider: ActiveServerProvider by inject()
 
-    private lateinit var librarySessionCallback: MediaLibrarySession.Callback
+    private lateinit var librarySessionCallback: AutoMediaBrowserCallback
 
     private var rxBusSubscription = CompositeDisposable()
 
@@ -132,12 +132,21 @@ class PlaybackService :
 
         setMediaNotificationProvider(CustomNotificationProvider(UApp.applicationContext()))
 
+        // TODO: Remove minor code duplication with updateBackend()
+        val desiredBackend = if (activeServerProvider.getActiveServer().jukeboxByDefault) {
+            MediaPlayerManager.PlayerBackend.JUKEBOX
+        } else {
+            MediaPlayerManager.PlayerBackend.LOCAL
+        }
+
         player = if (activeServerProvider.getActiveServer().jukeboxByDefault) {
             Timber.i("Jukebox enabled by default")
             getJukeboxPlayer()
         } else {
             getLocalPlayer()
         }
+
+        actualBackend = desiredBackend
 
         // Create browser interface
         librarySessionCallback = AutoMediaBrowserCallback(this)
@@ -147,6 +156,11 @@ class PlaybackService :
             .setSessionActivity(getPendingIntentForContent())
             .setBitmapLoader(ArtworkBitmapLoader())
             .build()
+
+        if (!librarySessionCallback.customLayout.isEmpty()) {
+            // Send custom layout to legacy session.
+            mediaLibrarySession.setCustomLayout(librarySessionCallback.customLayout)
+        }
 
         // Set a listener to update the API client when the active server has changed
         rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
@@ -209,6 +223,7 @@ class PlaybackService :
         player.addListener(listener)
 
         mediaLibrarySession.player = player
+
         actualBackend = newBackend
     }
 
@@ -281,7 +296,14 @@ class PlaybackService :
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            updateWidgetTrack(mediaItem?.toTrack())
+            // Since we cannot update the metadata of the media item after creation,
+            // we cannot set change the rating on it
+            // Therefore the track must be our source of truth
+            val track = mediaItem?.toTrack()
+            if (track != null) {
+                updateCustomHeartButton(track.starred)
+            }
+            updateWidgetTrack(track)
             cacheNextSongs()
         }
 
@@ -289,6 +311,10 @@ class PlaybackService :
             updateWidgetPlayerState(isPlaying)
             cacheNextSongs()
         }
+    }
+
+    private fun updateCustomHeartButton(isHeart: Boolean) {
+        librarySessionCallback.updateCustomHeartButton(mediaLibrarySession, isHeart)
     }
 
     private fun cacheNextSongs() {
@@ -394,6 +420,10 @@ class PlaybackService :
 
         private const val NOTIFICATION_CHANNEL_ID = "org.moire.ultrasonic.error"
         private const val NOTIFICATION_CHANNEL_NAME = "Ultrasonic error messages"
+        const val CUSTOM_COMMAND_TOGGLE_HEART_ON =
+            "org.moire.ultrasonic.HEART_ON"
+        const val CUSTOM_COMMAND_TOGGLE_HEART_OFF =
+            "org.moire.ultrasonic.HEART_OFF"
         private const val NOTIFICATION_ID = 3009
     }
 }
