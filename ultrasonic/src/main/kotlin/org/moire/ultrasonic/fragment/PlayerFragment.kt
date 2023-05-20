@@ -225,7 +225,7 @@ class PlayerFragment :
         fiveStar5ImageView = view.findViewById(R.id.song_five_star_5)
     }
 
-    @Suppress("LongMethod", "DEPRECATION")
+    @Suppress("LongMethod")
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         cancellationToken = CancellationToken()
@@ -235,6 +235,7 @@ class PlayerFragment :
         val width: Int
         val height: Int
 
+        @Suppress("DEPRECATION")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val bounds = windowManager.currentWindowMetrics.bounds
             width = bounds.width()

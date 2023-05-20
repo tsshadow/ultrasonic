@@ -15,8 +15,11 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -55,8 +58,7 @@ import timber.log.Timber
 
 /**
  * Initiates a search on the media library and displays the results
- *
- * TODO: Implement the search field without using the deprecated OptionsMenu calls
+ * TODO: Switch to material3 class
  */
 class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     private var searchResult: SearchResult? = null
@@ -80,7 +82,13 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
         cancellationToken = CancellationToken()
         setTitle(this, R.string.search_title)
-        setHasOptionsMenu(true)
+
+        // Register our options menu
+        (requireActivity() as MenuHost).addMenuProvider(
+            menuProvider,
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
 
         listModel.searchResult.observe(
             viewLifecycleOwner
@@ -141,12 +149,24 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     }
 
     /**
-     * This method creates the search bar above the recycler view
+     * This provide creates the search bar above the recycler view
      */
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    private val menuProvider: MenuProvider = object : MenuProvider {
+        override fun onPrepareMenu(menu: Menu) {
+            setupOptionsMenu(menu)
+        }
+
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.search, menu)
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+            return true
+        }
+    }
+    fun setupOptionsMenu(menu: Menu) {
         val activity = activity ?: return
         val searchManager = activity.getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        inflater.inflate(R.menu.search, menu)
         val searchItem = menu.findItem(R.id.search_item)
         searchView = searchItem.actionView as SearchView
         val searchableInfo = searchManager.getSearchableInfo(requireActivity().componentName)
@@ -275,7 +295,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 id = item.id,
                 name = item.name,
                 parentId = item.id,
-                isArtist = (item is Artist)
+                isArtist = false
             )
         } else {
             SearchFragmentDirections.searchToAlbumsList(
