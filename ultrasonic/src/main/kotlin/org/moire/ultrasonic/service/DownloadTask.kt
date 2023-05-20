@@ -92,8 +92,8 @@ class DownloadTask(
         // Attempt partial HTTP GET, appending to the file if it exists.
         val (inStream, isPartial) = musicService.getDownloadInputStream(
             downloadTrack.track, fileLength,
-            Settings.maxBitRate,
-            downloadTrack.pinned
+            if (downloadTrack.pinned) Settings.maxBitRatePinning else Settings.maxBitRate,
+            downloadTrack.pinned && Settings.pinWithHighestQuality
         )
 
         inputStream = inStream

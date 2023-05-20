@@ -167,18 +167,25 @@
         a:title="@string/settings.network_title"
         app:iconSpaceReserved="false">
         <ListPreference
-            a:defaultValue="0"
+            a:defaultValue="256"
+            a:entries="@array/maxBitrateNames"
+            a:entryValues="@array/maxBitrateValues"
+            a:key="@string/setting_key.max_bitrate_mobile"
+            a:title="@string/settings.max_bitrate_mobile"
+            app:iconSpaceReserved="false"/>
+        <ListPreference
+            a:defaultValue="320"
             a:entries="@array/maxBitrateNames"
             a:entryValues="@array/maxBitrateValues"
             a:key="@string/setting_key.max_bitrate_wifi"
             a:title="@string/settings.max_bitrate_wifi"
             app:iconSpaceReserved="false"/>
         <ListPreference
-            a:defaultValue="0"
+            a:defaultValue="320"
             a:entries="@array/maxBitrateNames"
             a:entryValues="@array/maxBitrateValues"
-            a:key="@string/setting_key.max_bitrate_mobile"
-            a:title="@string/settings.max_bitrate_mobile"
+            a:key="@string/setting_key.max_bitrate_pinning"
+            a:title="@string/settings.max_bitrate_pinning"
             app:iconSpaceReserved="false"/>
         <CheckBoxPreference
             a:defaultValue="false"
