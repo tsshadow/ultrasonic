@@ -12,6 +12,7 @@
     <string name="setting_key.show_track_number" translatable="false">showTrackNumber</string>
     <string name="setting_key.max_bitrate_wifi" translatable="false">maxBitrateWifi</string>
     <string name="setting_key.max_bitrate_mobile" translatable="false">maxBitrateMobile</string>
+    <string name="setting_key.max_bitrate_pinning" translatable="false">maxBitratePinning</string>
     <string name="setting_key.cache_size" translatable="false">cacheSize</string>
     <string name="setting_key.custom_cache_location" translatable="false">customCacheLocation</string>
     <string name="setting_key.cache_location" translatable="false">cacheLocation</string>

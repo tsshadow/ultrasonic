@@ -33,17 +33,22 @@ object Settings {
     val maxBitRate: Int
         get() {
             return if (Util.isNetworkRestricted()) {
-                maxMobileBitRate
+                maxBitRateMobile
             } else {
-                maxWifiBitRate
+                maxBitRateWifi
             }
         }
 
-    private var maxWifiBitRate
+    private var maxBitRateWifi
         by StringIntSetting(getKey(R.string.setting_key_max_bitrate_wifi))
 
-    private var maxMobileBitRate
+    private var maxBitRateMobile
         by StringIntSetting(getKey(R.string.setting_key_max_bitrate_mobile))
+
+    var maxBitRatePinning
+        by StringIntSetting(getKey(R.string.setting_key_max_bitrate_pinning))
+    val pinWithHighestQuality: Boolean
+        get() = (maxBitRatePinning == 0)
 
     @JvmStatic
     val preloadCount: Int
