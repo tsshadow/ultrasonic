@@ -18,6 +18,7 @@ import androidx.media3.common.MediaMetadata.FOLDER_TYPE_MIXED
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_PLAYLISTS
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_TITLES
 import androidx.media3.common.Rating
+import androidx.media3.common.StarRating
 import androidx.media3.session.CommandButton
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
@@ -296,7 +297,11 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
     ): ListenableFuture<SessionResult> {
         val mediaItem = session.player.currentMediaItem
         if (mediaItem != null) {
-            mediaItem.toTrack().starred = (rating as HeartRating).isHeart
+            if (rating is HeartRating) {
+                mediaItem.toTrack().starred = rating.isHeart
+            } else if (rating is StarRating) {
+                mediaItem.toTrack().userRating = rating.starRating.toInt()
+            }
             return onSetRating(
                 session,
                 controller,
