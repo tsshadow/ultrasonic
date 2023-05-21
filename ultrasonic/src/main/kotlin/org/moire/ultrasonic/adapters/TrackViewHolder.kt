@@ -142,13 +142,15 @@ class TrackViewHolder(val view: View) :
 
         // Listen for rating updates
         rxBusSubscription!! += RxBus.ratingPublishedObservable.subscribe {
-            // Ignore updates which are not for the current song
-            if (it.id != song.id) return@subscribe
+            launch(Dispatchers.Main) {
+                // Ignore updates which are not for the current song
+                if (it.id != song.id) return@launch
 
-            if (it.rating is HeartRating) {
-                updateSingleStar(it.rating.isHeart)
-            } else if (it.rating is StarRating) {
-                updateFiveStars(it.rating.starRating.toInt())
+                if (it.rating is HeartRating) {
+                    updateSingleStar(it.rating.isHeart)
+                } else if (it.rating is StarRating) {
+                    updateFiveStars(it.rating.starRating.toInt())
+                }
             }
         }
     }
