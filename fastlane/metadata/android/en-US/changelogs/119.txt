@@ -1,0 +1,10 @@
+Features:
+- This releases focuses on shuffled playback. The view of the playlist will now present itself in the order it will actually play. You can toggle the shuffle mode to create a new order, while the past playback history will be preserved.
+- Use Coroutines for triggering the download or playback of music through the context menus
+- Enable Artists pictures by Default
+
+Bug fixes:
+- Remove an unhelpful popup that "ID must be set"
+- Shuffle mode doesn't always play all tracks
+- Shuffle mode starts with the first track most of the time
+
