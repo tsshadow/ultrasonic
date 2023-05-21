@@ -1,5 +1,4 @@
 #### From Jackson
-
 -keepattributes *Annotation*,EnclosingMethod,Signature
 -keepnames class com.fasterxml.jackson.** {
 *;
