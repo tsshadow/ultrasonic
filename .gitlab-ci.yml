@@ -74,7 +74,9 @@ Unit Tests:
 
 Assemble Release:
   stage: Build
-  script: ./gradlew assembleRelease
+  script:
+    - sed -i 's/applicationId \"org.moire.ultrasonic\"/applicationId "org.moire.ultrasonic.gitlab"/' ultrasonic/build.gradle
+    - ./gradlew assembleRelease
   artifacts:
     name: ultrasonic-release-unsigned-${CI_COMMIT_SHA}
     paths:
