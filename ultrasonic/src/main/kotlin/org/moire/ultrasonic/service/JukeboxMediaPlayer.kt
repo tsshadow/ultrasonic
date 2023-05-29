@@ -505,7 +505,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
                 listeners.queueEvent(Player.EVENT_MEDIA_ITEM_TRANSITION) {
                     it.onMediaItemTransition(
                         currentMedia,
-                        Player.MEDIA_ITEM_TRANSITION_REASON_SEEK
+                        Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
                     )
                 }
             }
