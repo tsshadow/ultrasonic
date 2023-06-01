@@ -46,7 +46,7 @@ class DownloadHandler(
         var successString: String? = null
 
         // Launch the Job
-        executeTaskWithToast(fragment, {
+        executeTaskWithToast({
             val tracksToDownload: List<Track> = tracks
                 ?: getTracksFromServer(isArtist, id!!, isDirectory, name, isShare)
 
@@ -104,7 +104,7 @@ class DownloadHandler(
     ) {
         var successString: String? = null
         // Launch the Job
-        executeTaskWithToast(fragment, {
+        executeTaskWithToast({
             val songs: MutableList<Track> =
                 getTracksFromServer(isArtist, id, isDirectory, name, isShare)
 

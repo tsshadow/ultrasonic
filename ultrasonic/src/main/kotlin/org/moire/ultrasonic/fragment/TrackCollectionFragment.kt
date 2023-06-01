@@ -351,13 +351,11 @@ open class TrackCollectionFragment(
 
         val isArtist = navArgs.isArtist
 
-        // Need a valid id to download stuff
-        val id = navArgs.id ?: return
-
-        if (hasSubFolders) {
+        // Need a valid id to recurse sub directories stuff
+        if (hasSubFolders && navArgs.id != null) {
             downloadHandler.fetchTracksAndAddToController(
                 fragment = this,
-                id = id,
+                id = navArgs.id!!,
                 append = append,
                 autoPlay = !append,
                 shuffle = shuffle,
