@@ -14,6 +14,6 @@ data class PlaybackState(
     var repeatMode: Int = 0
 ) : Serializable {
     companion object {
-        const val serialVersionUID = -293487987L
+        private const val serialVersionUID = -293487987L
     }
 }

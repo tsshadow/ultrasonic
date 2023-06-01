@@ -52,7 +52,11 @@ style:
     active: true
   ForbiddenComment:
     active: true
-    values: ['FIXME:', 'STOPSHIP:']
+    comments:
+      - reason: 'Forbidden FIXME todo marker in comment, please fix the problem.'
+        value: 'FIXME:'
+      - reason: 'Forbidden STOPSHIP todo marker in comment, please address the problem before shipping the code.'
+        value: 'STOPSHIP:'
   WildcardImport:
     active: true
   MaxLineLength:
