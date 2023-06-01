@@ -31,7 +31,6 @@ object CoroutinePatterns {
 }
 
 fun CoroutineScope.executeTaskWithToast(
-    fragment: Fragment,
     task: suspend CoroutineScope.() -> Unit,
     successString: () -> String?
 ): Job {
@@ -63,7 +62,7 @@ fun CoroutineScope.executeTaskWithModalDialog(
     successString: () -> String
 ) {
     // Create the job
-    val job = executeTaskWithToast(fragment, task, successString)
+    val job = executeTaskWithToast(task, successString)
 
     // Create the dialog
     val builder = InfoDialog.Builder(fragment.requireContext())
