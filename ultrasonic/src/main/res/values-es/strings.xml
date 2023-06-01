@@ -452,4 +452,5 @@
     <string name="supported_server_features">Funciones soportadas</string>
     <string name="foreground_exception_title">No se puede reanudar la reproducción</string>
     <string name="foreground_exception_text">Presione el botón de reproducción en la notificación de medios si aún está presente; de lo contrario, abra la aplicación para iniciar la reproducción y vuelva a conectar la sesión al controlador</string>
+    <string name="settings.max_bitrate_pinning">Tasa de bits máxima: al fijar una canción de forma permanente</string>
 </resources>
