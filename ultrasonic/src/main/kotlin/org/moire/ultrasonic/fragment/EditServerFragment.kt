@@ -401,7 +401,7 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
                 Timber.w(exception)
                 ErrorDialog.Builder(requireContext())
                     .setTitle(R.string.error_label)
-                    .setMessage(getErrorMessage(exception, context))
+                    .setMessage(getErrorMessage(exception))
                     .show()
             }
         }

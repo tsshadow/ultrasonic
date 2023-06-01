@@ -78,6 +78,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.adapters.TrackViewBinder
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
+import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.shouldUseId3Tags
@@ -662,7 +663,6 @@ class PlayerFragment :
                     parentId = track.parent,
                     isAlbum = true
                 )
-
                 findNavController().navigate(action)
                 return true
             }
@@ -822,16 +822,16 @@ class PlayerFragment :
             musicService.createPlaylist(null, playlistName, entries)
         }.invokeOnCompletion {
             if (it == null || it is CancellationException) {
-                Util.toast(context, R.string.download_playlist_done)
+                Util.toast(UApp.applicationContext(), R.string.download_playlist_done)
             } else {
                 Timber.e(it, "Exception has occurred in savePlaylistInBackground")
                 val msg = String.format(
                     Locale.ROOT,
                     "%s %s",
                     resources.getString(R.string.download_playlist_error),
-                    CommunicationError.getErrorMessage(it, context)
+                    CommunicationError.getErrorMessage(it)
                 )
-                Util.toast(context, msg)
+                Util.toast(UApp.applicationContext(), msg)
             }
         }
     }

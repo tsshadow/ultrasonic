@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.api.subsonic.SubsonicRESTException
+import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.subsonic.getLocalizedErrorMessage
 import timber.log.Timber
 
@@ -46,14 +47,14 @@ object CommunicationError {
 
         ErrorDialog(
             context = context,
-            message = getErrorMessage(error, context)
+            message = getErrorMessage(error)
         ).show()
     }
 
     @JvmStatic
     @Suppress("ReturnCount")
-    fun getErrorMessage(error: Throwable, context: Context?): String {
-        if (context == null) return "Couldn't get Error message, Context is null"
+    fun getErrorMessage(error: Throwable): String {
+        val context = UApp.applicationContext()
         if (error is IOException && !Util.hasUsableNetwork()) {
             return context.resources.getString(R.string.background_task_no_network)
         } else if (error is FileNotFoundException) {

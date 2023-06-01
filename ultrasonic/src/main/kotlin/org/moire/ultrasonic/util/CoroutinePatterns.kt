@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.app.UApp
 import timber.log.Timber
 
 object CoroutinePatterns {
@@ -40,7 +41,7 @@ fun CoroutineScope.executeTaskWithToast(
     // Setup a handler when the job is done
     job.invokeOnCompletion {
         val toastString = if (it != null && it !is CancellationException) {
-            CommunicationError.getErrorMessage(it, fragment.context)
+            CommunicationError.getErrorMessage(it)
         } else {
             successString()
         }
@@ -49,7 +50,7 @@ fun CoroutineScope.executeTaskWithToast(
         if (toastString == null) return@invokeOnCompletion
 
         launch(Dispatchers.Main) {
-            Util.toast(fragment.context, toastString)
+            Util.toast(UApp.applicationContext(), toastString)
         }
     }
 
