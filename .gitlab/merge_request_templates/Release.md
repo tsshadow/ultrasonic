@@ -1,6 +1,6 @@
 #### Before merge:
 - [ ] MR is targetting the master branch
-- [ ] Squash commits must be disabled!
+- [ ] **Squash commits must be disabled!**
 - [ ] RoboTests (5 physical, 10 virtual) on a Release apk return no errors
 - [ ] Release notes present
 
