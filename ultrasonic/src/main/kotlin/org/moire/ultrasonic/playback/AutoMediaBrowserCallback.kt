@@ -9,8 +9,6 @@ package org.moire.ultrasonic.playback
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.widget.Toast
-import android.widget.Toast.LENGTH_SHORT
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -19,8 +17,9 @@ import androidx.media3.common.MediaMetadata.FOLDER_TYPE_ARTISTS
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_MIXED
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_PLAYLISTS
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_TITLES
-import androidx.media3.common.Player
 import androidx.media3.common.Rating
+import androidx.media3.common.StarRating
+import androidx.media3.session.CommandButton
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
@@ -28,7 +27,6 @@ import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import androidx.media3.session.SessionResult.RESULT_SUCCESS
 import com.google.common.collect.ImmutableList
-import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
@@ -47,11 +45,9 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RatingManager
-import org.moire.ultrasonic.util.MainThreadExecutor
-import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.buildMediaItem
 import org.moire.ultrasonic.util.toMediaItem
@@ -94,7 +90,6 @@ private const val DISPLAY_LIMIT = 100
 private const val SEARCH_LIMIT = 10
 
 // List of available custom SessionCommands
-const val SESSION_CUSTOM_SET_RATING = "SESSION_CUSTOM_SET_RATING"
 const val PLAY_COMMAND = "play "
 
 /**
@@ -102,10 +97,10 @@ const val PLAY_COMMAND = "play "
  */
 @Suppress("TooManyFunctions", "LargeClass", "UnusedPrivateMember")
 @SuppressLint("UnsafeOptInUsageError")
-class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibraryService) :
+class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
     MediaLibraryService.MediaLibrarySession.Callback, KoinComponent {
 
-    private val mediaPlayerController by inject<MediaPlayerController>()
+    private val mediaPlayerManager by inject<MediaPlayerManager>()
     private val activeServerProvider: ActiveServerProvider by inject()
 
     private val serviceJob = SupervisorJob()
@@ -119,8 +114,25 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
     private val musicService get() = MusicServiceFactory.getMusicService()
     private val isOffline get() = ActiveServerProvider.isOffline()
-    private val useId3Tags get() = Settings.shouldUseId3Tags
     private val musicFolderId get() = activeServerProvider.getActiveServer().musicFolderId
+
+    private var customCommands: List<CommandButton>
+    internal var customLayout = ImmutableList.of<CommandButton>()
+
+    init {
+        customCommands =
+            listOf(
+                // This button is used for an unstarred track, and its action will star the track
+                getHeartCommandButton(
+                    SessionCommand(PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_ON, Bundle.EMPTY)
+                ),
+                // This button is used for an starred track, and its action will unstar the track
+                getHeartCommandButton(
+                    SessionCommand(PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_OFF, Bundle.EMPTY)
+                )
+            )
+        customLayout = ImmutableList.of(customCommands[0])
+    }
 
     /**
      * Called when a {@link MediaBrowser} requests the root {@link MediaItem} by {@link
@@ -179,16 +191,37 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         val connectionResult = super.onConnect(session, controller)
         val availableSessionCommands = connectionResult.availableSessionCommands.buildUpon()
 
-        /*
-        * TODO: Currently we need to create a custom session command, see https://github.com/androidx/media/issues/107
-        * When this issue is fixed we should be able to remove this method again
-        */
-        availableSessionCommands.add(SessionCommand(SESSION_CUSTOM_SET_RATING, Bundle()))
+        for (commandButton in customCommands) {
+            // Add custom command to available session commands.
+            commandButton.sessionCommand?.let { availableSessionCommands.add(it) }
+        }
 
         return MediaSession.ConnectionResult.accept(
             availableSessionCommands.build(),
             connectionResult.availablePlayerCommands
         )
+    }
+
+    override fun onPostConnect(session: MediaSession, controller: MediaSession.ControllerInfo) {
+        if (!customLayout.isEmpty() && controller.controllerVersion != 0) {
+            // Let Media3 controller (for instance the MediaNotificationProvider)
+            // know about the custom layout right after it connected.
+            session.setCustomLayout(customLayout)
+        }
+    }
+
+    private fun getHeartCommandButton(sessionCommand: SessionCommand): CommandButton {
+        val willHeart =
+            (sessionCommand.customAction == PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_ON)
+        return CommandButton.Builder()
+            .setDisplayName("Love")
+            .setIconResId(
+                if (willHeart) R.drawable.ic_star_hollow
+                else R.drawable.ic_star_full
+            )
+            .setSessionCommand(sessionCommand)
+            .setEnabled(true)
+            .build()
     }
 
     override fun onGetItem(
@@ -204,12 +237,12 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         // Create LRU Cache of MediaItems, fill it in the other calls
         // and retrieve it here.
 
-        if (mediaItem != null) {
-            return Futures.immediateFuture(
+        return if (mediaItem != null) {
+            Futures.immediateFuture(
                 LibraryResult.ofItem(mediaItem, null)
             )
         } else {
-            return Futures.immediateFuture(
+            Futures.immediateFuture(
                 LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
             )
         }
@@ -237,39 +270,13 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         var customCommandFuture: ListenableFuture<SessionResult>? = null
 
         when (customCommand.customAction) {
-            SESSION_CUSTOM_SET_RATING -> {
-                /*
-                * It is currently not possible to edit a MediaItem after creation so the isRated value
-                * is stored in the track.starred value
-                * See https://github.com/androidx/media/issues/33
-                */
-                val track = mediaPlayerController.currentMediaItem?.toTrack()
-                if (track != null) {
-                    customCommandFuture = onSetRating(
-                        session,
-                        controller,
-                        HeartRating(!track.starred)
-                    )
-                    Futures.addCallback(
-                        customCommandFuture,
-                        object : FutureCallback<SessionResult> {
-                            override fun onSuccess(result: SessionResult) {
-                                track.starred = !track.starred
-                                // This needs to be called on the main Thread
-                                libraryService.onUpdateNotification(session)
-                            }
-
-                            override fun onFailure(t: Throwable) {
-                                Toast.makeText(
-                                    mediaPlayerController.context,
-                                    "There was an error updating the rating",
-                                    LENGTH_SHORT
-                                ).show()
-                            }
-                        },
-                        MainThreadExecutor()
-                    )
-                }
+            PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_ON -> {
+                customCommandFuture = onSetRating(session, controller, HeartRating(true))
+                updateCustomHeartButton(session, true)
+            }
+            PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_OFF -> {
+                customCommandFuture = onSetRating(session, controller, HeartRating(false))
+                updateCustomHeartButton(session, false)
             }
             else -> {
                 Timber.d(
@@ -283,19 +290,25 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
             return customCommandFuture
         return super.onCustomCommand(session, controller, customCommand, args)
     }
-
     override fun onSetRating(
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
         rating: Rating
     ): ListenableFuture<SessionResult> {
-        if (session.player.currentMediaItem != null)
+        val mediaItem = session.player.currentMediaItem
+        if (mediaItem != null) {
+            if (rating is HeartRating) {
+                mediaItem.toTrack().starred = rating.isHeart
+            } else if (rating is StarRating) {
+                mediaItem.toTrack().userRating = rating.starRating.toInt()
+            }
             return onSetRating(
                 session,
                 controller,
-                session.player.currentMediaItem!!.mediaId,
+                mediaItem.mediaId,
                 rating
             )
+        }
         return super.onSetRating(session, controller, rating)
     }
 
@@ -305,6 +318,9 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
         mediaId: String,
         rating: Rating
     ): ListenableFuture<SessionResult> {
+        // TODO: Through this methods it is possible to set a rating on an arbitrary MediaItem.
+        // Right now the ratings are submitted, yet the underlying track is only updated when
+        // coming from the other onSetRating(session, controller, rating)
         return serviceScope.future {
             Timber.i(controller.packageName)
             // This function even though its declared in AutoMediaBrowserCallback.kt is
@@ -326,7 +342,6 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
      * and thereby customarily it is required to rebuild it..
      * See also: https://stackoverflow.com/questions/70096715/adding-mediaitem-when-using-the-media3-library-caused-an-error
      */
-
     override fun onAddMediaItems(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo,
@@ -661,7 +676,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
             var childMediaId: String = MEDIA_ARTIST_ITEM
 
             var artists = serviceScope.future {
-                if (!isOffline && useId3Tags) {
+                if (ActiveServerProvider.shouldUseId3Tags()) {
                     // TODO this list can be big so we're not refreshing.
                     //  Maybe a refresh menu item can be added
                     callWithErrorHandling { musicService.getArtists(false) }
@@ -716,7 +731,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
         return mainScope.future {
             val albums = serviceScope.future {
-                if (!isOffline && useId3Tags) {
+                if (ActiveServerProvider.shouldUseId3Tags()) {
                     callWithErrorHandling { musicService.getAlbumsOfArtist(id, name, false) }
                 } else {
                     callWithErrorHandling {
@@ -788,7 +803,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
             val offset = (page ?: 0) * DISPLAY_LIMIT
 
             val albums = serviceScope.future {
-                if (useId3Tags) {
+                if (ActiveServerProvider.shouldUseId3Tags()) {
                     callWithErrorHandling {
                         musicService.getAlbumList2(
                             type, DISPLAY_LIMIT, offset, null
@@ -1190,7 +1205,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
     private fun listSongsInMusicService(id: String, name: String?): MusicDirectory? {
         return serviceScope.future {
-            if (!ActiveServerProvider.isOffline() && Settings.shouldUseId3Tags) {
+            if (ActiveServerProvider.shouldUseId3Tags()) {
                 callWithErrorHandling { musicService.getAlbumAsDir(id, name, false) }
             } else {
                 callWithErrorHandling { musicService.getMusicDirectory(id, name, false) }
@@ -1200,7 +1215,7 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
 
     private fun listStarredSongsInMusicService(): SearchResult? {
         return serviceScope.future {
-            if (Settings.shouldUseId3Tags) {
+            if (ActiveServerProvider.shouldUseId3Tags()) {
                 callWithErrorHandling { musicService.getStarred2() }
             } else {
                 callWithErrorHandling { musicService.getStarred() }
@@ -1277,5 +1292,16 @@ class AutoMediaBrowserCallback(var player: Player, val libraryService: MediaLibr
             Timber.i(all)
             null
         }
+    }
+
+    fun updateCustomHeartButton(
+        session: MediaSession,
+        isHeart: Boolean
+    ) {
+        val command = if (isHeart) customCommands[1] else customCommands[0]
+        // Change the custom layout to contain the right heart button
+        customLayout = ImmutableList.of(command)
+        // Send the updated custom layout to controllers.
+        session.setCustomLayout(customLayout)
     }
 }

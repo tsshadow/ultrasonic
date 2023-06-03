@@ -11,6 +11,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.HeartRating
+import androidx.media3.common.StarRating
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -139,7 +140,19 @@ class TrackViewHolder(val view: View) :
             updateStatus(it.state, it.progress)
         }
 
-        // Timber.v("Setting song done")
+        // Listen for rating updates
+        rxBusSubscription!! += RxBus.ratingPublishedObservable.subscribe {
+            launch(Dispatchers.Main) {
+                // Ignore updates which are not for the current song
+                if (it.id != song.id) return@launch
+
+                if (it.rating is HeartRating) {
+                    updateSingleStar(it.rating.isHeart)
+                } else if (it.rating is StarRating) {
+                    updateFiveStars(it.rating.starRating.toInt())
+                }
+            }
+        }
     }
 
     // This is called when the Holder is recycled and receives a new Song

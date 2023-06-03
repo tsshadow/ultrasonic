@@ -13,12 +13,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.DownloadState
 import org.moire.ultrasonic.service.MusicServiceFactory
-import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 
 /*
@@ -40,7 +40,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getMusicDirectory(id, name, refresh)
-
+            currentListIsSortable = true
             updateList(musicDirectory)
         }
     }
@@ -51,7 +51,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory: MusicDirectory = service.getAlbumAsDir(id, name, refresh)
-
+            currentListIsSortable = true
             updateList(musicDirectory)
         }
     }
@@ -60,6 +60,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getSongsByGenre(genre, count, offset)
+            currentListIsSortable = false
             updateList(musicDirectory, append)
         }
     }
@@ -71,12 +72,12 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory: MusicDirectory
 
-            musicDirectory = if (Settings.shouldUseId3Tags) {
+            musicDirectory = if (ActiveServerProvider.shouldUseId3Tags()) {
                 Util.getSongsFromSearchResult(service.getStarred2())
             } else {
                 Util.getSongsFromSearchResult(service.getStarred())
             }
-
+            currentListIsSortable = false
             updateList(musicDirectory)
         }
     }
@@ -87,8 +88,8 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val videos = service.getVideos(refresh)
-
             if (videos != null) {
+                currentListIsSortable = false
                 updateList(videos)
             }
         }
@@ -99,19 +100,16 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getRandomSongs(size)
-
             currentListIsSortable = false
-
             updateList(musicDirectory, append)
         }
     }
 
     suspend fun getPlaylist(playlistId: String, playlistName: String) {
-
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getPlaylist(playlistId, playlistName)
-
+            currentListIsSortable = false
             updateList(musicDirectory)
         }
     }
@@ -121,8 +119,8 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getPodcastEpisodes(podcastChannelId)
-
             if (musicDirectory != null) {
+                currentListIsSortable = false
                 updateList(musicDirectory)
             }
         }
@@ -144,7 +142,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
                     break
                 }
             }
-
+            currentListIsSortable = false
             updateList(musicDirectory)
         }
     }
@@ -153,7 +151,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = Util.getSongsFromBookmarks(service.getBookmarks())
-
+            currentListIsSortable = false
             updateList(musicDirectory)
         }
     }

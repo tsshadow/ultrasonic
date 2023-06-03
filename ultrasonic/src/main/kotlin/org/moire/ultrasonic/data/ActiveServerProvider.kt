@@ -270,8 +270,8 @@ class ActiveServerProvider(
         /**
          * Queries if ID3 tags should be used
          */
-        fun isID3Enabled(): Boolean {
-            return Settings.shouldUseId3Tags && (!isOffline() || Settings.useId3TagsOffline)
+        fun shouldUseId3Tags(): Boolean {
+            return Settings.id3TagsEnabledOnline && (!isOffline() || Settings.id3TagsEnabledOffline)
         }
 
         /**

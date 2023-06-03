@@ -1,0 +1,10 @@
+Features:
+- Revamp management of ratings. Tracks can be starred from the notification in Android 13, and the changes will show up everywhere immediately.
+- Add a setting to control the maximum bitrate when pinning music (can be used to avoid downloading lossless files like flac).
+- Modernize the Jukebox player.
+- The hardware keys can be used to set the Jukebox volume.
+- The current playlist shows a spinner when loading takes some time
+
+Bug fixes:
+- Request correct bluetooth permission on Android 13 (needed to pause/play on connect)
+- Update dependencies (OkHttp, Material)

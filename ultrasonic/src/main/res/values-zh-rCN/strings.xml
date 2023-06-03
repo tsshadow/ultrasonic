@@ -60,7 +60,6 @@
     <string name="download.jukebox_offline">离线模式不支持远程控制。</string>
     <string name="download.jukebox_on">已打开远程控制，音乐将在服务端播放。</string>
     <string name="download.jukebox_server_too_old">远程控制不支持，请升级您的 Subsonic 服务器。</string>
-    <string name="download.jukebox_volume">远程音量</string>
     <string name="download.menu_equalizer">均衡器</string>
     <string name="download.menu_jukebox_off">关闭点唱机</string>
     <string name="download.menu_jukebox_on">开启点唱机</string>
@@ -68,7 +67,7 @@
     <string name="download.menu_save">保存播放列表</string>
     <string name="download.menu_screen_off">关闭屏幕常亮</string>
     <string name="download.menu_screen_on">开启屏幕常亮</string>
-    <string name="download.menu_show_album">显示专辑</string>
+    <string name="download.menu_show_album">转到专辑</string>
     <string name="download.menu_shuffle">随机</string>
     <string name="download.menu_shuffle_on">随机播放模式已启用</string>
     <string name="download.menu_shuffle_off">随机播放模式已禁用</string>
@@ -281,7 +280,7 @@
     <string name="settings.test_connection_title">测试连接</string>
     <string name="settings.theme_light">亮色</string>
     <string name="settings.theme_dark">暗色</string>
-    <string name="settings.theme_black">Black</string>
+    <string name="settings.theme_black">黑色</string>
     <string name="settings.theme_title">主题</string>
     <string name="settings.title.allow_self_signed_certificate">允许自签名 HTTPS 证书</string>
     <string name="settings.title.force_plain_text_password">强制原始密码认证</string>
@@ -338,7 +337,7 @@
     <string name="share_default_greeting">看看我从 %s 分享的这首音乐</string>
     <string name="share_via">分享歌曲通过</string>
     <string name="menu.share">分享</string>
-    <string name="download.menu_show_artist">显示艺术家</string>
+    <string name="download.menu_show_artist">转到艺术家</string>
     <string name="common_multiple_years">数年</string>
     <string name="settings.debug.title">调试选项</string>
     <string name="settings.debug.log_to_file">将调试日志写入文件</string>
@@ -449,4 +448,5 @@
     <string name="language.cs">捷克语</string>
     <string name="language.de">德语</string>
     <string name="language.pt_BR">葡萄牙语（巴西）</string>
+    <string name="settings.max_bitrate_pinning">最大比特率 - 永久固定歌曲时</string>
 </resources>

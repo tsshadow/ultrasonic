@@ -17,7 +17,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.SearchRecentSuggestions
-import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -55,8 +54,8 @@ import org.moire.ultrasonic.data.ServerSettingDao
 import org.moire.ultrasonic.fragment.OnBackPressedHandler
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.provider.SearchSuggestionProvider
-import org.moire.ultrasonic.service.MediaPlayerController
 import org.moire.ultrasonic.service.MediaPlayerLifecycleSupport
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.Constants
@@ -98,7 +97,7 @@ class NavigationActivity : AppCompatActivity() {
 
     private val serverSettingsModel: ServerSettingsModel by viewModel()
     private val lifecycleSupport: MediaPlayerLifecycleSupport by inject()
-    private val mediaPlayerController: MediaPlayerController by inject()
+    private val mediaPlayerManager: MediaPlayerManager by inject()
     private val activeServerProvider: ActiveServerProvider by inject()
     private val serverRepository: ServerSettingDao by inject()
 
@@ -274,18 +273,6 @@ class NavigationActivity : AppCompatActivity() {
         }
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        val isVolumeDown = keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
-        val isVolumeUp = keyCode == KeyEvent.KEYCODE_VOLUME_UP
-        val isVolumeAdjust = isVolumeDown || isVolumeUp
-        val isJukebox = mediaPlayerController.isJukeboxEnabled
-        if (isVolumeAdjust && isJukebox) {
-            mediaPlayerController.adjustVolume(isVolumeUp)
-            return true
-        }
-        return super.onKeyDown(keyCode, event)
-    }
-
     private fun setupNavigationMenu(navController: NavController) {
         navigationView?.setupWithNavController(navController)
 
@@ -308,7 +295,7 @@ class NavigationActivity : AppCompatActivity() {
                 }
                 R.id.menu_exit -> {
                     setResult(Constants.RESULT_CLOSE_ALL)
-                    mediaPlayerController.onDestroy()
+                    mediaPlayerManager.onDestroy()
                     finish()
                     exit()
                 }
@@ -475,9 +462,9 @@ class NavigationActivity : AppCompatActivity() {
         }
 
         if (nowPlayingView != null) {
-            val playerState: Int = mediaPlayerController.playbackState
+            val playerState: Int = mediaPlayerManager.playbackState
             if (playerState == STATE_BUFFERING || playerState == STATE_READY) {
-                val item: MediaItem? = mediaPlayerController.currentMediaItem
+                val item: MediaItem? = mediaPlayerManager.currentMediaItem
                 if (item != null) {
                     nowPlayingView?.visibility = View.VISIBLE
                 }

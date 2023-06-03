@@ -42,7 +42,6 @@
     <string name="download.jukebox_on">リモートコントロールがオンになりました。サーバーで音楽が再生されます。</string>
     <string name="download.jukebox_off">リモートコントロールがオフになりました。モバイル端末で音楽が再生されます。</string>
     <string name="download.jukebox_server_too_old">リモートコントロールがサポートされていません。Subsonicサーバーをアップグレードしてください。</string>
-    <string name="download.jukebox_volume">リモート音量</string>
     <string name="download.menu_jukebox_on">ジュークボックス ON</string>
     <string name="download.menu_lyrics">歌詞</string>
     <string name="download.menu_show_album">アルバムを表示</string>

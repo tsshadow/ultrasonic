@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'org.jetbrains.kotlin.kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply from: "../gradle_scripts/code_quality.gradle"
 
@@ -9,12 +9,12 @@ android {
 
     defaultConfig {
         applicationId "org.moire.ultrasonic"
-        versionCode 120
-        versionName "4.4.1"
+        versionCode 122
+        versionName "4.5.0"
 
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
-        resConfigs 'cs', 'de', 'en', 'es', 'fr', 'gl', 'hu', 'it', 'ja', 'nb-rNO', 'nl', 'pl', 'pt', 'pt-rBR', 'ru', 'zh-rCN', 'zh-rTW'
+        resourceConfigurations += ['cs', 'de', 'en', 'es', 'fr', 'gl', 'hu', 'it', 'ja', 'nb-rNO', 'nl', 'pl', 'pt', 'pt-rBR', 'ru', 'zh-rCN', 'zh-rTW']
     }
 
     bundle.language.enableSplit = false

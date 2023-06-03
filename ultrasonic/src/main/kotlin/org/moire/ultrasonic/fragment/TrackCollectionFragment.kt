@@ -12,8 +12,11 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
@@ -40,7 +43,7 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.model.TrackCollectionModel
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.subsonic.DownloadAction
@@ -82,7 +85,7 @@ open class TrackCollectionFragment(
     private var playAllButton: MenuItem? = null
     private var shareButton: MenuItem? = null
 
-    internal val mediaPlayerController: MediaPlayerController by inject()
+    internal val mediaPlayerManager: MediaPlayerManager by inject()
     private val shareHandler: ShareHandler by inject()
     internal var cancellationToken: CancellationToken? = null
 
@@ -114,7 +117,13 @@ open class TrackCollectionFragment(
         setupButtons(view)
 
         registerForContextMenu(listView!!)
-        setHasOptionsMenu(true)
+
+        // Register our options menu
+        (requireActivity() as MenuHost).addMenuProvider(
+            menuProvider,
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
 
         // Create a View Manager
         viewManager = LinearLayoutManager(this.context)
@@ -257,41 +266,39 @@ open class TrackCollectionFragment(
         }
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
-        playAllButton = menu.findItem(R.id.select_album_play_all)
+    private val menuProvider: MenuProvider = object : MenuProvider {
+        override fun onPrepareMenu(menu: Menu) {
+            playAllButton = menu.findItem(R.id.select_album_play_all)
 
-        if (playAllButton != null) {
-            playAllButton!!.isVisible = playAllButtonVisible
+            if (playAllButton != null) {
+                playAllButton!!.isVisible = playAllButtonVisible
+            }
+
+            shareButton = menu.findItem(R.id.menu_item_share)
+
+            if (shareButton != null) {
+                shareButton!!.isVisible = shareButtonVisible
+            }
         }
 
-        shareButton = menu.findItem(R.id.menu_item_share)
-
-        if (shareButton != null) {
-            shareButton!!.isVisible = shareButtonVisible
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.select_album, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val itemId = item.itemId
-        if (itemId == R.id.select_album_play_all) {
-            playAll()
-            return true
-        } else if (itemId == R.id.menu_item_share) {
-            shareHandler.createShare(
-                this, getSelectedSongs(),
-                refreshListView, cancellationToken!!,
-                navArgs.id
-            )
-            return true
+        override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+            inflater.inflate(R.menu.select_album, menu)
         }
 
-        return false
+        override fun onMenuItemSelected(item: MenuItem): Boolean {
+            if (item.itemId == R.id.select_album_play_all) {
+                playAll()
+                return true
+            } else if (item.itemId == R.id.menu_item_share) {
+                shareHandler.createShare(
+                    this@TrackCollectionFragment, getSelectedSongs(),
+                    refreshListView, cancellationToken!!,
+                    navArgs.id
+                )
+                return true
+            }
+            return false
+        }
     }
 
     override fun onDestroyView() {
@@ -344,13 +351,11 @@ open class TrackCollectionFragment(
 
         val isArtist = navArgs.isArtist
 
-        // Need a valid id to download stuff
-        val id = navArgs.id ?: return
-
-        if (hasSubFolders) {
+        // Need a valid id to recurse sub directories stuff
+        if (hasSubFolders && navArgs.id != null) {
             downloadHandler.fetchTracksAndAddToController(
                 fragment = this,
-                id = id,
+                id = navArgs.id!!,
                 append = append,
                 autoPlay = !append,
                 shuffle = shuffle,
@@ -379,20 +384,17 @@ open class TrackCollectionFragment(
 
     private fun selectAllOrNone() {
         val someUnselected = viewAdapter.selectedSet.size < childCount
-
-        selectAll(someUnselected, true)
+        selectAll(someUnselected)
     }
 
-    private fun selectAll(selected: Boolean, toast: Boolean) {
+    private fun selectAll(selected: Boolean) {
         var selectedCount = viewAdapter.selectedSet.size * -1
 
         selectedCount += viewAdapter.setSelectionStatusOfAll(selected)
 
         // Display toast: N tracks selected
-        if (toast) {
-            val toastResId = R.string.select_album_n_selected
-            Util.toast(activity, getString(toastResId, selectedCount.coerceAtLeast(0)))
-        }
+        val toastResId = R.string.select_album_n_selected
+        Util.toast(activity, getString(toastResId, selectedCount.coerceAtLeast(0)))
     }
 
     @Synchronized
@@ -575,14 +577,14 @@ open class TrackCollectionFragment(
                 setTitle(R.string.main_videos)
                 listModel.getVideos(refresh2)
             } else if (id == null || getRandomTracks) {
-                // There seems to be a bug in ViewPager when resuming the Actitivy that subfragments
+                // There seems to be a bug in ViewPager when resuming the Activity that sub-fragments
                 // arguments are empty. If we have no id, just show some random tracks
                 setTitle(R.string.main_songs_random)
                 listModel.getRandom(size, append)
             } else {
                 setTitle(name)
 
-                if (ActiveServerProvider.isID3Enabled()) {
+                if (ActiveServerProvider.shouldUseId3Tags()) {
                     if (isAlbum) {
                         listModel.getAlbum(refresh2, id, name)
                     } else {
@@ -635,10 +637,6 @@ open class TrackCollectionFragment(
             }
             R.id.song_menu_download -> {
                 downloadBackground(false, songs)
-            }
-            R.id.select_album_play_all -> {
-                // TODO: Why is this being handled here?!
-                playAll()
             }
             R.id.song_menu_share -> {
                 if (item is Track) {

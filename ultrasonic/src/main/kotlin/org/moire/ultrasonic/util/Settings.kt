@@ -33,22 +33,26 @@ object Settings {
     val maxBitRate: Int
         get() {
             return if (Util.isNetworkRestricted()) {
-                maxMobileBitRate
+                maxBitRateMobile
             } else {
-                maxWifiBitRate
+                maxBitRateWifi
             }
         }
 
-    private var maxWifiBitRate
+    private var maxBitRateWifi
         by StringIntSetting(getKey(R.string.setting_key_max_bitrate_wifi))
 
-    private var maxMobileBitRate
+    private var maxBitRateMobile
         by StringIntSetting(getKey(R.string.setting_key_max_bitrate_mobile))
+
+    var maxBitRatePinning
+        by StringIntSetting(getKey(R.string.setting_key_max_bitrate_pinning))
+    val pinWithHighestQuality: Boolean
+        get() = (maxBitRatePinning == 0)
 
     @JvmStatic
     val preloadCount: Int
         get() {
-            val preferences = preferences
             val preloadCount =
                 preferences.getString(getKey(R.string.setting_key_preload_count), "-1")!!
                     .toInt()
@@ -60,7 +64,6 @@ object Settings {
     @JvmStatic
     val cacheSizeMB: Int
         get() {
-            val preferences = preferences
             val cacheSize = preferences.getString(
                 getKey(R.string.setting_key_cache_size),
                 "-1"
@@ -130,6 +133,9 @@ object Settings {
     var seekInterval
         by StringIntSetting(getKey(R.string.setting_key_increment_time), 5000)
 
+    val seekIntervalMillis: Long
+        get() = (seekInterval / 1000).toLong()
+
     @JvmStatic
     var mediaButtonsEnabled
         by BooleanSetting(getKey(R.string.setting_key_media_buttons), true)
@@ -168,11 +174,11 @@ object Settings {
     // Normally you don't need to use these Settings directly,
     // use ActiveServerProvider.isID3Enabled() instead
     @JvmStatic
-    var shouldUseId3Tags by BooleanSetting(getKey(R.string.setting_key_id3_tags), true)
+    var id3TagsEnabledOnline by BooleanSetting(getKey(R.string.setting_key_id3_tags), true)
 
     // See comment above.
     @JvmStatic
-    var useId3TagsOffline by BooleanSetting(getKey(R.string.setting_key_id3_tags_offline), true)
+    var id3TagsEnabledOffline by BooleanSetting(getKey(R.string.setting_key_id3_tags_offline), true)
 
     var activeServer by IntSetting(getKey(R.string.setting_key_server_instance), -1)
 
@@ -209,7 +215,6 @@ object Settings {
     @JvmStatic
     val shareGreeting: String?
         get() {
-            val preferences = preferences
             val context = Util.appContext()
             val defaultVal = String.format(
                 context.resources.getString(R.string.share_default_greeting),
@@ -278,8 +283,7 @@ object Settings {
     }
 
     fun getAllKeys(): List<String> {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(UApp.applicationContext())
-        return prefs.all.keys.toList()
+        return preferences.all.keys.toList()
     }
 
     private val appContext: Context

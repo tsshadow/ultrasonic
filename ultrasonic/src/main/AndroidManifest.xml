@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto">
 
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -21,6 +22,7 @@
     <application
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
+        android:hasFragileUserData="true" tools:targetApi="q"
         android:dataExtractionRules="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -62,13 +64,6 @@
         <service
             android:name=".service.DownloadService"
             android:label="Ultrasonic Media Player Service"
-            android:exported="false">
-        </service>
-
-        <service
-            android:name=".service.JukeboxMediaPlayer"
-            android:label="Ultrasonic Jukebox Media Player Service"
-            android:foregroundServiceType="mediaPlayback"
             android:exported="false">
         </service>
 

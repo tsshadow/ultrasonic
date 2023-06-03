@@ -34,6 +34,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ViewFlipper
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -53,6 +54,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -76,14 +78,17 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.adapters.TrackViewBinder
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
+import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
+import org.moire.ultrasonic.data.ActiveServerProvider.Companion.shouldUseId3Tags
 import org.moire.ultrasonic.data.RatingUpdate
+import org.moire.ultrasonic.databinding.CurrentPlayingBinding
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
@@ -124,7 +129,7 @@ class PlayerFragment :
 
     // Data & Services
     private val networkAndStorageChecker: NetworkAndStorageChecker by inject()
-    private val mediaPlayerController: MediaPlayerController by inject()
+    private val mediaPlayerManager: MediaPlayerManager by inject()
     private val shareHandler: ShareHandler by inject()
     private val imageLoaderProvider: ImageLoaderProvider by inject()
     private var currentSong: Track? = null
@@ -142,6 +147,7 @@ class PlayerFragment :
     private lateinit var fiveStar5ImageView: ImageView
     private lateinit var playlistFlipper: ViewFlipper
     private lateinit var emptyTextView: TextView
+    private lateinit var emptyView: ConstraintLayout
     private lateinit var songTitleTextView: TextView
     private lateinit var artistTextView: TextView
     private lateinit var albumTextView: TextView
@@ -161,8 +167,14 @@ class PlayerFragment :
     private lateinit var shuffleButton: View
     private lateinit var repeatButton: MaterialButton
     private lateinit var progressBar: SeekBar
+    private lateinit var progressIndicator: CircularProgressIndicator
     private val hollowStar = R.drawable.ic_star_hollow
     private val fullStar = R.drawable.ic_star_full
+
+    private var _binding: CurrentPlayingBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     private val viewAdapter: BaseAdapter<Identifiable> by lazy {
         BaseAdapter()
@@ -177,13 +189,17 @@ class PlayerFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.current_playing, container, false)
+    ): View {
+        _binding = CurrentPlayingBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
+    // TODO: Switch them all over to use the view binding
     private fun findViews(view: View) {
         playlistFlipper = view.findViewById(R.id.current_playing_playlist_flipper)
-        emptyTextView = view.findViewById(R.id.playlist_empty)
+        emptyTextView = view.findViewById(R.id.empty_list_text)
+        emptyView = view.findViewById(R.id.emptyListView)
+        progressIndicator = view.findViewById(R.id.progress_indicator)
         songTitleTextView = view.findViewById(R.id.current_playing_song)
         artistTextView = view.findViewById(R.id.current_playing_artist)
         albumTextView = view.findViewById(R.id.current_playing_album)
@@ -210,7 +226,7 @@ class PlayerFragment :
         fiveStar5ImageView = view.findViewById(R.id.song_five_star_5)
     }
 
-    @Suppress("LongMethod", "DEPRECATION")
+    @Suppress("LongMethod")
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         cancellationToken = CancellationToken()
@@ -220,6 +236,7 @@ class PlayerFragment :
         val width: Int
         val height: Int
 
+        @Suppress("DEPRECATION")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val bounds = windowManager.currentWindowMetrics.bounds
             width = bounds.width()
@@ -248,8 +265,8 @@ class PlayerFragment :
         val previousButton: AutoRepeatButton = view.findViewById(R.id.button_previous)
         val nextButton: AutoRepeatButton = view.findViewById(R.id.button_next)
         shuffleButton = view.findViewById(R.id.button_shuffle)
-        updateShuffleButtonState(mediaPlayerController.isShufflePlayEnabled)
-        updateRepeatButtonState(mediaPlayerController.repeatMode)
+        updateShuffleButtonState(mediaPlayerManager.isShufflePlayEnabled)
+        updateRepeatButtonState(mediaPlayerManager.repeatMode)
 
         val ratingLinearLayout = view.findViewById<LinearLayout>(R.id.song_rating)
         if (!useFiveStarRating) ratingLinearLayout.isVisible = false
@@ -271,7 +288,7 @@ class PlayerFragment :
         previousButton.setOnClickListener {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             launch(CommunicationError.getHandler(context)) {
-                mediaPlayerController.seekToPrevious()
+                mediaPlayerManager.seekToPrevious()
             }
         }
 
@@ -282,7 +299,7 @@ class PlayerFragment :
         nextButton.setOnClickListener {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
             launch(CommunicationError.getHandler(context)) {
-                mediaPlayerController.seekToNext()
+                mediaPlayerManager.seekToNext()
             }
         }
 
@@ -292,22 +309,22 @@ class PlayerFragment :
 
         pauseButton.setOnClickListener {
             launch(CommunicationError.getHandler(context)) {
-                mediaPlayerController.pause()
+                mediaPlayerManager.pause()
             }
         }
 
         stopButton.setOnClickListener {
             launch(CommunicationError.getHandler(context)) {
-                mediaPlayerController.reset()
+                mediaPlayerManager.reset()
             }
         }
 
         playButton.setOnClickListener {
-            if (!mediaPlayerController.isJukeboxEnabled)
+            if (!mediaPlayerManager.isJukeboxEnabled)
                 networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
 
             launch(CommunicationError.getHandler(context)) {
-                mediaPlayerController.play()
+                mediaPlayerManager.play()
             }
         }
 
@@ -316,12 +333,12 @@ class PlayerFragment :
         }
 
         repeatButton.setOnClickListener {
-            var newRepeat = mediaPlayerController.repeatMode + 1
+            var newRepeat = mediaPlayerManager.repeatMode + 1
             if (newRepeat == 3) {
                 newRepeat = 0
             }
 
-            mediaPlayerController.repeatMode = newRepeat
+            mediaPlayerManager.repeatMode = newRepeat
 
             onPlaylistChanged()
 
@@ -343,7 +360,7 @@ class PlayerFragment :
         progressBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 launch(CommunicationError.getHandler(context)) {
-                    mediaPlayerController.seekTo(progressBar.progress)
+                    mediaPlayerManager.seekTo(progressBar.progress)
                 }
             }
 
@@ -380,11 +397,18 @@ class PlayerFragment :
         // Query the Jukebox state in an IO Context
         ioScope.launch(CommunicationError.getHandler(context)) {
             try {
-                jukeboxAvailable = mediaPlayerController.isJukeboxAvailable
+                jukeboxAvailable = mediaPlayerManager.isJukeboxAvailable
             } catch (all: Exception) {
                 Timber.e(all)
             }
         }
+
+        // Subscribe to change in command availability
+        mediaPlayerManager.addListener(object : Player.Listener {
+            override fun onAvailableCommandsChanged(availableCommands: Player.Commands) {
+                updateMediaButtonActivationState()
+            }
+        })
 
         view.setOnTouchListener { _, event -> gestureScanner.onTouchEvent(event) }
     }
@@ -417,7 +441,7 @@ class PlayerFragment :
     }
 
     private fun toggleShuffle() {
-        val isEnabled = mediaPlayerController.toggleShuffle()
+        val isEnabled = mediaPlayerManager.toggleShuffle()
 
         if (isEnabled) {
             Util.toast(activity, R.string.download_menu_shuffle_on)
@@ -430,7 +454,7 @@ class PlayerFragment :
 
     override fun onResume() {
         super.onResume()
-        if (mediaPlayerController.currentMediaItem == null) {
+        if (mediaPlayerManager.currentMediaItem == null) {
             playlistFlipper.displayedChild = 1
         } else {
             // Download list and Album art must be updated when resumed
@@ -443,7 +467,7 @@ class PlayerFragment :
         executorService = Executors.newSingleThreadScheduledExecutor()
         executorService.scheduleWithFixedDelay(runnable, 0L, 500L, TimeUnit.MILLISECONDS)
 
-        if (mediaPlayerController.keepScreenOn) {
+        if (mediaPlayerManager.keepScreenOn) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
             requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -454,7 +478,7 @@ class PlayerFragment :
 
     // Scroll to current playing.
     private fun scrollToCurrent() {
-        val index = mediaPlayerController.currentMediaItemIndex
+        val index = mediaPlayerManager.currentMediaItemIndex
 
         if (index != -1) {
             val smoothScroller = LinearSmoothScroller(context)
@@ -472,6 +496,7 @@ class PlayerFragment :
         rxBusSubscription.dispose()
         cancel("CoroutineScope cancelled because the view was destroyed")
         cancellationToken.cancel()
+        _binding = null
         super.onDestroyView()
     }
 
@@ -541,7 +566,7 @@ class PlayerFragment :
             equalizerMenuItem.isVisible = isEqualizerAvailable
         }
 
-        val mediaPlayerController = mediaPlayerController
+        val mediaPlayerController = mediaPlayerManager
         val track = mediaPlayerController.currentMediaItem?.toTrack()
 
         if (track != null) {
@@ -591,10 +616,10 @@ class PlayerFragment :
             }
         }
 
-        if (isOffline() || !Settings.shouldUseId3Tags) {
-            popup.menu.findItem(R.id.menu_show_artist)?.isVisible = false
-        }
+        // Only show the menu if the ID3 tags are available
+        popup.menu.findItem(R.id.menu_show_artist)?.isVisible = shouldUseId3Tags()
 
+        // Only show the lyrics when the user is online
         popup.menu.findItem(R.id.menu_lyrics)?.isVisible = !isOffline()
         popup.show()
         return popup
@@ -614,7 +639,7 @@ class PlayerFragment :
             R.id.menu_show_artist -> {
                 if (track == null) return false
 
-                if (Settings.shouldUseId3Tags) {
+                if (Settings.id3TagsEnabledOnline) {
                     val action = PlayerFragmentDirections.playerToAlbumsList(
                         type = AlbumListType.SORTED_BY_NAME,
                         byArtist = true,
@@ -630,7 +655,7 @@ class PlayerFragment :
             R.id.menu_show_album -> {
                 if (track == null) return false
 
-                val albumId = if (Settings.shouldUseId3Tags) track.albumId else track.parent
+                val albumId = if (shouldUseId3Tags()) track.albumId else track.parent
 
                 val action = PlayerFragmentDirections.playerToSelectAlbum(
                     id = albumId,
@@ -638,7 +663,6 @@ class PlayerFragment :
                     parentId = track.parent,
                     isAlbum = true
                 )
-
                 findNavController().navigate(action)
                 return true
             }
@@ -650,12 +674,12 @@ class PlayerFragment :
             }
             R.id.menu_item_screen_on_off -> {
                 val window = requireActivity().window
-                if (mediaPlayerController.keepScreenOn) {
+                if (mediaPlayerManager.keepScreenOn) {
                     window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    mediaPlayerController.keepScreenOn = false
+                    mediaPlayerManager.keepScreenOn = false
                 } else {
                     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    mediaPlayerController.keepScreenOn = true
+                    mediaPlayerManager.keepScreenOn = true
                 }
                 return true
             }
@@ -668,8 +692,8 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_item_jukebox -> {
-                val jukeboxEnabled = !mediaPlayerController.isJukeboxEnabled
-                mediaPlayerController.isJukeboxEnabled = jukeboxEnabled
+                val jukeboxEnabled = !mediaPlayerManager.isJukeboxEnabled
+                mediaPlayerManager.isJukeboxEnabled = jukeboxEnabled
                 Util.toast(
                     context,
                     if (jukeboxEnabled) R.string.download_jukebox_on
@@ -683,13 +707,13 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_item_clear_playlist -> {
-                mediaPlayerController.isShufflePlayEnabled = false
-                mediaPlayerController.clear()
+                mediaPlayerManager.isShufflePlayEnabled = false
+                mediaPlayerManager.clear()
                 onPlaylistChanged()
                 return true
             }
             R.id.menu_item_save_playlist -> {
-                if (mediaPlayerController.playlistSize > 0) {
+                if (mediaPlayerManager.playlistSize > 0) {
                     showSavePlaylistDialog()
                 }
                 return true
@@ -708,7 +732,7 @@ class PlayerFragment :
                 if (track == null) return true
 
                 val songId = track.id
-                val playerPosition = mediaPlayerController.playerPosition
+                val playerPosition = mediaPlayerManager.playerPosition
                 track.bookmarkPosition = playerPosition
                 val bookmarkTime = Util.formatTotalDuration(playerPosition.toLong(), true)
                 Thread {
@@ -743,7 +767,7 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_item_share -> {
-                val mediaPlayerController = mediaPlayerController
+                val mediaPlayerController = mediaPlayerManager
                 val tracks: MutableList<Track?> = ArrayList()
                 val playlist = mediaPlayerController.playlist
                 for (item in playlist) {
@@ -778,8 +802,7 @@ class PlayerFragment :
 
     private fun update(cancel: CancellationToken? = null) {
         if (cancel?.isCancellationRequested == true) return
-        val mediaPlayerController = mediaPlayerController
-        if (currentSong?.id != mediaPlayerController.currentMediaItem?.mediaId) {
+        if (currentSong?.id != mediaPlayerManager.currentMediaItem?.mediaId) {
             onTrackChanged()
         }
         updateSeekBar()
@@ -787,10 +810,10 @@ class PlayerFragment :
 
     private fun savePlaylistInBackground(playlistName: String) {
         Util.toast(context, resources.getString(R.string.download_playlist_saving, playlistName))
-        mediaPlayerController.suggestedPlaylistName = playlistName
+        mediaPlayerManager.suggestedPlaylistName = playlistName
 
         // The playlist can be acquired only from the main thread
-        val entries = mediaPlayerController.playlist.map {
+        val entries = mediaPlayerManager.playlist.map {
             it.toTrack()
         }
 
@@ -799,16 +822,16 @@ class PlayerFragment :
             musicService.createPlaylist(null, playlistName, entries)
         }.invokeOnCompletion {
             if (it == null || it is CancellationException) {
-                Util.toast(context, R.string.download_playlist_done)
+                Util.toast(UApp.applicationContext(), R.string.download_playlist_done)
             } else {
                 Timber.e(it, "Exception has occurred in savePlaylistInBackground")
                 val msg = String.format(
                     Locale.ROOT,
                     "%s %s",
                     resources.getString(R.string.download_playlist_error),
-                    CommunicationError.getErrorMessage(it, context)
+                    CommunicationError.getErrorMessage(it)
                 )
-                Util.toast(context, msg)
+                Util.toast(UApp.applicationContext(), msg)
             }
         }
     }
@@ -843,8 +866,8 @@ class PlayerFragment :
 
         // Create listener
         val clickHandler: ((Track, Int) -> Unit) = { _, listPos ->
-            val mediaIndex = mediaPlayerController.getUnshuffledIndexOf(listPos)
-            mediaPlayerController.play(mediaIndex)
+            val mediaIndex = mediaPlayerManager.getUnshuffledIndexOf(listPos)
+            mediaPlayerManager.play(mediaIndex)
         }
 
         viewAdapter.register(
@@ -908,7 +931,7 @@ class PlayerFragment :
             @SuppressLint("NotifyDataSetChanged")
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val pos = viewHolder.bindingAdapterPosition
-                val item = mediaPlayerController.getMediaItemAt(pos)
+                val item = mediaPlayerManager.getMediaItemAt(pos)
 
                 // Remove the item from the list quickly
                 val items = viewAdapter.getCurrentList().toMutableList()
@@ -924,7 +947,7 @@ class PlayerFragment :
                 Util.toast(context, songRemoved)
 
                 // Remove the item from the playlist
-                mediaPlayerController.removeFromPlaylist(pos)
+                mediaPlayerManager.removeFromPlaylist(pos)
             }
 
             override fun onSelectedChanged(
@@ -944,7 +967,7 @@ class PlayerFragment :
                     dragging = false
                     // Move the item in the playlist separately
                     Timber.i("Moving item %s to %s", startPosition, endPosition)
-                    mediaPlayerController.moveItemInPlaylist(startPosition, endPosition)
+                    mediaPlayerManager.moveItemInPlaylist(startPosition, endPosition)
                 }
             }
 
@@ -1022,25 +1045,24 @@ class PlayerFragment :
     }
 
     private fun onPlaylistChanged() {
-        val mediaPlayerController = mediaPlayerController
+        val mediaPlayerController = mediaPlayerManager
         // Try to display playlist in play order
         val list = mediaPlayerController.playlistInPlayOrder
         emptyTextView.setText(R.string.playlist_empty)
-
         viewAdapter.submitList(list.map(MediaItem::toTrack))
-
-        emptyTextView.isVisible = list.isEmpty()
+        progressIndicator.isVisible = false
+        emptyView.isVisible = list.isEmpty()
 
         updateRepeatButtonState(mediaPlayerController.repeatMode)
     }
 
     private fun onTrackChanged() {
-        currentSong = mediaPlayerController.currentMediaItem?.toTrack()
+        currentSong = mediaPlayerManager.currentMediaItem?.toTrack()
 
         scrollToCurrent()
-        val totalDuration = mediaPlayerController.playListDuration
-        val totalSongs = mediaPlayerController.playlistSize
-        val currentSongIndex = mediaPlayerController.currentMediaItemIndex + 1
+        val totalDuration = mediaPlayerManager.playListDuration
+        val totalSongs = mediaPlayerManager.playlistSize
+        val currentSongIndex = mediaPlayerManager.currentMediaItemIndex + 1
         val duration = Util.formatTotalDuration(totalDuration)
         val trackFormat =
             String.format(Locale.getDefault(), "%d / %d", currentSongIndex, totalSongs)
@@ -1095,23 +1117,27 @@ class PlayerFragment :
 
         updateSongRating()
 
-        nextButton.isEnabled = mediaPlayerController.canSeekToNext()
-        previousButton.isEnabled = mediaPlayerController.canSeekToPrevious()
+        updateMediaButtonActivationState()
+    }
+
+    private fun updateMediaButtonActivationState() {
+        nextButton.isEnabled = mediaPlayerManager.canSeekToNext()
+        previousButton.isEnabled = mediaPlayerManager.canSeekToPrevious()
     }
 
     @Synchronized
     private fun updateSeekBar() {
-        val isJukeboxEnabled: Boolean = mediaPlayerController.isJukeboxEnabled
-        val millisPlayed: Int = max(0, mediaPlayerController.playerPosition)
-        val duration: Int = mediaPlayerController.playerDuration
-        val playbackState: Int = mediaPlayerController.playbackState
+        val isJukeboxEnabled: Boolean = mediaPlayerManager.isJukeboxEnabled
+        val millisPlayed: Int = max(0, mediaPlayerManager.playerPosition)
+        val duration: Int = mediaPlayerManager.playerDuration
+        val playbackState: Int = mediaPlayerManager.playbackState
 
         if (currentSong != null) {
             positionTextView.text = Util.formatTotalDuration(millisPlayed.toLong(), true)
             durationTextView.text = Util.formatTotalDuration(duration.toLong(), true)
             progressBar.max = if (duration == 0) 100 else duration // Work-around for apparent bug.
             progressBar.progress = millisPlayed
-            progressBar.isEnabled = mediaPlayerController.isPlaying || isJukeboxEnabled
+            progressBar.isEnabled = mediaPlayerManager.isPlaying || isJukeboxEnabled
         } else {
             positionTextView.setText(R.string.util_zero_time)
             durationTextView.setText(R.string.util_no_time)
@@ -1120,7 +1146,7 @@ class PlayerFragment :
             progressBar.isEnabled = false
         }
 
-        val progress = mediaPlayerController.bufferedPercentage
+        val progress = mediaPlayerManager.bufferedPercentage
         updateBufferProgress(playbackState, progress)
     }
 
@@ -1133,7 +1159,7 @@ class PlayerFragment :
                 setTitle(this@PlayerFragment, downloadStatus)
             }
             Player.STATE_READY -> {
-                if (mediaPlayerController.isShufflePlayEnabled) {
+                if (mediaPlayerManager.isShufflePlayEnabled) {
                     setTitle(
                         this@PlayerFragment,
                         R.string.download_playerstate_playing_shuffle
@@ -1157,7 +1183,7 @@ class PlayerFragment :
     }
 
     private fun updateButtonStates(playbackState: Int) {
-        val isPlaying = mediaPlayerController.isPlaying
+        val isPlaying = mediaPlayerManager.isPlaying
         when (playbackState) {
             Player.STATE_READY -> {
                 pauseButton.isVisible = isPlaying
@@ -1180,9 +1206,9 @@ class PlayerFragment :
     private fun seek(forward: Boolean) {
         launch(CommunicationError.getHandler(context)) {
             if (forward) {
-                mediaPlayerController.seekForward()
+                mediaPlayerManager.seekForward()
             } else {
-                mediaPlayerController.seekBack()
+                mediaPlayerManager.seekBack()
             }
         }
     }
@@ -1208,28 +1234,28 @@ class PlayerFragment :
         // Right to Left swipe
         if (e1X - e2X > swipeDistance && absX > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.seekToNext()
+            mediaPlayerManager.seekToNext()
             return true
         }
 
         // Left to Right swipe
         if (e2X - e1X > swipeDistance && absX > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.seekToPrevious()
+            mediaPlayerManager.seekToPrevious()
             return true
         }
 
         // Top to Bottom swipe
         if (e2Y - e1Y > swipeDistance && absY > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.seekTo(mediaPlayerController.playerPosition + 30000)
+            mediaPlayerManager.seekTo(mediaPlayerManager.playerPosition + 30000)
             return true
         }
 
         // Bottom to Top swipe
         if (e1Y - e2Y > swipeDistance && absY > swipeVelocity) {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            mediaPlayerController.seekTo(mediaPlayerController.playerPosition - 8000)
+            mediaPlayerManager.seekTo(mediaPlayerManager.playerPosition - 8000)
             return true
         }
         return false
@@ -1294,7 +1320,7 @@ class PlayerFragment :
         builder.setView(layout)
         builder.setCancelable(true)
         val dialog = builder.create()
-        val playlistName = mediaPlayerController.suggestedPlaylistName
+        val playlistName = mediaPlayerManager.suggestedPlaylistName
         if (playlistName != null) {
             playlistNameView.setText(playlistName)
         } else {

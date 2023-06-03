@@ -16,8 +16,6 @@ import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
-import androidx.media3.common.Player.COMMAND_SEEK_TO_NEXT
-import androidx.media3.common.Player.COMMAND_SEEK_TO_PREVIOUS
 import androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
 import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.media3.common.Rating
@@ -50,12 +48,13 @@ private const val CONTROLLER_SWITCH_DELAY = 500L
 private const val VOLUME_DELTA = 0.05f
 
 /**
- * The implementation of the Media Player Controller.
+ * The Media Player Manager can forward commands to the Media3 controller as
+ * well as switch between different player interfaces (local, remote, cast etc).
  * This class contains everything that is necessary for the Application UI
  * to control the Media Player implementation.
  */
 @Suppress("TooManyFunctions")
-class MediaPlayerController(
+class MediaPlayerManager(
     private val playbackStateSerializer: PlaybackStateSerializer,
     private val externalStorageMonitor: ExternalStorageMonitor,
     val context: Context
@@ -97,15 +96,15 @@ class MediaPlayerController(
          * We run the event through RxBus in order to throttle them
          */
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-            val start = controller?.currentTimeline?.getFirstWindowIndex(isShufflePlayEnabled)
+            val start = timeline.getFirstWindowIndex(isShufflePlayEnabled)
             Timber.w("On timeline changed. First shuffle play at index: %s", start)
             deferredPlay?.let {
                 Timber.w("Executing deferred shuffle play")
                 it()
                 deferredPlay = null
             }
-
-            RxBus.playlistPublisher.onNext(playlist.map(MediaItem::toTrack))
+            val playlist = Util.getPlayListFromTimeline(timeline, false).map(MediaItem::toTrack)
+            RxBus.playlistPublisher.onNext(playlist)
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -179,11 +178,8 @@ class MediaPlayerController(
     fun onCreate(onCreated: () -> Unit) {
         if (created) return
         externalStorageMonitor.onCreate { reset() }
-        if (activeServerProvider.getActiveServer().jukeboxByDefault) {
-            switchToJukebox(onCreated)
-        } else {
-            switchToLocalPlayer(onCreated)
-        }
+
+        createMediaController(onCreated)
 
         rxBusSubscription += RxBus.activeServerChangingObservable.subscribe { oldServer ->
             if (oldServer != OFFLINE_DB_ID) {
@@ -195,8 +191,7 @@ class MediaPlayerController(
             if (controller is JukeboxMediaPlayer) {
                 // When the server changes, the Jukebox should be released.
                 // The new server won't understand the jukebox requests of the old one.
-                releaseJukebox(controller)
-                controller = null
+                switchToLocalPlayer()
             }
         }
 
@@ -246,6 +241,22 @@ class MediaPlayerController(
         Timber.i("MediaPlayerController started")
     }
 
+    private fun createMediaController(onCreated: () -> Unit) {
+        mediaControllerFuture = MediaController.Builder(
+            context,
+            sessionToken
+        ).buildAsync()
+
+        mediaControllerFuture?.addListener({
+            controller = mediaControllerFuture?.get()
+
+            Timber.i("MediaController Instance received")
+            controller?.addListener(listeners)
+            onCreated()
+            Timber.i("MediaPlayerController creation complete")
+        }, MoreExecutors.directExecutor())
+    }
+
     private fun playerStateChangedHandler() {
         val currentPlaying = controller?.currentMediaItem?.toTrack() ?: return
 
@@ -260,6 +271,10 @@ class MediaPlayerController(
                 scrobbler.scrobble(currentPlaying, true)
             }
         }
+    }
+
+    fun addListener(listener: Player.Listener) {
+        controller?.addListener(listener)
     }
 
     private fun clearBookmark() {
@@ -336,7 +351,6 @@ class MediaPlayerController(
     @Synchronized
     fun play(index: Int) {
         controller?.seekTo(index, 0L)
-        // FIXME CHECK ITS NOT MAKING PROBLEMS
         controller?.prepare()
         controller?.play()
     }
@@ -538,7 +552,7 @@ class MediaPlayerController(
 
     @Synchronized
     fun canSeekToPrevious(): Boolean {
-        return controller?.isCommandAvailable(COMMAND_SEEK_TO_PREVIOUS) == true
+        return controller?.isCommandAvailable(Player.COMMAND_SEEK_TO_PREVIOUS) == true
     }
 
     @Synchronized
@@ -548,7 +562,7 @@ class MediaPlayerController(
 
     @Synchronized
     fun canSeekToNext(): Boolean {
-        return controller?.isCommandAvailable(COMMAND_SEEK_TO_NEXT) == true
+        return controller?.isCommandAvailable(Player.COMMAND_SEEK_TO_NEXT) == true
     }
 
     @Synchronized
@@ -580,100 +594,47 @@ class MediaPlayerController(
 
     @set:Synchronized
     var isJukeboxEnabled: Boolean
-        get() = controller is JukeboxMediaPlayer
-        set(jukeboxEnabled) {
-            if (jukeboxEnabled) {
-                switchToJukebox {}
+        get() = PlaybackService.actualBackend == PlayerBackend.JUKEBOX
+        set(shouldEnable) {
+            if (shouldEnable) {
+                switchToJukebox()
             } else {
-                switchToLocalPlayer {}
+                switchToLocalPlayer()
             }
         }
 
-    private fun switchToJukebox(onCreated: () -> Unit) {
-        if (controller is JukeboxMediaPlayer) return
-        val currentPlaylist = playlist
-        val currentIndex = controller?.currentMediaItemIndex ?: 0
-        val currentPosition = controller?.currentPosition ?: 0
+    private fun switchToJukebox() {
+        if (isJukeboxEnabled) return
+        scheduleSwitchTo(PlayerBackend.JUKEBOX)
         DownloadService.requestStop()
         controller?.pause()
         controller?.stop()
-        val oldController = controller
-        controller = null // While we switch, the controller shouldn't be available
-
-        // Stop() won't work if we don't give it time to be processed
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (oldController != null) releaseLocalPlayer(oldController)
-            setupJukebox {
-                controller?.setMediaItems(currentPlaylist, currentIndex, currentPosition)
-                onCreated()
-            }
-        }, CONTROLLER_SWITCH_DELAY)
     }
 
-    private fun switchToLocalPlayer(onCreated: () -> Unit) {
-        if (controller is MediaController) return
-        val currentPlaylist = playlist
+    private fun switchToLocalPlayer() {
+        if (!isJukeboxEnabled) return
+        scheduleSwitchTo(PlayerBackend.LOCAL)
+        controller?.stop()
+    }
+
+    private fun scheduleSwitchTo(newBackend: PlayerBackend) {
+        val currentPlaylist = playlist.toList()
         val currentIndex = controller?.currentMediaItemIndex ?: 0
         val currentPosition = controller?.currentPosition ?: 0
-        controller?.stop()
-        val oldController = controller
-        controller = null // While we switch, the controller shouldn't be available
 
         Handler(Looper.getMainLooper()).postDelayed({
-            if (oldController != null) releaseJukebox(oldController)
-            setupLocalPlayer {
-                controller?.setMediaItems(currentPlaylist, currentIndex, currentPosition)
-                onCreated()
-            }
+            // Change the backend
+            PlaybackService.setBackend(newBackend)
+            // Restore the media items
+            controller?.setMediaItems(currentPlaylist, currentIndex, currentPosition)
         }, CONTROLLER_SWITCH_DELAY)
     }
 
     private fun releaseController() {
-        when (controller) {
-            null -> return
-            is JukeboxMediaPlayer -> releaseJukebox(controller)
-            is MediaController -> releaseLocalPlayer(controller)
-        }
-    }
-
-    private fun setupLocalPlayer(onCreated: () -> Unit) {
-        mediaControllerFuture = MediaController.Builder(
-            context,
-            sessionToken
-        ).buildAsync()
-
-        mediaControllerFuture?.addListener({
-            controller = mediaControllerFuture?.get()
-
-            Timber.i("MediaController Instance received")
-            controller?.addListener(listeners)
-            onCreated()
-            Timber.i("MediaPlayerController creation complete")
-        }, MoreExecutors.directExecutor())
-    }
-
-    private fun releaseLocalPlayer(player: Player?) {
-        player?.removeListener(listeners)
-        player?.release()
+        controller?.removeListener(listeners)
+        controller?.release()
         if (mediaControllerFuture != null) MediaController.releaseFuture(mediaControllerFuture!!)
         Timber.i("MediaPlayerController released")
-    }
-
-    private fun setupJukebox(onCreated: () -> Unit) {
-        val jukeboxFuture = JukeboxMediaPlayer.requestStart()
-        jukeboxFuture?.addListener({
-            controller = jukeboxFuture.get()
-            onCreated()
-            controller?.addListener(listeners)
-            Timber.i("JukeboxService creation complete")
-        }, MoreExecutors.directExecutor())
-    }
-
-    private fun releaseJukebox(player: Player?) {
-        val jukebox = player as JukeboxMediaPlayer?
-        jukebox?.removeListener(listeners)
-        jukebox?.requestStop()
-        Timber.i("JukeboxService released")
     }
 
     /**
@@ -698,10 +659,6 @@ class MediaPlayerController(
         gain = gain.coerceAtLeast(0.0f)
         gain = gain.coerceAtMost(1.0f)
         controller?.volume = gain
-    }
-
-    fun setVolume(volume: Float) {
-        controller?.volume = volume
     }
 
     /*
@@ -841,4 +798,6 @@ class MediaPlayerController(
     enum class InsertionMode {
         CLEAR, APPEND, AFTER_CURRENT
     }
+
+    enum class PlayerBackend { JUKEBOX, LOCAL }
 }

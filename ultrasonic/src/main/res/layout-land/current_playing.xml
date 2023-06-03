@@ -119,7 +119,7 @@
             </LinearLayout>
         </FrameLayout>
 
-        <include layout="@layout/current_playlist" />
+        <include layout="@layout/current_playlist" a:id="@+id/playlist"/>
     </ViewFlipper>
 
 </LinearLayout>

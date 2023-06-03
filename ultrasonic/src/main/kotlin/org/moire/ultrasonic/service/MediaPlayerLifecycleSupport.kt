@@ -32,7 +32,7 @@ import timber.log.Timber
 class MediaPlayerLifecycleSupport : KoinComponent {
     private lateinit var ratingManager: RatingManager
     private val playbackStateSerializer by inject<PlaybackStateSerializer>()
-    private val mediaPlayerController by inject<MediaPlayerController>()
+    private val mediaPlayerManager by inject<MediaPlayerManager>()
     private val imageLoaderProvider: ImageLoaderProvider by inject()
 
     private var created = false
@@ -64,7 +64,7 @@ class MediaPlayerLifecycleSupport : KoinComponent {
             return
         }
 
-        mediaPlayerController.onCreate {
+        mediaPlayerManager.onCreate {
             restoreLastSession(autoPlay, afterRestore)
         }
 
@@ -81,7 +81,7 @@ class MediaPlayerLifecycleSupport : KoinComponent {
 
             Timber.i("Restoring %s songs", it!!.songs.size)
 
-            mediaPlayerController.restore(
+            mediaPlayerManager.restore(
                 it,
                 autoPlay,
                 false
@@ -110,7 +110,7 @@ class MediaPlayerLifecycleSupport : KoinComponent {
         if (intent == null) return
 
         val intentAction = intent.action
-        if (intentAction == null || intentAction.isEmpty()) return
+        if (intentAction.isNullOrEmpty()) return
 
         Timber.i("Received intent: %s", intentAction)
 
@@ -146,15 +146,15 @@ class MediaPlayerLifecycleSupport : KoinComponent {
                 val state = extras.getInt("state")
 
                 if (state == 0) {
-                    if (!mediaPlayerController.isJukeboxEnabled) {
-                        mediaPlayerController.pause()
+                    if (!mediaPlayerManager.isJukeboxEnabled) {
+                        mediaPlayerManager.pause()
                     }
                 } else if (state == 1) {
-                    if (!mediaPlayerController.isJukeboxEnabled &&
-                        Settings.resumePlayOnHeadphonePlug && !mediaPlayerController.isPlaying
+                    if (!mediaPlayerManager.isJukeboxEnabled &&
+                        Settings.resumePlayOnHeadphonePlug && !mediaPlayerManager.isPlaying
                     ) {
-                        mediaPlayerController.prepare()
-                        mediaPlayerController.play()
+                        mediaPlayerManager.prepare()
+                        mediaPlayerManager.play()
                     }
                 }
             }
@@ -183,18 +183,18 @@ class MediaPlayerLifecycleSupport : KoinComponent {
         onCreate(autoStart) {
             when (keyCode) {
                 KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
-                KeyEvent.KEYCODE_HEADSETHOOK -> mediaPlayerController.togglePlayPause()
-                KeyEvent.KEYCODE_MEDIA_PREVIOUS -> mediaPlayerController.seekToPrevious()
-                KeyEvent.KEYCODE_MEDIA_NEXT -> mediaPlayerController.seekToNext()
-                KeyEvent.KEYCODE_MEDIA_STOP -> mediaPlayerController.stop()
-                KeyEvent.KEYCODE_MEDIA_PLAY -> mediaPlayerController.play()
-                KeyEvent.KEYCODE_MEDIA_PAUSE -> mediaPlayerController.pause()
-                KeyEvent.KEYCODE_1 -> mediaPlayerController.legacySetRating(1)
-                KeyEvent.KEYCODE_2 -> mediaPlayerController.legacySetRating(2)
-                KeyEvent.KEYCODE_3 -> mediaPlayerController.legacySetRating(3)
-                KeyEvent.KEYCODE_4 -> mediaPlayerController.legacySetRating(4)
-                KeyEvent.KEYCODE_5 -> mediaPlayerController.legacySetRating(5)
-                KeyEvent.KEYCODE_STAR -> mediaPlayerController.legacyToggleStar()
+                KeyEvent.KEYCODE_HEADSETHOOK -> mediaPlayerManager.togglePlayPause()
+                KeyEvent.KEYCODE_MEDIA_PREVIOUS -> mediaPlayerManager.seekToPrevious()
+                KeyEvent.KEYCODE_MEDIA_NEXT -> mediaPlayerManager.seekToNext()
+                KeyEvent.KEYCODE_MEDIA_STOP -> mediaPlayerManager.stop()
+                KeyEvent.KEYCODE_MEDIA_PLAY -> mediaPlayerManager.play()
+                KeyEvent.KEYCODE_MEDIA_PAUSE -> mediaPlayerManager.pause()
+                KeyEvent.KEYCODE_1 -> mediaPlayerManager.legacySetRating(1)
+                KeyEvent.KEYCODE_2 -> mediaPlayerManager.legacySetRating(2)
+                KeyEvent.KEYCODE_3 -> mediaPlayerManager.legacySetRating(3)
+                KeyEvent.KEYCODE_4 -> mediaPlayerManager.legacySetRating(4)
+                KeyEvent.KEYCODE_5 -> mediaPlayerManager.legacySetRating(5)
+                KeyEvent.KEYCODE_STAR -> mediaPlayerManager.legacyToggleStar()
                 else -> {
                 }
             }
@@ -222,17 +222,17 @@ class MediaPlayerLifecycleSupport : KoinComponent {
         // We can receive intents when everything is stopped, so we need to start
         onCreate(autoStart) {
             when (action) {
-                Constants.CMD_PLAY -> mediaPlayerController.play()
+                Constants.CMD_PLAY -> mediaPlayerManager.play()
                 Constants.CMD_RESUME_OR_PLAY ->
                     // If Ultrasonic wasn't running, the autoStart is enough to resume,
                     // no need to call anything
-                    if (isRunning) mediaPlayerController.resumeOrPlay()
+                    if (isRunning) mediaPlayerManager.resumeOrPlay()
 
-                Constants.CMD_NEXT -> mediaPlayerController.seekToNext()
-                Constants.CMD_PREVIOUS -> mediaPlayerController.seekToPrevious()
-                Constants.CMD_TOGGLEPAUSE -> mediaPlayerController.togglePlayPause()
-                Constants.CMD_STOP -> mediaPlayerController.stop()
-                Constants.CMD_PAUSE -> mediaPlayerController.pause()
+                Constants.CMD_NEXT -> mediaPlayerManager.seekToNext()
+                Constants.CMD_PREVIOUS -> mediaPlayerManager.seekToPrevious()
+                Constants.CMD_TOGGLEPAUSE -> mediaPlayerManager.togglePlayPause()
+                Constants.CMD_STOP -> mediaPlayerManager.stop()
+                Constants.CMD_PAUSE -> mediaPlayerManager.pause()
             }
         }
     }

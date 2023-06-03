@@ -3,13 +3,13 @@
 gradle                 = "8.1.1"
 
 navigation             = "2.5.3"
-gradlePlugin           = "8.0.1"
-androidxcore           = "1.10.0"
+gradlePlugin           = "8.0.2"
+androidxcore           = "1.10.1"
 ktlint                 = "0.43.2"
 ktlintGradle           = "11.3.2"
-detekt                 = "1.22.0"
+detekt                 = "1.23.0"
 preferences            = "1.2.0"
-media3                 = "1.0.1"
+media3                 = "1.0.2"
 
 androidSupport         = "1.6.0"
 materialDesign         = "1.8.0"
@@ -17,25 +17,24 @@ constraintLayout       = "2.1.4"
 multidex               = "2.0.1"
 room                   = "2.5.1"
 kotlin                 = "1.8.21"
-kotlinxCoroutines      = "1.7.0"
-kotlinxGuava           = "1.7.0"
+kotlinxCoroutines      = "1.7.1"
 viewModelKtx           = "2.6.1"
 swipeRefresh           = "1.1.0"
 
 retrofit               = "2.9.0"
 ## KEEP ON 2.13 branch (https://github.com/FasterXML/jackson-databind/issues/3658#issuecomment-1312633064) for compatibility with API 24
 jackson                = "2.13.5"
-okhttp                 = "4.10.0"
+okhttp                 = "4.11.0"
 koin                   = "3.3.2"
 picasso                = "2.8"
 
 junit4                 = "4.13.2"
 junit5                 = "5.9.3"
 mockito                = "5.3.1"
-mockitoKotlin          = "4.1.0"
+mockitoKotlin          = "5.0.0"
 kluent                 = "1.73"
 apacheCodecs           = "1.15"
-robolectric            = "4.10.2"
+robolectric            = "4.10.3"
 timber                 = "5.0.1"
 fastScroll             = "2.0.1"
 colorPicker            = "2.2.4"
@@ -74,7 +73,7 @@ swipeRefresh            = { module = "androidx.swiperefreshlayout:swiperefreshla
 kotlinStdlib            = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlinReflect           = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlinxCoroutines       = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
-kotlinxGuava            = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "kotlinxGuava"}
+kotlinxGuava            = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "kotlinxCoroutines"}
 retrofit                = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 gsonConverter           = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 jacksonConverter        = { module = "com.squareup.retrofit2:converter-jackson", version.ref = "retrofit" }

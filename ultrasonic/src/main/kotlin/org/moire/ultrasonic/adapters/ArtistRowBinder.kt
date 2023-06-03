@@ -115,7 +115,7 @@ class ArtistRowBinder(
     }
 
     private fun showArtistPicture(): Boolean {
-        return ActiveServerProvider.isID3Enabled() && Settings.shouldShowArtistPicture
+        return ActiveServerProvider.shouldUseId3Tags() && Settings.shouldShowArtistPicture
     }
 
     /**

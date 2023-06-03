@@ -45,7 +45,6 @@
     <string name="download.jukebox_offline">Il controllo remoto non è disponibile nella modalità offline. </string>
     <string name="download.jukebox_on">Controllo remoto abilitato. La musica verrà riprodotta sul server.</string>
     <string name="download.jukebox_server_too_old">Il controllo remoto non è supportato. Per favore aggiorna la versione del server Airsonic.</string>
-    <string name="download.jukebox_volume">Volume remoto</string>
     <string name="download.menu_equalizer">Equalizzatore</string>
     <string name="download.menu_jukebox_off">Jukebox spento</string>
     <string name="download.menu_jukebox_on">Jukebox acceso</string>

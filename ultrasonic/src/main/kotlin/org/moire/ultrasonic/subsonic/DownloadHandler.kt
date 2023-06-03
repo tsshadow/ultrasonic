@@ -14,11 +14,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
+import org.moire.ultrasonic.data.ActiveServerProvider.Companion.shouldUseId3Tags
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.DownloadService
-import org.moire.ultrasonic.service.MediaPlayerController
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.executeTaskWithToast
@@ -28,7 +28,7 @@ import org.moire.ultrasonic.util.executeTaskWithToast
  */
 @Suppress("LongParameterList")
 class DownloadHandler(
-    val mediaPlayerController: MediaPlayerController,
+    val mediaPlayerManager: MediaPlayerManager,
     private val networkAndStorageChecker: NetworkAndStorageChecker
 ) : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private val maxSongs = 500
@@ -46,7 +46,7 @@ class DownloadHandler(
         var successString: String? = null
 
         // Launch the Job
-        executeTaskWithToast(fragment, {
+        executeTaskWithToast({
             val tracksToDownload: List<Track> = tracks
                 ?: getTracksFromServer(isArtist, id!!, isDirectory, name, isShare)
 
@@ -104,7 +104,7 @@ class DownloadHandler(
     ) {
         var successString: String? = null
         // Launch the Job
-        executeTaskWithToast(fragment, {
+        executeTaskWithToast({
             val songs: MutableList<Track> =
                 getTracksFromServer(isArtist, id, isDirectory, name, isShare)
 
@@ -150,16 +150,16 @@ class DownloadHandler(
         networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
 
         val insertionMode = when {
-            append -> MediaPlayerController.InsertionMode.APPEND
-            playNext -> MediaPlayerController.InsertionMode.AFTER_CURRENT
-            else -> MediaPlayerController.InsertionMode.CLEAR
+            append -> MediaPlayerManager.InsertionMode.APPEND
+            playNext -> MediaPlayerManager.InsertionMode.AFTER_CURRENT
+            else -> MediaPlayerManager.InsertionMode.CLEAR
         }
 
         if (playlistName != null) {
-            mediaPlayerController.suggestedPlaylistName = playlistName
+            mediaPlayerManager.suggestedPlaylistName = playlistName
         }
 
-        mediaPlayerController.addToPlaylist(
+        mediaPlayerManager.addToPlaylist(
             songs,
             autoPlay,
             shuffle,
@@ -181,11 +181,11 @@ class DownloadHandler(
         val musicService = getMusicService()
         val songs: MutableList<Track> = LinkedList()
         val root: MusicDirectory
-        if (!isOffline() && isArtist && Settings.shouldUseId3Tags) {
-            getSongsForArtist(id, songs)
+        if (shouldUseId3Tags() && isArtist) {
+            return getSongsForArtist(id)
         } else {
             if (isDirectory) {
-                root = if (!isOffline() && Settings.shouldUseId3Tags)
+                root = if (shouldUseId3Tags())
                     musicService.getAlbumAsDir(id, name, false)
                 else
                     musicService.getMusicDirectory(id, name, false)
@@ -219,23 +219,19 @@ class DownloadHandler(
         }
         val musicService = getMusicService()
         for ((id1, _, _, title) in parent.getAlbums()) {
-            val root: MusicDirectory = if (
-                !isOffline() &&
-                Settings.shouldUseId3Tags
-            ) musicService.getAlbumAsDir(id1, title, false)
-            else musicService.getMusicDirectory(id1, title, false)
+            val root: MusicDirectory = if (shouldUseId3Tags())
+                musicService.getAlbumAsDir(id1, title, false)
+            else
+                musicService.getMusicDirectory(id1, title, false)
             getSongsRecursively(root, songs)
         }
     }
 
     @Throws(Exception::class)
     private fun getSongsForArtist(
-        id: String,
-        songs: MutableCollection<Track>
-    ) {
-        if (songs.size > maxSongs) {
-            return
-        }
+        id: String
+    ): MutableList<Track> {
+        val songs: MutableList<Track> = LinkedList()
         val musicService = getMusicService()
         val artist = musicService.getAlbumsOfArtist(id, "", false)
         for ((id1) in artist) {
@@ -250,6 +246,7 @@ class DownloadHandler(
                 }
             }
         }
+        return songs
     }
 }
 

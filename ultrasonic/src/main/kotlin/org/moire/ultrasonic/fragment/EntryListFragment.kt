@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.FolderSelectorBinder
+import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.GenericEntry
 import org.moire.ultrasonic.domain.Identifiable
@@ -23,7 +24,6 @@ import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.subsonic.DownloadAction
 import org.moire.ultrasonic.subsonic.DownloadHandler
-import org.moire.ultrasonic.util.Settings
 
 /**
  * An extension of the MultiListFragment, with a few helper functions geared
@@ -39,7 +39,7 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
      */
     private fun showFolderHeader(): Boolean {
         return listModel.showSelectFolderHeader() && !listModel.isOffline() &&
-            !Settings.shouldUseId3Tags
+            !ActiveServerProvider.shouldUseId3Tags()
     }
 
     override fun onContextMenuItemSelected(menuItem: MenuItem, item: T): Boolean {

@@ -8,7 +8,6 @@
 package org.moire.ultrasonic.service
 
 import android.annotation.SuppressLint
-import android.app.Service
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -26,7 +25,7 @@ import androidx.media3.common.Tracks
  */
 @Suppress("TooManyFunctions")
 @SuppressLint("UnsafeOptInUsageError")
-abstract class JukeboxUnimplementedFunctions : Service(), Player {
+abstract class JukeboxUnimplementedFunctions : Player {
 
     override fun setMediaItems(mediaItems: MutableList<MediaItem>) {
         TODO("Not yet implemented")
@@ -140,10 +139,6 @@ abstract class JukeboxUnimplementedFunctions : Service(), Player {
         TODO("Not yet implemented")
     }
 
-    override fun release() {
-        TODO("Not yet implemented")
-    }
-
     override fun getCurrentTracks(): Tracks {
         // TODO Dummy information is returned for now, this seems to work
         return Tracks.EMPTY
@@ -226,22 +221,6 @@ abstract class JukeboxUnimplementedFunctions : Service(), Player {
     }
 
     override fun clearVideoTextureView(textureView: TextureView?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setDeviceVolume(volume: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun increaseDeviceVolume() {
-        TODO("Not yet implemented")
-    }
-
-    override fun decreaseDeviceVolume() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setDeviceMuted(muted: Boolean) {
         TODO("Not yet implemented")
     }
 }

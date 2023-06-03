@@ -43,7 +43,7 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
 
         val musicFolderId = activeServer.musicFolderId
 
-        val result = if (ActiveServerProvider.isID3Enabled()) {
+        val result = if (ActiveServerProvider.shouldUseId3Tags()) {
             musicService.getArtists(refresh)
         } else {
             musicService.getIndexes(musicFolderId, refresh)

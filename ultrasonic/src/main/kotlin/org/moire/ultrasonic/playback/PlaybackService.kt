@@ -26,8 +26,7 @@ import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
-import androidx.media3.exoplayer.source.ShuffleOrder.UnshuffledShuffleOrder
+import androidx.media3.exoplayer.source.ShuffleOrder
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -37,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.app.UApp
@@ -46,6 +46,8 @@ import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.imageloader.ArtworkBitmapLoader
 import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider
 import org.moire.ultrasonic.service.DownloadService
+import org.moire.ultrasonic.service.JukeboxMediaPlayer
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
@@ -61,11 +63,12 @@ class PlaybackService :
     MediaLibraryService(),
     KoinComponent,
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
-    private lateinit var player: ExoPlayer
+    private lateinit var player: Player
     private lateinit var mediaLibrarySession: MediaLibrarySession
     private var equalizer: EqualizerController? = null
+    private val activeServerProvider: ActiveServerProvider by inject()
 
-    private lateinit var librarySessionCallback: MediaLibrarySession.Callback
+    private lateinit var librarySessionCallback: AutoMediaBrowserCallback
 
     private var rxBusSubscription = CompositeDisposable()
 
@@ -76,6 +79,7 @@ class PlaybackService :
         super.onCreate()
         initializeSessionAndPlayer()
         setListener(MediaSessionServiceListener())
+        instance = this
     }
 
     private fun getWakeModeFlag(): Int {
@@ -99,6 +103,7 @@ class PlaybackService :
     }
 
     private fun releasePlayerAndSession() {
+        Timber.i("Releasing player and session")
         // Broadcast that the service is being shutdown
         RxBus.stopServiceCommandPublisher.onNext(Unit)
 
@@ -127,6 +132,106 @@ class PlaybackService :
 
         setMediaNotificationProvider(CustomNotificationProvider(UApp.applicationContext()))
 
+        // TODO: Remove minor code duplication with updateBackend()
+        val desiredBackend = if (activeServerProvider.getActiveServer().jukeboxByDefault) {
+            MediaPlayerManager.PlayerBackend.JUKEBOX
+        } else {
+            MediaPlayerManager.PlayerBackend.LOCAL
+        }
+
+        player = if (activeServerProvider.getActiveServer().jukeboxByDefault) {
+            Timber.i("Jukebox enabled by default")
+            getJukeboxPlayer()
+        } else {
+            getLocalPlayer()
+        }
+
+        actualBackend = desiredBackend
+
+        // Create browser interface
+        librarySessionCallback = AutoMediaBrowserCallback(this)
+
+        // This will need to use the AutoCalls
+        mediaLibrarySession = MediaLibrarySession.Builder(this, player, librarySessionCallback)
+            .setSessionActivity(getPendingIntentForContent())
+            .setBitmapLoader(ArtworkBitmapLoader())
+            .build()
+
+        if (!librarySessionCallback.customLayout.isEmpty()) {
+            // Send custom layout to legacy session.
+            mediaLibrarySession.setCustomLayout(librarySessionCallback.customLayout)
+        }
+
+        // Set a listener to update the API client when the active server has changed
+        rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
+            // Set the player wake mode
+            (player as? ExoPlayer)?.setWakeMode(getWakeModeFlag())
+        }
+
+        // Set a listener to reset the ShuffleOrder
+        rxBusSubscription += RxBus.shufflePlayObservable.subscribe { shuffle ->
+            // This only applies for local playback
+            val exo = if (player is ExoPlayer) {
+                player as ExoPlayer
+            } else {
+                return@subscribe
+            }
+            val len = player.currentTimeline.windowCount
+
+            Timber.i("Resetting shuffle order, isShuffled: %s", shuffle)
+
+            // If disabling Shuffle return early
+            if (!shuffle) {
+                return@subscribe exo.setShuffleOrder(
+                    ShuffleOrder.UnshuffledShuffleOrder(len)
+                )
+            }
+
+            // Get the position of the current track in the unshuffled order
+            val cur = player.currentMediaItemIndex
+            val seed = System.currentTimeMillis()
+            val random = Random(seed)
+
+            val list = createShuffleListFromCurrentIndex(cur, len, random)
+            Timber.i("New Shuffle order: %s", list.joinToString { it.toString() })
+            exo.setShuffleOrder(ShuffleOrder.DefaultShuffleOrder(list, seed))
+        }
+
+        // Listen to the shutdown command
+        rxBusSubscription += RxBus.shutdownCommandObservable.subscribe {
+            Timber.i("Received destroy command via Rx")
+            onDestroy()
+        }
+
+        player.addListener(listener)
+        isStarted = true
+    }
+
+    private fun updateBackend(newBackend: MediaPlayerManager.PlayerBackend) {
+        Timber.i("Switching player backends")
+        // Remove old listeners
+        player.removeListener(listener)
+        player.release()
+
+        player = if (newBackend == MediaPlayerManager.PlayerBackend.JUKEBOX) {
+            getJukeboxPlayer()
+        } else {
+            getLocalPlayer()
+        }
+
+        // Add fresh listeners
+        player.addListener(listener)
+
+        mediaLibrarySession.player = player
+
+        actualBackend = newBackend
+    }
+
+    private fun getJukeboxPlayer(): Player {
+        return JukeboxMediaPlayer()
+    }
+
+    private fun getLocalPlayer(): Player {
         // Create a new plain OkHttpClient
         val builder = OkHttpClient.Builder()
         val client = builder.build()
@@ -147,7 +252,7 @@ class PlaybackService :
             renderer.setEnableAudioOffload(true)
 
         // Create the player
-        player = ExoPlayer.Builder(this)
+        val player = ExoPlayer.Builder(this)
             .setAudioAttributes(getAudioAttributes(), true)
             .setWakeMode(getWakeModeFlag())
             .setHandleAudioBecomingNoisy(true)
@@ -157,59 +262,17 @@ class PlaybackService :
             .setSeekForwardIncrementMs(Settings.seekInterval.toLong())
             .build()
 
+        // Setup Equalizer
         equalizer = EqualizerController.create(player.audioSessionId)
 
         // Enable audio offload
         if (Settings.useHwOffload)
             player.experimentalSetOffloadSchedulingEnabled(true)
 
-        // Create browser interface
-        librarySessionCallback = AutoMediaBrowserCallback(player, this)
-
-        // This will need to use the AutoCalls
-        mediaLibrarySession = MediaLibrarySession.Builder(this, player, librarySessionCallback)
-            .setSessionActivity(getPendingIntentForContent())
-            .setBitmapLoader(ArtworkBitmapLoader())
-            .build()
-
-        // Set a listener to update the API client when the active server has changed
-        rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
-            // Set the player wake mode
-            player.setWakeMode(getWakeModeFlag())
-        }
-
-        // Set a listener to reset the ShuffleOrder
-        rxBusSubscription += RxBus.shufflePlayObservable.subscribe { shuffle ->
-            val len = player.currentTimeline.windowCount
-
-            Timber.i("Resetting shuffle order, isShuffled: %s", shuffle)
-
-            // If disabling Shuffle return early
-            if (!shuffle) {
-                return@subscribe player.setShuffleOrder(UnshuffledShuffleOrder(len))
-            }
-
-            // Get the position of the current track in the unshuffled order
-            val cur = player.currentMediaItemIndex
-            val seed = System.currentTimeMillis()
-            val random = Random(seed)
-
-            val list = createShuffleListFromCurrentIndex(cur, len, random)
-            Timber.i("New Shuffle order: %s", list.joinToString { it.toString() })
-            player.setShuffleOrder(DefaultShuffleOrder(list, seed))
-        }
-
-        // Listen to the shutdown command
-        rxBusSubscription += RxBus.shutdownCommandObservable.subscribe {
-            Timber.i("Received destroy command via Rx")
-            onDestroy()
-        }
-
-        player.addListener(listener)
-        isStarted = true
+        return player
     }
 
-    fun createShuffleListFromCurrentIndex(
+    private fun createShuffleListFromCurrentIndex(
         currentIndex: Int,
         length: Int,
         random: Random
@@ -233,7 +296,14 @@ class PlaybackService :
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            updateWidgetTrack(mediaItem?.toTrack())
+            // Since we cannot update the metadata of the media item after creation,
+            // we cannot set change the rating on it
+            // Therefore the track must be our source of truth
+            val track = mediaItem?.toTrack()
+            if (track != null) {
+                updateCustomHeartButton(track.starred)
+            }
+            updateWidgetTrack(track)
             cacheNextSongs()
         }
 
@@ -243,7 +313,12 @@ class PlaybackService :
         }
     }
 
+    private fun updateCustomHeartButton(isHeart: Boolean) {
+        librarySessionCallback.updateCustomHeartButton(mediaLibrarySession, isHeart)
+    }
+
     private fun cacheNextSongs() {
+        if (actualBackend == MediaPlayerManager.PlayerBackend.JUKEBOX) return
         Timber.d("PlaybackService caching the next songs")
         val nextSongs = Util.getPlayListFromTimeline(
             player.currentTimeline,
@@ -333,8 +408,22 @@ class PlaybackService :
     }
 
     companion object {
+        var actualBackend: MediaPlayerManager.PlayerBackend? = null
+
+        private var desiredBackend: MediaPlayerManager.PlayerBackend? = null
+        fun setBackend(playerBackend: MediaPlayerManager.PlayerBackend) {
+            desiredBackend = playerBackend
+            instance?.updateBackend(playerBackend)
+        }
+
+        var instance: PlaybackService? = null
+
         private const val NOTIFICATION_CHANNEL_ID = "org.moire.ultrasonic.error"
         private const val NOTIFICATION_CHANNEL_NAME = "Ultrasonic error messages"
+        const val CUSTOM_COMMAND_TOGGLE_HEART_ON =
+            "org.moire.ultrasonic.HEART_ON"
+        const val CUSTOM_COMMAND_TOGGLE_HEART_OFF =
+            "org.moire.ultrasonic.HEART_OFF"
         private const val NOTIFICATION_ID = 3009
     }
 }

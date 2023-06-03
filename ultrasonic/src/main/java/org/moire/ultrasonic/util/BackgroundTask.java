@@ -58,7 +58,7 @@ public abstract class BackgroundTask<T> implements ProgressListener
 
 	protected String getErrorMessage(Throwable error)
 	{
-		return CommunicationError.getErrorMessage(error, activity);
+		return CommunicationError.getErrorMessage(error);
 	}
 
 	@Override
