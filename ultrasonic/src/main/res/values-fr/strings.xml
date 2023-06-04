@@ -392,7 +392,7 @@
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Utiliser les étoiles pour noter les morceaux</string>
     <string name="main.albums_by_year">Chronologique</string>
-    <string name="grid_view">Reprise</string>
+    <string name="grid_view">Couverture</string>
     <string name="settings.preload_1000">1000 morceaux</string>
     <string name="settings.preload_100">100 morceaux</string>
     <string name="settings.preload_500">500 morceaux</string>
