@@ -481,9 +481,7 @@ class PlayerFragment :
         val index = mediaPlayerManager.currentMediaItemIndex
 
         if (index != -1) {
-            val smoothScroller = LinearSmoothScroller(context)
-            smoothScroller.targetPosition = index
-            viewManager.startSmoothScroll(smoothScroller)
+            viewManager.scrollToPosition(index)
         }
     }
 

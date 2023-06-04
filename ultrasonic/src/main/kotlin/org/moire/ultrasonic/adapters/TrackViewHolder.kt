@@ -1,5 +1,6 @@
 package org.moire.ultrasonic.adapters
 
+import android.graphics.PorterDuff
 import android.view.View
 import android.widget.Checkable
 import android.widget.CheckedTextView
@@ -45,6 +46,7 @@ class TrackViewHolder(val view: View) :
 
     var entry: Track? = null
         private set
+    var songLayout: LinearLayout = view.findViewById(R.id.song_layout)
     var check: CheckedTextView = view.findViewById(R.id.song_check)
     var drag: ImageView = view.findViewById(R.id.song_drag)
     var observableChecked = MutableLiveData(false)
@@ -170,11 +172,13 @@ class TrackViewHolder(val view: View) :
             title.setCompoundDrawablesWithIntrinsicBounds(
                 playingIcon, null, null, null
             )
+            songLayout.backgroundTintMode = PorterDuff.Mode.ADD
         } else if (!isPlaying && isPlayingCached) {
             isPlayingCached = false
             title.setCompoundDrawablesWithIntrinsicBounds(
                 0, 0, 0, 0
             )
+            songLayout.backgroundTintMode = PorterDuff.Mode.MULTIPLY
         }
     }
 

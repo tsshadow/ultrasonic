@@ -5,6 +5,9 @@
     a:id="@+id/song_layout"
     a:layout_width="fill_parent"
     a:layout_height="?android:attr/listPreferredItemHeight"
+    a:background="#00000000"
+    a:backgroundTint="@color/material_on_surface_stroke"
+    a:backgroundTintMode="multiply"
     a:minHeight="?android:attr/listPreferredItemHeight"
     a:orientation="horizontal">
 
