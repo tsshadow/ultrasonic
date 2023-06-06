@@ -21,6 +21,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -51,7 +52,6 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ServerSettingDao
-import org.moire.ultrasonic.fragment.OnBackPressedHandler
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.provider.SearchSuggestionProvider
 import org.moire.ultrasonic.service.MediaPlayerLifecycleSupport
@@ -125,6 +125,8 @@ class NavigationActivity : AppCompatActivity() {
         nowPlayingView = findViewById(R.id.now_playing_fragment)
         navigationView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
+
+        setupDrawerLayout(drawerLayout!!)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -210,6 +212,27 @@ class NavigationActivity : AppCompatActivity() {
             cachedServerCount = count ?: 0
             updateNavigationHeaderForServer()
         }
+    }
+
+    private fun setupDrawerLayout(drawerLayout: DrawerLayout) {
+        onBackPressedDispatcher.addCallback(this, closeNavigationDrawerOnBack)
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                // Nothing
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                closeNavigationDrawerOnBack.isEnabled = true
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                closeNavigationDrawerOnBack.isEnabled = false
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                // Nothing
+            }
+        })
     }
 
     override fun onResume() {
@@ -315,11 +338,18 @@ class NavigationActivity : AppCompatActivity() {
 
         selectServerButton =
             navigationView?.getHeaderView(0)?.findViewById(R.id.header_select_server)
-        selectServerButton?.setOnClickListener {
+        val dropDownButton: ImageView? =
+            navigationView?.getHeaderView(0)?.findViewById(R.id.edit_server_button)
+
+        val onClick: (View) -> Unit = {
             if (drawerLayout?.isDrawerVisible(GravityCompat.START) == true)
                 this.drawerLayout?.closeDrawer(GravityCompat.START)
             navController.navigate(R.id.serverSelectorFragment)
         }
+
+        selectServerButton?.setOnClickListener(onClick)
+        dropDownButton?.setOnClickListener(onClick)
+
         headerBackgroundImage =
             navigationView?.getHeaderView(0)?.findViewById(R.id.img_header_bg)
     }
@@ -328,13 +358,9 @@ class NavigationActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfig)
     }
 
-    override fun onBackPressed() {
-        if (drawerLayout?.isDrawerVisible(GravityCompat.START) == true) {
-            this.drawerLayout?.closeDrawer(GravityCompat.START)
-        } else {
-            val currentFragment = host!!.childFragmentManager.fragments.last()
-            if (currentFragment is OnBackPressedHandler) currentFragment.onBackPressed()
-            else super.onBackPressed()
+    private val closeNavigationDrawerOnBack = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            drawerLayout?.closeDrawer(GravityCompat.START)
         }
     }
 
@@ -352,17 +378,12 @@ class NavigationActivity : AppCompatActivity() {
             super.onOptionsItemSelected(item)
     }
 
+    // TODO: Why is this needed? Shouldn't it just work by default?
     override fun onSupportNavigateUp(): Boolean {
-        val currentFragment = host!!.childFragmentManager.fragments.last()
-        return if (currentFragment is OnBackPressedHandler) {
-            currentFragment.onBackPressed()
-            true
-        } else {
-            findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
-        }
+        return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
     }
 
-    // TODO Test if this works with external Intents
+    // TODO: Test if this works with external Intents
     // android.intent.action.SEARCH and android.media.action.MEDIA_PLAY_FROM_SEARCH calls here
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)

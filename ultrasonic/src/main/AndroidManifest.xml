@@ -33,6 +33,7 @@
         android:supportsRtl="false"
         android:preserveLegacyExternalStorage="true"
         tools:ignore="UnusedAttribute">
+        <!-- Add for API 34 android:enableOnBackInvokedCallBack="true" -->
 
         <meta-data android:name="com.google.android.gms.car.application"
             android:resource="@xml/automotive_app_desc"/>
