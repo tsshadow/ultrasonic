@@ -56,13 +56,16 @@ import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.provider.SearchSuggestionProvider
 import org.moire.ultrasonic.service.MediaPlayerLifecycleSupport
 import org.moire.ultrasonic.service.MediaPlayerManager
+import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
+import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.InfoDialog
 import org.moire.ultrasonic.util.LocaleHelper
 import org.moire.ultrasonic.util.ServerColor
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.ShortcutUtil
 import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.UncaughtExceptionHandler
 import org.moire.ultrasonic.util.Util
@@ -209,6 +212,12 @@ class NavigationActivity : AppCompatActivity() {
         serverRepository.liveServerCount().observe(this) { count ->
             cachedServerCount = count ?: 0
             updateNavigationHeaderForServer()
+        }
+
+        // Setup app shortcuts on supported devices, but not on first start, when the server
+        // is not configured yet.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && !UApp.instance!!.isFirstRun) {
+            ShortcutUtil.registerShortcuts(this)
         }
     }
 
@@ -367,6 +376,23 @@ class NavigationActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         if (intent == null) return
+
+        if (intent.action == Constants.INTENT_PLAY_RANDOM_SONGS) {
+            val currentFragment = host?.childFragmentManager?.fragments?.last() ?: return
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getRandomSongs(Settings.maxSongs)
+            val downloadHandler: DownloadHandler by inject()
+            downloadHandler.addTracksToMediaController(
+                songs = musicDirectory.getTracks(),
+                append = false,
+                playNext = false,
+                autoPlay = true,
+                shuffle = false,
+                fragment = currentFragment,
+                playlistName = null
+            )
+            return
+        }
 
         if (intent.getBooleanExtra(Constants.INTENT_SHOW_PLAYER, false)) {
             findNavController(R.id.nav_host_fragment).navigate(R.id.playerFragment)
