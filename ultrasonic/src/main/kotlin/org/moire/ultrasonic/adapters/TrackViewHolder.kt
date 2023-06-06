@@ -166,19 +166,22 @@ class TrackViewHolder(val view: View) :
         ContextCompat.getDrawable(view.context, R.drawable.ic_stat_play)!!
     }
 
+    @Suppress("MagicNumber")
     private fun setPlayIcon(isPlaying: Boolean) {
         if (isPlaying && !isPlayingCached) {
             isPlayingCached = true
             title.setCompoundDrawablesWithIntrinsicBounds(
                 playingIcon, null, null, null
             )
-            songLayout.backgroundTintMode = PorterDuff.Mode.ADD
+            songLayout.backgroundTintMode = PorterDuff.Mode.MULTIPLY
+            songLayout.elevation = 3F
         } else if (!isPlaying && isPlayingCached) {
             isPlayingCached = false
             title.setCompoundDrawablesWithIntrinsicBounds(
                 0, 0, 0, 0
             )
-            songLayout.backgroundTintMode = PorterDuff.Mode.MULTIPLY
+            songLayout.backgroundTintMode = PorterDuff.Mode.ADD
+            songLayout.elevation = 0F
         }
     }
 
