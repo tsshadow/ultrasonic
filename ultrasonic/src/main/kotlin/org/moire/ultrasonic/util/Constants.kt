@@ -25,6 +25,7 @@ object Constants {
     const val CMD_PREVIOUS = "org.moire.ultrasonic.CMD_PREVIOUS"
     const val CMD_NEXT = "org.moire.ultrasonic.CMD_NEXT"
     const val INTENT_SHOW_PLAYER = "org.moire.ultrasonic.SHOW_PLAYER"
+    const val INTENT_PLAY_RANDOM_SONGS = "org.moire.ultrasonic.CMD_RANDOM_SONGS"
 
     // Legacy Preferences keys
     // Warning: Don't add any new here!

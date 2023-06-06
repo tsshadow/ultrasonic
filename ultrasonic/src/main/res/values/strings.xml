@@ -456,6 +456,8 @@
     <string name="foreground_exception_text">Press on the play button on the media notification if it
     is still present, otherwise please open the app to start the playback and re-connect the session
     to the controller</string>
+    <string name="shortcut_play_random_songs_short">Random songs</string>
+    <string name="shortcut_play_random_songs_long">Play random songs</string>
 
 
 </resources>
