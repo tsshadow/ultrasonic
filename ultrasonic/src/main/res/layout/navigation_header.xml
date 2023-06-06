@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:a="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:a="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     a:id="@+id/view_container"
@@ -13,19 +12,18 @@
         a:id="@+id/img_header_bg"
         a:layout_width="match_parent"
         a:layout_height="0dp"
+        a:importantForAccessibility="no"
         a:scaleType="fitXY"
         a:src="@drawable/ic_header_bg"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        a:importantForAccessibility="no" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         a:id="@+id/header_select_server"
         style="@style/Widget.Material3.Button.TextButton.Icon"
-        a:layout_width="match_parent"
+        a:layout_width="0dp"
         a:layout_height="wrap_content"
-        a:layout_marginStart="3dp"
-        a:layout_marginTop="24dp"
+        a:layout_marginTop="48dp"
         a:background="@drawable/default_ripple"
         a:gravity="center_vertical"
         a:paddingHorizontal="22dp"
@@ -39,9 +37,27 @@
         app:iconPadding="12dp"
         app:iconSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/edit_server_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:iconTint="@color/selected_menu_dark"
         tools:textColor="@color/selected_menu_dark" />
+
+    <ImageView
+        a:id="@+id/edit_server_button"
+        style="@style/Widget.Material3.Button.TextButton.Icon"
+        a:layout_width="wrap_content"
+        a:layout_height="0dp"
+        a:layout_marginTop="6dp"
+        a:layout_marginBottom="6dp"
+        a:contentDescription="@string/server_menu.edit"
+        a:maxHeight="32dp"
+        a:src="@drawable/arrow_drop_down"
+        a:text="@null"
+        app:layout_constraintBottom_toBottomOf="@id/header_select_server"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/header_select_server"
+        app:layout_constraintTop_toTopOf="@id/header_select_server"
+        app:tint="@color/selected_menu_dark" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

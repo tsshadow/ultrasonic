@@ -338,11 +338,18 @@ class NavigationActivity : AppCompatActivity() {
 
         selectServerButton =
             navigationView?.getHeaderView(0)?.findViewById(R.id.header_select_server)
-        selectServerButton?.setOnClickListener {
+        val dropDownButton: ImageView? =
+            navigationView?.getHeaderView(0)?.findViewById(R.id.edit_server_button)
+
+        val onClick: (View) -> Unit = {
             if (drawerLayout?.isDrawerVisible(GravityCompat.START) == true)
                 this.drawerLayout?.closeDrawer(GravityCompat.START)
             navController.navigate(R.id.serverSelectorFragment)
         }
+
+        selectServerButton?.setOnClickListener(onClick)
+        dropDownButton?.setOnClickListener(onClick)
+
         headerBackgroundImage =
             navigationView?.getHeaderView(0)?.findViewById(R.id.img_header_bg)
     }
@@ -352,10 +359,10 @@ class NavigationActivity : AppCompatActivity() {
     }
 
     private val closeNavigationDrawerOnBack = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                drawerLayout?.closeDrawer(GravityCompat.START)
-            }
+        override fun handleOnBackPressed() {
+            drawerLayout?.closeDrawer(GravityCompat.START)
         }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val retValue = super.onCreateOptionsMenu(menu)
