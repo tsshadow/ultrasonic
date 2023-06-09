@@ -1,5 +1,6 @@
 package org.moire.ultrasonic.adapters
 
+import android.graphics.Color
 import android.view.View
 import android.widget.Checkable
 import android.widget.CheckedTextView
@@ -45,7 +46,6 @@ class TrackViewHolder(val view: View) :
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
     companion object {
-        val COLOR_NORMAL = com.google.android.material.R.attr.colorSurface
         val COLOR_HIGHLIGHT = com.google.android.material.R.attr.colorSecondaryContainer
     }
 
@@ -186,8 +186,7 @@ class TrackViewHolder(val view: View) :
             title.setCompoundDrawablesWithIntrinsicBounds(
                 0, 0, 0, 0
             )
-            val color = MaterialColors.getColor(view, COLOR_NORMAL)
-            songLayout.setBackgroundColor(color)
+            songLayout.setBackgroundColor(Color.TRANSPARENT)
             songLayout.elevation = 0F
         }
     }
