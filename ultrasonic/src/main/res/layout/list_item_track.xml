@@ -5,7 +5,6 @@
     a:id="@+id/song_layout"
     a:layout_width="fill_parent"
     a:layout_height="?android:attr/listPreferredItemHeight"
-    a:background="?attr/colorSurface"
     a:minHeight="?android:attr/listPreferredItemHeight"
     a:orientation="horizontal">
 
