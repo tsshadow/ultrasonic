@@ -1,6 +1,5 @@
 package org.moire.ultrasonic.adapters
 
-import android.graphics.PorterDuff
 import android.view.View
 import android.widget.Checkable
 import android.widget.CheckedTextView
@@ -14,6 +13,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.HeartRating
 import androidx.media3.common.StarRating
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
@@ -43,6 +43,11 @@ class TrackViewHolder(val view: View) :
     Checkable,
     KoinComponent,
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
+
+    companion object {
+        val COLOR_NORMAL = com.google.android.material.R.attr.colorSurface
+        val COLOR_HIGHLIGHT = com.google.android.material.R.attr.colorSecondaryContainer
+    }
 
     var entry: Track? = null
         private set
@@ -173,14 +178,16 @@ class TrackViewHolder(val view: View) :
             title.setCompoundDrawablesWithIntrinsicBounds(
                 playingIcon, null, null, null
             )
-            songLayout.backgroundTintMode = PorterDuff.Mode.MULTIPLY
+            val color = MaterialColors.getColor(view, COLOR_HIGHLIGHT)
+            songLayout.setBackgroundColor(color)
             songLayout.elevation = 3F
         } else if (!isPlaying && isPlayingCached) {
             isPlayingCached = false
             title.setCompoundDrawablesWithIntrinsicBounds(
                 0, 0, 0, 0
             )
-            songLayout.backgroundTintMode = PorterDuff.Mode.ADD
+            val color = MaterialColors.getColor(view, COLOR_NORMAL)
+            songLayout.setBackgroundColor(color)
             songLayout.elevation = 0F
         }
     }
