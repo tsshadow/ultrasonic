@@ -128,7 +128,6 @@
     <string name="playlist.updated_info_error">更新播放列表信息失败 - %s</string>
     <string name="search.albums">专辑</string>
     <string name="search.artists">艺人</string>
-    <string name="search.label">搜索</string>
     <string name="search.more">显示更多</string>
     <string name="search.no_match">没有匹配的结果，请重试</string>
     <string name="search.songs">歌曲</string>

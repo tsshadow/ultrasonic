@@ -128,7 +128,6 @@
     <string name="playlist.updated_info_error">Не удалось обновить информацию о плейлисте для %s</string>
     <string name="search.albums">Альбомы</string>
     <string name="search.artists">Исполнители</string>
-    <string name="search.label">Поиск</string>
     <string name="search.more">Показать еще</string>
     <string name="search.no_match">Нет совпадений, пожалуйста попробуйте еще раз</string>
     <string name="search.songs">Песни</string>

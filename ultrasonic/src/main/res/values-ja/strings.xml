@@ -106,7 +106,6 @@
     <string name="playlist.updated_info_error">%s のプレイリスト情報をアップデートできません</string>
     <string name="search.albums">アルバム</string>
     <string name="search.artists">アーティスト</string>
-    <string name="search.label">検索</string>
     <string name="search.more">もっと表示</string>
     <string name="search.no_match">一致するものはありません、やり直してください</string>
     <string name="search.songs">曲</string>

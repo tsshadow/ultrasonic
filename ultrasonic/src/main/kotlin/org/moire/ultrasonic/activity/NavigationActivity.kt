@@ -18,16 +18,20 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.SearchRecentSuggestions
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.MenuProvider
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentContainerView
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player.STATE_BUFFERING
@@ -93,6 +97,10 @@ class NavigationActivity : AppCompatActivity() {
     private var host: NavHostFragment? = null
     private var selectServerButton: MaterialButton? = null
     private var headerBackgroundImage: ImageView? = null
+
+    // We store the last search string in this variable.
+    // Seems a bit like a hack, is there a better way?
+    var searchQuery: String? = null
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
@@ -221,10 +229,57 @@ class NavigationActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && !UApp.instance!!.isFirstRun) {
             ShortcutUtil.registerShortcuts(this)
         }
+
+        // Register our options menu
+        addMenuProvider(
+            searchMenuProvider,
+            this,
+            Lifecycle.State.RESUMED
+        )
+    }
+
+    private val searchMenuProvider: MenuProvider = object : MenuProvider {
+        override fun onPrepareMenu(menu: Menu) {
+            setupSearchField(menu)
+        }
+
+        override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+            inflater.inflate(R.menu.search_view_menu, menu)
+        }
+
+        override fun onMenuItemSelected(item: MenuItem): Boolean {
+            return false
+        }
+    }
+
+    fun setupSearchField(menu: Menu) {
+        Timber.i("Recreating search field")
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView
+        val searchableInfo = searchManager.getSearchableInfo(this.componentName)
+        searchView.setSearchableInfo(searchableInfo)
+        searchView.setIconifiedByDefault(false)
+
+        if (searchQuery != null) {
+            Timber.e("Found existing search query")
+            searchItem.expandActionView()
+            searchView.isIconified = false
+            searchView.setQuery(searchQuery, false)
+            searchView.clearFocus()
+            // Restore search text only once!
+            searchQuery = null
+        }
     }
 
     private fun setupDrawerLayout(drawerLayout: DrawerLayout) {
+        // Set initial state passed on drawer state
+        closeNavigationDrawerOnBack.isEnabled = drawerLayout.isOpen
+
+        // Add the back press listener
         onBackPressedDispatcher.addCallback(this, closeNavigationDrawerOnBack)
+
+        // Listen to changes in the drawer state and enable the back press listener accordingly.
         drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 // Nothing
@@ -392,47 +447,55 @@ class NavigationActivity : AppCompatActivity() {
         return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
     }
 
-    // TODO: Test if this works with external Intents
-    // android.intent.action.SEARCH and android.media.action.MEDIA_PLAY_FROM_SEARCH calls here
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        if (intent == null) return
 
-        if (intent.action == Constants.INTENT_PLAY_RANDOM_SONGS) {
-            val currentFragment = host?.childFragmentManager?.fragments?.last() ?: return
-            val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getRandomSongs(Settings.maxSongs)
-            val downloadHandler: DownloadHandler by inject()
-            downloadHandler.addTracksToMediaController(
-                songs = musicDirectory.getTracks(),
-                append = false,
-                playNext = false,
-                autoPlay = true,
-                shuffle = false,
-                fragment = currentFragment,
-                playlistName = null
-            )
-            return
+        when (intent?.action) {
+            Constants.INTENT_PLAY_RANDOM_SONGS -> {
+                playRandomSongs()
+            }
+            Intent.ACTION_MAIN -> {
+                if (intent.getBooleanExtra(Constants.INTENT_SHOW_PLAYER, false)) {
+                    findNavController(R.id.nav_host_fragment).navigate(R.id.playerFragment)
+                }
+            }
+            Intent.ACTION_SEARCH -> {
+                searchQuery = intent.getStringExtra(SearchManager.QUERY)
+                handleSearchIntent(searchQuery, false)
+            }
+            MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH -> {
+                searchQuery = intent.getStringExtra(SearchManager.QUERY)
+                handleSearchIntent(searchQuery, true)
+            }
         }
+    }
 
-        if (intent.getBooleanExtra(Constants.INTENT_SHOW_PLAYER, false)) {
-            findNavController(R.id.nav_host_fragment).navigate(R.id.playerFragment)
-            return
-        }
+    private fun handleSearchIntent(query: String?, autoPlay: Boolean) {
+        val suggestions = SearchRecentSuggestions(
+            this,
+            SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE
+        )
+        suggestions.saveRecentQuery(query, null)
 
-        val query = intent.getStringExtra(SearchManager.QUERY)
+        val action = NavigationGraphDirections.toSearchFragment(query, autoPlay)
+        findNavController(R.id.nav_host_fragment).navigate(action)
+    }
 
-        if (query != null) {
-            val autoPlay = intent.action == MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH
-            val suggestions = SearchRecentSuggestions(
-                this,
-                SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE
-            )
-            suggestions.saveRecentQuery(query, null)
-
-            val action = NavigationGraphDirections.toSearchFragment(query, autoPlay)
-            findNavController(R.id.nav_host_fragment).navigate(action)
-        }
+    private fun playRandomSongs() {
+        val currentFragment = host?.childFragmentManager?.fragments?.last() ?: return
+        val service = MusicServiceFactory.getMusicService()
+        val musicDirectory = service.getRandomSongs(Settings.maxSongs)
+        val downloadHandler: DownloadHandler by inject()
+        downloadHandler.addTracksToMediaController(
+            songs = musicDirectory.getTracks(),
+            append = false,
+            playNext = false,
+            autoPlay = true,
+            shuffle = false,
+            fragment = currentFragment,
+            playlistName = null
+        )
+        return
     }
 
     /**

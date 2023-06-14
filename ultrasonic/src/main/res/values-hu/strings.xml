@@ -110,7 +110,6 @@
     <string name="playlist.updated_info_error">Lejátszási lista módosítása sikertelen %s</string>
     <string name="search.albums">Albumok</string>
     <string name="search.artists">Előadók</string>
-    <string name="search.label">Keresés</string>
     <string name="search.more">Továbbiak</string>
     <string name="search.no_match">Nincs találat, próbálja újra!</string>
     <string name="search.songs">Dalok</string>

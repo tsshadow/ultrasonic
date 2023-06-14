@@ -103,7 +103,6 @@
     <string name="playlist.updated_info_error">Błąd podczas aktualizacji playlisty %s</string>
     <string name="search.albums">Albumy</string>
     <string name="search.artists">Wykonawcy</string>
-    <string name="search.label">Wyszukaj</string>
     <string name="search.more">Wyświetl więcej</string>
     <string name="search.no_match">Brak wyników, proszę spróbować ponownie</string>
     <string name="search.songs">Utwory</string>

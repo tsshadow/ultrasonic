@@ -36,7 +36,6 @@ import org.moire.ultrasonic.adapters.AlbumHeader
 import org.moire.ultrasonic.adapters.AlbumRowDelegate
 import org.moire.ultrasonic.adapters.HeaderViewBinder
 import org.moire.ultrasonic.adapters.TrackViewBinder
-import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
@@ -64,7 +63,6 @@ import timber.log.Timber
  * In most cases the data should be just a list of Entries, but there are some cases
  * where the list can contain Albums as well. This happens especially when having ID3 tags disabled,
  * or using Offline mode, both in which Indexes instead of Artists are being used.
- *
  */
 @Suppress("TooManyFunctions")
 open class TrackCollectionFragment(
@@ -268,6 +266,9 @@ open class TrackCollectionFragment(
 
     private val menuProvider: MenuProvider = object : MenuProvider {
         override fun onPrepareMenu(menu: Menu) {
+            // Hide search button (from xml)
+            menu.findItem(R.id.action_search).isVisible = false
+
             playAllButton = menu.findItem(R.id.select_album_play_all)
 
             if (playAllButton != null) {
@@ -282,7 +283,7 @@ open class TrackCollectionFragment(
         }
 
         override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
-            inflater.inflate(R.menu.select_album, menu)
+            inflater.inflate(R.menu.track_collection_menu, menu)
         }
 
         override fun onMenuItemSelected(item: MenuItem): Boolean {
@@ -584,12 +585,8 @@ open class TrackCollectionFragment(
             } else {
                 setTitle(name)
 
-                if (ActiveServerProvider.shouldUseId3Tags()) {
-                    if (isAlbum) {
-                        listModel.getAlbum(refresh2, id, name)
-                    } else {
-                        throw IllegalAccessException("Use AlbumFragment instead!")
-                    }
+                if (isAlbum) {
+                    listModel.getAlbum(refresh2, id, name)
                 } else {
                     listModel.getMusicDirectory(refresh2, id, name)
                 }

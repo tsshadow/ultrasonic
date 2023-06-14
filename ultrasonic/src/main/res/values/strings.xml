@@ -142,7 +142,6 @@
     <string name="playlist.updated_info_error">Failed to update playlist information for %s</string>
     <string name="search.albums">Albums</string>
     <string name="search.artists">Artists</string>
-    <string name="search.label">Search</string>
     <string name="search.more">Show More</string>
     <string name="search.no_match">No matches, please try again</string>
     <string name="search.songs">Songs</string>
