@@ -91,7 +91,6 @@ open class TrackCollectionFragment(
     private val rxBusSubscription: CompositeDisposable = CompositeDisposable()
 
     private var sortOrder = initialOrder
-    private var offset: Int? = null
 
     /**
      * The id of the main layout
@@ -188,13 +187,12 @@ open class TrackCollectionFragment(
 
     private fun loadMoreTracks() {
         if (displayRandom() || navArgs.genreName != null) {
-            offset = navArgs.offset + navArgs.size
-            getLiveData(refresh = true, append = true)
+            getLiveData(append = true)
         }
     }
 
     internal open fun handleRefresh() {
-        getLiveData(true)
+        getLiveData(refresh = true)
     }
 
     internal open fun setupButtons(view: View) {
@@ -553,7 +551,7 @@ open class TrackCollectionFragment(
         val getVideos = navArgs.getVideos
         val getRandomTracks = displayRandom()
         val size = if (navArgs.size < 0) Settings.maxSongs else navArgs.size
-        val offset = offset ?: navArgs.offset
+        val offset = navArgs.offset
         val refresh2 = navArgs.refresh || refresh
 
         listModel.viewModelScope.launch(handler) {
@@ -685,7 +683,7 @@ open class TrackCollectionFragment(
 
     override fun setOrderType(newOrder: SortOrder) {
         sortOrder = newOrder
-        getLiveData(true)
+        getLiveData(refresh = true)
     }
 
     override var viewCapabilities: ViewCapabilities = ViewCapabilities(
