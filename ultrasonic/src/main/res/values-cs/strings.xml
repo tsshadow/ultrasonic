@@ -104,7 +104,6 @@
     <string name="playlist.updated_info_error">Chyba aktualizace informací playlistu %s</string>
     <string name="search.albums">Alba</string>
     <string name="search.artists">Umělci</string>
-    <string name="search.label">Vyhledávání</string>
     <string name="search.more">Zobrazit více</string>
     <string name="search.no_match">Nenalezeno, zkuste znovu</string>
     <string name="search.songs">Skladby</string>

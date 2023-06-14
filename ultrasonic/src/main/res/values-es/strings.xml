@@ -141,7 +141,6 @@
     <string name="playlist.updated_info_error">Fallo al actualizar la información de la lista de reproducción para %s</string>
     <string name="search.albums">Álbumes</string>
     <string name="search.artists">Artistas</string>
-    <string name="search.label">Buscar</string>
     <string name="search.more">Mostrar mas</string>
     <string name="search.no_match">Sin resultados, por favor inténtalo de nuevo</string>
     <string name="search.songs">Canciones</string>

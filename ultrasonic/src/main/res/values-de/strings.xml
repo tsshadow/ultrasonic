@@ -139,7 +139,6 @@
     <string name="playlist.updated_info_error">Aktualisierung der Wiedergabeliste %s ist fehlgeschlagen</string>
     <string name="search.albums">Alben</string>
     <string name="search.artists">Künstler*innen</string>
-    <string name="search.label">Suche</string>
     <string name="search.more">Zeige mehr</string>
     <string name="search.no_match">Keine Treffer, bitte erneut versuchen</string>
     <string name="search.songs">Titel</string>

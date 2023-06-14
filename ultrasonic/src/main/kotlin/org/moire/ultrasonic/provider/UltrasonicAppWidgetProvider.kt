@@ -219,8 +219,8 @@ open class UltrasonicAppWidgetProvider : AppWidgetProvider() {
                 NavigationActivity::class.java
             ).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             if (playerActive) intent.putExtra(Constants.INTENT_SHOW_PLAYER, true)
-            intent.action = "android.intent.action.MAIN"
-            intent.addCategory("android.intent.category.LAUNCHER")
+            intent.action = Intent.ACTION_MAIN
+            intent.addCategory(Intent.CATEGORY_LAUNCHER)
             var flags = PendingIntent.FLAG_UPDATE_CURRENT
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // needed starting Android 12 (S = 31)

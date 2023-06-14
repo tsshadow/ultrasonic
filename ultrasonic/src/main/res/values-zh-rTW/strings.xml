@@ -67,7 +67,6 @@
     <string name="playlist.label">播放清單</string>
     <string name="search.albums">專輯</string>
     <string name="search.artists">歌手</string>
-    <string name="search.label">搜尋</string>
     <string name="search.title">搜尋</string>
     <string name="select_genre.empty">無符合類型</string>
     <string name="settings.increment_time_0">已停用</string>

@@ -7,19 +7,11 @@
 
 package org.moire.ultrasonic.fragment
 
-import android.app.SearchManager
-import android.content.Context
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.widget.SearchView
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -54,16 +46,14 @@ import org.moire.ultrasonic.util.CommunicationError
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.toast
-import timber.log.Timber
 
 /**
  * Initiates a search on the media library and displays the results
- * TODO: Switch to material3 class
+
  */
 class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     private var searchResult: SearchResult? = null
     private var searchRefresh: SwipeRefreshLayout? = null
-    private var searchView: SearchView? = null
 
     private val mediaPlayerManager: MediaPlayerManager by inject()
 
@@ -82,13 +72,6 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
         cancellationToken = CancellationToken()
         setTitle(this, R.string.search_title)
-
-        // Register our options menu
-        (requireActivity() as MenuHost).addMenuProvider(
-            menuProvider,
-            viewLifecycleOwner,
-            Lifecycle.State.RESUMED
-        )
 
         listModel.searchResult.observe(
             viewLifecycleOwner
@@ -146,73 +129,6 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
         if (navArgs.query != null) {
             return search(navArgs.query!!, navArgs.autoplay)
         }
-    }
-
-    /**
-     * This provide creates the search bar above the recycler view
-     */
-    private val menuProvider: MenuProvider = object : MenuProvider {
-        override fun onPrepareMenu(menu: Menu) {
-            setupOptionsMenu(menu)
-        }
-
-        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(R.menu.search, menu)
-        }
-
-        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-            return true
-        }
-    }
-    fun setupOptionsMenu(menu: Menu) {
-        val activity = activity ?: return
-        val searchManager = activity.getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchItem = menu.findItem(R.id.search_item)
-        searchView = searchItem.actionView as SearchView
-        val searchableInfo = searchManager.getSearchableInfo(requireActivity().componentName)
-        searchView!!.setSearchableInfo(searchableInfo)
-
-        val autoPlay = navArgs.autoplay
-        val query = navArgs.query
-
-        // If started with a query, enter it to the searchView
-        if (query != null) {
-            searchView!!.setQuery(query, false)
-            searchView!!.clearFocus()
-        }
-
-        searchView!!.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
-            override fun onSuggestionSelect(position: Int): Boolean {
-                return true
-            }
-
-            override fun onSuggestionClick(position: Int): Boolean {
-                Timber.d("onSuggestionClick: %d", position)
-                val cursor = searchView!!.suggestionsAdapter.cursor
-                cursor.moveToPosition(position)
-
-                // 2 is the index of col containing suggestion name.
-                val suggestion = cursor.getString(2)
-                searchView!!.setQuery(suggestion, true)
-                return true
-            }
-        })
-
-        searchView!!.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                Timber.d("onQueryTextSubmit: %s", query)
-                searchView!!.clearFocus()
-                search(query, autoPlay)
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                return true
-            }
-        })
-
-        searchView!!.setIconifiedByDefault(false)
-        searchItem.expandActionView()
     }
 
     override fun onDestroyView() {
@@ -313,7 +229,6 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     }
 
     private fun onAlbumSelected(album: Album, autoplay: Boolean) {
-
         val action = SearchFragmentDirections.searchToTrackCollection(
             id = album.id,
             name = album.title,

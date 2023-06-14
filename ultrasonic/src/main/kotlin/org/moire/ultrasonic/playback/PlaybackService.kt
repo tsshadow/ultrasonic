@@ -340,6 +340,7 @@ class PlaybackService :
             // needed starting Android 12 (S = 31)
             flags = flags or FLAG_IMMUTABLE
         }
+        intent.action = Intent.ACTION_MAIN
         intent.putExtra(Constants.INTENT_SHOW_PLAYER, true)
         return PendingIntent.getActivity(this, 0, intent, flags)
     }
