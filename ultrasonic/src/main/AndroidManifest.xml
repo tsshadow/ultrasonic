@@ -32,6 +32,7 @@
         android:usesCleartextTraffic="true"
         android:supportsRtl="false"
         android:preserveLegacyExternalStorage="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:ignore="UnusedAttribute">
         <!-- Add for API 34 android:enableOnBackInvokedCallBack="true" -->
 
