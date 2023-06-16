@@ -25,11 +25,11 @@ object Constants {
     const val CMD_PREVIOUS = "org.moire.ultrasonic.CMD_PREVIOUS"
     const val CMD_NEXT = "org.moire.ultrasonic.CMD_NEXT"
     const val INTENT_SHOW_PLAYER = "org.moire.ultrasonic.SHOW_PLAYER"
+    const val INTENT_PLAY_RANDOM_SONGS = "org.moire.ultrasonic.CMD_RANDOM_SONGS"
 
     // Legacy Preferences keys
     // Warning: Don't add any new here!
     // Use setting_keys.xml
-    const val PREFERENCES_KEY_USE_FIVE_STAR_RATING = "use_five_star_rating"
     const val PREFERENCE_VALUE_ALL = 0
     const val PREFERENCE_VALUE_A2DP = 1
     const val PREFERENCE_VALUE_DISABLED = 2

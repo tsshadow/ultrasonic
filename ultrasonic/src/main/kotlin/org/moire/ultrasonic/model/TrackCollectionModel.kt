@@ -27,6 +27,7 @@ import org.moire.ultrasonic.util.Util
 class TrackCollectionModel(application: Application) : GenericListModel(application) {
 
     val currentList: MutableLiveData<List<MusicDirectory.Child>> = MutableLiveData()
+    private var loadedUntil: Int = 0
 
     /*
     * Especially when dealing with indexes, this method can return Albums, Entries or a mix of both!
@@ -37,7 +38,6 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         name: String?
     ) {
         withContext(Dispatchers.IO) {
-
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getMusicDirectory(id, name, refresh)
             currentListIsSortable = true
@@ -57,11 +57,19 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     }
 
     suspend fun getSongsForGenre(genre: String, count: Int, offset: Int, append: Boolean) {
+        // Handle the logic for endless scrolling:
+        // If appending the existing list, set the offset from where to load
+        var newOffset = offset
+        if (append) newOffset += (count + loadedUntil)
+
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByGenre(genre, count, offset)
+            val musicDirectory = service.getSongsByGenre(genre, count, newOffset)
             currentListIsSortable = false
             updateList(musicDirectory, append)
+
+            // Update current offset
+            loadedUntil = newOffset
         }
     }
 
@@ -96,7 +104,6 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     }
 
     suspend fun getRandom(size: Int, append: Boolean) {
-
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getRandomSongs(size)

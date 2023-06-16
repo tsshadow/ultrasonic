@@ -142,7 +142,6 @@
     <string name="playlist.updated_info_error">Kan afspeellijstinformatie voor %s niet bijwerken</string>
     <string name="search.albums">Albums</string>
     <string name="search.artists">Artiesten</string>
-    <string name="search.label">Zoeken</string>
     <string name="search.more">Meer tonen</string>
     <string name="search.no_match">Geen overeenkomsten; probeer het opnieuw</string>
     <string name="search.songs">Nummers</string>

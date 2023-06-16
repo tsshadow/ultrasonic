@@ -137,7 +137,6 @@
     <string name="playlist.updated_info_error">Échec de la mise à jour des informations de la liste de lecture pour %s</string>
     <string name="search.albums">Albums</string>
     <string name="search.artists">Artistes</string>
-    <string name="search.label">Recherche</string>
     <string name="search.more">Afficher plus</string>
     <string name="search.no_match">Aucun résultat, veuillez essayer à nouveau</string>
     <string name="search.songs">Titres</string>
@@ -392,7 +391,7 @@
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Utiliser les étoiles pour noter les morceaux</string>
     <string name="main.albums_by_year">Chronologique</string>
-    <string name="grid_view">Reprise</string>
+    <string name="grid_view">Couverture</string>
     <string name="settings.preload_1000">1000 morceaux</string>
     <string name="settings.preload_100">100 morceaux</string>
     <string name="settings.preload_500">500 morceaux</string>

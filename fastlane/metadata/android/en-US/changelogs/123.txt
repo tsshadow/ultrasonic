@@ -1,0 +1,12 @@
+Features:
+- Search is accesible through a new icon on the main screen
+- Modernize Back Handling
+- Reenable R8 Code minification
+- Add a "Play Random Songs" shortcut
+
+Bug fixes:
+- Tracks buttons flash a scrollbar sometimes in Android 13
+- Fix EndlessScrolling in genre listing
+- Couldn't delete a track when shuffle was active
+- Upgrade material to 1.9.0
+

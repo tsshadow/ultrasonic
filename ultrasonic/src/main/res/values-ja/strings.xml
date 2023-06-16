@@ -106,7 +106,6 @@
     <string name="playlist.updated_info_error">%s のプレイリスト情報をアップデートできません</string>
     <string name="search.albums">アルバム</string>
     <string name="search.artists">アーティスト</string>
-    <string name="search.label">検索</string>
     <string name="search.more">もっと表示</string>
     <string name="search.no_match">一致するものはありません、やり直してください</string>
     <string name="search.songs">曲</string>
@@ -446,4 +445,5 @@
     <string name="settings.use_hw_offload_title">ハードウェア再生を使用する (実験的)</string>
     <string name="settings.use_hw_offload_description">端末のメディアデコーダーチップを使用してメディアを再生するよう試行します。これにより、バッテリー使用量を改善できます。このオプションを有効化することで、再生の不具合が起こる場合も報告されています!</string>
     <string name="foreground_exception_text">メディア通知の再生ボタンがある場合はそれをタップします。ない場合はアプリを開いて再生を開始し、セッションをコントローラーに再接続します</string>
+    <string name="settings.max_bitrate_pinning">最高ビットレート - 永続的に固定された曲の場合</string>
 </resources>

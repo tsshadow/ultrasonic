@@ -720,16 +720,25 @@ class MediaPlayerManager(
     /**
      * Loops over the timeline windows to find the entry which matches the given closure.
      *
+     * @param returnWindow Determines which of the two indexes of a match to return:
+     * True for the position in the playlist, False for position in the play order.
      * @param searchClosure Determines the condition which the searched for window needs to match.
      * @return the index of the window that satisfies the search condition,
      * or [C.INDEX_UNSET] if not found.
      */
-    private fun getWindowIndexWhere(searchClosure: (Int, Int) -> Boolean): Int {
+    @Suppress("KotlinConstantConditions")
+    private fun getWindowIndexWhere(
+        returnWindow: Boolean,
+        searchClosure: (Int, Int) -> Boolean
+    ): Int {
         val timeline = controller?.currentTimeline!!
         var windowIndex = timeline.getFirstWindowIndex(true)
         var count = 0
+
         while (windowIndex != C.INDEX_UNSET) {
-            if (searchClosure(count, windowIndex)) return count
+            val match = searchClosure(count, windowIndex)
+            if (match && returnWindow) return windowIndex
+            if (match && !returnWindow) return count
             count++
             windowIndex = timeline.getNextWindowIndex(
                 windowIndex, REPEAT_MODE_OFF, true
@@ -748,7 +757,10 @@ class MediaPlayerManager(
      * @return The index of the item in the shuffled timeline, or [C.INDEX_UNSET] if not found.
      */
     fun getShuffledIndexOf(searchPosition: Int): Int {
-        return getWindowIndexWhere { _, windowIndex -> windowIndex == searchPosition }
+        return getWindowIndexWhere(false) {
+            _, windowIndex ->
+            windowIndex == searchPosition
+        }
     }
 
     /**
@@ -760,7 +772,10 @@ class MediaPlayerManager(
      * @return the index of the item in the unshuffled timeline, or [C.INDEX_UNSET] if not found.
      */
     fun getUnshuffledIndexOf(shufflePosition: Int): Int {
-        return getWindowIndexWhere { count, _ -> count == shufflePosition }
+        return getWindowIndexWhere(true) {
+            count, _ ->
+            count == shufflePosition
+        }
     }
 
     val mediaItemCount: Int

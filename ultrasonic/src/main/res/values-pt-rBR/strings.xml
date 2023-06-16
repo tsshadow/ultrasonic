@@ -140,7 +140,6 @@
     <string name="playlist.updated_info_error">Falha ao atualizar a informação da playlist para %s</string>
     <string name="search.albums">Álbuns</string>
     <string name="search.artists">Artistas</string>
-    <string name="search.label">Pesquisar</string>
     <string name="search.more">Mostrar Mais</string>
     <string name="search.no_match">Nada coincide, tente novamente</string>
     <string name="search.songs">Músicas</string>

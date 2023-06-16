@@ -142,7 +142,6 @@
     <string name="playlist.updated_info_error">Failed to update playlist information for %s</string>
     <string name="search.albums">Albums</string>
     <string name="search.artists">Artists</string>
-    <string name="search.label">Search</string>
     <string name="search.more">Show More</string>
     <string name="search.no_match">No matches, please try again</string>
     <string name="search.songs">Songs</string>
@@ -456,6 +455,8 @@
     <string name="foreground_exception_text">Press on the play button on the media notification if it
     is still present, otherwise please open the app to start the playback and re-connect the session
     to the controller</string>
+    <string name="shortcut_play_random_songs_short">Random songs</string>
+    <string name="shortcut_play_random_songs_long">Play random songs</string>
 
 
 </resources>

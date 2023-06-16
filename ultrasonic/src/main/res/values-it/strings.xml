@@ -100,7 +100,6 @@
     <string name="playlist.updated_info_error">Impossibile aggiornare informazioni playlist per %s</string>
     <string name="search.albums">Album</string>
     <string name="search.artists">Artisti</string>
-    <string name="search.label">Cerca</string>
     <string name="search.more">Mostra di più</string>
     <string name="search.no_match">Nessun risultato, riprova per favore</string>
     <string name="search.songs">Canzoni</string>

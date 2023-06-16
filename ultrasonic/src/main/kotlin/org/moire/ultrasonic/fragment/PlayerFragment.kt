@@ -51,7 +51,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_IDLE
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -481,9 +480,7 @@ class PlayerFragment :
         val index = mediaPlayerManager.currentMediaItemIndex
 
         if (index != -1) {
-            val smoothScroller = LinearSmoothScroller(context)
-            smoothScroller.targetPosition = index
-            viewManager.startSmoothScroll(smoothScroller)
+            viewManager.scrollToPosition(index)
         }
     }
 
@@ -930,7 +927,8 @@ class PlayerFragment :
             // Swipe to delete from playlist
             @SuppressLint("NotifyDataSetChanged")
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val pos = viewHolder.bindingAdapterPosition
+                val viewPos = viewHolder.bindingAdapterPosition
+                val pos = mediaPlayerManager.getUnshuffledIndexOf(viewPos)
                 val item = mediaPlayerManager.getMediaItemAt(pos)
 
                 // Remove the item from the list quickly

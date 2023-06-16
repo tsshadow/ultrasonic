@@ -1,5 +1,6 @@
 package org.moire.ultrasonic.adapters
 
+import android.graphics.Color
 import android.view.View
 import android.widget.Checkable
 import android.widget.CheckedTextView
@@ -13,6 +14,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.HeartRating
 import androidx.media3.common.StarRating
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
@@ -43,8 +45,13 @@ class TrackViewHolder(val view: View) :
     KoinComponent,
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
+    companion object {
+        val COLOR_HIGHLIGHT = com.google.android.material.R.attr.colorSecondaryContainer
+    }
+
     var entry: Track? = null
         private set
+    var songLayout: LinearLayout = view.findViewById(R.id.song_layout)
     var check: CheckedTextView = view.findViewById(R.id.song_check)
     var drag: ImageView = view.findViewById(R.id.song_drag)
     var observableChecked = MutableLiveData(false)
@@ -164,17 +171,23 @@ class TrackViewHolder(val view: View) :
         ContextCompat.getDrawable(view.context, R.drawable.ic_stat_play)!!
     }
 
+    @Suppress("MagicNumber")
     private fun setPlayIcon(isPlaying: Boolean) {
         if (isPlaying && !isPlayingCached) {
             isPlayingCached = true
             title.setCompoundDrawablesWithIntrinsicBounds(
                 playingIcon, null, null, null
             )
+            val color = MaterialColors.getColor(view, COLOR_HIGHLIGHT)
+            songLayout.setBackgroundColor(color)
+            songLayout.elevation = 3F
         } else if (!isPlaying && isPlayingCached) {
             isPlayingCached = false
             title.setCompoundDrawablesWithIntrinsicBounds(
                 0, 0, 0, 0
             )
+            songLayout.setBackgroundColor(Color.TRANSPARENT)
+            songLayout.elevation = 0F
         }
     }
 

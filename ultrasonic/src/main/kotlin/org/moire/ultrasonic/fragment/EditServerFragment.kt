@@ -7,12 +7,14 @@
 
 package org.moire.ultrasonic.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -52,7 +54,7 @@ private const val DIALOG_PADDING = 12
 /**
  * Displays a form where server settings can be created / edited
  */
-class EditServerFragment : Fragment(), OnBackPressedHandler {
+class EditServerFragment : Fragment() {
 
     private val serverSettingsModel: ServerSettingsModel by viewModel()
     private val activeServerProvider: ActiveServerProvider by inject()
@@ -80,6 +82,13 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         Util.applyTheme(this.context)
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onAttach(context: Context) {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this, confirmCloseCallback
+        )
+        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -189,9 +198,23 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
         }
     }
 
+    private val confirmCloseCallback = object : OnBackPressedCallback(
+        true // default to enabled
+    ) {
+        override fun handleOnBackPressed() {
+            finishActivity()
+        }
+    }
+
     override fun onStop() {
         Util.hideKeyboard(activity)
+        confirmCloseCallback.isEnabled = false
         super.onStop()
+    }
+
+    override fun onResume() {
+        confirmCloseCallback.isEnabled = true
+        super.onResume()
     }
 
     private fun correctServerAddress() {
@@ -206,11 +229,6 @@ class EditServerFragment : Fragment(), OnBackPressedHandler {
         image?.setTint(currentColor)
         serverColorImageView?.background = image
     }
-
-    override fun onBackPressed() {
-        finishActivity()
-    }
-
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
         savedInstanceState.putString(
             ::serverNameEditText.name, serverNameEditText!!.editText?.text.toString()
