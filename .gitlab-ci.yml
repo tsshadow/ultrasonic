@@ -86,7 +86,7 @@ Assemble Release:
 
 # We generate a signed package for each commit to develop as well as when making a release.
 # Since the develop signed apk are not persistent they can be downloaded for around 3 weeks before Gitlab deletes them.
-Generate Signed Develop APK:
+Generate Signed APK:
   variables:
     APK_NAME: ultrasonic-${CI_COMMIT_SHA}
   stage: Sign APK
