@@ -1,5 +1,6 @@
 <network-security-config xmlns:tools="http://schemas.android.com/tools">
-    <base-config>
+    <base-config cleartextTrafficPermitted="true"
+        tools:ignore="InsecureBaseConfiguration">
         <trust-anchors>
             <!-- Allow system CAs -->
             <certificates src="system" />

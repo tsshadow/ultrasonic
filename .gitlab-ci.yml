@@ -84,39 +84,30 @@ Assemble Release:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG || $CI_PROJECT_ID != $ROOT_PROJECT_ID
 
-Generate Signed Develop APK:
-  stage: Sign APK
-  # We don't need the gradle cache here
-  cache: []
-  script:
-    - openssl aes-256-cbc -K ${ULTRASONIC_KEYSTORE_KEY} -iv ${ULTRASONIC_KEYSTORE_IV} -in ultrasonic-keystore.enc -out ultrasonic-keystore -d
-    - mkdir -p ${CI_PROJECT_DIR}/ultrasonic-release
-    - ${ANDROID_HOME}/build-tools/*/zipalign -v 4 ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk ${CI_PROJECT_DIR}/ultrasonic-release/ultrasonic-${CI_COMMIT_SHA}.apk
-    - ${ANDROID_HOME}/build-tools/*/apksigner sign --verbose --ks ${CI_PROJECT_DIR}/ultrasonic-keystore --ks-pass pass:${ULTRASONIC_KEYSTORE_STOREPASS} --key-pass pass:${ULTRASONIC_KEYSTORE_KEYPASS} ${CI_PROJECT_DIR}/ultrasonic-release/ultrasonic-${CI_COMMIT_SHA}.apk
-    - ${ANDROID_HOME}/build-tools/*/apksigner verify --verbose ${CI_PROJECT_DIR}/ultrasonic-release/ultrasonic-${CI_COMMIT_SHA}.apk
-  artifacts:
-    name: ultrasonic-${CI_COMMIT_SHA}
-    paths:
-      - ultrasonic-release/
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == $ROOT_PROJECT_ID
-
+# We generate a signed package for each commit to develop as well as when making a release.
+# Since the develop signed apk are not persistent they can be downloaded for around 3 weeks before Gitlab deletes them.
 Generate Signed APK:
+  variables:
+    APK_NAME: ultrasonic-${CI_COMMIT_SHA}
   stage: Sign APK
   # We don't need the gradle cache here
   cache: []
   script:
     - openssl aes-256-cbc -K ${ULTRASONIC_KEYSTORE_KEY} -iv ${ULTRASONIC_KEYSTORE_IV} -in ultrasonic-keystore.enc -out ultrasonic-keystore -d
     - mkdir -p ${CI_PROJECT_DIR}/ultrasonic-release
-    - ${ANDROID_HOME}/build-tools/*/zipalign -v 4 ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
-    - ${ANDROID_HOME}/build-tools/*/apksigner sign --verbose --ks ${CI_PROJECT_DIR}/ultrasonic-keystore --ks-pass pass:${ULTRASONIC_KEYSTORE_STOREPASS} --key-pass pass:${ULTRASONIC_KEYSTORE_KEYPASS} ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
-    - ${ANDROID_HOME}/build-tools/*/apksigner verify --verbose ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
+    - ${ANDROID_HOME}/build-tools/*/zipalign -v 4 ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk ${CI_PROJECT_DIR}/ultrasonic-release/${APK_NAME}.apk
+    - ${ANDROID_HOME}/build-tools/*/apksigner sign --verbose --ks ${CI_PROJECT_DIR}/ultrasonic-keystore --ks-pass pass:${ULTRASONIC_KEYSTORE_STOREPASS} --key-pass pass:${ULTRASONIC_KEYSTORE_KEYPASS} ${CI_PROJECT_DIR}/ultrasonic-release/${APK_NAME}.apk
+    - ${ANDROID_HOME}/build-tools/*/apksigner verify --verbose ${CI_PROJECT_DIR}/ultrasonic-release/${APK_NAME}.apk
   artifacts:
-    name: ultrasonic-${CI_COMMIT_TAG}
+    name: $APK_NAME
     paths:
       - ultrasonic-release/
   rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == $ROOT_PROJECT_ID && $CI_PIPELINE_SOURCE != "merge_request_event"
     - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == $ROOT_PROJECT_ID
+      variables:
+        APK_NAME: ultrasonic-${CI_COMMIT_TAG}
+
 
 Publish Signed APK:
   stage: Publish
@@ -138,3 +129,14 @@ Release:
       --assets-link "{\"name\":\"${PACKAGE_APK_IDSIG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${PACKAGE_APK_IDSIG}\"}"
   rules:
     - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == $ROOT_PROJECT_ID
+
+RoboTest:
+  stage: Release
+  image: gcr.io/google.com/cloudsdktool/google-cloud-cli:latest
+  script:
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - gcloud auth activate-service-account --key-file .secure_files/ultrasonic-61089-8ab2ad46c8a8.json 
+    - gcloud firebase test android run --token $FIREBASE_TOKEN --type robo --app ultrasonic-release/${PACKAGE_APK} --device model=Nexus6,version=21,locale=en,orientation=portrait  --device model=Nexus7,version=19,locale=fr,orientation=landscape 
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == $ROOT_PROJECT_ID
+
