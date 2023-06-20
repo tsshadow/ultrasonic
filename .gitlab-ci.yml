@@ -93,9 +93,9 @@ Generate Signed APK:
   script:
     - openssl aes-256-cbc -K ${ULTRASONIC_KEYSTORE_KEY} -iv ${ULTRASONIC_KEYSTORE_IV} -in ultrasonic-keystore.enc -out ultrasonic-keystore -d
     - mkdir -p ${CI_PROJECT_DIR}/ultrasonic-release
-    - ${ANDROID_HOME}/build-tools/*/zipalign -v 4 ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}.apk
-    - ${ANDROID_HOME}/build-tools/*/apksigner sign --verbose --ks ${CI_PROJECT_DIR}/ultrasonic-keystore --ks-pass pass:${ULTRASONIC_KEYSTORE_STOREPASS} --key-pass pass:${ULTRASONIC_KEYSTORE_KEYPASS} ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}.apk
-    - ${ANDROID_HOME}/build-tools/*/apksigner verify --verbose ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}.apk
+    - ${ANDROID_HOME}/build-tools/*/zipalign -v 4 ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
+    - ${ANDROID_HOME}/build-tools/*/apksigner sign --verbose --ks ${CI_PROJECT_DIR}/ultrasonic-keystore --ks-pass pass:${ULTRASONIC_KEYSTORE_STOREPASS} --key-pass pass:${ULTRASONIC_KEYSTORE_KEYPASS} ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
+    - ${ANDROID_HOME}/build-tools/*/apksigner verify --verbose ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
   artifacts:
     name: $PACKAGE_APK
     paths:
@@ -106,7 +106,7 @@ Generate Signed APK:
     # Or when adding a new commit to develop (but never inside merge events)
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == $ROOT_PROJECT_ID && $CI_PIPELINE_SOURCE != "merge_request_event"
       variables:
-        PACKAGE_APK: ultrasonic-${CI_COMMIT_SHA}
+        PACKAGE_APK: ultrasonic-${CI_COMMIT_SHA}.apk
 
 
 Publish Signed APK:
@@ -147,5 +147,5 @@ RoboTest:
     # Because it would not have access to the protected keys.
     - if: $CI_COMMIT_MESSAGE =~ /^\[ROBO\].*/ && $CI_PROJECT_ID == $ROOT_PROJECT_ID && $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       variables:
-        PACKAGE_APK: ultrasonic-${CI_COMMIT_SHA}
+        PACKAGE_APK: ultrasonic-${CI_COMMIT_SHA}.apk
 
