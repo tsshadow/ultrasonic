@@ -144,7 +144,7 @@ RoboTest:
     - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == $ROOT_PROJECT_ID
     # or when requested by using [ROBO] inside the commit message and merging to develop
     # Would be nice to be able to run it in a MR as well, but currently not possible
-    # Because it would not have access to the protected keys
+    # Because it would not have access to the protected keys.
     - if: $CI_COMMIT_MESSAGE =~ /^\[ROBO\].*/ && $CI_PROJECT_ID == $ROOT_PROJECT_ID && $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       variables:
         PACKAGE_APK: ultrasonic-${CI_COMMIT_SHA}
