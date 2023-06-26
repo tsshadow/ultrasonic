@@ -26,7 +26,8 @@ import timber.log.Timber
  * It should be kept generic enough that it can be used a Base for all lists in the app.
  */
 @Suppress("unused", "UNUSED_PARAMETER")
-class BaseAdapter<T : Identifiable> : MultiTypeAdapter(), FastScrollRecyclerView.SectionedAdapter {
+class BaseAdapter<T : Identifiable>(allowDuplicateEntries: Boolean = false) :
+    MultiTypeAdapter(), FastScrollRecyclerView.SectionedAdapter {
 
     // Update the BoundedTreeSet if selection type is changed
     internal var selectionType: SelectionType = SelectionType.MULTIPLE
@@ -41,7 +42,7 @@ class BaseAdapter<T : Identifiable> : MultiTypeAdapter(), FastScrollRecyclerView
     private val diffCallback = GenericDiffCallback<T>()
 
     init {
-        setHasStableIds(true)
+        setHasStableIds(!allowDuplicateEntries)
     }
 
     override fun getItemId(position: Int): Long {
