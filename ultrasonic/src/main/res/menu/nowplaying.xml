@@ -12,7 +12,7 @@
     <item
         a:id="@+id/menu_item_star"
         a:icon="@drawable/ic_star_hollow"
-        app:showAsAction="ifRoom|withText"
+        app:showAsAction="always"
         a:title="@string/download.menu_star"/>
 
     <item

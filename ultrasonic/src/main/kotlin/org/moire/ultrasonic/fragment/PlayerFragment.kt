@@ -536,8 +536,10 @@ class PlayerFragment :
                 if (update.success == true && update.rating is HeartRating) {
                     if (update.rating.isHeart) {
                         starMenuItem.setIcon(fullStar)
+                        starMenuItem.setTitle(R.string.download_menu_unstar)
                     } else {
                         starMenuItem.setIcon(hollowStar)
+                        starMenuItem.setTitle(R.string.download_menu_star)
                     }
                 } else if (update.success == false) {
                     Toast.makeText(context, "Setting rating failed", Toast.LENGTH_SHORT)
