@@ -346,6 +346,7 @@
     <string name="download.bookmark_set">Set Bookmark</string>
     <string name="download.bookmark_delete">Delete Bookmark</string>
     <string name="download.menu_star">Star</string>
+    <string name="download.menu_unstar">Unstar</string>
     <string name="download.menu_clear_playlist">Clear Playlist</string>
     <string name="button_bar.shares">Shares</string>
     <string name="select_share.empty">No shares available on server</string>
