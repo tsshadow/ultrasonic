@@ -176,7 +176,7 @@ class PlayerFragment :
     private val binding get() = _binding!!
 
     private val viewAdapter: BaseAdapter<Identifiable> by lazy {
-        BaseAdapter()
+        BaseAdapter(allowDuplicateEntries = true)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
