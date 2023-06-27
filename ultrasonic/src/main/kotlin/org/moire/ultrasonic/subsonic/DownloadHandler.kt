@@ -98,7 +98,7 @@ class DownloadHandler(
         isDirectory: Boolean = true,
         append: Boolean,
         autoPlay: Boolean,
-        shuffle: Boolean,
+        shuffle: Boolean = false,
         playNext: Boolean,
         isArtist: Boolean = false
     ) {
@@ -141,7 +141,7 @@ class DownloadHandler(
         append: Boolean,
         playNext: Boolean,
         autoPlay: Boolean,
-        shuffle: Boolean,
+        shuffle: Boolean = false,
         playlistName: String? = null,
         fragment: Fragment
     ) {

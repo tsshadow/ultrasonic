@@ -316,7 +316,6 @@ open class TrackCollectionFragment(
                 append = append,
                 playNext = false,
                 autoPlay = !append,
-                shuffle = false,
                 playlistName = null,
                 fragment = this
             )
@@ -616,7 +615,6 @@ open class TrackCollectionFragment(
                     append = true,
                     playNext = true,
                     autoPlay = false,
-                    shuffle = false,
                     playlistName = navArgs.playlistName,
                     fragment = this@TrackCollectionFragment
                 )
