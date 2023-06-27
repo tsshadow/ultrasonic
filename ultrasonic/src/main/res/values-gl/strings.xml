@@ -24,4 +24,40 @@
     <string name="button_bar.podcasts">Podcast</string>
     <string name="button_bar.search">Buscar</string>
     <string name="chat.send_a_message">Enviar unha mensaxe</string>
+    <string name="button_bar.bookmarks">Marcadores</string>
+    <string name="chat.send_button">Enviar</string>
+    <string name="chat.user_avatar">Imaxe do avatar</string>
+    <string name="common.album">Álbum</string>
+    <string name="common.comment">Comentar</string>
+    <string name="common.confirm">Confirmar</string>
+    <string name="common.delete">Borrar</string>
+    <string name="common.download">Descargar</string>
+    <string name="common.info">Detalles</string>
+    <string name="common.multiple_genres">Múltiples xéneros</string>
+    <string name="common.name">Nome</string>
+    <string name="common.ok">OK</string>
+    <string name="common.play_next">Reproducir a continuación</string>
+    <string name="common.play_now">Reproducir agora</string>
+    <string name="common.play_shuffled">Reproducir aleatoriamente</string>
+    <string name="common.public">Público</string>
+    <string name="common.save">Gardar</string>
+    <string name="common.select_all">Seleccionar todo</string>
+    <string name="common.unpin">Desancorar</string>
+    <string name="common.unpin_selection_confirmation">¿Realmente queres desancorar a selección actual\?</string>
+    <string name="common.appname">Ultrasonic</string>
+    <string name="common.title">Título</string>
+    <string name="common.artist">Artista</string>
+    <string name="common.cancel">Cancelar</string>
+    <string name="common.play_last">Reproducir última</string>
+    <string name="common.pin">Ancorar</string>
+    <string name="settings.show_confirmation_dialog_summary">Mostra un cadro de diálogo de confirmación antes de eliminar ou desancorar as cancións</string>
+    <plurals name="select_album_n_songs_pinned">
+        <item quantity="one">%d canción seleccionada para ser ancorada</item>
+        <item quantity="other">%d cancións seleccionadas para ser ancoradas</item>
+    </plurals>
+    <string name="settings.max_bitrate_pinning">Tasa de bits máxima: ao fixar unha canción de forma permanente</string>
+    <plurals name="select_album_n_songs_unpinned">
+        <item quantity="one">%d canción desancorada</item>
+        <item quantity="other">%d cancións desancoradas</item>
+    </plurals>
 </resources>
