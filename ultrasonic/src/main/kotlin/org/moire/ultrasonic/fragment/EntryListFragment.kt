@@ -135,7 +135,6 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
                         item.id,
                         append = false,
                         autoPlay = true,
-                        shuffle = false,
                         playNext = false,
                         isArtist = isArtist
                     )
@@ -145,7 +144,6 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
                         item.id,
                         append = false,
                         autoPlay = true,
-                        shuffle = true,
                         playNext = true,
                         isArtist = isArtist
                     )
@@ -155,7 +153,6 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
                         item.id,
                         append = true,
                         autoPlay = false,
-                        shuffle = false,
                         playNext = false,
                         isArtist = isArtist
                     )
