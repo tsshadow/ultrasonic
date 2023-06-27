@@ -429,7 +429,10 @@ class MediaPlayerManager(
         when (insertionMode) {
             InsertionMode.CLEAR -> clear()
             InsertionMode.APPEND -> insertAt = mediaItemCount
-            InsertionMode.AFTER_CURRENT -> insertAt = currentMediaItemIndex + 1
+            InsertionMode.AFTER_CURRENT -> {
+                // Must never be larger than the count of items (especially when empty)
+                insertAt = (currentMediaItemIndex + 1).coerceAtMost(mediaItemCount)
+            }
         }
 
         val mediaItems: List<MediaItem> = songs.map {
@@ -437,9 +440,12 @@ class MediaPlayerManager(
             result
         }
 
-        if (shuffle) isShufflePlayEnabled = true
         Timber.w("Adding ${mediaItems.size} media items")
         controller?.addMediaItems(insertAt, mediaItems)
+
+        // There is a bug in media3 ( https://github.com/androidx/media/issues/480 ),
+        // so we must first add the tracks, and then enable shuffle
+        if (shuffle) isShufflePlayEnabled = true
 
         prepare()
 

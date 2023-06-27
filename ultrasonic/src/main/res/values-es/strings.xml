@@ -44,7 +44,7 @@
     <string name="common.play_next">Reproducir a continuación</string>
     <string name="common.play_now">Reproducir ahora</string>
     <string name="common.play_shuffled">Reproducción aleatoria</string>
-    <string name="common.public">Public</string>
+    <string name="common.public">Público</string>
     <string name="common.save">Guardar</string>
     <string name="common.select_all">Seleccionar todo</string>
     <string name="common.title">Título</string>
@@ -57,14 +57,14 @@
     <string name="download.bookmark_set_at_position" formatted="false">Marcador añadido a %s.</string>
     <string name="download.empty">Nada se esta descargando</string>
     <string name="playlist.empty">La lista de reproducción esta vacía</string>
-    <string name="download.jukebox_not_authorized">El control remoto no esta habilitado. Por favor habilita el modo jukebox en <b>Configuración &gt; Usuarios</b> en tu servidor de Subsonic.</string>
+    <string name="download.jukebox_not_authorized">El control remoto no esta habilitado. Por favor habilita el modo gramola (jukebox) en <b>Configuración &gt; Usuarios</b> en tu servidor de Subsonic.</string>
     <string name="download.jukebox_off">Control remoto apagado. La música se reproduce en tu dispositivo.</string>
     <string name="download.jukebox_offline">Control remoto no disponible en modo fuera de línea.</string>
     <string name="download.jukebox_on">Control remoto encendido. La música se reproduce en el servidor.</string>
     <string name="download.jukebox_server_too_old">Control remoto no soportado. Por favor actualiza tu servidor de Subsonic.</string>
     <string name="download.menu_equalizer">Ecualizador</string>
-    <string name="download.menu_jukebox_off">Apagar Jukebox</string>
-    <string name="download.menu_jukebox_on">Encender Jukebox</string>
+    <string name="download.menu_jukebox_off">Apagar gramola</string>
+    <string name="download.menu_jukebox_on">Encender gramola</string>
     <string name="download.menu_lyrics">Letras</string>
     <string name="download.menu_save">Guardar lista de reproducción</string>
     <string name="download.menu_screen_off">Pantalla apagada</string>
@@ -87,7 +87,7 @@
     <string name="equalizer.label">Ecualizador</string>
     <string name="equalizer.preset">Seleccionar preajuste</string>
     <string name="error.label">Error</string>
-    <string name="jukebox.is_default">Jukebox por defecto</string>
+    <string name="jukebox.is_default">Gramola por defecto</string>
     <string name="lyrics.nomatch">No se encontraron letras</string>
     <string name="language.default">Predeterminado del sistema</string>
     <string name="language.zh_CN">Chino (China)</string>
@@ -446,7 +446,7 @@
     <string name="settings.preload_100">100 canciones</string>
     <string name="settings.preload_50">50 canciones</string>
     <string name="settings.preload_1000">1000 canciones</string>
-    <string name="jukebox">Jukebox</string>
+    <string name="jukebox">Gramola</string>
     <string name="settings.preload_500">500 canciones</string>
     <string name="supported_server_features">Funciones soportadas</string>
     <string name="foreground_exception_title">No se puede reanudar la reproducción</string>
@@ -454,4 +454,5 @@
     <string name="settings.max_bitrate_pinning">Tasa de bits máxima: al fijar una canción de forma permanente</string>
     <string name="shortcut_play_random_songs_short">Canciones aleatorias</string>
     <string name="shortcut_play_random_songs_long">Reproducir las canciones aleatoriamente</string>
+    <string name="download.menu_unstar">No me gusta</string>
 </resources>

@@ -43,14 +43,7 @@ class TrackViewBinder(
     override fun onBindViewHolder(holder: TrackViewHolder, item: Identifiable) {
         val diffAdapter = adapter as BaseAdapter<*>
 
-        val track: Track = when (item) {
-            is Track -> {
-                item
-            }
-            else -> {
-                return
-            }
-        }
+        val track = (item as? Track) ?: return
 
         // Remove observer before binding
         holder.observableChecked.removeObservers(lifecycleOwner)
@@ -59,7 +52,7 @@ class TrackViewBinder(
             song = track,
             checkable = checkable,
             draggable = draggable,
-            diffAdapter.isSelected(item.longId)
+            diffAdapter.isSelected(track.longId)
         )
 
         holder.itemView.setOnLongClickListener {
@@ -110,7 +103,7 @@ class TrackViewBinder(
         diffAdapter.selectionRevision.observe(
             lifecycleOwner
         ) {
-            val newStatus = diffAdapter.isSelected(item.longId)
+            val newStatus = diffAdapter.isSelected(track.longId)
 
             if (newStatus != holder.check.isChecked) holder.check.isChecked = newStatus
         }

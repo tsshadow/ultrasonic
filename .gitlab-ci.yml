@@ -87,26 +87,26 @@ Assemble Release:
 # We generate a signed package for each commit to develop as well as when making a release.
 # Since the develop signed apk are not persistent they can be downloaded for around 3 weeks before Gitlab deletes them.
 Generate Signed APK:
-  variables:
-    APK_NAME: ultrasonic-${CI_COMMIT_SHA}
   stage: Sign APK
   # We don't need the gradle cache here
   cache: []
   script:
     - openssl aes-256-cbc -K ${ULTRASONIC_KEYSTORE_KEY} -iv ${ULTRASONIC_KEYSTORE_IV} -in ultrasonic-keystore.enc -out ultrasonic-keystore -d
     - mkdir -p ${CI_PROJECT_DIR}/ultrasonic-release
-    - ${ANDROID_HOME}/build-tools/*/zipalign -v 4 ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk ${CI_PROJECT_DIR}/ultrasonic-release/${APK_NAME}.apk
-    - ${ANDROID_HOME}/build-tools/*/apksigner sign --verbose --ks ${CI_PROJECT_DIR}/ultrasonic-keystore --ks-pass pass:${ULTRASONIC_KEYSTORE_STOREPASS} --key-pass pass:${ULTRASONIC_KEYSTORE_KEYPASS} ${CI_PROJECT_DIR}/ultrasonic-release/${APK_NAME}.apk
-    - ${ANDROID_HOME}/build-tools/*/apksigner verify --verbose ${CI_PROJECT_DIR}/ultrasonic-release/${APK_NAME}.apk
+    - ${ANDROID_HOME}/build-tools/*/zipalign -v 4 ultrasonic/build/outputs/apk/release/ultrasonic-release-unsigned.apk ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
+    - ${ANDROID_HOME}/build-tools/*/apksigner sign --verbose --ks ${CI_PROJECT_DIR}/ultrasonic-keystore --ks-pass pass:${ULTRASONIC_KEYSTORE_STOREPASS} --key-pass pass:${ULTRASONIC_KEYSTORE_KEYPASS} ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
+    - ${ANDROID_HOME}/build-tools/*/apksigner verify --verbose ${CI_PROJECT_DIR}/ultrasonic-release/${PACKAGE_APK}
   artifacts:
-    name: $APK_NAME
+    name: $PACKAGE_APK
     paths:
       - ultrasonic-release/
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == $ROOT_PROJECT_ID && $CI_PIPELINE_SOURCE != "merge_request_event"
+    # Run when releasing a new tag
     - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == $ROOT_PROJECT_ID
+    # Or when adding a new commit to develop (but never inside merge events)
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PROJECT_ID == $ROOT_PROJECT_ID && $CI_PIPELINE_SOURCE != "merge_request_event"
       variables:
-        APK_NAME: ultrasonic-${CI_COMMIT_TAG}
+        PACKAGE_APK: ultrasonic-${CI_COMMIT_SHA}.apk
 
 
 Publish Signed APK:
@@ -133,10 +133,19 @@ Release:
 RoboTest:
   stage: Release
   image: gcr.io/google.com/cloudsdktool/google-cloud-cli:latest
+  # We don't need the gradle cache here
+  cache: []
   script:
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    - gcloud auth activate-service-account --key-file .secure_files/ultrasonic-61089-8ab2ad46c8a8.json 
-    - gcloud firebase test android run --token $FIREBASE_TOKEN --type robo --app ultrasonic-release/${PACKAGE_APK} --device model=Nexus6,version=21,locale=en,orientation=portrait  --device model=Nexus7,version=19,locale=fr,orientation=landscape 
+    - gcloud auth activate-service-account --key-file .secure_files/firebase-key.json 
+    - gcloud firebase test android run --project ultrasonic-61089 --type robo --app ultrasonic-release/${PACKAGE_APK} --robo-directives click:button1= --device model=Nexus6,version=21,locale=en,orientation=portrait  --device model=Pixel3,version=28,locale=fr,orientation=landscape --device model=Pixel5,version=30,locale=zh,orientation=portrait 
   rules:
+    # Run when releasing a new tag
     - if: $CI_COMMIT_TAG && $CI_PROJECT_ID == $ROOT_PROJECT_ID
+    # or when requested by using [ROBO] inside the commit message and merging to develop
+    # Would be nice to be able to run it in a MR as well, but currently not possible
+    # Because it would not have access to the protected keys.
+    - if: $CI_COMMIT_MESSAGE =~ /^\[ROBO\].*/ && $CI_PROJECT_ID == $ROOT_PROJECT_ID && $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      variables:
+        PACKAGE_APK: ultrasonic-${CI_COMMIT_SHA}.apk
 
