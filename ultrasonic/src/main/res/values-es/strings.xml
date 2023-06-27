@@ -454,4 +454,5 @@
     <string name="settings.max_bitrate_pinning">Tasa de bits máxima: al fijar una canción de forma permanente</string>
     <string name="shortcut_play_random_songs_short">Canciones aleatorias</string>
     <string name="shortcut_play_random_songs_long">Reproducir las canciones aleatoriamente</string>
+    <string name="download.menu_unstar">No me gusta</string>
 </resources>
