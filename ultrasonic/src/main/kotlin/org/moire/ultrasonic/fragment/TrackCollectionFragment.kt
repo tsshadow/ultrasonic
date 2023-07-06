@@ -36,6 +36,7 @@ import org.moire.ultrasonic.adapters.AlbumHeader
 import org.moire.ultrasonic.adapters.AlbumRowDelegate
 import org.moire.ultrasonic.adapters.HeaderViewBinder
 import org.moire.ultrasonic.adapters.TrackViewBinder
+import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
@@ -582,7 +583,7 @@ open class TrackCollectionFragment(
             } else {
                 setTitle(name)
 
-                if (isAlbum) {
+                if (isAlbum && ActiveServerProvider.shouldUseId3Tags()) {
                     listModel.getAlbum(refresh2, id, name)
                 } else {
                     listModel.getMusicDirectory(refresh2, id, name)
