@@ -306,7 +306,7 @@ class NavigationActivity : AppCompatActivity() {
         Storage.reset()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            Storage.ensureRootIsAvailable()
+            Storage.checkForErrorsWithCustomRoot()
         }
 
         setMenuForServerCapabilities()
