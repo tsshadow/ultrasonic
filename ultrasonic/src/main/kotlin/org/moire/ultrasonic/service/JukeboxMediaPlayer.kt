@@ -206,6 +206,8 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
             Player.COMMAND_CHANGE_MEDIA_ITEMS,
             Player.COMMAND_GET_TIMELINE,
             Player.COMMAND_GET_DEVICE_VOLUME,
+            Player.COMMAND_ADJUST_DEVICE_VOLUME_WITH_FLAGS,
+            Player.COMMAND_SET_DEVICE_VOLUME_WITH_FLAGS,
             Player.COMMAND_ADJUST_DEVICE_VOLUME,
             Player.COMMAND_SET_DEVICE_VOLUME
         )
@@ -213,6 +215,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         if (playlist.isNotEmpty()) {
             commandsBuilder.addAll(
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
+                Player.COMMAND_GET_METADATA,
                 Player.COMMAND_GET_MEDIA_ITEMS_METADATA,
                 Player.COMMAND_PLAY_PAUSE,
                 Player.COMMAND_PREPARE,
@@ -284,6 +287,10 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
     override fun setShuffleModeEnabled(shuffleModeEnabled: Boolean) {}
 
     override fun setDeviceVolume(volume: Int) {
+        setDeviceVolume(volume, 0)
+    }
+
+    override fun setDeviceVolume(volume: Int, flags: Int) {
         gain = volume
         tasks.remove(SetGain::class.java)
         tasks.add(SetGain(floatGain))
@@ -299,17 +306,32 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun increaseDeviceVolume() {
+        increaseDeviceVolume(C.VOLUME_FLAG_SHOW_UI)
+    }
+
+    override fun increaseDeviceVolume(flags: Int) {
         gain = (gain + 1).coerceAtMost(MAX_GAIN)
         deviceVolume = gain
     }
 
+    @Deprecated("Deprecated in Java")
     override fun decreaseDeviceVolume() {
+        decreaseDeviceVolume(C.VOLUME_FLAG_SHOW_UI)
+    }
+
+    override fun decreaseDeviceVolume(flags: Int) {
         gain = (gain - 1).coerceAtLeast(0)
         deviceVolume = gain
     }
 
+    @Deprecated("Deprecated in Java")
     override fun setDeviceMuted(muted: Boolean) {
+        setDeviceMuted(muted, C.VOLUME_FLAG_SHOW_UI)
+    }
+
+    override fun setDeviceMuted(muted: Boolean, flags: Int) {
         gain = 0
         deviceVolume = gain
     }

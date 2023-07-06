@@ -130,21 +130,14 @@ class PlaybackService :
     private fun initializeSessionAndPlayer() {
         if (isStarted) return
 
-        setMediaNotificationProvider(CustomNotificationProvider(UApp.applicationContext()))
-
-        // TODO: Remove minor code duplication with updateBackend()
         val desiredBackend = if (activeServerProvider.getActiveServer().jukeboxByDefault) {
+            Timber.i("Jukebox enabled by default")
             MediaPlayerManager.PlayerBackend.JUKEBOX
         } else {
             MediaPlayerManager.PlayerBackend.LOCAL
         }
 
-        player = if (activeServerProvider.getActiveServer().jukeboxByDefault) {
-            Timber.i("Jukebox enabled by default")
-            getJukeboxPlayer()
-        } else {
-            getLocalPlayer()
-        }
+        player = createNewBackend(desiredBackend)
 
         actualBackend = desiredBackend
 
@@ -213,11 +206,7 @@ class PlaybackService :
         player.removeListener(listener)
         player.release()
 
-        player = if (newBackend == MediaPlayerManager.PlayerBackend.JUKEBOX) {
-            getJukeboxPlayer()
-        } else {
-            getLocalPlayer()
-        }
+        player = createNewBackend(newBackend)
 
         // Add fresh listeners
         player.addListener(listener)
@@ -225,6 +214,14 @@ class PlaybackService :
         mediaLibrarySession.player = player
 
         actualBackend = newBackend
+    }
+
+    private fun createNewBackend(newBackend: MediaPlayerManager.PlayerBackend): Player {
+        return if (newBackend == MediaPlayerManager.PlayerBackend.JUKEBOX) {
+            getJukeboxPlayer()
+        } else {
+            getLocalPlayer()
+        }
     }
 
     private fun getJukeboxPlayer(): Player {
