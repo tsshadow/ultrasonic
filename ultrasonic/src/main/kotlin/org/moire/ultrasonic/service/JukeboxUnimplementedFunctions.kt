@@ -67,6 +67,18 @@ abstract class JukeboxUnimplementedFunctions : Player {
         TODO("Not yet implemented")
     }
 
+    override fun replaceMediaItem(index: Int, mediaItem: MediaItem) {
+        TODO("Not yet implemented")
+    }
+
+    override fun replaceMediaItems(
+        fromIndex: Int,
+        toIndex: Int,
+        mediaItems: MutableList<MediaItem>
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override fun setPlayWhenReady(playWhenReady: Boolean) {
         TODO("Not yet implemented")
     }
@@ -134,11 +146,6 @@ abstract class JukeboxUnimplementedFunctions : Player {
     override fun setPlaybackSpeed(speed: Float) {
         TODO("Not yet implemented")
     }
-
-    override fun stop(reset: Boolean) {
-        TODO("Not yet implemented")
-    }
-
     override fun getCurrentTracks(): Tracks {
         // TODO Dummy information is returned for now, this seems to work
         return Tracks.EMPTY
