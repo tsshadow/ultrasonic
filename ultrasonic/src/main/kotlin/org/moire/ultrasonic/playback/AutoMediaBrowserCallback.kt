@@ -274,10 +274,12 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 customCommandFuture = onSetRating(session, controller, HeartRating(true))
                 updateCustomHeartButton(session, true)
             }
+
             PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_OFF -> {
                 customCommandFuture = onSetRating(session, controller, HeartRating(false))
                 updateCustomHeartButton(session, false)
             }
+
             else -> {
                 Timber.d(
                     "CustomCommand not recognized %s with extra %s",
@@ -290,6 +292,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             return customCommandFuture
         return super.onCustomCommand(session, controller, customCommand, args)
     }
+
     override fun onSetRating(
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
@@ -385,10 +388,12 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
                 mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
             )
+
             MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[1], mediaIdParts[2])
             MEDIA_ALBUM_SONG_ITEM -> playAlbumSong(
                 mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
             )
+
             MEDIA_SONG_STARRED_ID -> playStarredSongs()
             MEDIA_SONG_STARRED_ITEM -> playStarredSong(mediaIdParts[1])
             MEDIA_SONG_RANDOM_ID -> playRandomSongs()
@@ -400,6 +405,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             MEDIA_PODCAST_EPISODE_ITEM -> playPodcastEpisode(
                 mediaIdParts[1], mediaIdParts[2]
             )
+
             MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
             else -> null
         }
@@ -432,6 +438,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             MEDIA_ALBUM_PAGE_ID -> return getAlbums(
                 AlbumListType.fromName(parentIdParts[1]), parentIdParts[2].toInt()
             )
+
             MEDIA_PLAYLIST_ID -> return getPlaylists()
             MEDIA_ALBUM_FREQUENT_ID -> return getAlbums(AlbumListType.FREQUENT)
             MEDIA_ALBUM_NEWEST_ID -> return getAlbums(AlbumListType.NEWEST)
@@ -447,6 +454,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             MEDIA_ARTIST_ITEM -> return getAlbumsForArtist(
                 parentIdParts[1], parentIdParts[2]
             )
+
             MEDIA_ALBUM_ITEM -> return getSongsForAlbum(parentIdParts[1], parentIdParts[2])
             MEDIA_SHARE_ITEM -> return getSongsForShare(parentIdParts[1])
             MEDIA_PODCAST_ITEM -> return getPodcastEpisodes(parentIdParts[1])
@@ -534,10 +542,12 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
                 mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
             )
+
             MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[1], mediaIdParts[2])
             MEDIA_ALBUM_SONG_ITEM -> playAlbumSong(
                 mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
             )
+
             MEDIA_SONG_STARRED_ID -> playStarredSongs()
             MEDIA_SONG_STARRED_ITEM -> playStarredSong(mediaIdParts[1])
             MEDIA_SONG_RANDOM_ID -> playRandomSongs()
@@ -549,6 +559,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             MEDIA_PODCAST_EPISODE_ITEM -> playPodcastEpisode(
                 mediaIdParts[1], mediaIdParts[2]
             )
+
             MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
             else -> {
                 listOf()
@@ -768,7 +779,17 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     mediaItems.addPlayAllItem(listOf(MEDIA_ALBUM_ITEM, id, name).joinToString("|"))
 
                 // TODO: Paging is not implemented for songs, is it necessary at all?
-                val items = songs.getTracks().take(DISPLAY_LIMIT)
+                val items = songs.getChildren().take(DISPLAY_LIMIT).toMutableList()
+
+                items.sortWith { o1, o2 ->
+                    if (o1.isDirectory && o2.isDirectory)
+                        (o1.title ?: "").compareTo(o2.title ?: "")
+                    else if (o1.isDirectory)
+                        -1
+                    else
+                        1
+                }
+
                 items.map { item ->
                     if (item.isDirectory)
                         mediaItems.add(
@@ -776,7 +797,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                             listOf(MEDIA_ALBUM_ITEM, item.id, item.name).joinToString("|"),
                             FOLDER_TYPE_TITLES
                         )
-                    else
+                    else if (item is Track)
                         mediaItems.add(
                             item.toMediaItem(
                                 listOf(
@@ -789,6 +810,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                         )
                 }
             }
+
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
     }
