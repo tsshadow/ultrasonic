@@ -140,7 +140,11 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
     private fun downloadBackground(save: Boolean, songs: List<Track?>) {
         val onValid = Runnable {
             networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            DownloadService.download(songs.filterNotNull(), save)
+            DownloadService.download(
+                songs.filterNotNull(),
+                save = save,
+                updateSaveFlag = true
+            )
         }
         onValid.run()
     }
