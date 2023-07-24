@@ -7,16 +7,15 @@
 
 package org.moire.ultrasonic.playback
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_ALBUMS
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_ARTISTS
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_MIXED
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_PLAYLISTS
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_TITLES
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ARTISTS
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MIXED
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_PLAYLIST
 import androidx.media3.common.Player
 import androidx.media3.common.Rating
 import androidx.media3.common.StarRating
@@ -46,7 +45,6 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RatingManager
 import org.moire.ultrasonic.util.Util
@@ -97,11 +95,8 @@ const val PLAY_COMMAND = "play "
  * MediaBrowserService implementation for e.g. Android Auto
  */
 @Suppress("TooManyFunctions", "LargeClass", "UnusedPrivateMember")
-@SuppressLint("UnsafeOptInUsageError")
-class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
-    MediaLibraryService.MediaLibrarySession.Callback, KoinComponent {
+class AutoMediaBrowserCallback : MediaLibraryService.MediaLibrarySession.Callback, KoinComponent {
 
-    private val mediaPlayerManager by inject<MediaPlayerManager>()
     private val activeServerProvider: ActiveServerProvider by inject()
 
     private val serviceJob = SupervisorJob()
@@ -213,8 +208,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     "Root Folder",
                     MEDIA_ROOT_ID,
                     isPlayable = false,
-                    folderType = FOLDER_TYPE_MIXED,
-                    mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
+                    isBrowsable = true,
+                    mediaType = MEDIA_TYPE_FOLDER_MIXED
                 ),
                 params
             )
@@ -528,7 +523,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             ?: Futures.immediateFuture(mediaItems)
     }
 
-    @Suppress("ComplexMethod")
+    @Suppress("ReturnCount", "ComplexMethod")
     private fun onLoadChildren(
         parentId: String,
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
@@ -598,8 +593,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     mediaItems.add(
                         album.title ?: "",
                         listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
-                            .joinToString("|"),
-                        FOLDER_TYPE_ALBUMS
+                            .joinToString("|")
                     )
                 }
 
@@ -691,7 +685,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 R.string.music_library_label,
                 MEDIA_LIBRARY_ID,
                 null,
-                folderType = FOLDER_TYPE_MIXED,
+                isBrowsable = true,
+                mediaType = MEDIA_TYPE_FOLDER_MIXED,
                 icon = R.drawable.ic_library
             )
 
@@ -699,7 +694,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             R.string.main_artists_title,
             MEDIA_ARTIST_ID,
             null,
-            folderType = FOLDER_TYPE_ARTISTS,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_FOLDER_ARTISTS,
             icon = R.drawable.ic_artist
         )
 
@@ -708,7 +704,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 R.string.main_albums_title,
                 MEDIA_ALBUM_ID,
                 null,
-                folderType = FOLDER_TYPE_ALBUMS,
+                isBrowsable = true,
+                mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
                 icon = R.drawable.ic_menu_browse
             )
 
@@ -716,7 +713,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             R.string.playlist_label,
             MEDIA_PLAYLIST_ID,
             null,
-            folderType = FOLDER_TYPE_PLAYLISTS,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_FOLDER_PLAYLISTS,
             icon = R.drawable.ic_menu_playlists
         )
 
@@ -731,14 +729,16 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             R.string.main_songs_random,
             MEDIA_SONG_RANDOM_ID,
             R.string.main_songs_title,
-            folderType = FOLDER_TYPE_TITLES
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
         )
 
         mediaItems.add(
             R.string.main_songs_starred,
             MEDIA_SONG_STARRED_ID,
             R.string.main_songs_title,
-            folderType = FOLDER_TYPE_TITLES
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
         )
 
         // Albums
@@ -752,28 +752,28 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             R.string.main_albums_recent,
             MEDIA_ALBUM_RECENT_ID,
             R.string.main_albums_title,
-            folderType = FOLDER_TYPE_ALBUMS
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
         )
 
         mediaItems.add(
             R.string.main_albums_frequent,
             MEDIA_ALBUM_FREQUENT_ID,
             R.string.main_albums_title,
-            folderType = FOLDER_TYPE_ALBUMS
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
         )
 
         mediaItems.add(
             R.string.main_albums_random,
             MEDIA_ALBUM_RANDOM_ID,
             R.string.main_albums_title,
-            folderType = FOLDER_TYPE_ALBUMS
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
         )
 
         mediaItems.add(
             R.string.main_albums_starred,
             MEDIA_ALBUM_STARRED_ID,
             R.string.main_albums_title,
-            folderType = FOLDER_TYPE_ALBUMS
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
         )
 
         // Other
@@ -822,8 +822,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                             index.add(currentSection)
                             mediaItems.add(
                                 currentSection,
-                                listOf(MEDIA_ARTIST_SECTION, currentSection).joinToString("|"),
-                                FOLDER_TYPE_ARTISTS
+                                listOf(MEDIA_ARTIST_SECTION, currentSection).joinToString("|")
                             )
                         }
                     }
@@ -831,8 +830,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     artists.map { artist ->
                         mediaItems.add(
                             artist.name ?: "",
-                            listOf(childMediaId, artist.id, artist.name).joinToString("|"),
-                            FOLDER_TYPE_ARTISTS
+                            listOf(childMediaId, artist.id, artist.name).joinToString("|")
                         )
                     }
                 }
@@ -862,8 +860,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 mediaItems.add(
                     album.title ?: "",
                     listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
-                        .joinToString("|"),
-                    FOLDER_TYPE_ALBUMS
+                        .joinToString("|")
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -901,8 +898,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     if (item.isDirectory)
                         mediaItems.add(
                             item.title ?: "",
-                            listOf(MEDIA_ALBUM_ITEM, item.id, item.name).joinToString("|"),
-                            FOLDER_TYPE_TITLES
+                            listOf(MEDIA_ALBUM_ITEM, item.id, item.name).joinToString("|")
                         )
                     else if (item is Track)
                         mediaItems.add(
@@ -951,8 +947,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 mediaItems.add(
                     album.title ?: "",
                     listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
-                        .joinToString("|"),
-                    FOLDER_TYPE_ALBUMS
+                        .joinToString("|")
                 )
             }
 
@@ -980,7 +975,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     playlist.name,
                     listOf(MEDIA_PLAYLIST_ITEM, playlist.id, playlist.name)
                         .joinToString("|"),
-                    FOLDER_TYPE_PLAYLISTS
+                    mediaType = MEDIA_TYPE_PLAYLIST,
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -1074,7 +1069,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 mediaItems.add(
                     podcast.title ?: "",
                     listOf(MEDIA_PODCAST_ITEM, podcast.id).joinToString("|"),
-                    FOLDER_TYPE_MIXED
+                    mediaType = MEDIA_TYPE_FOLDER_MIXED,
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -1177,7 +1172,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     share.name ?: "",
                     listOf(MEDIA_SHARE_ITEM, share.id)
                         .joinToString("|"),
-                    FOLDER_TYPE_MIXED
+                    mediaType = MEDIA_TYPE_FOLDER_MIXED,
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -1355,14 +1350,16 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
     private fun MutableList<MediaItem>.add(
         title: String,
         mediaId: String,
-        folderType: Int
+        mediaType: Int = MEDIA_TYPE_MIXED,
+        isBrowsable: Boolean = false
     ) {
 
         val mediaItem = buildMediaItem(
             title,
             mediaId,
             isPlayable = false,
-            folderType = folderType
+            isBrowsable = isBrowsable,
+            mediaType = mediaType
         )
 
         this.add(mediaItem)
@@ -1373,8 +1370,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
         resId: Int,
         mediaId: String,
         groupNameId: Int?,
-        browsable: Boolean = true,
-        folderType: Int = FOLDER_TYPE_MIXED,
+        isBrowsable: Boolean = true,
+        mediaType: Int = MEDIA_TYPE_FOLDER_MIXED,
         icon: Int? = null
     ) {
         val applicationContext = UApp.applicationContext()
@@ -1382,14 +1379,15 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
         val mediaItem = buildMediaItem(
             applicationContext.getString(resId),
             mediaId,
-            isPlayable = !browsable,
-            folderType = folderType,
+            isPlayable = !isBrowsable,
+            isBrowsable = isBrowsable,
+            imageUri = if (icon != null) {
+                Util.getUriToDrawable(applicationContext, icon)
+            } else null,
             group = if (groupNameId != null) {
                 applicationContext.getString(groupNameId)
             } else null,
-            imageUri = if (icon != null) {
-                Util.getUriToDrawable(applicationContext, icon)
-            } else null
+            mediaType = mediaType
         )
 
         this.add(mediaItem)

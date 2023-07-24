@@ -142,7 +142,7 @@ class PlaybackService :
         actualBackend = desiredBackend
 
         // Create browser interface
-        librarySessionCallback = AutoMediaBrowserCallback(this)
+        librarySessionCallback = AutoMediaBrowserCallback()
 
         // This will need to use the AutoCalls
         mediaLibrarySession = MediaLibrarySession.Builder(this, player, librarySessionCallback)

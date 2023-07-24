@@ -14,7 +14,8 @@ import androidx.core.net.toUri
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_NONE
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MUSIC
 import androidx.media3.common.StarRating
 import java.text.DateFormat
 import java.text.ParseException
@@ -22,7 +23,7 @@ import java.util.Date
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.provider.AlbumArtContentProvider
 
-// Copied from androidx.media.utils.MediaConstants in order to avoid importing a whole dependecy
+// Copied from androidx.media.utils.MediaConstants in order to avoid importing a whole dependency
 // for a single string value
 private const val DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE =
     "android.media.browse.CONTENT_STYLE_GROUP_TITLE_HINT"
@@ -76,15 +77,16 @@ fun Track.toMediaItem(
         title = title ?: "",
         mediaId = mediaId,
         isPlayable = !isDirectory,
-        folderType = if (isDirectory) MediaMetadata.FOLDER_TYPE_TITLES
-        else MediaMetadata.FOLDER_TYPE_NONE,
+        isBrowsable = isDirectory,
         album = album,
         artist = artist,
         genre = genre,
         sourceUri = uri.toUri(),
         imageUri = artworkUri,
         starred = starred,
-        group = null
+        group = null,
+        mediaType = if (isDirectory) MEDIA_TYPE_FOLDER_MIXED
+        else MEDIA_TYPE_MUSIC
     )
 
     val metadataBuilder = mediaItem.mediaMetadata.buildUpon()
@@ -204,14 +206,6 @@ private fun safeParseDate(created: String?): Date? {
     } else null
 }
 
-fun MediaItem.setPin(pin: Boolean) {
-    this.mediaMetadata.extras?.putBoolean("pin", pin)
-}
-
-fun MediaItem.shouldBePinned(): Boolean {
-    return this.mediaMetadata.extras?.getBoolean("pin") ?: false
-}
-
 /**
  * Build a new MediaItem from a list of attributes.
  * Especially useful to create folder entries in the Auto interface.
@@ -222,7 +216,7 @@ fun buildMediaItem(
     title: String,
     mediaId: String,
     isPlayable: Boolean,
-    folderType: @MediaMetadata.FolderType Int,
+    isBrowsable: Boolean = false,
     album: String? = null,
     artist: String? = null,
     genre: String? = null,
@@ -241,15 +235,11 @@ fun buildMediaItem(
         .setAlbumArtist(artist)
         .setGenre(genre)
         .setUserRating(HeartRating(starred))
-        .setFolderType(folderType)
+        .setIsBrowsable(isBrowsable)
         .setIsPlayable(isPlayable)
 
     if (imageUri != null) {
         metadataBuilder.setArtworkUri(imageUri)
-    }
-
-    if (folderType > FOLDER_TYPE_NONE) {
-        metadataBuilder.setIsBrowsable(true)
     }
 
     if (mediaType != null) {

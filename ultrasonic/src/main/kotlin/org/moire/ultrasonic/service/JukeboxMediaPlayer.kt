@@ -82,7 +82,10 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
     companion object {
         // This is quite important, by setting the DeviceInfo the player is recognized by
         // Android as being a remote playback surface
-        val DEVICE_INFO = DeviceInfo(DeviceInfo.PLAYBACK_TYPE_REMOTE, 0, 10)
+        val DEVICE_INFO = DeviceInfo.Builder(DeviceInfo.PLAYBACK_TYPE_REMOTE)
+            .setMinVolume(0)
+            .setMaxVolume(10)
+            .build()
         val running = AtomicBoolean()
         const val MAX_GAIN = 10
     }
@@ -208,15 +211,12 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
             Player.COMMAND_GET_DEVICE_VOLUME,
             Player.COMMAND_ADJUST_DEVICE_VOLUME_WITH_FLAGS,
             Player.COMMAND_SET_DEVICE_VOLUME_WITH_FLAGS,
-            Player.COMMAND_ADJUST_DEVICE_VOLUME,
-            Player.COMMAND_SET_DEVICE_VOLUME
         )
         if (isPlaying) commandsBuilder.add(Player.COMMAND_STOP)
         if (playlist.isNotEmpty()) {
             commandsBuilder.addAll(
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
-                Player.COMMAND_GET_MEDIA_ITEMS_METADATA,
                 Player.COMMAND_PLAY_PAUSE,
                 Player.COMMAND_PREPARE,
                 Player.COMMAND_SEEK_BACK,
