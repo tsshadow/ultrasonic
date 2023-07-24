@@ -1,8 +1,8 @@
 package org.moire.ultrasonic.service
 
-import android.os.Looper
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -12,14 +12,9 @@ import org.moire.ultrasonic.domain.Track
 
 class RxBus {
 
-    /*
-    * TODO: mainThread() seems to be not equal to the "normal" main Thread, so it causes
-    * a lot of often unnecessary thread switching. It looks like observeOn can actually
-    * be removed in many cases
-    */
     companion object {
 
-        private fun mainThread() = AndroidSchedulers.from(Looper.getMainLooper())
+        fun mainThread(): Scheduler = AndroidSchedulers.mainThread()
 
         val shufflePlayPublisher: PublishSubject<Boolean> =
             PublishSubject.create()
