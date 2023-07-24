@@ -150,10 +150,8 @@ class PlaybackService :
             .setBitmapLoader(ArtworkBitmapLoader())
             .build()
 
-        if (!librarySessionCallback.customLayout.isEmpty()) {
-            // Send custom layout to legacy session.
-            mediaLibrarySession.setCustomLayout(librarySessionCallback.customLayout)
-        }
+        // Send custom layout to legacy session.
+        mediaLibrarySession.setCustomLayout(librarySessionCallback.defaultCustomCommands)
 
         // Set a listener to update the API client when the active server has changed
         rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
@@ -422,6 +420,12 @@ class PlaybackService :
             "org.moire.ultrasonic.HEART_ON"
         const val CUSTOM_COMMAND_TOGGLE_HEART_OFF =
             "org.moire.ultrasonic.HEART_OFF"
+        const val CUSTOM_COMMAND_SHUFFLE =
+            "org.moire.ultrasonic.SHUFFLE"
+        const val CUSTOM_COMMAND_PLACEHOLDER =
+            "org.moire.ultrasonic.PLACEHOLDER"
+        const val CUSTOM_COMMAND_REPEAT_MODE =
+            "org.moire.ultrasonic.REPEAT_MODE"
         private const val NOTIFICATION_ID = 3009
     }
 }
