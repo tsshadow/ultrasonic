@@ -53,8 +53,16 @@ class DownloadHandler(
             withContext(Dispatchers.Main) {
                 // If we are just downloading tracks we don't need to add them to the controller
                 when (action) {
-                    DownloadAction.DOWNLOAD -> DownloadService.download(tracksToDownload, false)
-                    DownloadAction.PIN -> DownloadService.download(tracksToDownload, true)
+                    DownloadAction.DOWNLOAD -> DownloadService.download(
+                        tracksToDownload,
+                        save = false,
+                        updateSaveFlag = true
+                    )
+                    DownloadAction.PIN -> DownloadService.download(
+                        tracksToDownload,
+                        save = true,
+                        updateSaveFlag = true
+                    )
                     DownloadAction.UNPIN -> DownloadService.unpin(tracksToDownload)
                     DownloadAction.DELETE -> DownloadService.delete(tracksToDownload)
                 }
