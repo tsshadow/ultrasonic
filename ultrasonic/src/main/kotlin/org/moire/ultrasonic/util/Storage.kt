@@ -22,19 +22,23 @@ import timber.log.Timber
 object Storage {
 
     val mediaRoot: ResettableLazy<AbstractFile> = ResettableLazy {
-        getRoot()!!
+        val ret = getRoot()
+        rootNotFoundError = ret.second
+        ret.first
     }
+
+    var rootNotFoundError: Boolean = false
 
     fun reset() {
         StorageFile.storageFilePathDictionary.clear()
         StorageFile.notExistingPathDictionary.clear()
         mediaRoot.reset()
+        rootNotFoundError = false
         Timber.i("StorageFile caches were reset")
     }
 
-    fun ensureRootIsAvailable() {
-        val root = getRoot()
-        if (root == null) {
+    fun checkForErrorsWithCustomRoot() {
+        if (rootNotFoundError) {
             Settings.customCacheLocation = false
             Settings.cacheLocationUri = ""
             Util.toast(UApp.applicationContext(), R.string.settings_cache_location_error)
@@ -98,18 +102,25 @@ object Storage {
         return success
     }
 
-    private fun getRoot(): AbstractFile? {
+    private fun getRoot(): Pair<AbstractFile, Boolean> {
         return if (Settings.customCacheLocation) {
-            if (Settings.cacheLocationUri.isBlank()) return null
+            if (Settings.cacheLocationUri.isBlank()) return Pair(getDefaultRoot(), true)
             val documentFile = DocumentFile.fromTreeUri(
                 UApp.applicationContext(),
                 Uri.parse(Settings.cacheLocationUri)
-            ) ?: return null
-            if (!documentFile.exists()) return null
-            StorageFile(null, documentFile.uri, documentFile.name!!, documentFile.isDirectory)
+            ) ?: return Pair(getDefaultRoot(), true)
+            if (!documentFile.exists()) return Pair(getDefaultRoot(), true)
+            Pair(
+                StorageFile(null, documentFile.uri, documentFile.name!!, documentFile.isDirectory),
+                false
+            )
         } else {
-            val file = File(FileUtil.defaultMusicDirectory.path)
-            JavaFile(null, file)
+            Pair(getDefaultRoot(), false)
         }
+    }
+
+    private fun getDefaultRoot(): JavaFile {
+        val file = File(FileUtil.defaultMusicDirectory.path)
+        return JavaFile(null, file)
     }
 }

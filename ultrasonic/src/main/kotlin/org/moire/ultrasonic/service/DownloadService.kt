@@ -274,46 +274,26 @@ class DownloadService : Service(), KoinComponent {
         @Synchronized
         fun download(
             tracks: List<Track>,
-            save: Boolean,
-            isHighPriority: Boolean = false
+            save: Boolean = false,
+            isHighPriority: Boolean = false,
+            updateSaveFlag: Boolean = false
         ) {
             CoroutineScope(Dispatchers.IO).launch {
 
-                // First handle and filter out those tracks that are already completed
-                var filteredTracks: List<Track>
-                if (save) {
-                    tracks.filter { Storage.isPathExists(it.getCompleteFile()) }.forEach { track ->
-                        Storage.getFromPath(track.getCompleteFile())?.let {
-                            Storage.renameOrDeleteIfAlreadyExists(it, track.getPinnedFile())
-                            postState(track, DownloadState.PINNED)
-                        }
-                    }
-                    filteredTracks = tracks.filter { !Storage.isPathExists(it.getPinnedFile()) }
+                // Remove tracks which are already downloaded and update the save flag
+                // if needed
+                var filteredTracks = if (updateSaveFlag) {
+                    setSaveFlagForTracks(save, tracks)
                 } else {
-                    tracks.filter { Storage.isPathExists(it.getPinnedFile()) }.forEach { track ->
-                        Storage.getFromPath(track.getPinnedFile())?.let {
-                            Storage.renameOrDeleteIfAlreadyExists(it, track.getCompleteFile())
-                            postState(track, DownloadState.DONE)
-                        }
-                    }
-                    filteredTracks = tracks.filter { !Storage.isPathExists(it.getCompleteFile()) }
+                    removeDownloadedTracksFromList(tracks)
                 }
 
-                // Update Pinned flag of items in progress
-                downloadQueue.filter { item -> tracks.any { it.id == item.id } }
-                    .forEach { it.pinned = save }
-                tracks.forEach {
-                    activeDownloads[it.id]?.downloadTrack?.pinned = save
-                }
-                tracks.forEach {
-                    failedList[it.id]?.pinned = save
-                }
-
+                // Remove tracks which are currently downloading
                 filteredTracks = filteredTracks.filter {
                     !downloadQueue.any { i -> i.id == it.id } && !activeDownloads.containsKey(it.id)
                 }
 
-                // The remainder tracks should be added to the download queue
+                // The remaining tracks should be added to the download queue
                 // By using the counter we ensure that the songs are added in the correct order
                 var priority = 0
                 val tracksToDownload =
@@ -332,6 +312,69 @@ class DownloadService : Service(), KoinComponent {
                     processNextTracksOnService()
                 }
             }
+        }
+
+        private fun removeDownloadedTracksFromList(tracks: List<Track>): List<Track> {
+            return tracks.filter { track ->
+                val pinnedFile = Storage.getFromPath(track.getPinnedFile())
+                val completeFile = Storage.getFromPath(track.getCompleteFile())
+
+                completeFile?.let {
+                    postState(track, DownloadState.DONE)
+                    false
+                }
+                pinnedFile?.let {
+                    postState(track, DownloadState.PINNED)
+                    false
+                }
+                true
+            }
+        }
+
+        private fun setSaveFlagForTracks(
+            shouldPin: Boolean,
+            tracks: List<Track>
+        ): List<Track> {
+            // Walk through the tracks. If a track is pinned or complete and needs to be changed
+            // to the other state, rename it, but don't return it, thereby excluding it from
+            // further processing.
+            // If it is neither pinned nor saved, return it, so that it can be processed.
+            val filteredTracks: List<Track> = tracks.map { track ->
+                val pinnedFile = Storage.getFromPath(track.getPinnedFile())
+                val completeFile = Storage.getFromPath(track.getCompleteFile())
+
+                if (shouldPin) {
+                    pinnedFile?.let {
+                        null
+                    }
+                    completeFile?.let {
+                        Storage.renameOrDeleteIfAlreadyExists(it, track.getPinnedFile())
+                        postState(track, DownloadState.PINNED)
+                        null
+                    }
+                } else {
+                    completeFile?.let {
+                        null
+                    }
+                    pinnedFile?.let {
+                        Storage.renameOrDeleteIfAlreadyExists(it, track.getCompleteFile())
+                        postState(track, DownloadState.DONE)
+                        null
+                    }
+                }
+                track
+            }
+
+            // Update Pinned flag of items in progress
+            downloadQueue.filter { item -> tracks.any { it.id == item.id } }
+                .forEach { it.pinned = shouldPin }
+            tracks.forEach {
+                activeDownloads[it.id]?.downloadTrack?.pinned = shouldPin
+            }
+            tracks.forEach {
+                failedList[it.id]?.pinned = shouldPin
+            }
+            return filteredTracks
         }
 
         fun requestStop() {

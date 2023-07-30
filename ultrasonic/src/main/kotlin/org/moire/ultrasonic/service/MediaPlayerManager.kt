@@ -181,19 +181,22 @@ class MediaPlayerManager(
 
         createMediaController(onCreated)
 
-        rxBusSubscription += RxBus.activeServerChangingObservable.subscribe { oldServer ->
-            if (oldServer != OFFLINE_DB_ID) {
-                // When the server changes, the playlist can retain the downloaded songs.
-                // Incomplete songs should be removed as the new server won't recognise them.
-                removeIncompleteTracksFromPlaylist()
-                DownloadService.requestStop()
+        rxBusSubscription += RxBus.activeServerChangingObservable
+            // All interaction with the Media3 needs to happen on the main thread
+            .subscribeOn(RxBus.mainThread())
+            .subscribe { oldServer ->
+                if (oldServer != OFFLINE_DB_ID) {
+                    // When the server changes, the playlist can retain the downloaded songs.
+                    // Incomplete songs should be removed as the new server won't recognise them.
+                    removeIncompleteTracksFromPlaylist()
+                    DownloadService.requestStop()
+                }
+                if (controller is JukeboxMediaPlayer) {
+                    // When the server changes, the Jukebox should be released.
+                    // The new server won't understand the jukebox requests of the old one.
+                    switchToLocalPlayer()
+                }
             }
-            if (controller is JukeboxMediaPlayer) {
-                // When the server changes, the Jukebox should be released.
-                // The new server won't understand the jukebox requests of the old one.
-                switchToLocalPlayer()
-            }
-        }
 
         rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
             val jukebox = activeServerProvider.getActiveServer().jukeboxByDefault
@@ -204,19 +207,19 @@ class MediaPlayerManager(
             isJukeboxEnabled = jukebox
         }
 
-        rxBusSubscription += RxBus.throttledPlaylistObservable.subscribe {
-            // Even though Rx should launch on the main thread it doesn't always :(
-            mainScope.launch {
+        rxBusSubscription += RxBus.throttledPlaylistObservable
+            // All interaction with the Media3 needs to happen on the main thread
+            .subscribeOn(RxBus.mainThread())
+            .subscribe {
                 serializeCurrentSession()
             }
-        }
 
-        rxBusSubscription += RxBus.throttledPlayerStateObservable.subscribe {
-            // Even though Rx should launch on the main thread it doesn't always :(
-            mainScope.launch {
+        rxBusSubscription += RxBus.throttledPlayerStateObservable
+            // All interaction with the Media3 needs to happen on the main thread
+            .subscribeOn(RxBus.mainThread())
+            .subscribe {
                 serializeCurrentSession()
             }
-        }
 
         rxBusSubscription += RxBus.shutdownCommandObservable.subscribe {
             clear(false)
@@ -245,7 +248,10 @@ class MediaPlayerManager(
         mediaControllerFuture = MediaController.Builder(
             context,
             sessionToken
-        ).buildAsync()
+        )
+            // Specify mainThread explicitely
+            .setApplicationLooper(Looper.getMainLooper())
+            .buildAsync()
 
         mediaControllerFuture?.addListener({
             controller = mediaControllerFuture?.get()

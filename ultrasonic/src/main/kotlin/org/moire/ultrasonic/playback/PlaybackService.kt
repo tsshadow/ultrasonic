@@ -328,7 +328,7 @@ class PlaybackService :
         ).map { it.toTrack() }
 
         launch {
-            DownloadService.download(nextSongs, save = false, isHighPriority = true)
+            DownloadService.download(nextSongs, isHighPriority = true)
         }
     }
 

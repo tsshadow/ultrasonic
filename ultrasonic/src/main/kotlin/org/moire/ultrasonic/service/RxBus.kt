@@ -1,8 +1,8 @@
 package org.moire.ultrasonic.service
 
-import android.os.Looper
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -12,14 +12,14 @@ import org.moire.ultrasonic.domain.Track
 
 class RxBus {
 
-    /*
-    * TODO: mainThread() seems to be not equal to the "normal" main Thread, so it causes
-    * a lot of often unnecessary thread switching. It looks like observeOn can actually
-    * be removed in many cases
-    */
+    /**
+     * IMPORTANT: methods like .delay() or .throttle() will implicitly change the thread to the
+     * RxComputationScheduler. Always use the function call with the additional arguments of the
+     * desired scheduler
+     **/
     companion object {
 
-        private fun mainThread() = AndroidSchedulers.from(Looper.getMainLooper())
+        fun mainThread(): Scheduler = AndroidSchedulers.mainThread()
 
         val shufflePlayPublisher: PublishSubject<Boolean> =
             PublishSubject.create()
@@ -57,7 +57,8 @@ class RxBus {
             playerStatePublisher
                 .replay(1)
                 .autoConnect(0)
-                .throttleLatest(300, TimeUnit.MILLISECONDS)
+                // Need to specify thread, see comment at beginning
+                .throttleLatest(300, TimeUnit.MILLISECONDS, mainThread())
 
         val playlistPublisher: PublishSubject<List<Track>> =
             PublishSubject.create()
@@ -69,7 +70,8 @@ class RxBus {
             playlistPublisher
                 .replay(1)
                 .autoConnect(0)
-                .throttleLatest(300, TimeUnit.MILLISECONDS)
+                // Need to specify thread, see comment at beginning
+                .throttleLatest(300, TimeUnit.MILLISECONDS, mainThread())
 
         val trackDownloadStatePublisher: PublishSubject<TrackDownloadState> =
             PublishSubject.create()

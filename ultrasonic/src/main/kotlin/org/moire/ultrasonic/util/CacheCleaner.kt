@@ -235,11 +235,9 @@ class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO), KoinCompo
 
     private fun findFilesToNotDelete(): Set<String> {
         val filesToNotDelete: MutableSet<String> = HashSet(5)
-        val mediaController = inject<MediaPlayerManager>(
-            MediaPlayerManager::class.java
-        )
+        val mediaPlayerManager: MediaPlayerManager by inject()
 
-        val playlist = mainScope.future { mediaController.value.playlist }.get()
+        val playlist = mainScope.future { mediaPlayerManager.playlist }.get()
         for (item in playlist) {
             val track = item.toTrack()
             filesToNotDelete.add(track.getPartialFile())
