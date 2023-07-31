@@ -12,6 +12,11 @@ import org.moire.ultrasonic.domain.Track
 
 class RxBus {
 
+    /**
+     * IMPORTANT: methods like .delay() or .throttle() will implicitly change the thread to the
+     * RxComputationScheduler. Always use the function call with the additional arguments of the
+     * desired scheduler
+     **/
     companion object {
 
         fun mainThread(): Scheduler = AndroidSchedulers.mainThread()
@@ -52,7 +57,8 @@ class RxBus {
             playerStatePublisher
                 .replay(1)
                 .autoConnect(0)
-                .throttleLatest(300, TimeUnit.MILLISECONDS)
+                // Need to specify thread, see comment at beginning
+                .throttleLatest(300, TimeUnit.MILLISECONDS, mainThread())
 
         val playlistPublisher: PublishSubject<List<Track>> =
             PublishSubject.create()
@@ -64,7 +70,8 @@ class RxBus {
             playlistPublisher
                 .replay(1)
                 .autoConnect(0)
-                .throttleLatest(300, TimeUnit.MILLISECONDS)
+                // Need to specify thread, see comment at beginning
+                .throttleLatest(300, TimeUnit.MILLISECONDS, mainThread())
 
         val trackDownloadStatePublisher: PublishSubject<TrackDownloadState> =
             PublishSubject.create()

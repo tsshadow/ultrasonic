@@ -248,7 +248,10 @@ class MediaPlayerManager(
         mediaControllerFuture = MediaController.Builder(
             context,
             sessionToken
-        ).buildAsync()
+        )
+            // Specify mainThread explicitely
+            .setApplicationLooper(Looper.getMainLooper())
+            .buildAsync()
 
         mediaControllerFuture?.addListener({
             controller = mediaControllerFuture?.get()
