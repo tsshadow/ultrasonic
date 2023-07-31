@@ -424,7 +424,7 @@ open class TrackCollectionFragment(
             playNowButton?.isVisible = show.all
             playNextButton?.isVisible = show.all && multipleSelection
             playLastButton?.isVisible = show.all && multipleSelection
-            pinButton?.isVisible = show.all && !isOffline() && show.pin
+            pinButton?.isVisible = show.all && show.pin
             unpinButton?.isVisible = show.all && show.unpin
             downloadButton?.isVisible = show.all && show.download && !isOffline()
             deleteButton?.isVisible = show.all && show.delete
