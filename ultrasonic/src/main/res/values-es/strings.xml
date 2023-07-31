@@ -455,4 +455,9 @@
     <string name="shortcut_play_random_songs_short">Canciones aleatorias</string>
     <string name="shortcut_play_random_songs_long">Reproducir las canciones aleatoriamente</string>
     <string name="download.menu_unstar">No me gusta</string>
+    <plurals name="n_songs_added_play_now">
+        <item quantity="one">%d canción añadida a la cola de reproducción</item>
+        <item quantity="many">%d canciones añadidas a la cola de reproducción</item>
+        <item quantity="other">%d canciones añadidas a la cola de reproducción</item>
+    </plurals>
 </resources>
