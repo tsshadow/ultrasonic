@@ -326,7 +326,7 @@
     <string name="server_menu.move_down">Lejjebb mozgat</string>
     <string name="server_editor.authentication">Bejelentkezés</string>
     <string name="server_editor.advanced">Haladó beállítások</string>
-    <plurals name="select_album_n_songs">
+    <plurals name="n_songs">
         <item quantity="one">%d dal</item>
         <item quantity="other">%d dal</item>
     </plurals>

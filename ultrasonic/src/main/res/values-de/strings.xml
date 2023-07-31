@@ -383,31 +383,31 @@
     <string name="server_menu.demo">Demo Server</string>
     <string name="about.webpage">Website besuchen</string>
     <string name="about.report">Einen Fehler melden</string>
-    <plurals name="select_album_n_songs">
+    <plurals name="n_songs">
         <item quantity="one">%d Titel</item>
         <item quantity="other">%d Titel</item>
     </plurals>
-    <plurals name="select_album_n_songs_pinned">
+    <plurals name="n_songs_pinned">
         <item quantity="one">%d Titel zum Anheften ausgewählt</item>
         <item quantity="other">%d Titel zum Anheften ausgewählt</item>
     </plurals>
-    <plurals name="select_album_n_songs_downloaded">
+    <plurals name="n_songs_to_be_downloaded">
         <item quantity="one">%d Titel zum herunterladen ausgewählt</item>
         <item quantity="other">%d Titel zum herunterladen ausgewählt</item>
     </plurals>
-    <plurals name="select_album_n_songs_unpinned">
+    <plurals name="n_songs_unpinned">
         <item quantity="one">%d Titel losgelöst</item>
         <item quantity="other">%d Titel losgelöst</item>
     </plurals>
-    <plurals name="select_album_n_songs_deleted">
+    <plurals name="n_songs_deleted">
         <item quantity="one">%d Titel gelöscht</item>
         <item quantity="other">%d Titel gelöscht</item>
     </plurals>
-    <plurals name="select_album_n_songs_added">
+    <plurals name="n_songs_added_to_end">
         <item quantity="one">%d Titel am Ende hinzugefügt</item>
         <item quantity="other">%d Titel am Ende hinzugefügt</item>
     </plurals>
-    <plurals name="select_album_n_songs_play_next">
+    <plurals name="n_songs_added_after_current">
         <item quantity="one">%d Titel nach aktuellen Titel hinzugefügt</item>
         <item quantity="other">%d Titel nach aktuellen Titel hinzugefügt</item>
     </plurals>

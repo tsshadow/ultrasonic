@@ -488,8 +488,7 @@ class NavigationActivity : AppCompatActivity() {
         val downloadHandler: DownloadHandler by inject()
         downloadHandler.addTracksToMediaController(
             songs = musicDirectory.getTracks(),
-            append = false,
-            playNext = false,
+            insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
             autoPlay = true,
             shuffle = false,
             fragment = currentFragment,

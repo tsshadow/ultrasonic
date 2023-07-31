@@ -159,7 +159,7 @@ open class TrackCollectionFragment(
         // Change the buttons if the status of any selected track changes
         rxBusSubscription += RxBus.trackDownloadStateObservable.subscribe {
             if (it.progress != null) return@subscribe
-            val selectedSongs = getSelectedSongs()
+            val selectedSongs = getSelectedTracks()
             if (!selectedSongs.any { song -> song.id == it.id }) return@subscribe
             triggerButtonUpdate(selectedSongs)
         }
@@ -211,23 +211,15 @@ open class TrackCollectionFragment(
         }
 
         playNowButton?.setOnClickListener {
-            playNow(false)
+            playNow(MediaPlayerManager.InsertionMode.CLEAR, toast = true)
         }
 
         playNextButton?.setOnClickListener {
-            downloadHandler.addTracksToMediaController(
-                songs = getSelectedSongs(),
-                append = true,
-                playNext = true,
-                autoPlay = false,
-                shuffle = false,
-                playlistName = navArgs.playlistName,
-                this@TrackCollectionFragment
-            )
+            playNow(MediaPlayerManager.InsertionMode.AFTER_CURRENT, toast = true)
         }
 
         playLastButton!!.setOnClickListener {
-            playNow(true)
+            playNow(MediaPlayerManager.InsertionMode.APPEND, toast = true)
         }
 
         pinButton?.setOnClickListener {
@@ -291,7 +283,7 @@ open class TrackCollectionFragment(
                 return true
             } else if (item.itemId == R.id.menu_item_share) {
                 shareHandler.createShare(
-                    this@TrackCollectionFragment, getSelectedSongs(),
+                    this@TrackCollectionFragment, getSelectedTracks(),
                     refreshListView, cancellationToken!!,
                     navArgs.id
                 )
@@ -308,20 +300,37 @@ open class TrackCollectionFragment(
     }
 
     private fun playNow(
-        append: Boolean,
-        selectedSongs: List<Track> = getSelectedSongs()
+        insertionMode: MediaPlayerManager.InsertionMode,
+        selectedTracks: List<Track> = getSelectedTracks(),
+        toast: Boolean = false
     ) {
-        if (selectedSongs.isNotEmpty()) {
+        if (selectedTracks.isNotEmpty()) {
             downloadHandler.addTracksToMediaController(
-                songs = selectedSongs,
-                append = append,
-                playNext = false,
-                autoPlay = !append,
+                songs = selectedTracks,
+                insertionMode = insertionMode,
+                autoPlay = (insertionMode == MediaPlayerManager.InsertionMode.CLEAR),
                 playlistName = null,
                 fragment = this
             )
         } else {
-            playAll(false, append)
+            playAll(false, insertionMode)
+        }
+
+        if (toast) {
+            val stringInt = when (insertionMode) {
+                MediaPlayerManager.InsertionMode.CLEAR ->
+                    R.plurals.n_songs_added_play_now
+                MediaPlayerManager.InsertionMode.AFTER_CURRENT ->
+                    R.plurals.n_songs_added_after_current
+                MediaPlayerManager.InsertionMode.APPEND ->
+                    R.plurals.n_songs_added_to_end
+            }
+            val msg = resources.getQuantityString(
+                stringInt,
+                selectedTracks.size,
+                selectedTracks.size
+            )
+            Util.toast(requireContext(), msg)
         }
     }
 
@@ -338,7 +347,10 @@ open class TrackCollectionFragment(
             }
         }
 
-    private fun playAll(shuffle: Boolean = false, append: Boolean = false) {
+    private fun playAll(
+        shuffle: Boolean = false,
+        insertionMode: MediaPlayerManager.InsertionMode = MediaPlayerManager.InsertionMode.CLEAR
+    ) {
         var hasSubFolders = false
 
         for (item in viewAdapter.getCurrentList()) {
@@ -355,18 +367,16 @@ open class TrackCollectionFragment(
             downloadHandler.fetchTracksAndAddToController(
                 fragment = this,
                 id = navArgs.id!!,
-                append = append,
-                autoPlay = !append,
+                insertionMode = insertionMode,
+                autoPlay = (insertionMode != MediaPlayerManager.InsertionMode.APPEND),
                 shuffle = shuffle,
-                playNext = false,
                 isArtist = isArtist
             )
         } else {
             downloadHandler.addTracksToMediaController(
                 songs = getAllSongs(),
-                append = append,
-                playNext = false,
-                autoPlay = !append,
+                insertionMode = insertionMode,
+                autoPlay = (insertionMode != MediaPlayerManager.InsertionMode.APPEND),
                 shuffle = shuffle,
                 playlistName = navArgs.playlistName,
                 fragment = this
@@ -397,7 +407,7 @@ open class TrackCollectionFragment(
     }
 
     @Synchronized
-    fun triggerButtonUpdate(selection: List<Track> = getSelectedSongs()) {
+    fun triggerButtonUpdate(selection: List<Track> = getSelectedTracks()) {
         listModel.calculateButtonState(selection, ::updateButtonState)
     }
 
@@ -414,14 +424,14 @@ open class TrackCollectionFragment(
             playNowButton?.isVisible = show.all
             playNextButton?.isVisible = show.all && multipleSelection
             playLastButton?.isVisible = show.all && multipleSelection
-            pinButton?.isVisible = show.all && !isOffline() && show.pin
+            pinButton?.isVisible = show.all && show.pin
             unpinButton?.isVisible = show.all && show.unpin
             downloadButton?.isVisible = show.all && show.download && !isOffline()
             deleteButton?.isVisible = show.all && show.delete
         }
     }
 
-    private fun downloadBackground(save: Boolean, tracks: List<Track> = getSelectedSongs()) {
+    private fun downloadBackground(save: Boolean, tracks: List<Track> = getSelectedTracks()) {
         var songs = tracks
 
         if (songs.isEmpty()) {
@@ -436,7 +446,7 @@ open class TrackCollectionFragment(
         )
     }
 
-    internal fun delete(songs: List<Track> = getSelectedSongs()) {
+    internal fun delete(songs: List<Track> = getSelectedTracks()) {
         downloadHandler.justDownload(
             action = DownloadAction.DELETE,
             fragment = this,
@@ -444,7 +454,7 @@ open class TrackCollectionFragment(
         )
     }
 
-    internal fun unpin(songs: List<Track> = getSelectedSongs()) {
+    internal fun unpin(songs: List<Track> = getSelectedTracks()) {
         downloadHandler.justDownload(
             action = DownloadAction.UNPIN,
             fragment = this,
@@ -502,10 +512,7 @@ open class TrackCollectionFragment(
         val playAll = navArgs.autoPlay
 
         if (playAll && songCount > 0) {
-            playAll(
-                navArgs.shuffle,
-                false
-            )
+            playAll(navArgs.shuffle, MediaPlayerManager.InsertionMode.CLEAR)
         }
 
         listModel.currentListIsSortable = true
@@ -513,7 +520,7 @@ open class TrackCollectionFragment(
         Timber.i("Processed list")
     }
 
-    internal fun getSelectedSongs(): List<Track> {
+    internal fun getSelectedTracks(): List<Track> {
         // Walk through selected set and get the Entries based on the saved ids.
         return viewAdapter.getCurrentList().mapNotNull {
             if (it is Track && viewAdapter.isSelected(it.longId))
@@ -608,20 +615,13 @@ open class TrackCollectionFragment(
 
         when (menuItem.itemId) {
             R.id.song_menu_play_now -> {
-                playNow(false, songs)
+                playNow(MediaPlayerManager.InsertionMode.CLEAR, songs, true)
             }
             R.id.song_menu_play_next -> {
-                downloadHandler.addTracksToMediaController(
-                    songs = songs,
-                    append = true,
-                    playNext = true,
-                    autoPlay = false,
-                    playlistName = navArgs.playlistName,
-                    fragment = this@TrackCollectionFragment
-                )
+                playNow(MediaPlayerManager.InsertionMode.AFTER_CURRENT, songs, true)
             }
             R.id.song_menu_play_last -> {
-                playNow(true, songs)
+                playNow(MediaPlayerManager.InsertionMode.APPEND, songs, true)
             }
             R.id.song_menu_pin -> {
                 downloadBackground(true, songs)

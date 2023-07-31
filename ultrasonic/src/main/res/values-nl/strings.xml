@@ -391,31 +391,31 @@
     <string name="about.webpage">Website openen</string>
     <string name="about.report">Bug melden</string>
     <string name="about.text"><b>Ultrasonic</b> is een gratis, open source muziekstreamingclient voor Android, die gebruikmaakt van servers die compatibel zijn met de Subsonic-api (versie 1.7.0 of hoger).\n\nMet <b>Ultrasonic</b> kun je eenvoudig muziek streamen of downloaden van je computer naar je Android-telefoon met behulp van een met Subsonic compatibele mediaserver. Let op: de Subsonic-serversoftware vereist aanvullende configuratie.\n\nStandaard is Ultrasonic niet ingesteld. Zet je eigen server op en wijzig de serverconfiguratie in die van je eigen.</string>
-    <plurals name="select_album_n_songs">
+    <plurals name="n_songs">
         <item quantity="one">%d nummer</item>
         <item quantity="other">%d nummers</item>
     </plurals>
-    <plurals name="select_album_n_songs_pinned">
+    <plurals name="n_songs_pinned">
         <item quantity="one">%d vast te maken nummer geselecteerd</item>
         <item quantity="other">%d vast te maken nummers geselecteerd</item>
     </plurals>
-    <plurals name="select_album_n_songs_downloaded">
+    <plurals name="n_songs_to_be_downloaded">
         <item quantity="one">%d te downloaden nummer geselecteerd</item>
         <item quantity="other">%d te downloaden nummers geselecteerd</item>
     </plurals>
-    <plurals name="select_album_n_songs_unpinned">
+    <plurals name="n_songs_unpinned">
         <item quantity="one">%d nummer losgemaakt</item>
         <item quantity="other">%d nummers losgemaakt</item>
     </plurals>
-    <plurals name="select_album_n_songs_deleted">
+    <plurals name="n_songs_deleted">
         <item quantity="one">%d nummer verwijderd</item>
         <item quantity="other">%d nummers verwijderd</item>
     </plurals>
-    <plurals name="select_album_n_songs_added">
+    <plurals name="n_songs_added_to_end">
         <item quantity="one">%d nummer toegevoegd aan het einde van afspeelwachtrij</item>
         <item quantity="other">%d nummers toegevoegd aan het einde van afspeelwachtrij</item>
     </plurals>
-    <plurals name="select_album_n_songs_play_next">
+    <plurals name="n_songs_added_after_current">
         <item quantity="one">%d nummer ingevoegd na het huidige nummer</item>
         <item quantity="other">%d nummers ingevoegd na het huidige nummer</item>
     </plurals>

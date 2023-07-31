@@ -347,7 +347,7 @@
     <string name="server_editor.disabled_feature">Одна или несколько функций были отключены, потому что сервер их не поддерживает.\nВы можете запустить этот тест снова в любое время.</string>
     <string name="server_menu.demo">Демо-сервер</string>
 
-    <plurals name="select_album_n_songs">
+    <plurals name="n_songs">
         <item quantity="one">%d песня</item>
         <item quantity="few">%d песни</item>
         <item quantity="many">%d песен</item>

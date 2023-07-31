@@ -368,25 +368,25 @@
 \n通过使用 <b>Ultrasonic</b> 你可以轻松的从你的电脑上的 Subsonic 兼容服务端流式传输或者下载音乐。 Subsonic 服务端与 Ultrasonic 都需要额外的配置才可使用。
 \n
 \n默认情况下，Ultrasonic 并未进行配置，当服务端配置完成后，请确保配置允许客户端连接到你的计算机。</string>
-    <plurals name="select_album_n_songs">
+    <plurals name="n_songs">
         <item quantity="other">%d 首曲目</item>
     </plurals>
-    <plurals name="select_album_n_songs_pinned">
+    <plurals name="n_songs_pinned">
         <item quantity="other">已选择 %d 首歌曲进行固定</item>
     </plurals>
-    <plurals name="select_album_n_songs_downloaded">
+    <plurals name="n_songs_to_be_downloaded">
         <item quantity="other">已选择要下载 %d 首歌曲</item>
     </plurals>
-    <plurals name="select_album_n_songs_unpinned">
+    <plurals name="n_songs_unpinned">
         <item quantity="other">已选择 %d 首歌曲取消固定</item>
     </plurals>
-    <plurals name="select_album_n_songs_deleted">
+    <plurals name="n_songs_deleted">
         <item quantity="other">%d 首歌曲被删除</item>
     </plurals>
-    <plurals name="select_album_n_songs_added">
+    <plurals name="n_songs_added_to_end">
         <item quantity="other">已将 %d 首歌曲添加到播放队列的末尾</item>
     </plurals>
-    <plurals name="select_album_n_songs_play_next">
+    <plurals name="n_songs_added_after_current">
         <item quantity="other">在当前歌曲之后插入了 %d 首歌曲</item>
     </plurals>
     <!-- Subsonic api errors -->

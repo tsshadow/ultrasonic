@@ -98,7 +98,7 @@ class HeaderViewBinder(
         holder.yearView.text = year
 
         val songs = resources.getQuantityString(
-            R.plurals.select_album_n_songs, item.childCount,
+            R.plurals.n_songs, item.childCount,
             item.childCount
         )
         holder.songCountView.text = songs
