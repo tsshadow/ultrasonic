@@ -2,7 +2,7 @@
  * This module provides a base for for pure kotlin modules
  */
 apply plugin: 'kotlin'
-apply plugin: 'org.jetbrains.kotlin.kapt'
+apply plugin: 'com.google.devtools.ksp'
 apply from: "${project.rootDir}/gradle_scripts/code_quality.gradle"
 
 sourceSets {
@@ -11,7 +11,6 @@ sourceSets {
     test.java.srcDirs += "${projectDir}/src/integrationTest/kotlin"
     test.resources.srcDirs += "${projectDir}/src/integrationTest/resources"
 }
-
 
 dependencies {
     api libs.kotlinStdlib

@@ -1,3 +1,7 @@
+plugins {
+    alias libs.plugins.ksp
+}
+
 apply from: bootstrap.kotlinModule
 
 dependencies {
