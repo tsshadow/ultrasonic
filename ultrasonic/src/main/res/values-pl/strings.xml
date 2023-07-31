@@ -307,7 +307,7 @@
     <string name="server_menu.move_down">Przesuń się w dół</string>
     <string name="server_editor.authentication">Authentication</string>
     <string name="server_editor.advanced">Ustawienia zaawansowane</string>
-    <plurals name="select_album_n_songs">
+    <plurals name="n_songs">
         <item quantity="one">%d utwór</item>
         <item quantity="few">%d utwory</item>
         <item quantity="many">%d utworów</item>
@@ -356,7 +356,7 @@
     <string name="language.hu">Węgierski</string>
     <string name="settings.debug.log_summary">Zapisanych jest %1$s plików z logami, które zajmują ~%2$s MB miejsca w katalogu %3$s. Czy chcesz je zachować\?</string>
     <string name="buttons.previous">Poprzednie</string>
-    <plurals name="select_album_n_songs_deleted">
+    <plurals name="n_songs_deleted">
         <item quantity="one">Usunięto %d utwór</item>
         <item quantity="few">Usunięto %d utwory</item>
         <item quantity="many">Usunięto %d utworów</item>
@@ -403,20 +403,20 @@
     <string name="settings.wifi_required_title">Pobieraj tylko przez Wi-Fi</string>
     <string name="settings.sharing_always_ask_for_details_summary">Zawsze pytaj o opis i czas wygaśnięcia podczas tworzenia udostępnienia na serwerze</string>
     <string name="settings.debug.log_delete">Usuń pliki</string>
-    <plurals name="select_album_n_songs_pinned">
+    <plurals name="n_songs_pinned">
         <item quantity="one">%d utwór zaznaczony do przypięcia</item>
         <item quantity="few">%d utwory zaznaczone do przypięcia</item>
         <item quantity="many">%d utworów zaznaczonych do przypięcia</item>
         <item quantity="other">%d utworów zaznaczonych do przypięcia</item>
     </plurals>
-    <plurals name="select_album_n_songs_downloaded">
+    <plurals name="n_songs_to_be_downloaded">
         <item quantity="one">%d utworów zaznaczonych do pobrania</item>
         <item quantity="few">%d utwory zaznaczone do pobrania</item>
         <item quantity="many">%d utworów zaznaczonych do pobrania</item>
         <item quantity="other">%d utworów zaznaczonych do pobrania</item>
     </plurals>
     <string name="about.webpage">Odwiedź stronę internetową</string>
-    <plurals name="select_album_n_songs_unpinned">
+    <plurals name="n_songs_unpinned">
         <item quantity="one">Odpięto %d utwór</item>
         <item quantity="few">Odpięto %d utwory</item>
         <item quantity="many">Odpięto %d utworów</item>
@@ -446,13 +446,13 @@
     <string name="list_view">Lista</string>
     <string name="grid_view">Okładka</string>
     <string name="settings.use_hw_offload_description">Spróbuj odtworzyć pliki multimedialne za pomocą układu dekodującego w telefonie. Może to zmniejszyć zużycie baterii!</string>
-    <plurals name="select_album_n_songs_added">
+    <plurals name="n_songs_added_to_end">
         <item quantity="one">Dodano %d utwór na koniec kolejki odtwarzania</item>
         <item quantity="few">Dodano %d utwory na koniec kolejki odtwarzania</item>
         <item quantity="many">Dodano %d utworów na koniec kolejki odtwarzania</item>
         <item quantity="other">Dodano %d utworów na koniec kolejki odtwarzania</item>
     </plurals>
-    <plurals name="select_album_n_songs_play_next">
+    <plurals name="n_songs_added_after_current">
         <item quantity="one">Wstawiono %d utwór po bieżącym utworze</item>
         <item quantity="few">Wstawiono %d utwory po bieżącym utworze</item>
         <item quantity="many">Wstawiono %d utworów po bieżącym utworze</item>

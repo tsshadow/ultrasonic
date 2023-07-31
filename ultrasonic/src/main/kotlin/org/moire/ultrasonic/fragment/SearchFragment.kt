@@ -253,7 +253,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             insertionMode = MediaPlayerManager.InsertionMode.APPEND
         )
         mediaPlayerManager.play(mediaPlayerManager.mediaItemCount - 1)
-        toast(context, resources.getQuantityString(R.plurals.select_album_n_songs_added, 1, 1))
+        toast(context, resources.getQuantityString(R.plurals.n_songs_added_to_end, 1, 1))
     }
 
     private fun onVideoSelected(track: Track) {
@@ -307,8 +307,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 songs.add(item)
                 downloadHandler.addTracksToMediaController(
                     songs = songs,
-                    append = false,
-                    playNext = false,
+                    insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
                     autoPlay = true,
                     shuffle = false,
                     fragment = this,
@@ -319,8 +318,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 songs.add(item)
                 downloadHandler.addTracksToMediaController(
                     songs = songs,
-                    append = true,
-                    playNext = true,
+                    insertionMode = MediaPlayerManager.InsertionMode.AFTER_CURRENT,
                     autoPlay = false,
                     shuffle = false,
                     fragment = this,
@@ -331,8 +329,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 songs.add(item)
                 downloadHandler.addTracksToMediaController(
                     songs = songs,
-                    append = true,
-                    playNext = false,
+                    insertionMode = MediaPlayerManager.InsertionMode.APPEND,
                     autoPlay = false,
                     shuffle = false,
                     fragment = this,
@@ -344,7 +341,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 toast(
                     context,
                     resources.getQuantityString(
-                        R.plurals.select_album_n_songs_pinned,
+                        R.plurals.n_songs_pinned,
                         songs.size,
                         songs.size
                     )
@@ -356,7 +353,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 toast(
                     context,
                     resources.getQuantityString(
-                        R.plurals.select_album_n_songs_downloaded,
+                        R.plurals.n_songs_to_be_downloaded,
                         songs.size,
                         songs.size
                     )
@@ -368,7 +365,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
                 toast(
                     context,
                     resources.getQuantityString(
-                        R.plurals.select_album_n_songs_unpinned,
+                        R.plurals.n_songs_unpinned,
                         songs.size,
                         songs.size
                     )

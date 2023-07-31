@@ -388,37 +388,37 @@
     <string name="about.webpage">Visitar a página web</string>
     <string name="about.report">Reportar um erro</string>
     <string name="about.text"><b>Ultrasonic</b> é um cliente gratuito e open-source para Android de streaming de música para API de servidores compatíveis com Subsonic (version 1.7.0 ou maior).\n\nCom <b>Ultrasonic</b> você pode facilmente reproduzir online ou baixar música de seu computador doméstico para seu telefone Android usando um servidor de mídia compatível com Subsonic. O software do servidor Subsonic necessita uma configuração independente do Ultrasonic.\n\nPor padrão, o servidor Ultrasonic não é configurado. Uma vez que você configurou seu próprio servidor, altere a configuração no Ultrasonic para poder conectá-lo.</string>
-    <plurals name="select_album_n_songs">
+    <plurals name="n_songs">
         <item quantity="one">%d música</item>
         <item quantity="many">%d músicas</item>
         <item quantity="other">%d músicas</item>
     </plurals>
-    <plurals name="select_album_n_songs_pinned">
+    <plurals name="n_songs_pinned">
         <item quantity="one">%d música selecionada para ser fixada</item>
         <item quantity="many">%d músicas selecionadas para serem fixadas</item>
         <item quantity="other">%d músicas selecionadas para serem fixadas</item>
     </plurals>
-    <plurals name="select_album_n_songs_downloaded">
+    <plurals name="n_songs_to_be_downloaded">
         <item quantity="one">%d música selecionada para ser baixada</item>
         <item quantity="many">%d músicas selecionadas para serem baixadas</item>
         <item quantity="other">%d músicas selecionadas para serem baixadas</item>
     </plurals>
-    <plurals name="select_album_n_songs_unpinned">
+    <plurals name="n_songs_unpinned">
         <item quantity="one">%d música desfixada</item>
         <item quantity="many">%d músicas desfixadas</item>
         <item quantity="other">%d músicas desfixadas</item>
     </plurals>
-    <plurals name="select_album_n_songs_deleted">
+    <plurals name="n_songs_deleted">
         <item quantity="one">%d música excluída</item>
         <item quantity="many">%d músicas excluídas</item>
         <item quantity="other">%d músicas excluídas</item>
     </plurals>
-    <plurals name="select_album_n_songs_added">
+    <plurals name="n_songs_added_to_end">
         <item quantity="one">%d música adicionada ao final da playlist</item>
         <item quantity="many">%d músicas adicionadas ao final da playlist</item>
         <item quantity="other">%d músicas adicionadas ao final da playlist</item>
     </plurals>
-    <plurals name="select_album_n_songs_play_next">
+    <plurals name="n_songs_added_after_current">
         <item quantity="one">%d música adicionada após a atual</item>
         <item quantity="many">%d músicas adicionadas após a atual</item>
         <item quantity="other">%d músicas adicionadas após a atual</item>

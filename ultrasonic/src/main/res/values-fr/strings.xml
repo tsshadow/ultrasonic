@@ -372,7 +372,7 @@
     <string name="about.webpage">Visiter la page web</string>
     <string name="about.report">Signaler un bug</string>
     <string name="about.text"><b>Ultrasonic</b> est un client Android de streaming musical gratuit et open-source pour les serveurs compatibles avec l\'API Subsonic (version 1.7.0 ou supérieure). Avec <b>Ultrasonic</b>, vous pouvez facilement diffuser ou télécharger de la musique depuis votre ordinateur personnel vers votre téléphone Android en utilisant votre serveur multimédia compatible Subsonic. Le logiciel du serveur Subsonic nécessite une configuration supplémentaire distincte d\'Ultrasonic. Par défaut, Ultrasonic n\'est pas configuré. Une fois que vous avez mis en place votre propre serveur, veuillez modifier la configuration du serveur afin qu\'il se connecte à votre ordinateur.</string>
-    <plurals name="select_album_n_songs">
+    <plurals name="n_songs">
         <item quantity="one">%d titre</item>
         <item quantity="many">%d titres</item>
         <item quantity="other">%d titres</item>
@@ -400,12 +400,12 @@
     <string name="settings.preload_50">50 morceaux</string>
     <string name="chat.user_avatar">Image d\'avatar</string>
     <string name="settings.theme_day_night">Jour et nuit</string>
-    <plurals name="select_album_n_songs_added">
+    <plurals name="n_songs_added_to_end">
         <item quantity="one">%d morceau ajouté à la file d\'attente de fin de lecture</item>
         <item quantity="many">"%d morceaux  ajoutés à la file d\'attente de fin de lecture"</item>
         <item quantity="other">%d morceaux ajoutés à la file d\'attente de fin de lecture</item>
     </plurals>
-    <plurals name="select_album_n_songs_deleted">
+    <plurals name="n_songs_deleted">
         <item quantity="one">%d morceau supprimé</item>
         <item quantity="many">%d morceaux supprimés</item>
         <item quantity="other">%d morceaux supprimés</item>
@@ -429,22 +429,22 @@
     <string name="settings.parallel_downloads">Combien de chansons peuvent être téléchargées en parallèle</string>
     <string name="settings.show_now_playing_details_summary">Afficher plus de détails sur la chanson dans la lecture en cours (genre, année, débit)</string>
     <string name="list_view">Liste</string>
-    <plurals name="select_album_n_songs_downloaded">
+    <plurals name="n_songs_to_be_downloaded">
         <item quantity="one">%d chanson sélectionnée pour téléchargement</item>
         <item quantity="many">%d chansons sélectionnées pour téléchargement</item>
         <item quantity="other">%d chansons sélectionnées pour téléchargement</item>
     </plurals>
-    <plurals name="select_album_n_songs_unpinned">
+    <plurals name="n_songs_unpinned">
         <item quantity="one">%d chanson désépinglée</item>
         <item quantity="many">%d chansons désépinglées</item>
         <item quantity="other">%d chansons désépinglées</item>
     </plurals>
-    <plurals name="select_album_n_songs_play_next">
+    <plurals name="n_songs_added_after_current">
         <item quantity="one">%d chanson insérée après la chanson en cours</item>
         <item quantity="many">%d chansons insérées après la chanson en cours</item>
         <item quantity="other">%d chansons insérées après la chanson en cours</item>
     </plurals>
-    <plurals name="select_album_n_songs_pinned">
+    <plurals name="n_songs_pinned">
         <item quantity="one">%d chanson sélectionnée à épingler</item>
         <item quantity="many">%d chansons sélectionnées à épingler</item>
         <item quantity="other">%d chansons sélectionnées à épingler</item>

@@ -20,6 +20,7 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.GenericEntry
 import org.moire.ultrasonic.domain.Identifiable
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.subsonic.DownloadAction
@@ -133,27 +134,24 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
                     downloadHandler.fetchTracksAndAddToController(
                         fragment,
                         item.id,
-                        append = false,
+                        insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
                         autoPlay = true,
-                        playNext = false,
                         isArtist = isArtist
                     )
                 R.id.menu_play_next ->
                     downloadHandler.fetchTracksAndAddToController(
                         fragment,
                         item.id,
-                        append = false,
+                        insertionMode = MediaPlayerManager.InsertionMode.AFTER_CURRENT,
                         autoPlay = true,
-                        playNext = true,
                         isArtist = isArtist
                     )
                 R.id.menu_play_last ->
                     downloadHandler.fetchTracksAndAddToController(
                         fragment,
                         item.id,
-                        append = true,
+                        insertionMode = MediaPlayerManager.InsertionMode.APPEND,
                         autoPlay = false,
-                        playNext = false,
                         isArtist = isArtist
                     )
                 R.id.menu_pin ->

@@ -402,31 +402,35 @@
     <string name="about.webpage.url" translatable="false">https://ultrasonic.gitlab.io/</string>
     <string name="about.report.url" translatable="false">https://gitlab.com/ultrasonic/ultrasonic/issues</string>
 
-    <plurals name="select_album_n_songs">
+    <plurals name="n_songs">
         <item quantity="one">%d song</item>
         <item quantity="other">%d songs</item>
     </plurals>
-    <plurals name="select_album_n_songs_pinned">
+    <plurals name="n_songs_pinned">
         <item quantity="one">%d song selected to be pinned</item>
         <item quantity="other">%d songs selected to be pinned</item>
     </plurals>
-    <plurals name="select_album_n_songs_downloaded">
+    <plurals name="n_songs_to_be_downloaded">
         <item quantity="one">%d song selected to be downloaded</item>
         <item quantity="other">%d songs selected to be downloaded</item>
     </plurals>
-    <plurals name="select_album_n_songs_unpinned">
+    <plurals name="n_songs_unpinned">
         <item quantity="one">%d song unpinned</item>
         <item quantity="other">%d songs unpinned</item>
     </plurals>
-    <plurals name="select_album_n_songs_deleted">
+    <plurals name="n_songs_deleted">
         <item quantity="one">%d song deleted</item>
         <item quantity="other">%d songs deleted</item>
     </plurals>
-    <plurals name="select_album_n_songs_added">
+    <plurals name="n_songs_added_play_now">
+        <item quantity="one">%d song added to the play queue</item>
+        <item quantity="other">%d songs added to the play queue</item>
+    </plurals>
+    <plurals name="n_songs_added_to_end">
         <item quantity="one">%d song added to the end of play queue</item>
         <item quantity="other">%d songs added to the end of play queue</item>
     </plurals>
-    <plurals name="select_album_n_songs_play_next">
+    <plurals name="n_songs_added_after_current">
         <item quantity="one">%d song inserted after current song</item>
         <item quantity="other">%d songs inserted after current song</item>
     </plurals>
