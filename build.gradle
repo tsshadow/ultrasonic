@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     apply from: 'gradle/versions.gradle'
@@ -10,6 +12,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
@@ -26,19 +29,27 @@ allprojects {
     buildscript {
         repositories {
             mavenCentral()
+            gradlePluginPortal()
             google()
         }
     }
 
     repositories {
         mavenCentral()
+        gradlePluginPortal()
         google()
     }
 
     // Set Kotlin JVM target to the same for all subprojects
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    tasks.withType(KotlinCompile).configureEach {
         kotlinOptions {
             jvmTarget = "17"
+        }
+    }
+
+    tasks.withType(JavaCompile).tap {
+        configureEach {
+            options.compilerArgs.add("-Xlint:deprecation")
         }
     }
 }

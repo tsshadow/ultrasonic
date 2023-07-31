@@ -1,11 +1,14 @@
+plugins {
+    alias libs.plugins.ksp
+}
+
 apply from: bootstrap.androidModule
-apply plugin: 'kotlin-kapt'
 
 dependencies {
     implementation libs.core
     implementation libs.roomRuntime
     implementation libs.roomKtx
-    kapt libs.room
+    ksp libs.room
 }
 
 android {

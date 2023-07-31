@@ -17,6 +17,7 @@ constraintLayout       = "2.1.4"
 multidex               = "2.0.1"
 room                   = "2.5.2"
 kotlin                 = "1.8.22"
+ksp                    = "1.8.22-1.0.11"
 kotlinxCoroutines      = "1.7.3"
 viewModelKtx           = "2.6.1"
 swipeRefresh           = "1.1.0"
@@ -100,3 +101,6 @@ kluentAndroid           = { module = "org.amshove.kluent:kluent-android", versio
 mockWebServer           = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
 apacheCodecs            = { module = "commons-codec:commons-codec", version.ref = "apacheCodecs" }
 robolectric             = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+
+[plugins]
+ksp                     = { id = "com.google.devtools.ksp", version.ref = "ksp" }
