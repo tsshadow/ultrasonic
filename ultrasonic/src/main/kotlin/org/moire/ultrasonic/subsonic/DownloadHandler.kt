@@ -169,7 +169,7 @@ class DownloadHandler(
         )
 
         if (Settings.shouldTransitionOnPlayback &&
-            (insertionMode == MediaPlayerManager.InsertionMode.CLEAR || autoPlay)
+            insertionMode == MediaPlayerManager.InsertionMode.CLEAR
         ) {
             fragment.findNavController().popBackStack(R.id.playerFragment, true)
             fragment.findNavController().navigate(R.id.playerFragment)

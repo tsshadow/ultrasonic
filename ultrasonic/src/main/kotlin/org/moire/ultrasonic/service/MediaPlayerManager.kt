@@ -460,7 +460,7 @@ class MediaPlayerManager(
         // We can't just use play(0,0) then all random playlists will start with the first track.
         // Additionally the shuffle order becomes clear on after some time, so we need to wait for
         // the right event, and can start playback only then.
-        if (autoPlay) {
+        if (autoPlay && controller?.isPlaying != true) {
             if (isShufflePlayEnabled) {
                 deferredPlay = {
                     val start = controller?.currentTimeline
