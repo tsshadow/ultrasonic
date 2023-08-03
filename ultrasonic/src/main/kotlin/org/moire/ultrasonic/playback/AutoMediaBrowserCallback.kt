@@ -7,16 +7,16 @@
 
 package org.moire.ultrasonic.playback
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_ALBUMS
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_ARTISTS
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_MIXED
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_PLAYLISTS
-import androidx.media3.common.MediaMetadata.FOLDER_TYPE_TITLES
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ARTISTS
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MIXED
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_PLAYLIST
+import androidx.media3.common.Player
 import androidx.media3.common.Rating
 import androidx.media3.common.StarRating
 import androidx.media3.session.CommandButton
@@ -45,7 +45,6 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RatingManager
 import org.moire.ultrasonic.util.Util
@@ -96,11 +95,8 @@ const val PLAY_COMMAND = "play "
  * MediaBrowserService implementation for e.g. Android Auto
  */
 @Suppress("TooManyFunctions", "LargeClass", "UnusedPrivateMember")
-@SuppressLint("UnsafeOptInUsageError")
-class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
-    MediaLibraryService.MediaLibrarySession.Callback, KoinComponent {
+class AutoMediaBrowserCallback : MediaLibraryService.MediaLibrarySession.Callback, KoinComponent {
 
-    private val mediaPlayerManager by inject<MediaPlayerManager>()
     private val activeServerProvider: ActiveServerProvider by inject()
 
     private val serviceJob = SupervisorJob()
@@ -116,22 +112,59 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
     private val isOffline get() = ActiveServerProvider.isOffline()
     private val musicFolderId get() = activeServerProvider.getActiveServer().musicFolderId
 
-    private var customCommands: List<CommandButton>
-    internal var customLayout = ImmutableList.of<CommandButton>()
+    private val placeholderButton = getPlaceholderButton()
+
+    private var heartIsCurrentlyOn = false
+
+    // This button is used for an unstarred track, and its action will star the track
+    private val heartButtonToggleOn =
+        getHeartCommandButton(
+            SessionCommand(
+                PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_ON,
+                Bundle.EMPTY
+            ),
+            willHeart = true
+        )
+
+    // This button is used for an starred track, and its action will star the track
+    private val heartButtonToggleOff =
+        getHeartCommandButton(
+            SessionCommand(
+                PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_OFF,
+                Bundle.EMPTY
+            ),
+            willHeart = false
+        )
+
+    private val shuffleButton: CommandButton
+
+    private val repeatOffButton: CommandButton
+    private val repeatOneButton: CommandButton
+    private val repeatAllButton: CommandButton
+
+    private val allCustomCommands: List<CommandButton>
+
+    val defaultCustomCommands: List<CommandButton>
 
     init {
-        customCommands =
-            listOf(
-                // This button is used for an unstarred track, and its action will star the track
-                getHeartCommandButton(
-                    SessionCommand(PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_ON, Bundle.EMPTY)
-                ),
-                // This button is used for an starred track, and its action will unstar the track
-                getHeartCommandButton(
-                    SessionCommand(PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_OFF, Bundle.EMPTY)
-                )
-            )
-        customLayout = ImmutableList.of(customCommands[0])
+        val shuffleCommand = SessionCommand(PlaybackService.CUSTOM_COMMAND_SHUFFLE, Bundle.EMPTY)
+        shuffleButton = getShuffleCommandButton(shuffleCommand)
+
+        val repeatCommand = SessionCommand(PlaybackService.CUSTOM_COMMAND_REPEAT_MODE, Bundle.EMPTY)
+        repeatOffButton = getRepeatModeButton(repeatCommand, Player.REPEAT_MODE_OFF)
+        repeatOneButton = getRepeatModeButton(repeatCommand, Player.REPEAT_MODE_ONE)
+        repeatAllButton = getRepeatModeButton(repeatCommand, Player.REPEAT_MODE_ALL)
+
+        allCustomCommands = listOf(
+            heartButtonToggleOn,
+            heartButtonToggleOff,
+            shuffleButton,
+            repeatOffButton,
+            repeatOneButton,
+            repeatAllButton
+        )
+
+        defaultCustomCommands = listOf(heartButtonToggleOn, shuffleButton, repeatOffButton)
     }
 
     /**
@@ -175,8 +208,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     "Root Folder",
                     MEDIA_ROOT_ID,
                     isPlayable = false,
-                    folderType = FOLDER_TYPE_MIXED,
-                    mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
+                    isBrowsable = true,
+                    mediaType = MEDIA_TYPE_FOLDER_MIXED
                 ),
                 params
             )
@@ -188,13 +221,16 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
         controller: MediaSession.ControllerInfo
     ): MediaSession.ConnectionResult {
         Timber.i("onConnect")
+
         val connectionResult = super.onConnect(session, controller)
         val availableSessionCommands = connectionResult.availableSessionCommands.buildUpon()
 
-        for (commandButton in customCommands) {
+        for (commandButton in allCustomCommands) {
             // Add custom command to available session commands.
             commandButton.sessionCommand?.let { availableSessionCommands.add(it) }
         }
+
+        session.player.repeatMode = Player.REPEAT_MODE_ALL
 
         return MediaSession.ConnectionResult.accept(
             availableSessionCommands.build(),
@@ -203,26 +239,72 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
     }
 
     override fun onPostConnect(session: MediaSession, controller: MediaSession.ControllerInfo) {
-        if (!customLayout.isEmpty() && controller.controllerVersion != 0) {
+        if (controller.controllerVersion != 0) {
             // Let Media3 controller (for instance the MediaNotificationProvider)
             // know about the custom layout right after it connected.
-            session.setCustomLayout(customLayout)
+            with(session) {
+                setCustomLayout(session.buildCustomCommands(canShuffle = canShuffle()))
+            }
         }
     }
 
-    private fun getHeartCommandButton(sessionCommand: SessionCommand): CommandButton {
-        val willHeart =
-            (sessionCommand.customAction == PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_ON)
-        return CommandButton.Builder()
-            .setDisplayName("Love")
+    private fun getHeartCommandButton(sessionCommand: SessionCommand, willHeart: Boolean) =
+        CommandButton.Builder()
+            .setDisplayName(
+                if (willHeart)
+                    "Love"
+                else
+                    "Dislike"
+            )
             .setIconResId(
-                if (willHeart) R.drawable.ic_star_hollow
-                else R.drawable.ic_star_full
+                if (willHeart)
+                    R.drawable.ic_star_hollow
+                else
+                    R.drawable.ic_star_full
             )
             .setSessionCommand(sessionCommand)
             .setEnabled(true)
             .build()
-    }
+
+    private fun getShuffleCommandButton(sessionCommand: SessionCommand) =
+        CommandButton.Builder()
+            .setDisplayName("Shuffle")
+            .setIconResId(R.drawable.media_shuffle)
+            .setSessionCommand(sessionCommand)
+            .setEnabled(true)
+            .build()
+
+    private fun getPlaceholderButton() = CommandButton.Builder()
+        .setDisplayName("Placeholder")
+        .setIconResId(android.R.color.transparent)
+        .setSessionCommand(
+            SessionCommand(
+                PlaybackService.CUSTOM_COMMAND_PLACEHOLDER,
+                Bundle.EMPTY
+            )
+        )
+        .setEnabled(false)
+        .build()
+
+    private fun getRepeatModeButton(sessionCommand: SessionCommand, repeatMode: Int) =
+        CommandButton.Builder()
+            .setDisplayName(
+                when (repeatMode) {
+                    Player.REPEAT_MODE_ONE -> "Repeat One"
+                    Player.REPEAT_MODE_ALL -> "Repeat All"
+                    else -> "Repeat None"
+                }
+            )
+            .setIconResId(
+                when (repeatMode) {
+                    Player.REPEAT_MODE_ONE -> R.drawable.media_repeat_one
+                    Player.REPEAT_MODE_ALL -> R.drawable.media_repeat_all
+                    else -> R.drawable.media_repeat_off
+                }
+            )
+            .setSessionCommand(sessionCommand)
+            .setEnabled(true)
+            .build()
 
     override fun onGetItem(
         session: MediaLibraryService.MediaLibrarySession,
@@ -266,18 +348,32 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
         customCommand: SessionCommand,
         args: Bundle
     ): ListenableFuture<SessionResult> {
-        Timber.i("onCustomCommand")
+        Timber.i("onCustomCommand %s", customCommand.customAction)
         var customCommandFuture: ListenableFuture<SessionResult>? = null
 
         when (customCommand.customAction) {
             PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_ON -> {
                 customCommandFuture = onSetRating(session, controller, HeartRating(true))
-                updateCustomHeartButton(session, true)
+                updateCustomHeartButton(session, isHeart = true)
             }
+
             PlaybackService.CUSTOM_COMMAND_TOGGLE_HEART_OFF -> {
                 customCommandFuture = onSetRating(session, controller, HeartRating(false))
-                updateCustomHeartButton(session, false)
+                updateCustomHeartButton(session, isHeart = false)
             }
+
+            PlaybackService.CUSTOM_COMMAND_SHUFFLE -> {
+                customCommandFuture = Futures.immediateFuture(SessionResult(RESULT_SUCCESS))
+                shuffleCurrentPlaylist(session.player)
+            }
+
+            PlaybackService.CUSTOM_COMMAND_REPEAT_MODE -> {
+                customCommandFuture = Futures.immediateFuture(SessionResult(RESULT_SUCCESS))
+
+                session.player.setNextRepeatMode()
+                session.updateCustomCommands()
+            }
+
             else -> {
                 Timber.d(
                     "CustomCommand not recognized %s with extra %s",
@@ -286,16 +382,23 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 )
             }
         }
-        if (customCommandFuture != null)
-            return customCommandFuture
-        return super.onCustomCommand(session, controller, customCommand, args)
+
+        return customCommandFuture
+            ?: super.onCustomCommand(
+                session,
+                controller,
+                customCommand,
+                args
+            )
     }
+
     override fun onSetRating(
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
         rating: Rating
     ): ListenableFuture<SessionResult> {
         val mediaItem = session.player.currentMediaItem
+
         if (mediaItem != null) {
             if (rating is HeartRating) {
                 mediaItem.toTrack().starred = rating.isHeart
@@ -309,6 +412,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 rating
             )
         }
+
         return super.onSetRating(session, controller, rating)
     }
 
@@ -378,6 +482,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
     private fun onAddLegacyAutoItems(
         mediaItems: MutableList<MediaItem>
     ): ListenableFuture<List<MediaItem>> {
+        Timber.i("onAddLegacyAutoItems %s", mediaItems.first().mediaId)
+
         val mediaIdParts = mediaItems.first().mediaId.split('|')
 
         val tracks = when (mediaIdParts.first()) {
@@ -385,10 +491,12 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
                 mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
             )
+
             MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[1], mediaIdParts[2])
             MEDIA_ALBUM_SONG_ITEM -> playAlbumSong(
                 mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
             )
+
             MEDIA_SONG_STARRED_ID -> playStarredSongs()
             MEDIA_SONG_STARRED_ITEM -> playStarredSong(mediaIdParts[1])
             MEDIA_SONG_RANDOM_ID -> playRandomSongs()
@@ -400,57 +508,59 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             MEDIA_PODCAST_EPISODE_ITEM -> playPodcastEpisode(
                 mediaIdParts[1], mediaIdParts[2]
             )
+
             MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
             else -> null
         }
 
-        if (tracks != null) {
-            return Futures.immediateFuture(
-                tracks.map { track -> track.toMediaItem() }
-                    .toMutableList()
-            )
-        }
-
-        // Fallback to the original list
-        return Futures.immediateFuture(mediaItems)
+        return tracks
+            ?.let {
+                Futures.immediateFuture(
+                    it.map { track -> track.toMediaItem() }
+                        .toMutableList()
+                )
+            }
+            ?: Futures.immediateFuture(mediaItems)
     }
 
     @Suppress("ReturnCount", "ComplexMethod")
-    fun onLoadChildren(
+    private fun onLoadChildren(
         parentId: String,
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("AutoMediaBrowserService onLoadChildren called. ParentId: %s", parentId)
 
         val parentIdParts = parentId.split('|')
 
-        when (parentIdParts.first()) {
-            MEDIA_ROOT_ID -> return getRootItems()
-            MEDIA_LIBRARY_ID -> return getLibrary()
-            MEDIA_ARTIST_ID -> return getArtists()
-            MEDIA_ARTIST_SECTION -> return getArtists(parentIdParts[1])
-            MEDIA_ALBUM_ID -> return getAlbums(AlbumListType.SORTED_BY_NAME)
-            MEDIA_ALBUM_PAGE_ID -> return getAlbums(
+        return when (parentIdParts.first()) {
+            MEDIA_ROOT_ID -> getRootItems()
+            MEDIA_LIBRARY_ID -> getLibrary()
+            MEDIA_ARTIST_ID -> getArtists()
+            MEDIA_ARTIST_SECTION -> getArtists(parentIdParts[1])
+            MEDIA_ALBUM_ID -> getAlbums(AlbumListType.SORTED_BY_NAME)
+            MEDIA_ALBUM_PAGE_ID -> getAlbums(
                 AlbumListType.fromName(parentIdParts[1]), parentIdParts[2].toInt()
             )
-            MEDIA_PLAYLIST_ID -> return getPlaylists()
-            MEDIA_ALBUM_FREQUENT_ID -> return getAlbums(AlbumListType.FREQUENT)
-            MEDIA_ALBUM_NEWEST_ID -> return getAlbums(AlbumListType.NEWEST)
-            MEDIA_ALBUM_RECENT_ID -> return getAlbums(AlbumListType.RECENT)
-            MEDIA_ALBUM_RANDOM_ID -> return getAlbums(AlbumListType.RANDOM)
-            MEDIA_ALBUM_STARRED_ID -> return getAlbums(AlbumListType.STARRED)
-            MEDIA_SONG_RANDOM_ID -> return getRandomSongs()
-            MEDIA_SONG_STARRED_ID -> return getStarredSongs()
-            MEDIA_SHARE_ID -> return getShares()
-            MEDIA_BOOKMARK_ID -> return getBookmarks()
-            MEDIA_PODCAST_ID -> return getPodcasts()
-            MEDIA_PLAYLIST_ITEM -> return getPlaylist(parentIdParts[1], parentIdParts[2])
-            MEDIA_ARTIST_ITEM -> return getAlbumsForArtist(
+
+            MEDIA_PLAYLIST_ID -> getPlaylists()
+            MEDIA_ALBUM_FREQUENT_ID -> getAlbums(AlbumListType.FREQUENT)
+            MEDIA_ALBUM_NEWEST_ID -> getAlbums(AlbumListType.NEWEST)
+            MEDIA_ALBUM_RECENT_ID -> getAlbums(AlbumListType.RECENT)
+            MEDIA_ALBUM_RANDOM_ID -> getAlbums(AlbumListType.RANDOM)
+            MEDIA_ALBUM_STARRED_ID -> getAlbums(AlbumListType.STARRED)
+            MEDIA_SONG_RANDOM_ID -> getRandomSongs()
+            MEDIA_SONG_STARRED_ID -> getStarredSongs()
+            MEDIA_SHARE_ID -> getShares()
+            MEDIA_BOOKMARK_ID -> getBookmarks()
+            MEDIA_PODCAST_ID -> getPodcasts()
+            MEDIA_PLAYLIST_ITEM -> getPlaylist(parentIdParts[1], parentIdParts[2])
+            MEDIA_ARTIST_ITEM -> getAlbumsForArtist(
                 parentIdParts[1], parentIdParts[2]
             )
-            MEDIA_ALBUM_ITEM -> return getSongsForAlbum(parentIdParts[1], parentIdParts[2])
-            MEDIA_SHARE_ITEM -> return getSongsForShare(parentIdParts[1])
-            MEDIA_PODCAST_ITEM -> return getPodcastEpisodes(parentIdParts[1])
-            else -> return Futures.immediateFuture(LibraryResult.ofItemList(listOf(), null))
+
+            MEDIA_ALBUM_ITEM -> getSongsForAlbum(parentIdParts[1], parentIdParts[2])
+            MEDIA_SHARE_ITEM -> getSongsForShare(parentIdParts[1])
+            MEDIA_PODCAST_ITEM -> getPodcastEpisodes(parentIdParts[1])
+            else -> Futures.immediateFuture(LibraryResult.ofItemList(listOf(), null))
         }
     }
 
@@ -483,8 +593,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     mediaItems.add(
                         album.title ?: "",
                         listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
-                            .joinToString("|"),
-                        FOLDER_TYPE_ALBUMS
+                            .joinToString("|")
                     )
                 }
 
@@ -534,10 +643,12 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
                 mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
             )
+
             MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[1], mediaIdParts[2])
             MEDIA_ALBUM_SONG_ITEM -> playAlbumSong(
                 mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
             )
+
             MEDIA_SONG_STARRED_ID -> playStarredSongs()
             MEDIA_SONG_STARRED_ITEM -> playStarredSong(mediaIdParts[1])
             MEDIA_SONG_RANDOM_ID -> playRandomSongs()
@@ -549,6 +660,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             MEDIA_PODCAST_EPISODE_ITEM -> playPodcastEpisode(
                 mediaIdParts[1], mediaIdParts[2]
             )
+
             MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
             else -> {
                 listOf()
@@ -573,7 +685,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 R.string.music_library_label,
                 MEDIA_LIBRARY_ID,
                 null,
-                folderType = FOLDER_TYPE_MIXED,
+                isBrowsable = true,
+                mediaType = MEDIA_TYPE_FOLDER_MIXED,
                 icon = R.drawable.ic_library
             )
 
@@ -581,7 +694,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             R.string.main_artists_title,
             MEDIA_ARTIST_ID,
             null,
-            folderType = FOLDER_TYPE_ARTISTS,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_FOLDER_ARTISTS,
             icon = R.drawable.ic_artist
         )
 
@@ -590,7 +704,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 R.string.main_albums_title,
                 MEDIA_ALBUM_ID,
                 null,
-                folderType = FOLDER_TYPE_ALBUMS,
+                isBrowsable = true,
+                mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
                 icon = R.drawable.ic_menu_browse
             )
 
@@ -598,7 +713,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             R.string.playlist_label,
             MEDIA_PLAYLIST_ID,
             null,
-            folderType = FOLDER_TYPE_PLAYLISTS,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_FOLDER_PLAYLISTS,
             icon = R.drawable.ic_menu_playlists
         )
 
@@ -613,14 +729,16 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             R.string.main_songs_random,
             MEDIA_SONG_RANDOM_ID,
             R.string.main_songs_title,
-            folderType = FOLDER_TYPE_TITLES
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
         )
 
         mediaItems.add(
             R.string.main_songs_starred,
             MEDIA_SONG_STARRED_ID,
             R.string.main_songs_title,
-            folderType = FOLDER_TYPE_TITLES
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
         )
 
         // Albums
@@ -634,28 +752,28 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
             R.string.main_albums_recent,
             MEDIA_ALBUM_RECENT_ID,
             R.string.main_albums_title,
-            folderType = FOLDER_TYPE_ALBUMS
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
         )
 
         mediaItems.add(
             R.string.main_albums_frequent,
             MEDIA_ALBUM_FREQUENT_ID,
             R.string.main_albums_title,
-            folderType = FOLDER_TYPE_ALBUMS
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
         )
 
         mediaItems.add(
             R.string.main_albums_random,
             MEDIA_ALBUM_RANDOM_ID,
             R.string.main_albums_title,
-            folderType = FOLDER_TYPE_ALBUMS
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
         )
 
         mediaItems.add(
             R.string.main_albums_starred,
             MEDIA_ALBUM_STARRED_ID,
             R.string.main_albums_title,
-            folderType = FOLDER_TYPE_ALBUMS
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
         )
 
         // Other
@@ -704,8 +822,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                             index.add(currentSection)
                             mediaItems.add(
                                 currentSection,
-                                listOf(MEDIA_ARTIST_SECTION, currentSection).joinToString("|"),
-                                FOLDER_TYPE_ARTISTS
+                                listOf(MEDIA_ARTIST_SECTION, currentSection).joinToString("|")
                             )
                         }
                     }
@@ -713,8 +830,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     artists.map { artist ->
                         mediaItems.add(
                             artist.name ?: "",
-                            listOf(childMediaId, artist.id, artist.name).joinToString("|"),
-                            FOLDER_TYPE_ARTISTS
+                            listOf(childMediaId, artist.id, artist.name).joinToString("|")
                         )
                     }
                 }
@@ -744,8 +860,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 mediaItems.add(
                     album.title ?: "",
                     listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
-                        .joinToString("|"),
-                    FOLDER_TYPE_ALBUMS
+                        .joinToString("|")
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -768,15 +883,24 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     mediaItems.addPlayAllItem(listOf(MEDIA_ALBUM_ITEM, id, name).joinToString("|"))
 
                 // TODO: Paging is not implemented for songs, is it necessary at all?
-                val items = songs.getTracks().take(DISPLAY_LIMIT)
+                val items = songs.getChildren().take(DISPLAY_LIMIT).toMutableList()
+
+                items.sortWith { o1, o2 ->
+                    if (o1.isDirectory && o2.isDirectory)
+                        (o1.title ?: "").compareTo(o2.title ?: "")
+                    else if (o1.isDirectory)
+                        -1
+                    else
+                        1
+                }
+
                 items.map { item ->
                     if (item.isDirectory)
                         mediaItems.add(
                             item.title ?: "",
-                            listOf(MEDIA_ALBUM_ITEM, item.id, item.name).joinToString("|"),
-                            FOLDER_TYPE_TITLES
+                            listOf(MEDIA_ALBUM_ITEM, item.id, item.name).joinToString("|")
                         )
-                    else
+                    else if (item is Track)
                         mediaItems.add(
                             item.toMediaItem(
                                 listOf(
@@ -789,6 +913,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                         )
                 }
             }
+
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
     }
@@ -822,8 +947,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 mediaItems.add(
                     album.title ?: "",
                     listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
-                        .joinToString("|"),
-                    FOLDER_TYPE_ALBUMS
+                        .joinToString("|")
                 )
             }
 
@@ -851,7 +975,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     playlist.name,
                     listOf(MEDIA_PLAYLIST_ITEM, playlist.id, playlist.name)
                         .joinToString("|"),
-                    FOLDER_TYPE_PLAYLISTS
+                    mediaType = MEDIA_TYPE_PLAYLIST,
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -945,7 +1069,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                 mediaItems.add(
                     podcast.title ?: "",
                     listOf(MEDIA_PODCAST_ITEM, podcast.id).joinToString("|"),
-                    FOLDER_TYPE_MIXED
+                    mediaType = MEDIA_TYPE_FOLDER_MIXED,
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -1048,7 +1172,7 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
                     share.name ?: "",
                     listOf(MEDIA_SHARE_ITEM, share.id)
                         .joinToString("|"),
-                    FOLDER_TYPE_MIXED
+                    mediaType = MEDIA_TYPE_FOLDER_MIXED,
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -1226,14 +1350,16 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
     private fun MutableList<MediaItem>.add(
         title: String,
         mediaId: String,
-        folderType: Int
+        mediaType: Int = MEDIA_TYPE_MIXED,
+        isBrowsable: Boolean = false
     ) {
 
         val mediaItem = buildMediaItem(
             title,
             mediaId,
             isPlayable = false,
-            folderType = folderType
+            isBrowsable = isBrowsable,
+            mediaType = mediaType
         )
 
         this.add(mediaItem)
@@ -1244,8 +1370,8 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
         resId: Int,
         mediaId: String,
         groupNameId: Int?,
-        browsable: Boolean = true,
-        folderType: Int = FOLDER_TYPE_MIXED,
+        isBrowsable: Boolean = true,
+        mediaType: Int = MEDIA_TYPE_FOLDER_MIXED,
         icon: Int? = null
     ) {
         val applicationContext = UApp.applicationContext()
@@ -1253,14 +1379,15 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
         val mediaItem = buildMediaItem(
             applicationContext.getString(resId),
             mediaId,
-            isPlayable = !browsable,
-            folderType = folderType,
+            isPlayable = !isBrowsable,
+            isBrowsable = isBrowsable,
+            imageUri = if (icon != null) {
+                Util.getUriToDrawable(applicationContext, icon)
+            } else null,
             group = if (groupNameId != null) {
                 applicationContext.getString(groupNameId)
             } else null,
-            imageUri = if (icon != null) {
-                Util.getUriToDrawable(applicationContext, icon)
-            } else null
+            mediaType = mediaType
         )
 
         this.add(mediaItem)
@@ -1294,14 +1421,102 @@ class AutoMediaBrowserCallback(val libraryService: MediaLibraryService) :
         }
     }
 
-    fun updateCustomHeartButton(
-        session: MediaSession,
-        isHeart: Boolean
-    ) {
-        val command = if (isHeart) customCommands[1] else customCommands[0]
-        // Change the custom layout to contain the right heart button
-        customLayout = ImmutableList.of(command)
-        // Send the updated custom layout to controllers.
-        session.setCustomLayout(customLayout)
+    private fun Player.setNextRepeatMode() {
+        repeatMode =
+            when (repeatMode) {
+                Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                else -> Player.REPEAT_MODE_OFF
+            }
+    }
+
+    private fun MediaSession.updateCustomCommands() {
+        setCustomLayout(
+            buildCustomCommands(
+                heartIsCurrentlyOn,
+                canShuffle()
+            )
+        )
+    }
+
+    fun updateCustomHeartButton(session: MediaSession, isHeart: Boolean) {
+        with(session) {
+            setCustomLayout(
+                buildCustomCommands(
+                    isHeart = isHeart,
+                    canShuffle = canShuffle()
+                )
+            )
+        }
+    }
+
+    private fun MediaSession.canShuffle() =
+        player.mediaItemCount > 2
+
+    private fun MediaSession.buildCustomCommands(
+        isHeart: Boolean = false,
+        canShuffle: Boolean = false
+    ): ImmutableList<CommandButton> {
+        Timber.d("building custom commands (isHeart = %s, canShuffle = %s)", isHeart, canShuffle)
+
+        heartIsCurrentlyOn = isHeart
+
+        return ImmutableList.copyOf(
+            buildList {
+                // placeholder must come first here because if there is no next button the first
+                // custom command button is place right next to the play/pause button
+                if (
+                    player.repeatMode != Player.REPEAT_MODE_ALL &&
+                    player.currentMediaItemIndex == player.mediaItemCount - 1
+                )
+                    add(placeholderButton)
+
+                // due to the previous placeholder this heart button will always appear to the left
+                // of the default playback items
+                add(
+                    if (isHeart)
+                        heartButtonToggleOff
+                    else
+                        heartButtonToggleOn
+                )
+
+                // both the shuffle and the active repeat mode button will end up in the overflow
+                // menu if both are available at the same time
+                if (canShuffle)
+                    add(shuffleButton)
+
+                add(
+                    when (player.repeatMode) {
+                        Player.REPEAT_MODE_ONE -> repeatOneButton
+                        Player.REPEAT_MODE_ALL -> repeatAllButton
+                        else -> repeatOffButton
+                    }
+                )
+            }.asIterable()
+        )
+    }
+
+    private fun shuffleCurrentPlaylist(player: Player) {
+        Timber.d("shuffleCurrentPlaylist")
+
+        // 3 was chosen because that leaves at least two other songs to be shuffled around
+        @Suppress("MagicNumber")
+        if (player.mediaItemCount < 3)
+            return
+
+        val mediaItemsToShuffle = mutableListOf<MediaItem>()
+
+        for (i in 0 until player.currentMediaItemIndex) {
+            mediaItemsToShuffle += player.getMediaItemAt(i)
+        }
+
+        for (i in player.currentMediaItemIndex + 1 until player.mediaItemCount) {
+            mediaItemsToShuffle += player.getMediaItemAt(i)
+        }
+
+        player.removeMediaItems(player.currentMediaItemIndex + 1, player.mediaItemCount)
+        player.removeMediaItems(0, player.currentMediaItemIndex)
+
+        player.addMediaItems(mediaItemsToShuffle.shuffled())
     }
 }

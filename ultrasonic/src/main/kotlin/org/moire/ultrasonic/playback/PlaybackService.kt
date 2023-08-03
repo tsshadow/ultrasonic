@@ -130,26 +130,19 @@ class PlaybackService :
     private fun initializeSessionAndPlayer() {
         if (isStarted) return
 
-        setMediaNotificationProvider(CustomNotificationProvider(UApp.applicationContext()))
-
-        // TODO: Remove minor code duplication with updateBackend()
         val desiredBackend = if (activeServerProvider.getActiveServer().jukeboxByDefault) {
+            Timber.i("Jukebox enabled by default")
             MediaPlayerManager.PlayerBackend.JUKEBOX
         } else {
             MediaPlayerManager.PlayerBackend.LOCAL
         }
 
-        player = if (activeServerProvider.getActiveServer().jukeboxByDefault) {
-            Timber.i("Jukebox enabled by default")
-            getJukeboxPlayer()
-        } else {
-            getLocalPlayer()
-        }
+        player = createNewBackend(desiredBackend)
 
         actualBackend = desiredBackend
 
         // Create browser interface
-        librarySessionCallback = AutoMediaBrowserCallback(this)
+        librarySessionCallback = AutoMediaBrowserCallback()
 
         // This will need to use the AutoCalls
         mediaLibrarySession = MediaLibrarySession.Builder(this, player, librarySessionCallback)
@@ -157,10 +150,8 @@ class PlaybackService :
             .setBitmapLoader(ArtworkBitmapLoader())
             .build()
 
-        if (!librarySessionCallback.customLayout.isEmpty()) {
-            // Send custom layout to legacy session.
-            mediaLibrarySession.setCustomLayout(librarySessionCallback.customLayout)
-        }
+        // Send custom layout to legacy session.
+        mediaLibrarySession.setCustomLayout(librarySessionCallback.defaultCustomCommands)
 
         // Set a listener to update the API client when the active server has changed
         rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
@@ -213,11 +204,7 @@ class PlaybackService :
         player.removeListener(listener)
         player.release()
 
-        player = if (newBackend == MediaPlayerManager.PlayerBackend.JUKEBOX) {
-            getJukeboxPlayer()
-        } else {
-            getLocalPlayer()
-        }
+        player = createNewBackend(newBackend)
 
         // Add fresh listeners
         player.addListener(listener)
@@ -225,6 +212,14 @@ class PlaybackService :
         mediaLibrarySession.player = player
 
         actualBackend = newBackend
+    }
+
+    private fun createNewBackend(newBackend: MediaPlayerManager.PlayerBackend): Player {
+        return if (newBackend == MediaPlayerManager.PlayerBackend.JUKEBOX) {
+            getJukeboxPlayer()
+        } else {
+            getLocalPlayer()
+        }
     }
 
     private fun getJukeboxPlayer(): Player {
@@ -425,6 +420,12 @@ class PlaybackService :
             "org.moire.ultrasonic.HEART_ON"
         const val CUSTOM_COMMAND_TOGGLE_HEART_OFF =
             "org.moire.ultrasonic.HEART_OFF"
+        const val CUSTOM_COMMAND_SHUFFLE =
+            "org.moire.ultrasonic.SHUFFLE"
+        const val CUSTOM_COMMAND_PLACEHOLDER =
+            "org.moire.ultrasonic.PLACEHOLDER"
+        const val CUSTOM_COMMAND_REPEAT_MODE =
+            "org.moire.ultrasonic.REPEAT_MODE"
         private const val NOTIFICATION_ID = 3009
     }
 }

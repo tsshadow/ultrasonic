@@ -1,6 +1,9 @@
+plugins {
+    alias libs.plugins.ksp
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'org.jetbrains.kotlin.kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply from: "../gradle_scripts/code_quality.gradle"
 
@@ -9,8 +12,8 @@ android {
 
     defaultConfig {
         applicationId "org.moire.ultrasonic"
-        versionCode 126
-        versionName "4.6.3"
+        versionCode 128
+        versionName "4.7.0"
 
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
@@ -64,20 +67,20 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    kapt {
-        arguments {
-            arg("room.schemaLocation", "$rootDir/ultrasonic/schemas".toString())
-        }
+    ksp {
+        arg("room.schemaLocation", "$rootDir/ultrasonic/schemas")
     }
 
     lint {
         baseline = file("lint-baseline.xml")
         abortOnError true
         warningsAsErrors true
-        disable 'IconMissingDensityFolder', 'VectorPath'
-        ignore 'MissingTranslation', 'UnusedQuantity', 'MissingQuantity'
         warning 'ImpliedQuantity'
+        disable 'IconMissingDensityFolder', 'VectorPath'
+        disable 'MissingTranslation', 'UnusedQuantity', 'MissingQuantity'
         disable 'ObsoleteLintCustomCheck'
+        // We manage dependencies on Gitlab with RenovateBot
+        disable 'GradleDependency'
         textReport true
         checkDependencies true
     }
@@ -85,7 +88,7 @@ android {
 
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
 
@@ -129,7 +132,7 @@ dependencies {
     implementation libs.rxAndroid
     implementation libs.multiType
 
-    kapt libs.room
+    ksp libs.room
 
     testImplementation libs.kotlinReflect
     testImplementation libs.junit
@@ -141,6 +144,5 @@ dependencies {
     testImplementation libs.robolectric
 
     implementation libs.timber
-
 }
 

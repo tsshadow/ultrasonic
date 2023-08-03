@@ -56,7 +56,7 @@ class BookmarksFragment : TrackCollectionFragment() {
         super.setupButtons(view)
 
         playNowButton!!.setOnClickListener {
-            playNow(getSelectedSongs())
+            playNow(getSelectedTracks())
         }
     }
 

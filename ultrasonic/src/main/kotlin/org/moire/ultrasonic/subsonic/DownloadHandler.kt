@@ -68,27 +68,27 @@ class DownloadHandler(
                 }
                 successString = when (action) {
                     DownloadAction.DOWNLOAD -> fragment.resources.getQuantityString(
-                        R.plurals.select_album_n_songs_downloaded,
+                        R.plurals.n_songs_to_be_downloaded,
                         tracksToDownload.size,
                         tracksToDownload.size
                     )
                     DownloadAction.UNPIN -> {
                         fragment.resources.getQuantityString(
-                            R.plurals.select_album_n_songs_unpinned,
+                            R.plurals.n_songs_unpinned,
                             tracksToDownload.size,
                             tracksToDownload.size
                         )
                     }
                     DownloadAction.PIN -> {
                         fragment.resources.getQuantityString(
-                            R.plurals.select_album_n_songs_pinned,
+                            R.plurals.n_songs_pinned,
                             tracksToDownload.size,
                             tracksToDownload.size
                         )
                     }
                     DownloadAction.DELETE -> {
                         fragment.resources.getQuantityString(
-                            R.plurals.select_album_n_songs_deleted,
+                            R.plurals.n_songs_deleted,
                             tracksToDownload.size,
                             tracksToDownload.size
                         )
@@ -104,10 +104,9 @@ class DownloadHandler(
         name: String? = "",
         isShare: Boolean = false,
         isDirectory: Boolean = true,
-        append: Boolean,
+        insertionMode: MediaPlayerManager.InsertionMode,
         autoPlay: Boolean,
         shuffle: Boolean = false,
-        playNext: Boolean,
         isArtist: Boolean = false
     ) {
         var successString: String? = null
@@ -119,26 +118,28 @@ class DownloadHandler(
             withContext(Dispatchers.Main) {
                 addTracksToMediaController(
                     songs = songs,
-                    append = append,
-                    playNext = playNext,
+                    insertionMode = insertionMode,
                     autoPlay = autoPlay,
                     shuffle = shuffle,
                     playlistName = null,
                     fragment = fragment
                 )
+
                 // Play Now doesn't get a Toast :)
-                if (playNext) {
-                    successString = fragment.resources.getQuantityString(
-                        R.plurals.select_album_n_songs_play_next,
-                        songs.size,
-                        songs.size
-                    )
-                } else if (append) {
-                    successString = fragment.resources.getQuantityString(
-                        R.plurals.select_album_n_songs_added,
-                        songs.size,
-                        songs.size
-                    )
+                successString = when (insertionMode) {
+                    MediaPlayerManager.InsertionMode.AFTER_CURRENT ->
+                        fragment.resources.getQuantityString(
+                            R.plurals.n_songs_added_after_current,
+                            songs.size,
+                            songs.size
+                        )
+                    MediaPlayerManager.InsertionMode.APPEND ->
+                        fragment.resources.getQuantityString(
+                            R.plurals.n_songs_added_to_end,
+                            songs.size,
+                            songs.size
+                        )
+                    else -> null
                 }
             }
         }) { successString }
@@ -146,8 +147,7 @@ class DownloadHandler(
 
     fun addTracksToMediaController(
         songs: List<Track>,
-        append: Boolean,
-        playNext: Boolean,
+        insertionMode: MediaPlayerManager.InsertionMode,
         autoPlay: Boolean,
         shuffle: Boolean = false,
         playlistName: String? = null,
@@ -156,12 +156,6 @@ class DownloadHandler(
         if (songs.isEmpty()) return
 
         networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-
-        val insertionMode = when {
-            append -> MediaPlayerManager.InsertionMode.APPEND
-            playNext -> MediaPlayerManager.InsertionMode.AFTER_CURRENT
-            else -> MediaPlayerManager.InsertionMode.CLEAR
-        }
 
         if (playlistName != null) {
             mediaPlayerManager.suggestedPlaylistName = playlistName
@@ -173,7 +167,10 @@ class DownloadHandler(
             shuffle,
             insertionMode
         )
-        if (Settings.shouldTransitionOnPlayback && (!append || autoPlay)) {
+
+        if (Settings.shouldTransitionOnPlayback &&
+            insertionMode == MediaPlayerManager.InsertionMode.CLEAR
+        ) {
             fragment.findNavController().popBackStack(R.id.playerFragment, true)
             fragment.findNavController().navigate(R.id.playerFragment)
         }

@@ -35,6 +35,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.domain.Share
 import org.moire.ultrasonic.fragment.FragmentTitle
+import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.OfflineException
 import org.moire.ultrasonic.subsonic.DownloadAction
@@ -165,10 +166,9 @@ class SharesFragment : Fragment(), KoinComponent {
                     this,
                     share.id,
                     share.name,
-                    append = false,
+                    insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
                     autoPlay = true,
-                    shuffle = false,
-                    playNext = false,
+                    shuffle = false
                 )
             }
             R.id.share_menu_play_shuffled -> {
@@ -176,10 +176,9 @@ class SharesFragment : Fragment(), KoinComponent {
                     this,
                     share.id,
                     share.name,
-                    append = false,
+                    insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
                     autoPlay = true,
                     shuffle = true,
-                    playNext = false,
                 )
             }
             R.id.share_menu_delete -> {
