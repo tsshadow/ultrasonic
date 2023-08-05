@@ -1,6 +1,6 @@
 /*
  * SharesFragment.kt
- * Copyright (C) 2009-2022 Ultrasonic developers
+ * Copyright (C) 2009-2023 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -58,7 +58,7 @@ class SharesFragment : Fragment(), KoinComponent {
     private var sharesListView: ListView? = null
     private var emptyTextView: View? = null
     private var shareAdapter: ShareAdapter? = null
-    private val downloadHandler = inject<DownloadHandler>()
+    private val downloadHandler: DownloadHandler by inject()
     private var cancellationToken: CancellationToken? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         Util.applyTheme(this.context)
@@ -110,8 +110,9 @@ class SharesFragment : Fragment(), KoinComponent {
             }
 
             override fun done(result: List<Share>) {
-                sharesListView!!.adapter = ShareAdapter(context, result).also { shareAdapter = it }
-                emptyTextView!!.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
+                shareAdapter = ShareAdapter(requireContext(), result)
+                sharesListView?.adapter = shareAdapter
+                emptyTextView?.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
             }
         }
         task.execute()
@@ -132,7 +133,7 @@ class SharesFragment : Fragment(), KoinComponent {
         val share = sharesListView!!.getItemAtPosition(info.position) as Share
         when (menuItem.itemId) {
             R.id.share_menu_pin -> {
-                downloadHandler.value.justDownload(
+                downloadHandler.justDownload(
                     DownloadAction.PIN,
                     fragment = this,
                     id = share.id,
@@ -142,7 +143,7 @@ class SharesFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.share_menu_unpin -> {
-                downloadHandler.value.justDownload(
+                downloadHandler.justDownload(
                     DownloadAction.UNPIN,
                     fragment = this,
                     id = share.id,
@@ -152,7 +153,7 @@ class SharesFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.share_menu_download -> {
-                downloadHandler.value.justDownload(
+                downloadHandler.justDownload(
                     DownloadAction.DOWNLOAD,
                     fragment = this,
                     id = share.id,
@@ -162,7 +163,7 @@ class SharesFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.share_menu_play_now -> {
-                downloadHandler.value.fetchTracksAndAddToController(
+                downloadHandler.fetchTracksAndAddToController(
                     this,
                     share.id,
                     share.name,
@@ -172,7 +173,7 @@ class SharesFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.share_menu_play_shuffled -> {
-                downloadHandler.value.fetchTracksAndAddToController(
+                downloadHandler.fetchTracksAndAddToController(
                     this,
                     share.id,
                     share.name,
