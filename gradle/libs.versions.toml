@@ -4,6 +4,7 @@ gradle                 = "8.1.1"
 
 navigation             = "2.6.0"
 gradlePlugin           = "8.1.0"
+androidxcar            = "1.2.0"
 androidxcore           = "1.10.1"
 ktlint                 = "0.43.2"
 ktlintGradle           = "11.5.0"
@@ -49,6 +50,7 @@ kotlin                  = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin"
 ktlintGradle            = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlintGradle" }
 detekt                  = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 
+car                     = { module = "androidx.car.app:app", version.ref = "androidxcar" }
 core                    = { module = "androidx.core:core-ktx", version.ref = "androidxcore" }
 design                  = { module = "com.google.android.material:material", version.ref = "materialDesign" }
 annotations             = { module = "androidx.annotation:annotation", version.ref = "androidSupport" }
