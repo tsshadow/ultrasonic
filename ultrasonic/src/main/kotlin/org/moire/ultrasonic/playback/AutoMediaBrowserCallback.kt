@@ -7,7 +7,10 @@
 
 package org.moire.ultrasonic.playback
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import androidx.car.app.connection.CarConnection
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
@@ -97,6 +100,7 @@ const val PLAY_COMMAND = "play "
 @Suppress("TooManyFunctions", "LargeClass", "UnusedPrivateMember")
 class AutoMediaBrowserCallback : MediaLibraryService.MediaLibrarySession.Callback, KoinComponent {
 
+    private val applicationContext: Context by inject()
     private val activeServerProvider: ActiveServerProvider by inject()
 
     private val serviceJob = SupervisorJob()
@@ -115,6 +119,7 @@ class AutoMediaBrowserCallback : MediaLibraryService.MediaLibrarySession.Callbac
     private val placeholderButton = getPlaceholderButton()
 
     private var heartIsCurrentlyOn = false
+    private var customRepeatModeSet = false
 
     // This button is used for an unstarred track, and its action will star the track
     private val heartButtonToggleOn =
@@ -230,12 +235,48 @@ class AutoMediaBrowserCallback : MediaLibraryService.MediaLibrarySession.Callbac
             commandButton.sessionCommand?.let { availableSessionCommands.add(it) }
         }
 
-        session.player.repeatMode = Player.REPEAT_MODE_ALL
+        configureRepeatMode(session.player)
 
         return MediaSession.ConnectionResult.accept(
             availableSessionCommands.build(),
             connectionResult.availablePlayerCommands
         )
+    }
+
+    private fun configureRepeatMode(player: Player) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Timber.d("Car app library available, observing CarConnection")
+
+            val originalRepeatMode = player.repeatMode
+
+            var lastCarConnectionType = -1
+
+            CarConnection(applicationContext).type.observeForever {
+                if (lastCarConnectionType == it)
+                    return@observeForever
+
+                lastCarConnectionType = it
+
+                Timber.d("CarConnection type changed to %s", it)
+
+                when (it) {
+                    CarConnection.CONNECTION_TYPE_PROJECTION ->
+                        if (!customRepeatModeSet) {
+                            Timber.d("[CarConnection] Setting repeat mode to ALL")
+                            player.repeatMode = Player.REPEAT_MODE_ALL
+                            customRepeatModeSet = true
+                        }
+
+                    CarConnection.CONNECTION_TYPE_NOT_CONNECTED ->
+                        if (customRepeatModeSet) {
+                            Timber.d("[CarConnection] Resetting repeat mode")
+                            player.repeatMode = originalRepeatMode
+                            customRepeatModeSet = false
+                        }
+                }
+            }
+        } else
+            Timber.d("Car app library not available")
     }
 
     override fun onPostConnect(session: MediaSession, controller: MediaSession.ControllerInfo) {
@@ -369,6 +410,7 @@ class AutoMediaBrowserCallback : MediaLibraryService.MediaLibrarySession.Callbac
 
             PlaybackService.CUSTOM_COMMAND_REPEAT_MODE -> {
                 customCommandFuture = Futures.immediateFuture(SessionResult(RESULT_SUCCESS))
+                customRepeatModeSet = true
 
                 session.player.setNextRepeatMode()
                 session.updateCustomCommands()
