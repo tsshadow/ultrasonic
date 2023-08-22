@@ -276,7 +276,7 @@ class AutoMediaBrowserCallback : MediaLibraryService.MediaLibrarySession.Callbac
 
     private fun getPlaceholderButton() = CommandButton.Builder()
         .setDisplayName("Placeholder")
-        .setIconResId(R.drawable.empty)
+        .setIconResId(android.R.color.transparent)
         .setSessionCommand(
             SessionCommand(
                 PlaybackService.CUSTOM_COMMAND_PLACEHOLDER,
