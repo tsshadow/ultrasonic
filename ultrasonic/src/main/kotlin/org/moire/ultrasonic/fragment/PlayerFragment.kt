@@ -1219,14 +1219,14 @@ class PlayerFragment :
 
     @Suppress("ReturnCount")
     override fun onFling(
-        e1: MotionEvent,
+        e1: MotionEvent?,
         e2: MotionEvent,
         velocityX: Float,
         velocityY: Float
     ): Boolean {
-        val e1X = e1.x
+        val e1X = e1?.x ?: 0F
         val e2X = e2.x
-        val e1Y = e1.y
+        val e1Y = e1?.y ?: 0F
         val e2Y = e2.y
         val absX = abs(velocityX)
         val absY = abs(velocityY)
@@ -1263,7 +1263,7 @@ class PlayerFragment :
 
     override fun onLongPress(e: MotionEvent) {}
     override fun onScroll(
-        e1: MotionEvent,
+        e1: MotionEvent?,
         e2: MotionEvent,
         distanceX: Float,
         distanceY: Float
