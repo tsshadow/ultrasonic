@@ -91,10 +91,12 @@ abstract class JukeboxUnimplementedFunctions : Player {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun hasPrevious(): Boolean {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun hasPreviousWindow(): Boolean {
         TODO("Not yet implemented")
     }
@@ -103,10 +105,12 @@ abstract class JukeboxUnimplementedFunctions : Player {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun previous() {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun seekToPreviousWindow() {
         TODO("Not yet implemented")
     }
@@ -115,10 +119,12 @@ abstract class JukeboxUnimplementedFunctions : Player {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun hasNext(): Boolean {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun hasNextWindow(): Boolean {
         TODO("Not yet implemented")
     }
@@ -127,10 +133,12 @@ abstract class JukeboxUnimplementedFunctions : Player {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun next() {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun seekToNextWindow() {
         TODO("Not yet implemented")
     }
@@ -163,10 +171,12 @@ abstract class JukeboxUnimplementedFunctions : Player {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun getCurrentWindowIndex(): Int {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun getNextWindowIndex(): Int {
         TODO("Not yet implemented")
     }
@@ -175,6 +185,7 @@ abstract class JukeboxUnimplementedFunctions : Player {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun getPreviousWindowIndex(): Int {
         TODO("Not yet implemented")
     }
@@ -183,14 +194,17 @@ abstract class JukeboxUnimplementedFunctions : Player {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun isCurrentWindowDynamic(): Boolean {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun isCurrentWindowLive(): Boolean {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("Deprecated in Java")
     override fun isCurrentWindowSeekable(): Boolean {
         TODO("Not yet implemented")
     }

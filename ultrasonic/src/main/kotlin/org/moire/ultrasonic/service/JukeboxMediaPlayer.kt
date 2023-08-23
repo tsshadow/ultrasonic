@@ -286,6 +286,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun setShuffleModeEnabled(shuffleModeEnabled: Boolean) {}
 
+    @Deprecated("Deprecated in Java")
     override fun setDeviceVolume(volume: Int) {
         setDeviceVolume(volume, 0)
     }
