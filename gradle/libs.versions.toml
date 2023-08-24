@@ -2,7 +2,7 @@
 # You need to run ./gradlew wrapper after updating the version
 gradle                 = "8.1.1"
 
-navigation             = "2.7.0"
+navigation             = "2.7.1"
 gradlePlugin           = "8.1.1"
 androidxcar            = "1.2.0"
 androidxcore           = "1.10.1"
