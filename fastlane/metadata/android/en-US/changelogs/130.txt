@@ -1,0 +1,9 @@
+### Features
+- Added custom buttons for shuffling the current queue and setting repeat mode (Android Auto)
+- Properly handling nested directory structures (Android Auto)
+- Add a toast when adding tracks to the playlist
+- Allow pinning when offline
+
+### Dependencies
+- Update koin
+- Update media3 to v1.1.0

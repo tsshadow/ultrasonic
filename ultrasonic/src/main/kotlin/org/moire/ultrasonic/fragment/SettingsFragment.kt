@@ -108,7 +108,9 @@ class SettingsFragment :
         preferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == null || sharedPreferences == null) return
+
         Timber.d("Preference changed: %s", key)
         updateCustomPreferences()
 

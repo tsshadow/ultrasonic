@@ -8,7 +8,7 @@
     <string name="background_task.parse_error">Antwort nicht verstanden. Bitte die Serveradresse überprüfen.</string>
     <string name="background_task.ssl_cert_error">HTTPS Zertifikatsfehler: %1$s.</string>
     <string name="background_task.ssl_error">SSL Verbindungsfehler. Bitte das Serverzertifikat überprüfen.</string>
-    <string name="background_task.wait">Bitte warten… </string>
+    <string name="background_task.wait">Bitte warten…</string>
     <string name="button_bar.bookmarks">Lesezeichen</string>
     <string name="button_bar.browse">Medienbibliothek</string>
     <string name="button_bar.chat">Chat</string>
@@ -59,8 +59,8 @@
     <string name="download.jukebox_not_authorized">Fernbedienung ist nicht erlaubt. Bitte Jukebox Modus auf dem Subsonic Server in <b>Benutzer &gt; Einstellungen</b> aktivieren.</string>
     <string name="download.jukebox_off">Fernbedienung ausgeschaltet. Musik wird auf dem Telefon wiedergegeben.</string>
     <string name="download.jukebox_offline">Fernbedienungs-Modus is Offline nicht verfügbar.</string>
-    <string name="download.jukebox_on">Fernbedienung ausgeschaltet. Musik wird auf dem Server wiedergegeben.</string>
-    <string name="download.jukebox_server_too_old">Fernbedienungs Modus wird nicht unterstützt. Bitte den Subsonic Server aktualisieren.</string>
+    <string name="download.jukebox_on">Fernbedienung eingeschaltet. Musik wird auf dem Server wiedergegeben.</string>
+    <string name="download.jukebox_server_too_old">Fernbedienungs Modus wird nicht unterstützt. Bitte aktualisiere den Subsonic Server.</string>
     <string name="download.menu_equalizer">Equalizer</string>
     <string name="download.menu_jukebox_off">Jukebox Aus</string>
     <string name="download.menu_jukebox_on">Jukebox An</string>
@@ -443,9 +443,15 @@
     <string name="albumArt">Album-Artwork</string>
     <string name="notification.permission_required">Benachrichtigungen sind für die Medienwiedergabe erforderlich. Du kannst die Erlaubnis jederzeit in den Android-Einstellungen erteilen.</string>
     <string name="settings.use_hw_offload_title">Hardware-Wiedergabe verwenden (experimentell)</string>
-    <string name="settings.use_hw_offload_description">Versuche, die Medien mit dem Mediendecoder-Chip auf Deinem Telefon abzuspielen. Dadurch kann der Akku besser genutzt werden.</string>
+    <string name="settings.use_hw_offload_description">Versuche, die Medien mit dem Mediendecoder-Chip auf Deinem Telefon abzuspielen. Dadurch kann der Akku besser genutzt werden. Einige Nutzer berichten über Stotterer beim Abspielen, wenn diese Option aktiv ist.</string>
     <string name="list_view">Liste</string>
     <string name="grid_view">Cover</string>
     <string name="supported_server_features">Unterstützte Funktionen</string>
     <string name="jukebox">Jukebox</string>
+    <string name="shortcut_play_random_songs_long">Zufällige Titel abspielen</string>
+    <string name="shortcut_play_random_songs_short">Zufällige Titel</string>
+    <plurals name="n_songs_added_play_now">
+        <item quantity="one">Ein Titel wurde zur Wiedergabeliste hinzugefügt</item>
+        <item quantity="other">%d Titel wurden zur Wiedergabeliste hinzugefügt</item>
+    </plurals>
 </resources>
