@@ -48,65 +48,65 @@
                         a:layout_width="0dip"
                         a:layout_height="fill_parent"
                         a:layout_weight="1"
-                        a:padding="5dip"
                         a:background="@android:color/transparent"
                         a:focusable="false"
                         a:gravity="center_vertical"
+                        a:importantForAccessibility="no"
+                        a:padding="5dip"
                         a:scaleType="fitCenter"
-                        a:src="@drawable/ic_star_hollow"
-                        a:importantForAccessibility="no" />
+                        a:src="@drawable/star_hollow_outline" />
 
                     <ImageView
                         a:id="@+id/song_five_star_2"
                         a:layout_width="0dip"
                         a:layout_height="fill_parent"
                         a:layout_weight="1"
-                        a:padding="5dip"
                         a:background="@android:color/transparent"
                         a:focusable="false"
                         a:gravity="center_vertical"
+                        a:importantForAccessibility="no"
+                        a:padding="5dip"
                         a:scaleType="fitCenter"
-                        a:src="@drawable/ic_star_hollow"
-                        a:importantForAccessibility="no" />
+                        a:src="@drawable/star_hollow_outline" />
 
                     <ImageView
                         a:id="@+id/song_five_star_3"
                         a:layout_width="0dip"
                         a:layout_height="fill_parent"
                         a:layout_weight="1"
-                        a:padding="5dip"
                         a:background="@android:color/transparent"
                         a:focusable="false"
                         a:gravity="center_vertical"
+                        a:importantForAccessibility="no"
+                        a:padding="5dip"
                         a:scaleType="fitCenter"
-                        a:src="@drawable/ic_star_hollow"
-                        a:importantForAccessibility="no" />
+                        a:src="@drawable/star_hollow_outline" />
 
                     <ImageView
                         a:id="@+id/song_five_star_4"
                         a:layout_width="0dip"
                         a:layout_height="fill_parent"
                         a:layout_weight="1"
-                        a:padding="5dip"
                         a:background="@android:color/transparent"
                         a:focusable="false"
                         a:gravity="center_vertical"
+                        a:importantForAccessibility="no"
+                        a:padding="5dip"
                         a:scaleType="fitCenter"
-                        a:src="@drawable/ic_star_hollow"
-                        a:importantForAccessibility="no" />
+                        a:src="@drawable/star_hollow_outline" />
 
                     <ImageView
                         a:id="@+id/song_five_star_5"
                         a:layout_width="0dip"
                         a:layout_height="fill_parent"
                         a:layout_weight="1"
-                        a:padding="5dip"
                         a:background="@android:color/transparent"
                         a:focusable="false"
                         a:gravity="center_vertical"
+                        a:importantForAccessibility="no"
+                        a:padding="5dip"
                         a:scaleType="fitCenter"
-                        a:src="@drawable/ic_star_hollow"
-                        a:importantForAccessibility="no" />
+                        a:src="@drawable/star_hollow_outline" />
 
                 </LinearLayout>
             </LinearLayout>

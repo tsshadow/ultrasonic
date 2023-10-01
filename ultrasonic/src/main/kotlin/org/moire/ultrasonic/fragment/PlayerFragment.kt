@@ -8,13 +8,17 @@
 package org.moire.ultrasonic.fragment
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color.argb
 import android.graphics.Point
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.Menu
@@ -34,6 +38,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ViewFlipper
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.MenuHost
@@ -52,6 +58,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_IDLE
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.R as RM
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -167,8 +174,10 @@ class PlayerFragment :
     private lateinit var repeatButton: MaterialButton
     private lateinit var progressBar: SeekBar
     private lateinit var progressIndicator: CircularProgressIndicator
-    private val hollowStar = R.drawable.ic_star_hollow
-    private val fullStar = R.drawable.ic_star_full
+    private val hollowStar = R.drawable.star_hollow_outline
+    private val fullStar = R.drawable.star_full_outline
+    private lateinit var hollowStarDrawable: Drawable
+    private lateinit var fullStarDrawable: Drawable
 
     private var _binding: CurrentPlayingBinding? = null
     // This property is only valid between onCreateView and
@@ -269,6 +278,11 @@ class PlayerFragment :
 
         val ratingLinearLayout = view.findViewById<LinearLayout>(R.id.song_rating)
         if (!useFiveStarRating) ratingLinearLayout.isVisible = false
+
+        hollowStarDrawable = ResourcesCompat.getDrawable(resources, hollowStar, null)!!
+        fullStarDrawable = ResourcesCompat.getDrawable(resources, fullStar, null)!!
+        setLayerDrawableColors(hollowStarDrawable as LayerDrawable)
+        setLayerDrawableColors(fullStarDrawable as LayerDrawable)
 
         fiveStar1ImageView.setOnClickListener { setSongRating(1) }
         fiveStar2ImageView.setOnClickListener { setSongRating(2) }
@@ -1100,7 +1114,7 @@ class PlayerFragment :
                 it.loadImage(albumArtImageView, currentSong, true, 0)
             }
 
-            updateSongRating()
+            updateSongRatingDisplay()
         } else {
             currentSong = null
             songTitleTextView.text = null
@@ -1115,7 +1129,7 @@ class PlayerFragment :
             }
         }
 
-        updateSongRating()
+        updateSongRatingDisplay()
 
         updateMediaButtonActivationState()
     }
@@ -1276,20 +1290,36 @@ class PlayerFragment :
         return false
     }
 
-    private fun updateSongRating() {
+    private fun updateSongRatingDisplay() {
         val rating = currentSong?.userRating ?: 0
 
-        fiveStar1ImageView.setImageResource(if (rating > 0) fullStar else hollowStar)
-        fiveStar2ImageView.setImageResource(if (rating > 1) fullStar else hollowStar)
-        fiveStar3ImageView.setImageResource(if (rating > 2) fullStar else hollowStar)
-        fiveStar4ImageView.setImageResource(if (rating > 3) fullStar else hollowStar)
-        fiveStar5ImageView.setImageResource(if (rating > 4) fullStar else hollowStar)
+        fiveStar1ImageView.setImageDrawable(getStarForRating(rating, 0))
+        fiveStar2ImageView.setImageDrawable(getStarForRating(rating, 1))
+        fiveStar3ImageView.setImageDrawable(getStarForRating(rating, 2))
+        fiveStar4ImageView.setImageDrawable(getStarForRating(rating, 3))
+        fiveStar5ImageView.setImageDrawable(getStarForRating(rating, 4))
     }
+
+    private fun getStarForRating(rating: Int, position: Int): Drawable {
+        return if (rating > position) fullStarDrawable else hollowStarDrawable
+    }
+
+    private fun setLayerDrawableColors(drawable: LayerDrawable) {
+        drawable.apply {
+            getDrawable(0).setTint(requireContext().themeColor(RM.attr.colorSurface))
+            getDrawable(1).setTint(requireContext().themeColor(RM.attr.colorAccent))
+        }
+    }
+
+    @ColorInt
+    fun Context.themeColor(@AttrRes attrRes: Int): Int = TypedValue()
+        .apply { theme.resolveAttribute(attrRes, this, true) }
+        .data
 
     private fun setSongRating(rating: Int) {
         if (currentSong == null) return
         currentSong?.userRating = rating
-        updateSongRating()
+        updateSongRatingDisplay()
 
         RxBus.ratingSubmitter.onNext(
             RatingUpdate(
