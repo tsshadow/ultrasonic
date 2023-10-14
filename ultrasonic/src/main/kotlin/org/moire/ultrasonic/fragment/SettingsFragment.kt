@@ -300,7 +300,7 @@ class SettingsFragment :
                         SearchSuggestionProvider.MODE
                     )
                     suggestions.clearHistory()
-                    toast(activity, R.string.settings_search_history_cleared)
+                    toast(R.string.settings_search_history_cleared)
                     false
                 }
         }
@@ -332,7 +332,7 @@ class SettingsFragment :
                 Timber.w("Failed to delete %s", nomediaDir)
             }
         }
-        toast(activity, R.string.settings_hide_media_toast, false)
+        toast(R.string.settings_hide_media_toast, false)
     }
 
     private fun setCacheLocation(path: String) {

@@ -17,7 +17,7 @@ import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
-import org.moire.ultrasonic.service.PlaybackState
+import org.moire.ultrasonic.service.MediaPlayerManager
 
 /**
  * Lists the Bookmarks available on the server
@@ -61,22 +61,21 @@ class BookmarksFragment : TrackCollectionFragment() {
     }
 
     /**
-     * Custom playback function which uses the restore functionality. A bit of a hack..
+     * Play the selected tracks at the bookmarked position
      */
     private fun playNow(songs: List<Track>) {
         if (songs.isNotEmpty()) {
 
-            val state = PlaybackState(
+            mediaPlayerManager.addToPlaylist(
                 songs = songs,
-                currentPlayingIndex = 0,
-                currentPlayingPosition = songs[0].bookmarkPosition
+                autoPlay = false,
+                shuffle = false,
+                insertionMode = MediaPlayerManager.InsertionMode.CLEAR
             )
 
-            mediaPlayerManager.restore(
-                state = state,
-                autoPlay = true,
-                newPlaylist = true
-            )
+            mediaPlayerManager.seekTo(0, songs[0].bookmarkPosition)
+            mediaPlayerManager.prepare()
+            mediaPlayerManager.play()
         }
     }
 }

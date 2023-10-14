@@ -37,4 +37,5 @@ object Constants {
     const val FILENAME_PLAYLIST_SER = "downloadstate.ser"
     const val ALBUM_ART_FILE = "folder.jpeg"
     const val RESULT_CLOSE_ALL = 1337
+    const val MAX_SONGS_RECURSIVE = 500
 }

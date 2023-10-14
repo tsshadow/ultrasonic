@@ -1,6 +1,5 @@
 package org.moire.ultrasonic.subsonic
 
-import android.content.Context
 import androidx.core.content.res.ResourcesCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,8 +19,7 @@ import timber.log.Timber
 /**
  * Handles the lifetime of the Image Loader
  */
-class
-ImageLoaderProvider(val context: Context) :
+class ImageLoaderProvider :
     KoinComponent,
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private var imageLoader: ImageLoader? = null

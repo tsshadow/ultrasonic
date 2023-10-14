@@ -17,6 +17,10 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.drakeet.multitype.ItemViewBinder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
@@ -63,16 +67,21 @@ class ArtistRowBinder(
 
         if (showArtistPicture()) {
             holder.coverArt.visibility = View.VISIBLE
-            val key = FileUtil.getArtistArtKey(item.name, false)
-            imageLoaderProvider.executeOn {
-                it.loadImage(
-                    view = holder.coverArt,
-                    id = holder.coverArtId,
-                    key = key,
-                    large = false,
-                    size = 0,
-                    defaultResourceId = R.drawable.ic_contact_picture
-                )
+            CoroutineScope(Dispatchers.IO).launch {
+                val key = FileUtil.getArtistArtKey(item.name, false)
+
+                withContext(Dispatchers.Main) {
+                    imageLoaderProvider.executeOn {
+                        it.loadImage(
+                            view = holder.coverArt,
+                            id = holder.coverArtId,
+                            key = key,
+                            large = false,
+                            size = 0,
+                            defaultResourceId = R.drawable.ic_contact_picture
+                        )
+                    }
+                }
             }
         } else {
             holder.coverArt.visibility = View.GONE

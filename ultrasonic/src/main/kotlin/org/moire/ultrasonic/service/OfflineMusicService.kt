@@ -335,6 +335,10 @@ class OfflineMusicService : MusicService, KoinComponent {
         }
     }
 
+    override fun isJukeboxAvailable(): Boolean {
+        return false
+    }
+
     @Throws(Exception::class)
     override fun updateJukeboxPlaylist(ids: List<String>?): JukeboxStatus {
         throw OfflineException("Jukebox not available in offline mode")

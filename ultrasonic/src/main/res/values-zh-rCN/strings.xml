@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="background_task.loading">加载中…</string>
     <string name="background_task.network_error">发生网络错误。请检查服务器地址或稍后重试。</string>
     <string name="background_task.unsupported_api">服务端 API v%1$s 不支持此功能。</string>
     <string name="background_task.no_network">此软件需要连接网络，请打开 Wi-Fi 或移动网络。</string>
@@ -8,7 +7,6 @@
     <string name="background_task.parse_error">未知回复内容，请检查服务器地址。</string>
     <string name="background_task.ssl_cert_error">HTTPS 证书错误：%1$s.</string>
     <string name="background_task.ssl_error">SSL 连接异常。请检查服务器证书。</string>
-    <string name="background_task.wait">请稍等…</string>
     <string name="button_bar.bookmarks">书签</string>
     <string name="button_bar.browse">媒体库</string>
     <string name="button_bar.chat">聊天</string>
@@ -218,8 +216,6 @@
     <string name="settings.max_bitrate_unlimited">不限制</string>
     <string name="settings.max_bitrate_wifi">最大比特率 - WIFI</string>
     <string name="settings.max_songs">最大歌曲</string>
-    <string name="settings.media_button_summary">响应手机、耳机和蓝牙设备的媒体按钮</string>
-    <string name="settings.media_button_title">媒体按钮</string>
     <string name="settings.network_timeout">网络超时</string>
     <string name="settings.network_timeout_105000">105 秒</string>
     <string name="settings.network_timeout_120000">120 秒</string>

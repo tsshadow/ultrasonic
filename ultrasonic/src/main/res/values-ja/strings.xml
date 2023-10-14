@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="background_task.loading">読み込み中…</string>
     <string name="background_task.network_error">ネットワークエラーが発生しました。サーバーのアドレスを確認してやり直してください。</string>
     <string name="background_task.parse_error">応答が確認できません。サーバーのアドレスを確認してください。</string>
     <string name="background_task.ssl_cert_error">HTTPS証明書エラー: %1$s.</string>
     <string name="background_task.ssl_error">SSL接続が異常です。サーバーの証明書を確認してください。</string>
-    <string name="background_task.wait">お待ち下さい…</string>
     <string name="button_bar.bookmarks">ブックマーク</string>
     <string name="button_bar.browse">メディアライブラリ</string>
     <string name="button_bar.chat">チャット</string>
@@ -181,8 +179,6 @@
     <string name="settings.max_bitrate_64">64 Kbps</string>
     <string name="settings.max_bitrate_80">80 Kbps</string>
     <string name="settings.max_bitrate_96">96 Kbps</string>
-    <string name="settings.media_button_summary">端末本体、ヘッドセットやBluetoothの再生コントロールボタンに対応します</string>
-    <string name="settings.media_button_title">メディアボタン</string>
     <string name="settings.network_timeout_15000">15秒</string>
     <string name="settings.network_timeout_75000">75秒</string>
     <string name="settings.network_timeout_90000">90秒</string>

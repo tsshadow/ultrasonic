@@ -1,13 +1,12 @@
 /*
- * AutoMediaBrowserCallback.kt
- * Copyright (C) 2009-2022 Ultrasonic developers
+ * MediaLibrarySessionCallback.kt
+ * Copyright (C) 2009-2023 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
 
-package org.moire.ultrasonic.playback
+package org.moire.ultrasonic.service
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.car.app.connection.CarConnection
@@ -32,11 +31,14 @@ import androidx.media3.session.SessionResult.RESULT_SUCCESS
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.SettableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.guava.future
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
@@ -48,8 +50,6 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.service.MusicServiceFactory
-import org.moire.ultrasonic.service.RatingManager
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.buildMediaItem
 import org.moire.ultrasonic.util.toMediaItem
@@ -98,10 +98,12 @@ const val PLAY_COMMAND = "play "
  * MediaBrowserService implementation for e.g. Android Auto
  */
 @Suppress("TooManyFunctions", "LargeClass", "UnusedPrivateMember")
-class AutoMediaBrowserCallback : MediaLibraryService.MediaLibrarySession.Callback, KoinComponent {
+class MediaLibrarySessionCallback :
+    MediaLibraryService.MediaLibrarySession.Callback,
+    KoinComponent {
 
-    private val applicationContext: Context by inject()
     private val activeServerProvider: ActiveServerProvider by inject()
+    private val playbackStateSerializer: PlaybackStateSerializer by inject()
 
     private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
@@ -243,6 +245,25 @@ class AutoMediaBrowserCallback : MediaLibraryService.MediaLibrarySession.Callbac
         )
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    override fun onPlaybackResumption(
+        mediaSession: MediaSession,
+        controller: MediaSession.ControllerInfo
+    ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
+        val result = SettableFuture.create<MediaSession.MediaItemsWithStartPosition>()
+        serviceScope.launch {
+            val state = playbackStateSerializer.deserializeNow()
+            if (state != null) {
+                result.set(state.toMediaItemsWithStartPosition())
+                withContext(Dispatchers.Main) {
+                    mediaSession.player.shuffleModeEnabled = state.shufflePlay
+                    mediaSession.player.repeatMode = state.repeatMode
+                }
+            }
+        }
+        return result
+    }
+
     private fun configureRepeatMode(player: Player) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Timber.d("Car app library available, observing CarConnection")
@@ -251,7 +272,7 @@ class AutoMediaBrowserCallback : MediaLibraryService.MediaLibrarySession.Callbac
 
             var lastCarConnectionType = -1
 
-            CarConnection(applicationContext).type.observeForever {
+            CarConnection(UApp.applicationContext()).type.observeForever {
                 if (lastCarConnectionType == it)
                     return@observeForever
 

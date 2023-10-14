@@ -1,10 +1,10 @@
 /*
  * PlaybackService.kt
- * Copyright (C) 2009-2022 Ultrasonic developers
+ * Copyright (C) 2009-2023 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
-package org.moire.ultrasonic.playback
+package org.moire.ultrasonic.service
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -42,15 +42,11 @@ import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.data.CachedDataSource
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.imageloader.ArtworkBitmapLoader
 import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider
-import org.moire.ultrasonic.service.DownloadService
-import org.moire.ultrasonic.service.JukeboxMediaPlayer
-import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.service.RxBus
-import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
@@ -68,7 +64,7 @@ class PlaybackService :
     private var equalizer: EqualizerController? = null
     private val activeServerProvider: ActiveServerProvider by inject()
 
-    private lateinit var librarySessionCallback: AutoMediaBrowserCallback
+    private lateinit var librarySessionCallback: MediaLibrarySessionCallback
 
     private var rxBusSubscription = CompositeDisposable()
 
@@ -115,6 +111,7 @@ class PlaybackService :
         isStarted = false
         stopForegroundRemoveNotification()
         stopSelf()
+        instance = null
     }
 
     private val resolver: ResolvingDataSource.Resolver = ResolvingDataSource.Resolver {
@@ -142,7 +139,7 @@ class PlaybackService :
         actualBackend = desiredBackend
 
         // Create browser interface
-        librarySessionCallback = AutoMediaBrowserCallback()
+        librarySessionCallback = MediaLibrarySessionCallback()
 
         // This will need to use the AutoCalls
         mediaLibrarySession = MediaLibrarySession.Builder(this, player, librarySessionCallback)

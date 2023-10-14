@@ -9,14 +9,12 @@ package org.moire.ultrasonic.util
 
 import android.os.Handler
 import android.os.Looper
-import androidx.fragment.app.Fragment
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import timber.log.Timber
 
@@ -30,53 +28,50 @@ object CoroutinePatterns {
     }
 }
 
-fun CoroutineScope.executeTaskWithToast(
-    task: suspend CoroutineScope.() -> Unit,
-    successString: () -> String?
-): Job {
+fun CoroutineScope.launchWithToast(
+    block: suspend CoroutineScope.() -> String?
+) {
     // Launch the Job
-    val job = launch(CoroutinePatterns.loggingExceptionHandler, block = task)
+    val deferred = async(CoroutinePatterns.loggingExceptionHandler, block = block)
 
     // Setup a handler when the job is done
-    job.invokeOnCompletion {
+    deferred.invokeOnCompletion {
         val toastString = if (it != null && it !is CancellationException) {
             CommunicationError.getErrorMessage(it)
         } else {
-            successString()
+            null
         }
 
-        // Return early if nothing to post
-        if (toastString == null) return@invokeOnCompletion
-
         launch(Dispatchers.Main) {
-            Util.toast(UApp.applicationContext(), toastString)
-        }
-    }
-
-    return job
-}
-
-fun CoroutineScope.executeTaskWithModalDialog(
-    fragment: Fragment,
-    task: suspend CoroutineScope.() -> Unit,
-    successString: () -> String
-) {
-    // Create the job
-    val job = executeTaskWithToast(task, successString)
-
-    // Create the dialog
-    val builder = InfoDialog.Builder(fragment.requireContext())
-    builder.setTitle(R.string.background_task_wait)
-    builder.setMessage(R.string.background_task_loading)
-    builder.setOnCancelListener { job.cancel() }
-    builder.setPositiveButton(R.string.common_cancel) { _, _ -> job.cancel() }
-    val dialog = builder.create()
-    dialog.show()
-
-    // Add additional handler to close the dialog
-    job.invokeOnCompletion {
-        launch(Dispatchers.Main) {
-            dialog.dismiss()
+            val successString = toastString ?: deferred.await()
+            if (successString != null) {
+                Util.toast(successString, UApp.applicationContext())
+            }
         }
     }
 }
+
+// Unused, kept commented for eventual later use
+// fun CoroutineScope.executeTaskWithModalDialog(
+//    fragment: Fragment,
+//    task: suspend CoroutineScope.() -> String?
+// ) {
+//    // Create the job
+//    val job = launchWithToast(task)
+//
+//    // Create the dialog
+//    val builder = InfoDialog.Builder(fragment.requireContext())
+//    builder.setTitle(R.string.background_task_wait)
+//    builder.setMessage(R.string.background_task_loading)
+//    builder.setOnCancelListener { job.cancel() }
+//    builder.setPositiveButton(R.string.common_cancel) { _, _ -> job.cancel() }
+//    val dialog = builder.create()
+//    dialog.show()
+//
+//    // Add additional handler to close the dialog
+//    job.invokeOnCompletion {
+//        launch(Dispatchers.Main) {
+//            dialog.dismiss()
+//        }
+//    }
+// }

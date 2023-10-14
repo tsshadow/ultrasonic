@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="background_task.loading">Načítám&#8230;</string>
     <string name="background_task.network_error">Chyba sítě. Ověřte adresu serveru nebo zkuste později.</string>
     <string name="background_task.unsupported_api">API serveru v%1$s nepodporuje tuto funkci.</string>
     <string name="background_task.no_network">Tento program vyžaduje síťové připojení. Zapněte Wi-Fi nebo mobilní připojení.</string>
@@ -9,7 +8,6 @@
     <string name="background_task.parse_error">Nesrozumitelná odpověď. Ověřte adresu serveru.</string>
     <string name="background_task.ssl_cert_error">Chyba HTTPS certifikátu: %1$s.</string>
     <string name="background_task.ssl_error">Vyjímka SSL připojení. Ověřte certifikát serveru.</string>
-    <string name="background_task.wait">Chvilku strpení&#8230;</string>
     <string name="button_bar.bookmarks">Záložky</string>
     <string name="button_bar.browse">Knihovna médií</string>
     <string name="button_bar.chat">Chat</string>
@@ -188,8 +186,6 @@
     <string name="settings.max_bitrate_unlimited">Neomezené</string>
     <string name="settings.max_bitrate_wifi">Max Bitrate - wi-fi</string>
     <string name="settings.max_songs">Maximum skladeb</string>
-    <string name="settings.media_button_summary">Odpovídat na tlačítka ovládání médií telefonu, sluchátek a bluetooth</string>
-    <string name="settings.media_button_title">Tlačítka médií</string>
     <string name="settings.network_timeout">Čas vypršení připojení</string>
     <string name="settings.network_timeout_105000">105 sekund</string>
     <string name="settings.network_timeout_120000">120 sekund</string>

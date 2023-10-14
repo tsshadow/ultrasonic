@@ -24,6 +24,8 @@ import timber.log.Timber
  * This class is responsible for the serialization / deserialization
  * of the playlist and the player state (e.g. current playing number and play position)
  * to the filesystem.
+ *
+ * TODO: Should use: MediaItemsWithStartPosition
  */
 class PlaybackStateSerializer : KoinComponent {
 
@@ -56,7 +58,7 @@ class PlaybackStateSerializer : KoinComponent {
         }
     }
 
-    fun serializeNow(
+    private fun serializeNow(
         tracks: Iterable<Track>,
         currentPlayingIndex: Int,
         currentPlayingPosition: Int,
@@ -85,7 +87,10 @@ class PlaybackStateSerializer : KoinComponent {
         if (isDeserializing.get()) return
         ioScope.launch {
             try {
-                deserializeNow(afterDeserialized)
+                val state = deserializeNow()
+                mainScope.launch {
+                    afterDeserialized(state)
+                }
                 isSetup.set(true)
             } catch (all: Exception) {
                 Timber.e(all, "Had a problem deserializing:")
@@ -95,11 +100,11 @@ class PlaybackStateSerializer : KoinComponent {
         }
     }
 
-    private fun deserializeNow(afterDeserialized: (PlaybackState?) -> Unit?) {
+    fun deserializeNow(): PlaybackState? {
 
         val state = FileUtil.deserialize<PlaybackState>(
             context, Constants.FILENAME_PLAYLIST_SER
-        ) ?: return
+        ) ?: return null
 
         Timber.i(
             "Deserialized currentPlayingIndex: %d, currentPlayingPosition: %d, shuffle: %b",
@@ -108,9 +113,7 @@ class PlaybackStateSerializer : KoinComponent {
             state.shufflePlay
         )
 
-        mainScope.launch {
-            afterDeserialized(state)
-        }
+        return state
     }
 
     companion object {

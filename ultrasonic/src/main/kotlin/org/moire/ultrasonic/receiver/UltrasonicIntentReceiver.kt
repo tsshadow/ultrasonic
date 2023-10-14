@@ -10,20 +10,19 @@ package org.moire.ultrasonic.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import org.koin.java.KoinJavaComponent.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.moire.ultrasonic.service.MediaPlayerLifecycleSupport
 import timber.log.Timber
 
-class UltrasonicIntentReceiver : BroadcastReceiver() {
-    private val lifecycleSupport = inject<MediaPlayerLifecycleSupport>(
-        MediaPlayerLifecycleSupport::class.java
-    )
+class UltrasonicIntentReceiver : BroadcastReceiver(), KoinComponent {
+    private val lifecycleSupport by inject<MediaPlayerLifecycleSupport>()
 
     override fun onReceive(context: Context, intent: Intent) {
         val intentAction = intent.action
         Timber.i("Received Ultrasonic Intent: %s", intentAction)
         try {
-            lifecycleSupport.value.receiveIntent(intent)
+            lifecycleSupport.receiveIntent(intent)
             if (isOrderedBroadcast) {
                 abortBroadcast()
             }

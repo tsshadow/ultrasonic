@@ -11,10 +11,10 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import org.moire.ultrasonic.R
+import org.koin.core.component.KoinScopeComponent
+import org.koin.core.component.inject
 import org.moire.ultrasonic.adapters.FolderSelectorBinder
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Artist
@@ -23,17 +23,17 @@ import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
-import org.moire.ultrasonic.subsonic.DownloadAction
-import org.moire.ultrasonic.subsonic.DownloadHandler
+import org.moire.ultrasonic.util.ContextMenuUtil.handleContextMenu
 
 /**
  * An extension of the MultiListFragment, with a few helper functions geared
  * towards the display of MusicDirectory.Entries.
  * @param T: The type of data which will be used (must extend GenericEntry)
  */
-abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
+abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>(), KoinScopeComponent {
 
     private var rxBusSubscription: CompositeDisposable = CompositeDisposable()
+    private val mediaPlayerManager: MediaPlayerManager by inject()
 
     /**
      * Whether to show the folder selector
@@ -46,7 +46,7 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
     override fun onContextMenuItemSelected(menuItem: MenuItem, item: T): Boolean {
         val isArtist = (item is Artist)
 
-        return handleContextMenu(menuItem, item, isArtist, downloadHandler, this)
+        return handleContextMenu(menuItem, item, isArtist, mediaPlayerManager, this)
     }
 
     override fun onItemClick(item: T) {
@@ -118,66 +118,5 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>() {
         }
 
         header
-    }
-
-    companion object {
-        @Suppress("LongMethod")
-        internal fun handleContextMenu(
-            menuItem: MenuItem,
-            item: Identifiable,
-            isArtist: Boolean,
-            downloadHandler: DownloadHandler,
-            fragment: Fragment
-        ): Boolean {
-            when (menuItem.itemId) {
-                R.id.menu_play_now ->
-                    downloadHandler.fetchTracksAndAddToController(
-                        fragment,
-                        item.id,
-                        insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
-                        autoPlay = true,
-                        isArtist = isArtist
-                    )
-                R.id.menu_play_next ->
-                    downloadHandler.fetchTracksAndAddToController(
-                        fragment,
-                        item.id,
-                        insertionMode = MediaPlayerManager.InsertionMode.AFTER_CURRENT,
-                        autoPlay = true,
-                        isArtist = isArtist
-                    )
-                R.id.menu_play_last ->
-                    downloadHandler.fetchTracksAndAddToController(
-                        fragment,
-                        item.id,
-                        insertionMode = MediaPlayerManager.InsertionMode.APPEND,
-                        autoPlay = false,
-                        isArtist = isArtist
-                    )
-                R.id.menu_pin ->
-                    downloadHandler.justDownload(
-                        action = DownloadAction.PIN,
-                        fragment,
-                        item.id,
-                        isArtist = isArtist
-                    )
-                R.id.menu_unpin ->
-                    downloadHandler.justDownload(
-                        action = DownloadAction.UNPIN,
-                        fragment,
-                        item.id,
-                        isArtist = isArtist
-                    )
-                R.id.menu_download ->
-                    downloadHandler.justDownload(
-                        action = DownloadAction.DOWNLOAD,
-                        fragment,
-                        item.id,
-                        isArtist = isArtist
-                    )
-                else -> return false
-            }
-            return true
-        }
     }
 }

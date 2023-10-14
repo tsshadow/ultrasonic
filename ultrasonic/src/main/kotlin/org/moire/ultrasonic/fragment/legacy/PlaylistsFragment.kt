@@ -25,11 +25,11 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.util.Locale
-import org.koin.core.component.KoinComponent
+import org.koin.androidx.scope.ScopeFragment
+import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
@@ -39,12 +39,12 @@ import org.moire.ultrasonic.domain.Playlist
 import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.OfflineException
-import org.moire.ultrasonic.subsonic.DownloadAction
-import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.util.BackgroundTask
 import org.moire.ultrasonic.util.CacheCleaner
 import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.ConfirmationDialog
+import org.moire.ultrasonic.util.DownloadAction
+import org.moire.ultrasonic.util.DownloadUtil
 import org.moire.ultrasonic.util.FragmentBackgroundTask
 import org.moire.ultrasonic.util.InfoDialog
 import org.moire.ultrasonic.util.LoadingTask
@@ -56,13 +56,11 @@ import org.moire.ultrasonic.util.Util.toast
  *
  * TODO: This file has been converted from Java, but not modernized yet.
  */
-class PlaylistsFragment : Fragment(), KoinComponent {
+class PlaylistsFragment : ScopeFragment(), KoinScopeComponent {
     private var refreshPlaylistsListView: SwipeRefreshLayout? = null
     private var playlistsListView: ListView? = null
     private var emptyTextView: View? = null
     private var playlistAdapter: ArrayAdapter<Playlist>? = null
-
-    private val downloadHandler by inject<DownloadHandler>()
 
     private var cancellationToken: CancellationToken? = null
 
@@ -115,7 +113,8 @@ class PlaylistsFragment : Fragment(), KoinComponent {
                 override fun doInBackground(): List<Playlist> {
                     val musicService = getMusicService()
                     val playlists = musicService.getPlaylists(refresh)
-                    if (!isOffline()) CacheCleaner().cleanPlaylists(playlists)
+                    val cacheCleaner: CacheCleaner by inject()
+                    if (!isOffline()) cacheCleaner.cleanPlaylists(playlists)
                     return playlists
                 }
 
@@ -147,8 +146,8 @@ class PlaylistsFragment : Fragment(), KoinComponent {
         val playlist = playlistsListView!!.getItemAtPosition(info.position) as Playlist
         when (menuItem.itemId) {
             R.id.playlist_menu_pin -> {
-                downloadHandler.justDownload(
-                    DownloadAction.PIN,
+                DownloadUtil.justDownload(
+                    action = DownloadAction.PIN,
                     fragment = this,
                     id = playlist.id,
                     name = playlist.name,
@@ -157,8 +156,8 @@ class PlaylistsFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.playlist_menu_unpin -> {
-                downloadHandler.justDownload(
-                    DownloadAction.UNPIN,
+                DownloadUtil.justDownload(
+                    action = DownloadAction.UNPIN,
                     fragment = this,
                     id = playlist.id,
                     name = playlist.name,
@@ -167,8 +166,8 @@ class PlaylistsFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.playlist_menu_download -> {
-                downloadHandler.justDownload(
-                    DownloadAction.DOWNLOAD,
+                DownloadUtil.justDownload(
+                    action = DownloadAction.DOWNLOAD,
                     fragment = this,
                     id = playlist.id,
                     name = playlist.name,
@@ -227,7 +226,6 @@ class PlaylistsFragment : Fragment(), KoinComponent {
                         playlistAdapter!!.remove(playlist)
                         playlistAdapter!!.notifyDataSetChanged()
                         toast(
-                            context,
                             resources.getString(R.string.menu_deleted_playlist, playlist.name)
                         )
                     }
@@ -246,7 +244,7 @@ class PlaylistsFragment : Fragment(), KoinComponent {
                                 ),
                                 getErrorMessage(error)
                             )
-                        toast(context, msg, false)
+                        toast(msg, false)
                     }
                 }.execute()
             }.setNegativeButton(R.string.common_cancel, null).show()
@@ -310,7 +308,6 @@ class PlaylistsFragment : Fragment(), KoinComponent {
                 override fun done(result: Any?) {
                     load(true)
                     toast(
-                        context,
                         resources.getString(R.string.playlist_updated_info, playlist.name)
                     )
                 }
@@ -329,7 +326,7 @@ class PlaylistsFragment : Fragment(), KoinComponent {
                             ),
                             getErrorMessage(error)
                         )
-                    toast(context, msg, false)
+                    toast(msg, false)
                 }
             }.execute()
         }
