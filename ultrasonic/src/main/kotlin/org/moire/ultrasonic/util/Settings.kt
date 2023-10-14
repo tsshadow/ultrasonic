@@ -136,10 +136,6 @@ object Settings {
     val seekIntervalMillis: Long
         get() = (seekInterval / 1000).toLong()
 
-    @JvmStatic
-    var mediaButtonsEnabled
-        by BooleanSetting(getKey(R.string.setting_key_media_buttons), true)
-
     var resumePlayOnHeadphonePlug
         by BooleanSetting(R.string.setting_key_resume_play_on_headphones_plug, true)
 

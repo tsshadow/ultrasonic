@@ -138,6 +138,8 @@ interface MusicService {
     @Throws(Exception::class)
     fun getStreamUrl(id: String, maxBitRate: Int?, format: String?): String?
 
+    fun isJukeboxAvailable(): Boolean
+
     @Throws(Exception::class)
     fun updateJukeboxPlaylist(ids: List<String>?): JukeboxStatus
 

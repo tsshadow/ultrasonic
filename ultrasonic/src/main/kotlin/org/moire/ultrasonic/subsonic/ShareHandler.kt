@@ -8,7 +8,6 @@
 package org.moire.ultrasonic.subsonic
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -17,27 +16,27 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.lifecycle.lifecycleScope
 import java.util.Locale
 import java.util.regex.Pattern
-import kotlin.collections.ArrayList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Share
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.util.BackgroundTask
-import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.ConfirmationDialog
-import org.moire.ultrasonic.util.FragmentBackgroundTask
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.ShareDetails
 import org.moire.ultrasonic.util.TimeSpanPicker
+import org.moire.ultrasonic.util.Util.getString
 import org.moire.ultrasonic.util.Util.ifNotNull
 
 /**
  * This class handles sharing items in the media library
  */
-class ShareHandler(val context: Context) {
+class ShareHandler {
     private var shareDescription: EditText? = null
     private var timeSpanPicker: TimeSpanPicker? = null
     private var shareOnServerCheckBox: CheckBox? = null
@@ -51,21 +50,26 @@ class ShareHandler(val context: Context) {
     fun share(
         fragment: Fragment,
         shareDetails: ShareDetails,
-        swipe: SwipeRefreshLayout?,
-        cancellationToken: CancellationToken,
         additionalId: String?
     ) {
-        val task: BackgroundTask<Share?> = object : FragmentBackgroundTask<Share?>(
-            fragment.requireActivity(),
-            true,
-            swipe,
-            cancellationToken
-        ) {
-            @Throws(Throwable::class)
-            override fun doInBackground(): Share? {
+        val scope = fragment.activity?.lifecycleScope ?: fragment.lifecycleScope
+        scope.launch {
+            val share = createShareOnServer(shareDetails, additionalId)
+            startActivityForShare(share, shareDetails, fragment)
+        }
+    }
+
+    private suspend fun createShareOnServer(
+        shareDetails: ShareDetails,
+        additionalId: String?
+    ): Share? {
+        return withContext(Dispatchers.IO) {
+            return@withContext try {
+
                 val ids: MutableList<String> = ArrayList()
 
-                if (!shareDetails.ShareOnServer && shareDetails.Entries.size == 1) return null
+                if (!shareDetails.ShareOnServer && shareDetails.Entries.size == 1)
+                    return@withContext null
                 if (shareDetails.Entries.isEmpty()) {
                     additionalId.ifNotNull {
                         ids.add(it)
@@ -86,78 +90,80 @@ class ShareHandler(val context: Context) {
                 val shares =
                     musicService.createShare(ids, shareDetails.Description, timeInMillis)
 
-                return shares[0]
-            }
-
-            override fun done(result: Share?) {
-
-                val intent = Intent(Intent.ACTION_SEND)
-                intent.type = "text/plain"
-
-                if (result != null) {
-                    // Created a share, send the URL
-                    intent.putExtra(
-                        Intent.EXTRA_TEXT,
-                        String.format(
-                            Locale.ROOT, "%s\n\n%s", Settings.shareGreeting, result.url
-                        )
-                    )
-                } else {
-                    // Sending only text details
-                    val textBuilder = StringBuilder()
-                    textBuilder.appendLine(Settings.shareGreeting)
-
-                    if (!shareDetails.Entries[0].title.isNullOrEmpty())
-                        textBuilder.append(context.resources.getString(R.string.common_title))
-                            .append(": ").appendLine(shareDetails.Entries[0].title)
-                    if (!shareDetails.Entries[0].artist.isNullOrEmpty())
-                        textBuilder.append(context.resources.getString(R.string.common_artist))
-                            .append(": ").appendLine(shareDetails.Entries[0].artist)
-                    if (!shareDetails.Entries[0].album.isNullOrEmpty())
-                        textBuilder.append(context.resources.getString(R.string.common_album))
-                            .append(": ").append(shareDetails.Entries[0].album)
-
-                    intent.putExtra(Intent.EXTRA_TEXT, textBuilder.toString())
-                }
-
-                fragment.activity?.startActivity(
-                    Intent.createChooser(
-                        intent,
-                        context.resources.getString(R.string.share_via)
-                    )
-                )
+                // Return the share
+                shares[0]
+            } catch (ignored: Exception) {
+                null
             }
         }
-        task.execute()
+    }
+
+    private suspend fun startActivityForShare(
+        result: Share?,
+        shareDetails: ShareDetails,
+        fragment: Fragment
+    ) {
+        return withContext(Dispatchers.Main) {
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/plain"
+
+            if (result != null) {
+                // Created a share, send the URL
+                intent.putExtra(
+                    Intent.EXTRA_TEXT,
+                    String.format(
+                        Locale.ROOT, "%s\n\n%s", Settings.shareGreeting, result.url
+                    )
+                )
+            } else {
+                // Sending only text details
+                val textBuilder = StringBuilder()
+                textBuilder.appendLine(Settings.shareGreeting)
+
+                if (!shareDetails.Entries[0].title.isNullOrEmpty())
+                    textBuilder.append(getString(R.string.common_title))
+                        .append(": ").appendLine(shareDetails.Entries[0].title)
+                if (!shareDetails.Entries[0].artist.isNullOrEmpty())
+                    textBuilder.append(getString(R.string.common_artist))
+                        .append(": ").appendLine(shareDetails.Entries[0].artist)
+                if (!shareDetails.Entries[0].album.isNullOrEmpty())
+                    textBuilder.append(getString(R.string.common_album))
+                        .append(": ").append(shareDetails.Entries[0].album)
+
+                intent.putExtra(Intent.EXTRA_TEXT, textBuilder.toString())
+            }
+
+            fragment.activity?.startActivity(
+                Intent.createChooser(
+                    intent,
+                    getString(R.string.share_via)
+                )
+            )
+        }
     }
 
     fun createShare(
         fragment: Fragment,
         tracks: List<Track?>?,
-        swipe: SwipeRefreshLayout?,
-        cancellationToken: CancellationToken,
         additionalId: String? = null
     ) {
         val askForDetails = Settings.shouldAskForShareDetails
         val shareDetails = ShareDetails()
         shareDetails.Entries = tracks
         if (askForDetails) {
-            showDialog(fragment, shareDetails, swipe, cancellationToken, additionalId)
+            showDialog(fragment, shareDetails, additionalId)
         } else {
             shareDetails.Description = Settings.defaultShareDescription
             shareDetails.Expiration = System.currentTimeMillis() +
                 Settings.defaultShareExpirationInMillis
-            share(fragment, shareDetails, swipe, cancellationToken, additionalId)
+            share(fragment, shareDetails, additionalId)
         }
     }
 
-    @Suppress("LongMethod")
     @SuppressLint("InflateParams")
     private fun showDialog(
         fragment: Fragment,
         shareDetails: ShareDetails,
-        swipe: SwipeRefreshLayout?,
-        cancellationToken: CancellationToken,
         additionalId: String?
     ) {
         val layout = LayoutInflater.from(fragment.context).inflate(R.layout.share_details, null)
@@ -175,18 +181,57 @@ class ShareHandler(val context: Context) {
             textViewExpiration = layout.findViewById<View>(R.id.textViewExpiration) as TextView
         }
 
+        // Handle the visibility based on shareDetails.Entries size
         if (shareDetails.Entries.size == 1) {
-            // For single songs the sharing may be done by text only
             shareOnServerCheckBox?.setOnCheckedChangeListener { _, _ ->
                 updateVisibility()
             }
-
             shareOnServerCheckBox?.isChecked = Settings.shareOnServer
         } else {
             shareOnServerCheckBox?.isVisible = false
         }
+
         updateVisibility()
 
+        // Set up the dialog builder
+        val builder = makeDialogBuilder(fragment, shareDetails, additionalId, layout)
+
+        // Initialize UI components with default values
+        setupDefaultValues()
+
+        builder.create()
+        builder.show()
+    }
+
+    private fun setupDefaultValues() {
+        val defaultDescription = Settings.defaultShareDescription
+        val timeSpan = Settings.defaultShareExpiration
+        val split = pattern.split(timeSpan)
+        if (split.size == 2) {
+            val timeSpanAmount = split[0].toInt()
+            val timeSpanType = split[1]
+            if (timeSpanAmount > 0) {
+                noExpirationCheckBox!!.isChecked = false
+                timeSpanPicker!!.isEnabled = true
+                timeSpanPicker!!.setTimeSpanAmount(timeSpanAmount.toString())
+                timeSpanPicker!!.timeSpanType = timeSpanType
+            } else {
+                noExpirationCheckBox!!.isChecked = true
+                timeSpanPicker!!.isEnabled = false
+            }
+        } else {
+            noExpirationCheckBox!!.isChecked = true
+            timeSpanPicker!!.isEnabled = false
+        }
+        shareDescription!!.setText(defaultDescription)
+    }
+
+    private fun makeDialogBuilder(
+        fragment: Fragment,
+        shareDetails: ShareDetails,
+        additionalId: String?,
+        layout: View?
+    ): ConfirmationDialog.Builder {
         val builder = ConfirmationDialog.Builder(fragment.requireContext())
         builder.setTitle(R.string.share_set_share_options)
 
@@ -214,7 +259,7 @@ class ShareHandler(val context: Context) {
                 Settings.shareOnServer = shareDetails.ShareOnServer
             }
 
-            share(fragment, shareDetails, swipe, cancellationToken, additionalId)
+            share(fragment, shareDetails, additionalId)
         }
 
         builder.setNegativeButton(R.string.common_cancel) { dialog, _ ->
@@ -224,35 +269,12 @@ class ShareHandler(val context: Context) {
         builder.setView(layout)
         builder.setCancelable(true)
 
-        timeSpanPicker!!.setTimeSpanDisableText(context.resources.getString(R.string.no_expiration))
+        // Set up the timeSpanPicker
+        timeSpanPicker!!.setTimeSpanDisableText(getString(R.string.no_expiration))
         noExpirationCheckBox!!.setOnCheckedChangeListener { _, b ->
             timeSpanPicker!!.isEnabled = !b
         }
-
-        val defaultDescription = Settings.defaultShareDescription
-        val timeSpan = Settings.defaultShareExpiration
-
-        val split = pattern.split(timeSpan)
-        if (split.size == 2) {
-            val timeSpanAmount = split[0].toInt()
-            val timeSpanType = split[1]
-            if (timeSpanAmount > 0) {
-                noExpirationCheckBox!!.isChecked = false
-                timeSpanPicker!!.isEnabled = true
-                timeSpanPicker!!.setTimeSpanAmount(timeSpanAmount.toString())
-                timeSpanPicker!!.timeSpanType = timeSpanType
-            } else {
-                noExpirationCheckBox!!.isChecked = true
-                timeSpanPicker!!.isEnabled = false
-            }
-        } else {
-            noExpirationCheckBox!!.isChecked = true
-            timeSpanPicker!!.isEnabled = false
-        }
-
-        shareDescription!!.setText(defaultDescription)
-        builder.create()
-        builder.show()
+        return builder
     }
 
     private fun updateVisibility() {

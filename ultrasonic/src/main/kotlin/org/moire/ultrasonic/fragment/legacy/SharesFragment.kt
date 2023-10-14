@@ -24,11 +24,11 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.util.Locale
-import org.koin.core.component.KoinComponent
+import org.koin.androidx.scope.ScopeFragment
+import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
@@ -38,14 +38,15 @@ import org.moire.ultrasonic.fragment.FragmentTitle
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.OfflineException
-import org.moire.ultrasonic.subsonic.DownloadAction
-import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.util.BackgroundTask
 import org.moire.ultrasonic.util.CancellationToken
+import org.moire.ultrasonic.util.DownloadAction
+import org.moire.ultrasonic.util.DownloadUtil
 import org.moire.ultrasonic.util.FragmentBackgroundTask
 import org.moire.ultrasonic.util.LoadingTask
 import org.moire.ultrasonic.util.TimeSpanPicker
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.Util.toast
 import org.moire.ultrasonic.view.ShareAdapter
 
 /**
@@ -53,12 +54,12 @@ import org.moire.ultrasonic.view.ShareAdapter
  *
  * TODO: This file has been converted from Java, but not modernized yet.
  */
-class SharesFragment : Fragment(), KoinComponent {
+class SharesFragment : ScopeFragment(), KoinScopeComponent {
     private var refreshSharesListView: SwipeRefreshLayout? = null
     private var sharesListView: ListView? = null
     private var emptyTextView: View? = null
     private var shareAdapter: ShareAdapter? = null
-    private val downloadHandler: DownloadHandler by inject()
+    private val mediaPlayerManager: MediaPlayerManager by inject()
     private var cancellationToken: CancellationToken? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         Util.applyTheme(this.context)
@@ -133,8 +134,8 @@ class SharesFragment : Fragment(), KoinComponent {
         val share = sharesListView!!.getItemAtPosition(info.position) as Share
         when (menuItem.itemId) {
             R.id.share_menu_pin -> {
-                downloadHandler.justDownload(
-                    DownloadAction.PIN,
+                DownloadUtil.justDownload(
+                    action = DownloadAction.PIN,
                     fragment = this,
                     id = share.id,
                     name = share.name,
@@ -143,8 +144,8 @@ class SharesFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.share_menu_unpin -> {
-                downloadHandler.justDownload(
-                    DownloadAction.UNPIN,
+                DownloadUtil.justDownload(
+                    action = DownloadAction.UNPIN,
                     fragment = this,
                     id = share.id,
                     name = share.name,
@@ -153,8 +154,8 @@ class SharesFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.share_menu_download -> {
-                downloadHandler.justDownload(
-                    DownloadAction.DOWNLOAD,
+                DownloadUtil.justDownload(
+                    action = DownloadAction.DOWNLOAD,
                     fragment = this,
                     id = share.id,
                     name = share.name,
@@ -163,22 +164,20 @@ class SharesFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.share_menu_play_now -> {
-                downloadHandler.fetchTracksAndAddToController(
+                mediaPlayerManager.playTracksAndToast(
                     this,
-                    share.id,
-                    share.name,
                     insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
-                    autoPlay = true,
+                    id = share.id,
+                    name = share.name,
                     shuffle = false
                 )
             }
             R.id.share_menu_play_shuffled -> {
-                downloadHandler.fetchTracksAndAddToController(
+                mediaPlayerManager.playTracksAndToast(
                     this,
-                    share.id,
-                    share.name,
                     insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
-                    autoPlay = true,
+                    id = share.id,
+                    name = share.name,
                     shuffle = true,
                 )
             }
@@ -214,8 +213,7 @@ class SharesFragment : Fragment(), KoinComponent {
                     override fun done(result: Any?) {
                         shareAdapter!!.remove(share)
                         shareAdapter!!.notifyDataSetChanged()
-                        Util.toast(
-                            context,
+                        toast(
                             resources.getString(R.string.menu_deleted_share, share.name)
                         )
                     }
@@ -237,7 +235,7 @@ class SharesFragment : Fragment(), KoinComponent {
                                     getErrorMessage(error)
                                 )
                             }
-                        Util.toast(context, msg, false)
+                        toast(msg, false)
                     }
                 }.execute()
             }.setNegativeButton(R.string.common_cancel, null).show()
@@ -315,8 +313,7 @@ class SharesFragment : Fragment(), KoinComponent {
 
                 override fun done(result: Any?) {
                     load(true)
-                    Util.toast(
-                        context,
+                    toast(
                         resources.getString(R.string.playlist_updated_info, share.name)
                     )
                 }
@@ -338,7 +335,7 @@ class SharesFragment : Fragment(), KoinComponent {
                                 getErrorMessage(error)
                             )
                         }
-                    Util.toast(context, msg, false)
+                    toast(msg, false)
                 }
             }.execute()
         }

@@ -45,7 +45,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
@@ -79,12 +78,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.core.component.KoinComponent
+import org.koin.androidx.scope.ScopeFragment
+import org.koin.core.component.KoinScopeComponent
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.adapters.TrackViewBinder
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.shouldUseId3Tags
@@ -106,6 +105,7 @@ import org.moire.ultrasonic.util.CommunicationError
 import org.moire.ultrasonic.util.ConfirmationDialog
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.Util.toast
 import org.moire.ultrasonic.util.toTrack
 import org.moire.ultrasonic.view.AutoRepeatButton
 import timber.log.Timber
@@ -116,9 +116,9 @@ import timber.log.Timber
  */
 @Suppress("LargeClass", "TooManyFunctions", "MagicNumber")
 class PlayerFragment :
-    Fragment(),
+    ScopeFragment(),
     GestureDetector.OnGestureListener,
-    KoinComponent,
+    KoinScopeComponent,
     CoroutineScope by CoroutineScope(Dispatchers.Main) {
 
     // Settings
@@ -356,14 +356,14 @@ class PlayerFragment :
             onPlaylistChanged()
 
             when (newRepeat) {
-                0 -> Util.toast(
-                    context, R.string.download_repeat_off
+                0 -> toast(
+                    R.string.download_repeat_off
                 )
-                1 -> Util.toast(
-                    context, R.string.download_repeat_single
+                1 -> toast(
+                    R.string.download_repeat_single
                 )
-                2 -> Util.toast(
-                    context, R.string.download_repeat_all
+                2 -> toast(
+                    R.string.download_repeat_all
                 )
                 else -> {
                 }
@@ -410,7 +410,7 @@ class PlayerFragment :
         // Query the Jukebox state in an IO Context
         ioScope.launch(CommunicationError.getHandler(context)) {
             try {
-                jukeboxAvailable = mediaPlayerManager.isJukeboxAvailable
+                jukeboxAvailable = getMusicService().isJukeboxAvailable()
             } catch (all: Exception) {
                 Timber.e(all)
             }
@@ -457,9 +457,9 @@ class PlayerFragment :
         val isEnabled = mediaPlayerManager.toggleShuffle()
 
         if (isEnabled) {
-            Util.toast(activity, R.string.download_menu_shuffle_on)
+            toast(R.string.download_menu_shuffle_on)
         } else {
-            Util.toast(activity, R.string.download_menu_shuffle_off)
+            toast(R.string.download_menu_shuffle_off)
         }
 
         updateShuffleButtonState(isEnabled)
@@ -579,8 +579,7 @@ class PlayerFragment :
             equalizerMenuItem.isVisible = isEqualizerAvailable
         }
 
-        val mediaPlayerController = mediaPlayerManager
-        val track = mediaPlayerController.currentMediaItem?.toTrack()
+        val track = mediaPlayerManager.currentMediaItem?.toTrack()
 
         if (track != null) {
             currentSong = track
@@ -600,7 +599,7 @@ class PlayerFragment :
             goToArtist.isVisible = false
         }
 
-        if (mediaPlayerController.keepScreenOn) {
+        if (mediaPlayerManager.keepScreenOn) {
             screenOption?.setTitle(R.string.download_menu_screen_off)
         } else {
             screenOption?.setTitle(R.string.download_menu_screen_on)
@@ -609,7 +608,7 @@ class PlayerFragment :
         if (jukeboxOption != null) {
             jukeboxOption.isEnabled = jukeboxAvailable
             jukeboxOption.isVisible = jukeboxAvailable
-            if (mediaPlayerController.isJukeboxEnabled) {
+            if (mediaPlayerManager.isJukeboxEnabled) {
                 jukeboxOption.setTitle(R.string.download_menu_jukebox_off)
             } else {
                 jukeboxOption.setTitle(R.string.download_menu_jukebox_on)
@@ -707,8 +706,7 @@ class PlayerFragment :
             R.id.menu_item_jukebox -> {
                 val jukeboxEnabled = !mediaPlayerManager.isJukeboxEnabled
                 mediaPlayerManager.isJukeboxEnabled = jukeboxEnabled
-                Util.toast(
-                    context,
+                toast(
                     if (jukeboxEnabled) R.string.download_jukebox_on
                     else R.string.download_jukebox_off,
                     false
@@ -760,7 +758,7 @@ class PlayerFragment :
                     R.string.download_bookmark_set_at_position,
                     bookmarkTime
                 )
-                Util.toast(context, msg)
+                toast(msg)
                 return true
             }
             R.id.menu_item_bookmark_delete -> {
@@ -776,13 +774,12 @@ class PlayerFragment :
                         Timber.e(all)
                     }
                 }.start()
-                Util.toast(context, R.string.download_bookmark_removed)
+                toast(R.string.download_bookmark_removed)
                 return true
             }
             R.id.menu_item_share -> {
-                val mediaPlayerController = mediaPlayerManager
                 val tracks: MutableList<Track?> = ArrayList()
-                val playlist = mediaPlayerController.playlist
+                val playlist = mediaPlayerManager.playlist
                 for (item in playlist) {
                     val playlistEntry = item.toTrack()
                     tracks.add(playlistEntry)
@@ -790,8 +787,6 @@ class PlayerFragment :
                 shareHandler.createShare(
                     this,
                     tracks = tracks,
-                    swipe = null,
-                    cancellationToken = cancellationToken,
                 )
                 return true
             }
@@ -804,8 +799,6 @@ class PlayerFragment :
                 shareHandler.createShare(
                     this,
                     tracks,
-                    swipe = null,
-                    cancellationToken = cancellationToken
                 )
                 return true
             }
@@ -822,7 +815,7 @@ class PlayerFragment :
     }
 
     private fun savePlaylistInBackground(playlistName: String) {
-        Util.toast(context, resources.getString(R.string.download_playlist_saving, playlistName))
+        toast(resources.getString(R.string.download_playlist_saving, playlistName))
         mediaPlayerManager.suggestedPlaylistName = playlistName
 
         // The playlist can be acquired only from the main thread
@@ -835,7 +828,7 @@ class PlayerFragment :
             musicService.createPlaylist(null, playlistName, entries)
         }.invokeOnCompletion {
             if (it == null || it is CancellationException) {
-                Util.toast(UApp.applicationContext(), R.string.download_playlist_done)
+                toast(R.string.download_playlist_done)
             } else {
                 Timber.e(it, "Exception has occurred in savePlaylistInBackground")
                 val msg = String.format(
@@ -844,7 +837,7 @@ class PlayerFragment :
                     resources.getString(R.string.download_playlist_error),
                     CommunicationError.getErrorMessage(it)
                 )
-                Util.toast(UApp.applicationContext(), msg)
+                toast(msg)
             }
         }
     }
@@ -958,7 +951,7 @@ class PlayerFragment :
                     item?.mediaMetadata?.title
                 )
 
-                Util.toast(context, songRemoved)
+                toast(songRemoved)
 
                 // Remove the item from the playlist
                 mediaPlayerManager.removeFromPlaylist(pos)
@@ -1059,15 +1052,14 @@ class PlayerFragment :
     }
 
     private fun onPlaylistChanged() {
-        val mediaPlayerController = mediaPlayerManager
         // Try to display playlist in play order
-        val list = mediaPlayerController.playlistInPlayOrder
+        val list = mediaPlayerManager.playlistInPlayOrder
         emptyTextView.setText(R.string.playlist_empty)
         viewAdapter.submitList(list.map(MediaItem::toTrack))
         progressIndicator.isVisible = false
         emptyView.isVisible = list.isEmpty()
 
-        updateRepeatButtonState(mediaPlayerController.repeatMode)
+        updateRepeatButtonState(mediaPlayerManager.repeatMode)
     }
 
     private fun onTrackChanged() {

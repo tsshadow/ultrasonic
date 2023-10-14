@@ -16,8 +16,6 @@ import android.os.Build
 import android.view.KeyEvent
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.app.UApp.Companion.applicationContext
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 import org.moire.ultrasonic.util.CacheCleaner
@@ -29,11 +27,13 @@ import timber.log.Timber
 /**
  * This class is responsible for handling received events for the Media Player implementation
  */
-class MediaPlayerLifecycleSupport : KoinComponent {
+class MediaPlayerLifecycleSupport(
+    val mediaPlayerManager: MediaPlayerManager,
+    private val playbackStateSerializer: PlaybackStateSerializer,
+    val imageLoaderProvider: ImageLoaderProvider,
+    private val cacheCleaner: CacheCleaner
+) : KoinComponent {
     private lateinit var ratingManager: RatingManager
-    private val playbackStateSerializer by inject<PlaybackStateSerializer>()
-    private val mediaPlayerManager by inject<MediaPlayerManager>()
-    private val imageLoaderProvider: ImageLoaderProvider by inject()
 
     private var created = false
     private var headsetEventReceiver: BroadcastReceiver? = null
@@ -70,7 +70,7 @@ class MediaPlayerLifecycleSupport : KoinComponent {
 
         registerHeadsetReceiver()
 
-        CacheCleaner().clean()
+        cacheCleaner.clean()
         created = true
         ratingManager = RatingManager.instance
         Timber.i("LifecycleSupport created")
@@ -78,15 +78,10 @@ class MediaPlayerLifecycleSupport : KoinComponent {
 
     private fun restoreLastSession(autoPlay: Boolean, afterRestore: Runnable?) {
         playbackStateSerializer.deserialize {
+            if (it == null) return@deserialize null
+            Timber.i("Restoring %s songs", it.songs.size)
 
-            Timber.i("Restoring %s songs", it!!.songs.size)
-
-            mediaPlayerManager.restore(
-                it,
-                autoPlay,
-                false
-            )
-
+            mediaPlayerManager.restore(it, autoPlay)
             afterRestore?.run()
         }
     }
@@ -99,7 +94,6 @@ class MediaPlayerLifecycleSupport : KoinComponent {
         applicationContext().unregisterReceiver(headsetEventReceiver)
 
         imageLoaderProvider.clearImageLoader()
-        UApp.instance!!.shutdownKoin()
 
         created = false
         Timber.i("LifecycleSupport destroyed")

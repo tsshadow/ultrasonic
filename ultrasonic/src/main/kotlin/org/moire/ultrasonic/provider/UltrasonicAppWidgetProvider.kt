@@ -23,7 +23,7 @@ import android.widget.RemoteViews
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.activity.NavigationActivity
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.receiver.MediaButtonIntentReceiver
+import org.moire.ultrasonic.receiver.UltrasonicIntentReceiver
 import org.moire.ultrasonic.util.Constants
 import timber.log.Timber
 
@@ -233,7 +233,7 @@ open class UltrasonicAppWidgetProvider : AppWidgetProvider() {
 
             // Emulate media button clicks.
             intent = Intent(Constants.CMD_PROCESS_KEYCODE)
-            intent.component = ComponentName(context, MediaButtonIntentReceiver::class.java)
+            intent.component = ComponentName(context, UltrasonicIntentReceiver::class.java)
             intent.putExtra(
                 Intent.EXTRA_KEY_EVENT,
                 KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
@@ -241,12 +241,12 @@ open class UltrasonicAppWidgetProvider : AppWidgetProvider() {
             flags = 0
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // needed starting Android 12 (S = 31)
-                flags = flags or PendingIntent.FLAG_IMMUTABLE
+                flags = PendingIntent.FLAG_IMMUTABLE
             }
             pendingIntent = PendingIntent.getBroadcast(context, 11, intent, flags)
             views.setOnClickPendingIntent(R.id.control_play, pendingIntent)
             intent = Intent(Constants.CMD_PROCESS_KEYCODE)
-            intent.component = ComponentName(context, MediaButtonIntentReceiver::class.java)
+            intent.component = ComponentName(context, UltrasonicIntentReceiver::class.java)
             intent.putExtra(
                 Intent.EXTRA_KEY_EVENT,
                 KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT)
@@ -254,7 +254,7 @@ open class UltrasonicAppWidgetProvider : AppWidgetProvider() {
             pendingIntent = PendingIntent.getBroadcast(context, 12, intent, flags)
             views.setOnClickPendingIntent(R.id.control_next, pendingIntent)
             intent = Intent(Constants.CMD_PROCESS_KEYCODE)
-            intent.component = ComponentName(context, MediaButtonIntentReceiver::class.java)
+            intent.component = ComponentName(context, UltrasonicIntentReceiver::class.java)
             intent.putExtra(
                 Intent.EXTRA_KEY_EVENT,
                 KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PREVIOUS)

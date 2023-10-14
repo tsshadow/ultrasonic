@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="background_task.loading">Lade…</string>
     <string name="background_task.network_error">Ein Netzwerkfehler ist aufgetreten. Bitte die Serveradresse prüfen oder später noch einmal versuchen.</string>
     <string name="background_task.unsupported_api">Server API v%1$s unterstützt diese Funktion nicht.</string>
     <string name="background_task.no_network">Dieses Programm benötigt eine Netzwerkverbindung. Bitte das WLAN oder Mobilfunk einschalten.</string>
@@ -8,7 +7,6 @@
     <string name="background_task.parse_error">Antwort nicht verstanden. Bitte die Serveradresse überprüfen.</string>
     <string name="background_task.ssl_cert_error">HTTPS Zertifikatsfehler: %1$s.</string>
     <string name="background_task.ssl_error">SSL Verbindungsfehler. Bitte das Serverzertifikat überprüfen.</string>
-    <string name="background_task.wait">Bitte warten…</string>
     <string name="button_bar.bookmarks">Lesezeichen</string>
     <string name="button_bar.browse">Medienbibliothek</string>
     <string name="button_bar.chat">Chat</string>
@@ -230,8 +228,6 @@
     <string name="settings.max_bitrate_unlimited">Unbegrenzt</string>
     <string name="settings.max_bitrate_wifi">Max. Bitrate - WLAN</string>
     <string name="settings.max_songs">Max. Anzahl der Titel</string>
-    <string name="settings.media_button_summary">Auf Telefon, Headset und Bluetooth-Media-Tasten reagieren</string>
-    <string name="settings.media_button_title">Medien Tasten</string>
     <string name="settings.network_timeout">Netzwerk Zeitüberschreitung</string>
     <string name="settings.network_timeout_105000">105 Sekunden</string>
     <string name="settings.network_timeout_120000">120 Sekunden</string>

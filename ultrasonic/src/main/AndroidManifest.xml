@@ -72,7 +72,7 @@
         </service>
 
         <!-- Needs to be exported: https://android.googlesource.com/platform/developers/build/+/4de32d4/prebuilts/gradle/MediaBrowserService/README.md -->
-        <service android:name=".playback.PlaybackService"
+        <service android:name=".service.PlaybackService"
             android:label="@string/common.appname"
             android:foregroundServiceType="mediaPlayback"
             android:exported="true"
@@ -107,6 +107,12 @@
                 <action android:name="android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED"/>
             </intent-filter>
         </receiver>
+        <receiver android:name="androidx.media3.session.MediaButtonReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name=".provider.UltrasonicAppWidgetProvider"
             android:label="Ultrasonic"
@@ -118,12 +124,6 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/appwidget_info"/>
-        </receiver>
-        <receiver android:name=".receiver.MediaButtonIntentReceiver"
-            android:exported="true">
-            <intent-filter android:priority="2147483647">
-                <action android:name="android.intent.action.MEDIA_BUTTON"/>
-            </intent-filter>
         </receiver>
         <provider
             android:name=".provider.SearchSuggestionProvider"

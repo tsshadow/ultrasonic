@@ -31,7 +31,7 @@ class TimeSpanPicker(private var mContext: Context, attrs: AttributeSet?, defSty
     AdapterView.OnItemSelectedListener {
     private val timeSpanEditText: EditText
     private val timeSpanSpinner: Spinner
-    private val timeSpanDisableCheckbox: CheckBox
+    val timeSpanDisableCheckbox: CheckBox
     private var mTimeSpan: Long = -1L
     private val adapter: ArrayAdapter<CharSequence>
     private val dialog: View

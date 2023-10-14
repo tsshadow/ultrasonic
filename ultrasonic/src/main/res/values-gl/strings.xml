@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="background_task.loading">Cargando…</string>
     <string name="background_task.network_error">Ocorreu un erro de rede. Por favor comproba a dirección do servidor ou téntao de novo mais tarde.</string>
     <string name="background_task.unsupported_api">A API do servidor v%1$s non admite esta función.</string>
     <string name="background_task.no_network">Este programa require acceso á rede. Por favor acende a Wi-Fi ou a rede móbil.</string>
@@ -8,7 +7,6 @@
     <string name="background_task.parse_error">Non se entende a resposta. Por favor comproba a dirección do servidor.</string>
     <string name="background_task.ssl_cert_error">Erro do certificado HTTPS: %1$s.</string>
     <string name="background_task.ssl_error">Excepción de conexión SSL. Comprobe o certificado do servidor.</string>
-    <string name="background_task.wait">Por favor agarde…</string>
     <string name="button_bar.browse">Biblioteca</string>
     <string name="button_bar.chat">Chat</string>
     <string name="button_bar.now_playing">Reproducindo agora</string>

@@ -1,11 +1,11 @@
 /*
  * CachedDataSource.kt
- * Copyright (C) 2009-2022 Ultrasonic developers
+ * Copyright (C) 2009-2023 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
 
-package org.moire.ultrasonic.playback
+package org.moire.ultrasonic.data
 
 import android.net.Uri
 import androidx.core.net.toUri
