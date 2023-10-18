@@ -5,8 +5,6 @@
  * Distributed under terms of the GNU GPLv3 license.
  */
 
-@file:Suppress("NAME_SHADOWING")
-
 package org.moire.ultrasonic.fragment
 
 import android.os.Bundle
@@ -32,6 +30,7 @@ import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.model.AlbumListModel
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.toastingExceptionHandler
 import org.moire.ultrasonic.view.FilterButtonBar
 import org.moire.ultrasonic.view.SortOrder
 import org.moire.ultrasonic.view.ViewCapabilities
@@ -76,9 +75,10 @@ class AlbumListFragment(
     }
 
     private fun fetchAlbums(refresh: Boolean = navArgs.refresh, append: Boolean = navArgs.append) {
-
-        listModel.viewModelScope.launch(handler) {
-            refreshListView?.isRefreshing = true
+        listModel.viewModelScope.launch(
+            toastingExceptionHandler()
+        ) {
+            swipeRefresh?.isRefreshing = true
 
             if (navArgs.byArtist) {
                 listModel.getAlbumsOfArtist(
@@ -95,7 +95,7 @@ class AlbumListFragment(
                     refresh = refresh or append
                 )
             }
-            refreshListView?.isRefreshing = false
+            swipeRefresh?.isRefreshing = false
         }
     }
 
@@ -185,8 +185,8 @@ class AlbumListFragment(
         super.onViewCreated(view, savedInstanceState)
 
         // Setup refresh handler
-        refreshListView = view.findViewById(refreshListId)
-        refreshListView?.setOnRefreshListener {
+        swipeRefresh = view.findViewById(refreshListId)
+        swipeRefresh?.setOnRefreshListener {
             fetchAlbums(refresh = true)
         }
 

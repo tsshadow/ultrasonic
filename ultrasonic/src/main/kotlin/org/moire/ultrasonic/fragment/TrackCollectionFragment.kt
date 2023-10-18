@@ -41,7 +41,7 @@ import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.model.TrackCollectionModel
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.RxBus
@@ -56,6 +56,7 @@ import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util.navigateToCurrent
 import org.moire.ultrasonic.util.Util.toast
+import org.moire.ultrasonic.util.toastingExceptionHandler
 import org.moire.ultrasonic.view.SortOrder
 import org.moire.ultrasonic.view.ViewCapabilities
 import timber.log.Timber
@@ -107,8 +108,8 @@ open class TrackCollectionFragment(
         albumButtons = view.findViewById(R.id.menu_album)
 
         // Setup refresh handler
-        refreshListView = view.findViewById(refreshListId)
-        refreshListView?.setOnRefreshListener {
+        swipeRefresh = view.findViewById(refreshListId)
+        swipeRefresh?.setOnRefreshListener {
             handleRefresh()
         }
 
@@ -284,7 +285,7 @@ open class TrackCollectionFragment(
             } else if (item.itemId == R.id.menu_item_share) {
                 shareHandler.createShare(
                     fragment = this@TrackCollectionFragment,
-                    tracks = getSelectedTracks(),
+                    tracks = getSelectedOrAllTracks(),
                     additionalId = navArgs.id
                 )
                 return true
@@ -338,7 +339,7 @@ open class TrackCollectionFragment(
         } else {
             mediaPlayerManager.suggestedPlaylistName = navArgs.playlistName
             mediaPlayerManager.addToPlaylist(
-                songs = getAllSongs(),
+                songs = getAllTracks(),
                 insertionMode = insertionMode,
                 autoPlay = (insertionMode != MediaPlayerManager.InsertionMode.APPEND),
                 shuffle = shuffle
@@ -357,26 +358,20 @@ open class TrackCollectionFragment(
     }
 
     private fun downloadSelectedOrAllTracks(save: Boolean) {
-        var tracks = getSelectedTracks()
-        if (tracks.isEmpty()) tracks = getAllSongs()
-
         DownloadUtil.justDownload(
             action = if (save) DownloadAction.PIN else DownloadAction.DOWNLOAD,
             fragment = this,
-            tracks = tracks
+            tracks = getSelectedOrAllTracks()
         )
     }
 
     private fun playSelectedOrAllTracks(
         insertionMode: MediaPlayerManager.InsertionMode
     ) {
-        var tracks = getSelectedTracks()
-        if (tracks.isEmpty()) tracks = getAllSongs()
-
         mediaPlayerManager.playTracksAndToast(
             fragment = this,
             insertionMode = insertionMode,
-            tracks = tracks
+            tracks = getSelectedOrAllTracks()
         )
     }
 
@@ -386,13 +381,6 @@ open class TrackCollectionFragment(
             fragment = this,
             tracks = getSelectedTracks()
         )
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun getAllSongs(): List<Track> {
-        return viewAdapter.getCurrentList().filter {
-            it is Track && !it.isDirectory
-        } as List<Track>
     }
 
     private fun selectAllOrNone() {
@@ -503,6 +491,19 @@ open class TrackCollectionFragment(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
+    private fun getAllTracks(): List<Track> {
+        return viewAdapter.getCurrentList().filter {
+            it is Track && !it.isDirectory
+        } as List<Track>
+    }
+
+    fun getSelectedOrAllTracks(): List<Track> {
+        return getSelectedTracks().ifEmpty {
+            getAllTracks()
+        }
+    }
+
     override fun setTitle(title: String?) {
         setTitle(this@TrackCollectionFragment, title)
     }
@@ -534,8 +535,10 @@ open class TrackCollectionFragment(
         val offset = navArgs.offset
         val refresh2 = navArgs.refresh || refresh
 
-        listModel.viewModelScope.launch(handler) {
-            refreshListView?.isRefreshing = true
+        listModel.viewModelScope.launch(
+            toastingExceptionHandler()
+        ) {
+            swipeRefresh?.isRefreshing = true
 
             if (playlistId != null) {
                 setTitle(playlistName!!)
@@ -570,7 +573,7 @@ open class TrackCollectionFragment(
                 }
             }
 
-            refreshListView?.isRefreshing = false
+            swipeRefresh?.isRefreshing = false
         }
         return listModel.currentList
     }

@@ -92,7 +92,7 @@ import org.moire.ultrasonic.databinding.CurrentPlayingBinding
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
@@ -778,11 +778,8 @@ class PlayerFragment :
                 return true
             }
             R.id.menu_item_share -> {
-                val tracks: MutableList<Track?> = ArrayList()
-                val playlist = mediaPlayerManager.playlist
-                for (item in playlist) {
-                    val playlistEntry = item.toTrack()
-                    tracks.add(playlistEntry)
+                val tracks = mediaPlayerManager.playlist.map {
+                    it.toTrack()
                 }
                 shareHandler.createShare(
                     this,
@@ -793,12 +790,9 @@ class PlayerFragment :
             R.id.menu_item_share_song -> {
                 if (track == null) return true
 
-                val tracks: MutableList<Track?> = ArrayList()
-                tracks.add(track)
-
                 shareHandler.createShare(
                     this,
-                    tracks,
+                    listOf(track),
                 )
                 return true
             }

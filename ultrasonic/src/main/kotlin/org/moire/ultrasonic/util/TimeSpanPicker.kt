@@ -31,7 +31,7 @@ class TimeSpanPicker(private var mContext: Context, attrs: AttributeSet?, defSty
     AdapterView.OnItemSelectedListener {
     private val timeSpanEditText: EditText
     private val timeSpanSpinner: Spinner
-    val timeSpanDisableCheckbox: CheckBox
+    private val timeSpanDisableCheckbox: CheckBox
     private var mTimeSpan: Long = -1L
     private val adapter: ArrayAdapter<CharSequence>
     private val dialog: View
@@ -49,7 +49,7 @@ class TimeSpanPicker(private var mContext: Context, attrs: AttributeSet?, defSty
         dialog = inflater.inflate(R.layout.time_span_dialog, this, true)
         timeSpanEditText = dialog.findViewById<View>(R.id.timeSpanEditText) as EditText
         timeSpanEditText.setText("0")
-        timeSpanSpinner = dialog.findViewById<View>(R.id.timeSpanSpinner) as Spinner
+        timeSpanSpinner = dialog.findViewById<View>(R.id.timeSpanUnitSelector) as Spinner
         timeSpanDisableCheckbox =
             dialog.findViewById<View>(R.id.timeSpanDisableCheckBox) as CheckBox
         timeSpanDisableCheckbox.setOnCheckedChangeListener { _, b ->
@@ -128,7 +128,7 @@ class TimeSpanPicker(private var mContext: Context, attrs: AttributeSet?, defSty
     companion object {
         fun getTimeSpanFromDialog(context: Context, dialog: View): Long {
             val timeSpanEditText = dialog.findViewById<View>(R.id.timeSpanEditText) as EditText
-            val timeSpanSpinner = dialog.findViewById<View>(R.id.timeSpanSpinner) as Spinner
+            val timeSpanSpinner = dialog.findViewById<View>(R.id.timeSpanUnitSelector) as Spinner
             val timeSpanType = timeSpanSpinner.selectedItem as String
             Timber.i("SELECTED ITEM: %d", timeSpanSpinner.selectedItemId)
             val text = timeSpanEditText.text

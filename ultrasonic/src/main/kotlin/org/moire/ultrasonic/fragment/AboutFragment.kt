@@ -18,7 +18,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import java.util.Locale
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.Util.getVersionName
 
@@ -56,7 +55,7 @@ class AboutFragment : Fragment() {
             versionName
         )
 
-        setTitle(this@AboutFragment, getString(R.string.menu_about))
+        FragmentTitle.setTitle(this@AboutFragment, getString(R.string.menu_about))
         titleText?.text = title
 
         webPageButton?.setOnClickListener {

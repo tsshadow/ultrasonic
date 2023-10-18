@@ -9,13 +9,16 @@ package org.moire.ultrasonic.util
 
 import android.os.Handler
 import android.os.Looper
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import org.moire.ultrasonic.app.UApp
+import org.moire.ultrasonic.util.CommunicationError.getErrorMessage
+import org.moire.ultrasonic.util.Util.toast
 import timber.log.Timber
 
 object CoroutinePatterns {
@@ -28,24 +31,43 @@ object CoroutinePatterns {
     }
 }
 
-fun CoroutineScope.launchWithToast(
+fun Fragment.toastingExceptionHandler(
+    prefix: String = ""
+): CoroutineExceptionHandler {
+    return CoroutineExceptionHandler { _, exception ->
+        // Stop the spinner if applicable
+        if (this is RefreshableFragment) {
+            this.swipeRefresh?.isRefreshing = false
+        }
+        toast("$prefix ${getErrorMessage(exception)}", shortDuration = false)
+    }
+}
+
+/*
+* Launch a coroutine with a toast
+* This extension can be only  started from a fragment
+* because it needs the fragments scope to create the toast
+ */
+fun Fragment.launchWithToast(
     block: suspend CoroutineScope.() -> String?
 ) {
+    // Get the scope
+    val scope = activity?.lifecycleScope ?: lifecycleScope
+
     // Launch the Job
-    val deferred = async(CoroutinePatterns.loggingExceptionHandler, block = block)
+    val deferred = scope.async(block = block)
 
     // Setup a handler when the job is done
     deferred.invokeOnCompletion {
         val toastString = if (it != null && it !is CancellationException) {
-            CommunicationError.getErrorMessage(it)
+            getErrorMessage(it)
         } else {
             null
         }
-
-        launch(Dispatchers.Main) {
+        scope.launch(Dispatchers.Main) {
             val successString = toastString ?: deferred.await()
             if (successString != null) {
-                Util.toast(successString, UApp.applicationContext())
+                this@launchWithToast.toast(successString)
             }
         }
     }

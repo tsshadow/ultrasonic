@@ -12,6 +12,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.imageloader.ImageLoader
 import org.moire.ultrasonic.imageloader.ImageLoaderConfig
+import org.moire.ultrasonic.util.CoroutinePatterns
 import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.Util
 import timber.log.Timber
@@ -55,7 +56,7 @@ class ImageLoaderProvider :
     }
 
     fun executeOn(cb: (iL: ImageLoader) -> Unit) {
-        launch {
+        launch(CoroutinePatterns.loggingExceptionHandler) {
             val iL = getImageLoader()
             withContext(Dispatchers.Main) {
                 cb(iL)

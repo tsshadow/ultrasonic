@@ -232,7 +232,7 @@
         android:name="org.moire.ultrasonic.fragment.BookmarksFragment" />
     <fragment
         android:id="@+id/chatFragment"
-        android:name="org.moire.ultrasonic.fragment.ChatFragment" />
+        android:name="org.moire.ultrasonic.fragment.legacy.ChatFragment" />
     <fragment
         android:id="@+id/podcastFragment"
         android:name="org.moire.ultrasonic.fragment.legacy.PodcastFragment">

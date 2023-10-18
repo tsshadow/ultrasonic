@@ -58,6 +58,7 @@ class AlbumArtContentProvider : ContentProvider(), KoinComponent {
         Timber.d("AlbumArtContentProvider openFile id: %s; file: %s", parts[0], albumArtFile)
 
         // TODO: Check if the dependency on the image loader could be removed.
+        // TODO: This method can be called outside of our regular lifecycle, where Koin might not exist yet
         imageLoaderProvider.executeOn {
             it.downloadCoverArt(parts[0], albumArtFile)
         }

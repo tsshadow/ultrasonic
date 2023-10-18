@@ -1,70 +1,79 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView xmlns:a="http://schemas.android.com/apk/res/android"
-            a:id="@+id/share_details"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content">
+    a:id="@+id/share_details"
+    a:layout_width="match_parent"
+    a:layout_height="wrap_content"
+    a:padding="8dp">
 
     <LinearLayout
+        a:layout_width="match_parent"
+        a:layout_height="wrap_content"
         a:orientation="vertical"
-        a:layout_width="wrap_content"
-        a:layout_height="wrap_content">
+        a:padding="16dp">
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             a:id="@+id/share_on_server"
-            a:text="@string/share_on_server"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
-            a:layout_marginTop="4dip"
-            a:layout_marginBottom="4dip" />
+            a:text="@string/share_on_server" />
 
         <TextView
+            a:id="@+id/commentHeading"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
+            a:layout_marginTop="8dip"
+            a:labelFor="@id/share_description"
             a:text="@string/share_comment"
-            a:theme="@style/Ultrasonic.AllCapsLabel"
-            a:id="@+id/textViewComment"
-            a:layout_gravity="center_horizontal"/>
+            a:theme="@style/Ultrasonic.AllCapsLabel" />
 
         <EditText
             a:id="@+id/share_description"
             a:layout_width="fill_parent"
-            a:layout_height="wrap_content"
-            a:inputType="text"
-            a:singleLine="false"
+            a:layout_height="50dp"
             a:layout_marginTop="4dip"
-            a:layout_marginBottom="4dip" />
+            a:layout_marginBottom="16dip"
+            a:inputType="text"
+            a:singleLine="false" />
+
 
         <TextView
+            a:id="@+id/expirationHeading"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
+            a:labelFor="@id/date_picker"
             a:text="@string/settings.share_expiration"
-            a:theme="@style/Ultrasonic.AllCapsLabel"
-            a:id="@+id/textViewExpiration"
-            a:layout_gravity="center_horizontal"/>
+            a:theme="@style/Ultrasonic.AllCapsLabel" />
+
 
         <org.moire.ultrasonic.util.TimeSpanPicker
             a:id="@+id/date_picker"
+            a:layout_width="match_parent"
+            a:layout_height="wrap_content" />
+
+
+        <TextView
+            a:id="@+id/optionsHeading"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
-            a:layout_marginTop="4dip"
-            a:layout_marginBottom="4dip" />
+            a:layout_marginTop="16dip"
+            a:labelFor="@id/share_description"
+            a:text="@string/settings.share_options"
+            a:theme="@style/Ultrasonic.AllCapsLabel" />
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             a:id="@+id/hide_dialog"
-            a:text="@string/do_not_show_dialog_again"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
-            a:layout_marginTop="4dip"
-            a:layout_marginBottom="4dip" />
+            a:layout_marginTop="0dp"
+            a:layout_marginBottom="0dp"
+            a:text="@string/do_not_show_dialog_again" />
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             a:id="@+id/save_as_defaults"
-            a:text="@string/save_as_defaults"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
-            a:layout_marginTop="4dip"
-            a:layout_marginBottom="4dip" />
+            a:layout_marginTop="0dp"
+            a:layout_marginBottom="8dp"
+            a:text="@string/save_as_defaults" />
 
     </LinearLayout>
 </ScrollView>

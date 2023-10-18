@@ -16,8 +16,9 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.service.MediaPlayerManager
+import org.moire.ultrasonic.util.toastingExceptionHandler
 
 /**
  * Lists the Bookmarks available on the server
@@ -40,10 +41,12 @@ class BookmarksFragment : TrackCollectionFragment() {
         refresh: Boolean,
         append: Boolean
     ): LiveData<List<MusicDirectory.Child>> {
-        listModel.viewModelScope.launch(handler) {
-            refreshListView?.isRefreshing = true
+        listModel.viewModelScope.launch(
+            toastingExceptionHandler()
+        ) {
+            swipeRefresh?.isRefreshing = true
             listModel.getBookmarks()
-            refreshListView?.isRefreshing = false
+            swipeRefresh?.isRefreshing = false
         }
         return listModel.currentList
     }

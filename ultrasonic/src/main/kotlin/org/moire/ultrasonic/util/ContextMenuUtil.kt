@@ -130,8 +130,7 @@ object ContextMenuUtil : KoinComponent {
                 val shareHandler: ShareHandler by inject()
                 shareHandler.createShare(
                     fragment = fragment,
-                    tracks = tracks,
-                    additionalId = null
+                    tracks = tracks
                 )
             }
             else -> return false

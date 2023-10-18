@@ -8,7 +8,6 @@
 package org.moire.ultrasonic.util
 
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import java.util.LinkedList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,10 +35,8 @@ object DownloadUtil {
         tracks: List<Track>? = null
     ) {
 
-        val scope = fragment.activity?.lifecycleScope ?: fragment.lifecycleScope
-
         // Launch the Job
-        scope.launchWithToast {
+        fragment.launchWithToast {
             val tracksToDownload: List<Track> = tracks
                 ?: getTracksFromServerAsync(isArtist, id!!, isDirectory, name, isShare)
 

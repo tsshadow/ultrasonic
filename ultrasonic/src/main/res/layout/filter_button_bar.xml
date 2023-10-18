@@ -45,7 +45,7 @@
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@+id/chip_view_toggle"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_default="wrap">
+        >
 
         <androidx.appcompat.widget.AppCompatAutoCompleteTextView
             a:id="@+id/sort_order_menu_options"

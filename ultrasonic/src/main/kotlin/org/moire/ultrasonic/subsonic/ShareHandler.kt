@@ -68,14 +68,14 @@ class ShareHandler {
 
                 val ids: MutableList<String> = ArrayList()
 
-                if (!shareDetails.ShareOnServer && shareDetails.Entries.size == 1)
+                if (!shareDetails.shareOnServer && shareDetails.entries.size == 1)
                     return@withContext null
-                if (shareDetails.Entries.isEmpty()) {
+                if (shareDetails.entries.isEmpty()) {
                     additionalId.ifNotNull {
                         ids.add(it)
                     }
                 } else {
-                    for ((id) in shareDetails.Entries) {
+                    for ((id) in shareDetails.entries) {
                         ids.add(id)
                     }
                 }
@@ -83,15 +83,21 @@ class ShareHandler {
                 val musicService = getMusicService()
                 var timeInMillis: Long = 0
 
-                if (shareDetails.Expiration != 0L) {
-                    timeInMillis = shareDetails.Expiration
+                if (shareDetails.expiration != 0L) {
+                    timeInMillis = shareDetails.expiration
                 }
 
-                val shares =
-                    musicService.createShare(ids, shareDetails.Description, timeInMillis)
+                val shares = musicService.createShare(
+                    ids = ids,
+                    description = shareDetails.description,
+                    expires = timeInMillis
+                )
 
                 // Return the share
-                shares[0]
+                if (shares.isNotEmpty())
+                    shares[0]
+                else
+                    null
             } catch (ignored: Exception) {
                 null
             }
@@ -120,15 +126,15 @@ class ShareHandler {
                 val textBuilder = StringBuilder()
                 textBuilder.appendLine(Settings.shareGreeting)
 
-                if (!shareDetails.Entries[0].title.isNullOrEmpty())
+                if (!shareDetails.entries[0].title.isNullOrEmpty())
                     textBuilder.append(getString(R.string.common_title))
-                        .append(": ").appendLine(shareDetails.Entries[0].title)
-                if (!shareDetails.Entries[0].artist.isNullOrEmpty())
+                        .append(": ").appendLine(shareDetails.entries[0].title)
+                if (!shareDetails.entries[0].artist.isNullOrEmpty())
                     textBuilder.append(getString(R.string.common_artist))
-                        .append(": ").appendLine(shareDetails.Entries[0].artist)
-                if (!shareDetails.Entries[0].album.isNullOrEmpty())
+                        .append(": ").appendLine(shareDetails.entries[0].artist)
+                if (!shareDetails.entries[0].album.isNullOrEmpty())
                     textBuilder.append(getString(R.string.common_album))
-                        .append(": ").append(shareDetails.Entries[0].album)
+                        .append(": ").append(shareDetails.entries[0].album)
 
                 intent.putExtra(Intent.EXTRA_TEXT, textBuilder.toString())
             }
@@ -144,17 +150,17 @@ class ShareHandler {
 
     fun createShare(
         fragment: Fragment,
-        tracks: List<Track?>?,
+        tracks: List<Track>,
         additionalId: String? = null
     ) {
+        if (tracks.isEmpty()) return
         val askForDetails = Settings.shouldAskForShareDetails
-        val shareDetails = ShareDetails()
-        shareDetails.Entries = tracks
+        val shareDetails = ShareDetails(tracks)
         if (askForDetails) {
             showDialog(fragment, shareDetails, additionalId)
         } else {
-            shareDetails.Description = Settings.defaultShareDescription
-            shareDetails.Expiration = System.currentTimeMillis() +
+            shareDetails.description = Settings.defaultShareDescription
+            shareDetails.expiration = System.currentTimeMillis() +
                 Settings.defaultShareExpirationInMillis
             share(fragment, shareDetails, additionalId)
         }
@@ -177,12 +183,12 @@ class ShareHandler {
             noExpirationCheckBox = timeSpanPicker!!.findViewById<View>(
                 R.id.timeSpanDisableCheckBox
             ) as CheckBox
-            textViewComment = layout.findViewById<View>(R.id.textViewComment) as TextView
-            textViewExpiration = layout.findViewById<View>(R.id.textViewExpiration) as TextView
+            textViewComment = layout.findViewById<View>(R.id.commentHeading) as TextView
+            textViewExpiration = layout.findViewById<View>(R.id.expirationHeading) as TextView
         }
 
         // Handle the visibility based on shareDetails.Entries size
-        if (shareDetails.Entries.size == 1) {
+        if (shareDetails.entries.size == 1) {
             shareOnServerCheckBox?.setOnCheckedChangeListener { _, _ ->
                 updateVisibility()
             }
@@ -238,11 +244,11 @@ class ShareHandler {
         builder.setPositiveButton(R.string.menu_share) { _, _ ->
             if (!noExpirationCheckBox!!.isChecked) {
                 val timeSpan: Long = timeSpanPicker!!.getTimeSpan()
-                shareDetails.Expiration = System.currentTimeMillis() + timeSpan
+                shareDetails.expiration = System.currentTimeMillis() + timeSpan
             }
 
-            shareDetails.Description = shareDescription!!.text.toString()
-            shareDetails.ShareOnServer = shareOnServerCheckBox!!.isChecked
+            shareDetails.description = shareDescription!!.text.toString()
+            shareDetails.shareOnServer = shareOnServerCheckBox!!.isChecked
 
             if (hideDialogCheckBox!!.isChecked) {
                 Settings.shouldAskForShareDetails = false
@@ -255,8 +261,8 @@ class ShareHandler {
                     if (!noExpirationCheckBox!!.isChecked && timeSpanAmount > 0)
                         String.format("%d:%s", timeSpanAmount, timeSpanType) else ""
 
-                Settings.defaultShareDescription = shareDetails.Description
-                Settings.shareOnServer = shareDetails.ShareOnServer
+                Settings.defaultShareDescription = shareDetails.description!!
+                Settings.shareOnServer = shareDetails.shareOnServer
             }
 
             share(fragment, shareDetails, additionalId)

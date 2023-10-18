@@ -1,10 +1,3 @@
-/*
- * SelectGenreFragment.kt
- * Copyright (C) 2009-2022 Ultrasonic developers
- *
- * Distributed under terms of the GNU GPLv3 license.
- */
-
 package org.moire.ultrasonic.fragment.legacy
 
 import android.os.Bundle
@@ -15,35 +8,34 @@ import android.widget.AdapterView
 import android.widget.ListView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Genre
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.util.BackgroundTask
-import org.moire.ultrasonic.util.CancellationToken
-import org.moire.ultrasonic.util.FragmentBackgroundTask
+import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util.applyTheme
+import org.moire.ultrasonic.util.toastingExceptionHandler
 import org.moire.ultrasonic.view.GenreAdapter
-import timber.log.Timber
 
 /**
  * Displays the available genres in the media library
- *
- * TODO: This file has been converted from Java, but not modernized yet.
  */
-class SelectGenreFragment : Fragment() {
-    private var refreshGenreListView: SwipeRefreshLayout? = null
+class SelectGenreFragment : Fragment(), RefreshableFragment {
+    override var swipeRefresh: SwipeRefreshLayout? = null
     private var genreListView: ListView? = null
     private var emptyView: View? = null
-    private var cancellationToken: CancellationToken? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        applyTheme(this.context)
         super.onCreate(savedInstanceState)
+        applyTheme(requireContext())
     }
 
     override fun onCreateView(
@@ -55,15 +47,15 @@ class SelectGenreFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        cancellationToken = CancellationToken()
-        refreshGenreListView = view.findViewById(R.id.select_genre_refresh)
+        super.onViewCreated(view, savedInstanceState)
+        swipeRefresh = view.findViewById(R.id.select_genre_refresh)
         genreListView = view.findViewById(R.id.select_genre_list)
-        refreshGenreListView!!.setOnRefreshListener { load(true) }
+        swipeRefresh?.setOnRefreshListener { load(true) }
 
-        genreListView!!.setOnItemClickListener { parent: AdapterView<*>,
-            _: View?,
-            position: Int,
-            _: Long ->
+        genreListView?.setOnItemClickListener {
+            parent: AdapterView<*>, _: View?,
+            position: Int, _: Long
+            ->
             val genre = parent.getItemAtPosition(position) as Genre
 
             val action = NavigationGraphDirections.toTrackCollection(
@@ -79,34 +71,19 @@ class SelectGenreFragment : Fragment() {
         load(false)
     }
 
-    override fun onDestroyView() {
-        cancellationToken!!.cancel()
-        super.onDestroyView()
-    }
-
-    // TODO: Migrate to Coroutines
     private fun load(refresh: Boolean) {
-        val task: BackgroundTask<List<Genre>> = object : FragmentBackgroundTask<List<Genre>>(
-            activity, true, refreshGenreListView, cancellationToken
+        viewLifecycleOwner.lifecycleScope.launch(
+            toastingExceptionHandler()
         ) {
-            override fun doInBackground(): List<Genre> {
+            val result = withContext(Dispatchers.IO) {
                 val musicService = getMusicService()
-                var genres: List<Genre> = ArrayList()
-                try {
-                    genres = musicService.getGenres(refresh)
-                } catch (all: Exception) {
-                    Timber.e(all, "Failed to load genres")
-                }
-                return genres
+                musicService.getGenres(refresh)
             }
-
-            override fun done(result: List<Genre>) {
-                emptyView!!.isVisible = result.isEmpty()
-                if (context != null) {
-                    genreListView!!.adapter = GenreAdapter(context!!, result)
-                }
+            swipeRefresh?.isRefreshing = false
+            withContext(Dispatchers.Main) {
+                emptyView?.isVisible = result.isEmpty()
+                genreListView?.adapter = GenreAdapter(requireContext(), result)
             }
         }
-        task.execute()
     }
 }
