@@ -51,7 +51,7 @@ import timber.log.Timber
  */
 @Suppress("LargeClass")
 open class RESTMusicService(
-    val subsonicAPIClient: SubsonicAPIClient,
+    private val subsonicAPIClient: SubsonicAPIClient,
     private val activeServerProvider: ActiveServerProvider
 ) : MusicService {
 
@@ -502,6 +502,11 @@ open class RESTMusicService(
 
         // Create a new Okhttp client
         builder.build()
+    }
+
+    override fun isJukeboxAvailable(): Boolean {
+        val username = activeServerProvider.getActiveServer().userName
+        return getUser(username).jukeboxRole
     }
 
     @Throws(Exception::class)

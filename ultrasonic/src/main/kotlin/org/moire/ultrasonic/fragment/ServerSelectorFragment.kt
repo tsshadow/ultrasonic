@@ -64,7 +64,7 @@ class ServerSelectorFragment : Fragment() {
 
         listView?.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
             val server = parent.getItemAtPosition(position) as ServerSetting
-            ActiveServerProvider.setActiveServerById(server.id)
+            activeServerProvider.setActiveServerById(server.id)
             findNavController().popBackStack(R.id.mainFragment, false)
         }
 
@@ -99,7 +99,7 @@ class ServerSelectorFragment : Fragment() {
                 val activeServerId = ActiveServerProvider.getActiveServerId()
 
                 // If the currently active server is deleted, go offline
-                if (id == activeServerId) ActiveServerProvider.setActiveServerById(OFFLINE_DB_ID)
+                if (id == activeServerId) activeServerProvider.setActiveServerById(OFFLINE_DB_ID)
 
                 serverSettingsModel.deleteItemById(id)
 

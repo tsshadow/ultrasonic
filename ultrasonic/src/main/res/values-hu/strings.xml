@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="background_task.loading">Betöltés&#8230;</string>
     <string name="background_task.network_error">Hálózati hiba történt! Kérjük, ellenőrizze a kiszolgáló címét vagy próbálja később!</string>
     <string name="background_task.unsupported_api">A v%1$s verziójú Szerver api nem támogatja ezt a funkciót.</string>
     <string name="background_task.no_network">Az alkalmazás hálózati hozzáférést igényel. Kérjük, kapcsolja be a Wi-Fi-t vagy a mobilhálózatot!</string>
@@ -9,7 +8,6 @@
     <string name="background_task.parse_error">Értelmezhetetlen válasz! Kérjük, ellenőrizze a kiszolgáló címét!</string>
     <string name="background_task.ssl_cert_error">HTTPS tanúsítványhiba: %1$s.</string>
     <string name="background_task.ssl_error">SSL kapcsolat kivétel. Kérjük, ellenőrizze a szerver tanúsítványát.</string>
-    <string name="background_task.wait">Kérem várjon!&#8230;</string>
     <string name="button_bar.bookmarks">Könyvjelzők</string>
     <string name="button_bar.browse">Médiakönyvtár</string>
     <string name="button_bar.chat">Csevegés (Chat)</string>
@@ -194,8 +192,6 @@
     <string name="settings.max_bitrate_unlimited">Korlátlan</string>
     <string name="settings.max_bitrate_wifi">Max. bitráta - Wi-Fi kapcsolat</string>
     <string name="settings.max_songs">Dalok max. találati száma</string>
-    <string name="settings.media_button_summary">Telefon irányítása a Bluetooth eszköz, vagy a fülhallgató vezérlőgombjaival.</string>
-    <string name="settings.media_button_title">Média vezérlőgombok</string>
     <string name="settings.network_timeout">Hálózati időtúllépés</string>
     <string name="settings.network_timeout_105000">105 másodperc</string>
     <string name="settings.network_timeout_120000">120 másodperc</string>

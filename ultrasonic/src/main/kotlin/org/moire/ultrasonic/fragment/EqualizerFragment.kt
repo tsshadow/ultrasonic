@@ -26,7 +26,7 @@ import java.util.HashMap
 import java.util.Locale
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.audiofx.EqualizerController
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.util.Util.applyTheme
 import timber.log.Timber
 

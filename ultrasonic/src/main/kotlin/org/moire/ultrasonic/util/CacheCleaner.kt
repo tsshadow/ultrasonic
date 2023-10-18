@@ -11,7 +11,6 @@ import android.system.Os
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -19,7 +18,7 @@ import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Playlist
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.service.MediaPlayerManager
+import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.util.FileUtil.getAlbumArtFile
 import org.moire.ultrasonic.util.FileUtil.getCompleteFile
 import org.moire.ultrasonic.util.FileUtil.getPartialFile
@@ -38,7 +37,6 @@ import timber.log.Timber
  */
 class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO), KoinComponent {
 
-    private var mainScope = CoroutineScope(Dispatchers.Main)
     private val activeServerProvider by inject<ActiveServerProvider>()
 
     private fun exceptionHandler(tag: String): CoroutineExceptionHandler {
@@ -235,16 +233,14 @@ class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO), KoinCompo
 
     private fun findFilesToNotDelete(): Set<String> {
         val filesToNotDelete: MutableSet<String> = HashSet(5)
-        val mediaPlayerManager: MediaPlayerManager by inject()
 
-        val playlist = mainScope.future { mediaPlayerManager.playlist }.get()
-        for (item in playlist) {
-            val track = item.toTrack()
+        // We just take the last published playlist from RX
+        val playlist = RxBus.playlistObservable.blockingLast()
+        for (track in playlist) {
             filesToNotDelete.add(track.getPartialFile())
             filesToNotDelete.add(track.getCompleteFile())
             filesToNotDelete.add(track.getPinnedFile())
         }
-
         filesToNotDelete.add(musicDirectory.path)
         return filesToNotDelete
     }

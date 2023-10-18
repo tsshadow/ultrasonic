@@ -16,7 +16,7 @@ class VideoPlayer {
     companion object {
         fun playVideo(context: Context, track: Track?) {
             if (!Util.hasUsableNetwork() || track == null) {
-                Util.toast(context, R.string.select_album_no_network)
+                Util.toast(R.string.select_album_no_network, true, context)
                 return
             }
             try {
@@ -32,7 +32,7 @@ class VideoPlayer {
                 )
                 context.startActivity(intent)
             } catch (all: Exception) {
-                Util.toast(context, all.toString(), false)
+                Util.toast(all.toString(), false, context)
             }
         }
     }

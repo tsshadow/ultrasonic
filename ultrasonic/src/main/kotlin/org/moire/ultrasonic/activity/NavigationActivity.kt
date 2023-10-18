@@ -23,7 +23,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -39,6 +38,7 @@ import androidx.media3.common.Player.STATE_READY
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.onNavDestinationSelected
@@ -50,6 +50,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.scope.ScopeActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
@@ -63,7 +64,6 @@ import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
-import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.InfoDialog
 import org.moire.ultrasonic.util.LocaleHelper
@@ -81,7 +81,7 @@ import timber.log.Timber
  * onCreate/onResume/onDestroy methods...
  */
 @Suppress("TooManyFunctions")
-class NavigationActivity : AppCompatActivity() {
+class NavigationActivity : ScopeActivity() {
     private var videoMenuItem: MenuItem? = null
     private var chatMenuItem: MenuItem? = null
     private var bookmarksMenuItem: MenuItem? = null
@@ -485,15 +485,19 @@ class NavigationActivity : AppCompatActivity() {
         val currentFragment = host?.childFragmentManager?.fragments?.last() ?: return
         val service = MusicServiceFactory.getMusicService()
         val musicDirectory = service.getRandomSongs(Settings.maxSongs)
-        val downloadHandler: DownloadHandler by inject()
-        downloadHandler.addTracksToMediaController(
+
+        mediaPlayerManager.addToPlaylist(
             songs = musicDirectory.getTracks(),
-            insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
             autoPlay = true,
             shuffle = false,
-            fragment = currentFragment,
-            playlistName = null
+            insertionMode = MediaPlayerManager.InsertionMode.CLEAR
         )
+
+        if (Settings.shouldTransitionOnPlayback) {
+            currentFragment.findNavController().popBackStack(R.id.playerFragment, true)
+            currentFragment.findNavController().navigate(R.id.playerFragment)
+        }
+
         return
     }
 

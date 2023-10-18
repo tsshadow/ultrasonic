@@ -22,20 +22,22 @@
         android:xlargeScreens="true"/>
 
     <application
-        android:allowBackup="true"
-        android:fullBackupContent="@xml/backup_descriptor"
-        android:hasFragileUserData="true" tools:targetApi="q"
-        android:dataExtractionRules="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:theme="@style/Theme.Material3.DynamicColors.Dark"
         android:name=".app.UApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/backup_rules"
+        android:enableOnBackInvokedCallback="true"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:hasFragileUserData="true"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/common.appname"
-        android:usesCleartextTraffic="true"
-        android:supportsRtl="false"
-        android:preserveLegacyExternalStorage="true"
         android:networkSecurityConfig="@xml/network_security_config"
-        tools:ignore="UnusedAttribute">
+        android:preserveLegacyExternalStorage="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="false"
+        android:theme="@style/Theme.Material3.DynamicColors.Dark"
+        android:usesCleartextTraffic="true"
+        tools:ignore="UnusedAttribute"
+        tools:targetApi="q">
         <!-- Add for API 34 android:enableOnBackInvokedCallBack="true" -->
 
         <meta-data android:name="com.google.android.gms.car.application"
@@ -72,7 +74,7 @@
         </service>
 
         <!-- Needs to be exported: https://android.googlesource.com/platform/developers/build/+/4de32d4/prebuilts/gradle/MediaBrowserService/README.md -->
-        <service android:name=".playback.PlaybackService"
+        <service android:name=".service.PlaybackService"
             android:label="@string/common.appname"
             android:foregroundServiceType="mediaPlayback"
             android:exported="true"
@@ -107,6 +109,12 @@
                 <action android:name="android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED"/>
             </intent-filter>
         </receiver>
+        <receiver android:name="androidx.media3.session.MediaButtonReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name=".provider.UltrasonicAppWidgetProvider"
             android:label="Ultrasonic"
@@ -118,12 +126,6 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/appwidget_info"/>
-        </receiver>
-        <receiver android:name=".receiver.MediaButtonIntentReceiver"
-            android:exported="true">
-            <intent-filter android:priority="2147483647">
-                <action android:name="android.intent.action.MEDIA_BUTTON"/>
-            </intent-filter>
         </receiver>
         <provider
             android:name=".provider.SearchSuggestionProvider"
@@ -137,5 +139,4 @@
             android:exported="true"
             tools:ignore="ExportedContentProvider" />
     </application>
-
 </manifest>

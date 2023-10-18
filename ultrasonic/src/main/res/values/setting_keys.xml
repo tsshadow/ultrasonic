@@ -19,7 +19,6 @@
     <string name="setting_key.preload_count" translatable="false">preloadCount</string>
     <string name="setting_key.parallel_downloads" translatable="false">parallelDownloads</string>
     <string name="setting_key.hide_media" translatable="false">hideMedia</string>
-    <string name="setting_key.media_buttons" translatable="false">mediaButtons</string>
     <string name="setting_key.scrobble" translatable="false">scrobble</string>
     <string name="setting_key.server_scaling" translatable="false">serverScaling</string>
     <string name="setting_key.wifi_required_for_download" translatable="false">wifiRequiredForDownload</string>

@@ -71,50 +71,6 @@
     </issue>
 
     <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="        &lt;EditText"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/chat.xml"
-            line="33"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="    &lt;EditText"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/save_playlist.xml"
-            line="9"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="        &lt;EditText"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/share_details.xml"
-            line="29"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="        &lt;EditText"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/time_span_dialog.xml"
-            line="28"
-            column="10"/>
-    </issue>
-
-    <issue
         id="LabelFor"
         message="Missing accessibility label: provide either a view with an `android:labelFor` that references this view or provide an `android:hint`"
         errorLine1="    &lt;EditText"

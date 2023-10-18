@@ -7,8 +7,6 @@
 
 package org.moire.ultrasonic.data
 
-import android.os.Handler
-import android.os.Looper
 import androidx.room.Room
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -103,6 +101,30 @@ class ActiveServerProvider(
         launch {
             val serverId = repository.findByIndex(index)?.id ?: 0
             setActiveServerById(serverId)
+        }
+    }
+
+    /**
+     * Sets the Active Server by its unique id
+     * @param serverId: The id of the desired server
+     */
+    fun setActiveServerById(serverId: Int) {
+        val oldServerId = Settings.activeServer
+        if (oldServerId == serverId) return
+
+        // Notify components about the change before actually resetting the MusicService
+        // so they can react by e.g. stopping playback on the old server
+        RxBus.activeServerChangingPublisher.onNext(oldServerId)
+
+        // Use a coroutine to post the server change to the end of the message queue
+        launch {
+            withContext(Dispatchers.Main) {
+                resetMusicService()
+                Settings.activeServer = serverId
+
+                RxBus.activeServerChangedPublisher.onNext(getActiveServer(serverId))
+                Timber.i("setActiveServerById done, new id: %s", serverId)
+            }
         }
     }
 
@@ -232,29 +254,6 @@ class ActiveServerProvider(
          */
         fun getActiveServerId(): Int {
             return Settings.activeServer
-        }
-
-        /**
-         * Sets the Active Server by its unique id
-         * @param serverId: The id of the desired server
-         */
-        fun setActiveServerById(serverId: Int) {
-            val oldServerId = Settings.activeServer
-            if (oldServerId == serverId) return
-
-            // Notify components about the change before actually resetting the MusicService
-            // so they can react by e.g. stopping playback on the old server
-            RxBus.activeServerChangingPublisher.onNext(oldServerId)
-
-            // Post the server change to the end of the message queue,
-            // so the cleanup have time to finish
-            Handler(Looper.getMainLooper()).post {
-                resetMusicService()
-                Settings.activeServer = serverId
-
-                RxBus.activeServerChangedPublisher.onNext(serverId)
-                Timber.i("setActiveServerById done, new id: %s", serverId)
-            }
         }
 
         /**

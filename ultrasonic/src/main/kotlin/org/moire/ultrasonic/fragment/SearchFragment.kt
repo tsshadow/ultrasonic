@@ -17,7 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
+import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.AlbumRowDelegate
@@ -34,43 +34,32 @@ import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.model.SearchListModel
-import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.MediaPlayerManager
-import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
-import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.subsonic.VideoPlayer.Companion.playVideo
-import org.moire.ultrasonic.util.CancellationToken
-import org.moire.ultrasonic.util.CommunicationError
+import org.moire.ultrasonic.util.ContextMenuUtil.handleContextMenu
+import org.moire.ultrasonic.util.ContextMenuUtil.handleContextMenuTracks
+import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.toast
+import org.moire.ultrasonic.util.toastingExceptionHandler
 
 /**
  * Initiates a search on the media library and displays the results
 
  */
-class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
+class SearchFragment : MultiListFragment<Identifiable>(), KoinScopeComponent, RefreshableFragment {
     private var searchResult: SearchResult? = null
-    private var searchRefresh: SwipeRefreshLayout? = null
-
+    override var swipeRefresh: SwipeRefreshLayout? = null
     private val mediaPlayerManager: MediaPlayerManager by inject()
-
-    private val shareHandler: ShareHandler by inject()
-    private val networkAndStorageChecker: NetworkAndStorageChecker by inject()
-
-    private var cancellationToken: CancellationToken? = null
-
     private val navArgs by navArgs<SearchFragmentArgs>()
-
     override val listModel: SearchListModel by viewModels()
-
     override val mainLayout: Int = R.layout.search
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        cancellationToken = CancellationToken()
         setTitle(this, R.string.search_title)
 
         listModel.searchResult.observe(
@@ -83,8 +72,8 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             }
         }
 
-        searchRefresh = view.findViewById(R.id.swipe_refresh_view)
-        searchRefresh!!.isEnabled = false
+        swipeRefresh = view.findViewById(R.id.swipe_refresh_view)
+        swipeRefresh!!.isEnabled = false
 
         registerForContextMenu(listView!!)
 
@@ -133,29 +122,17 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
 
     override fun onDestroyView() {
         Util.hideKeyboard(activity)
-        cancellationToken?.cancel()
         super.onDestroyView()
     }
 
-    private fun downloadBackground(save: Boolean, songs: List<Track?>) {
-        val onValid = Runnable {
-            networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
-            DownloadService.download(
-                songs.filterNotNull(),
-                save = save,
-                updateSaveFlag = true
-            )
-        }
-        onValid.run()
-    }
-
     private fun search(query: String, autoplay: Boolean) {
-        listModel.viewModelScope.launch(CommunicationError.getHandler(context)) {
-            refreshListView?.isRefreshing = true
-            listModel.search(query)
-            refreshListView?.isRefreshing = false
-        }.invokeOnCompletion {
-            if (it == null && autoplay) {
+        listModel.viewModelScope.launch(
+            toastingExceptionHandler()
+        ) {
+            swipeRefresh?.isRefreshing = true
+            val result = listModel.search(query)
+            swipeRefresh?.isRefreshing = false
+            if (result != null && autoplay) {
                 autoplay()
             }
         }
@@ -253,7 +230,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
             insertionMode = MediaPlayerManager.InsertionMode.APPEND
         )
         mediaPlayerManager.play(mediaPlayerManager.mediaItemCount - 1)
-        toast(context, resources.getQuantityString(R.plurals.n_songs_added_to_end, 1, 1))
+        toast(resources.getQuantityString(R.plurals.n_songs_added_to_end, 1, 1))
     }
 
     private fun onVideoSelected(track: Track) {
@@ -288,103 +265,23 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinComponent {
 
     @Suppress("LongMethod")
     override fun onContextMenuItemSelected(menuItem: MenuItem, item: Identifiable): Boolean {
-        val isArtist = (item is Artist)
-
-        val found = EntryListFragment.handleContextMenu(
-            menuItem,
-            item,
-            isArtist,
-            downloadHandler,
-            this
-        )
-
-        if (found || item !is Track) return true
-
-        val songs = mutableListOf<Track>()
-
-        when (menuItem.itemId) {
-            R.id.song_menu_play_now -> {
-                songs.add(item)
-                downloadHandler.addTracksToMediaController(
-                    songs = songs,
-                    insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
-                    autoPlay = true,
-                    shuffle = false,
-                    fragment = this,
-                    playlistName = null
-                )
-            }
-            R.id.song_menu_play_next -> {
-                songs.add(item)
-                downloadHandler.addTracksToMediaController(
-                    songs = songs,
-                    insertionMode = MediaPlayerManager.InsertionMode.AFTER_CURRENT,
-                    autoPlay = false,
-                    shuffle = false,
-                    fragment = this,
-                    playlistName = null
-                )
-            }
-            R.id.song_menu_play_last -> {
-                songs.add(item)
-                downloadHandler.addTracksToMediaController(
-                    songs = songs,
-                    insertionMode = MediaPlayerManager.InsertionMode.APPEND,
-                    autoPlay = false,
-                    shuffle = false,
-                    fragment = this,
-                    playlistName = null
-                )
-            }
-            R.id.song_menu_pin -> {
-                songs.add(item)
-                toast(
-                    context,
-                    resources.getQuantityString(
-                        R.plurals.n_songs_pinned,
-                        songs.size,
-                        songs.size
-                    )
-                )
-                downloadBackground(true, songs)
-            }
-            R.id.song_menu_download -> {
-                songs.add(item)
-                toast(
-                    context,
-                    resources.getQuantityString(
-                        R.plurals.n_songs_to_be_downloaded,
-                        songs.size,
-                        songs.size
-                    )
-                )
-                downloadBackground(false, songs)
-            }
-            R.id.song_menu_unpin -> {
-                songs.add(item)
-                toast(
-                    context,
-                    resources.getQuantityString(
-                        R.plurals.n_songs_unpinned,
-                        songs.size,
-                        songs.size
-                    )
-                )
-                DownloadService.unpin(songs)
-            }
-            R.id.song_menu_share -> {
-                songs.add(item)
-                shareHandler.createShare(
-                    fragment = this,
-                    tracks = songs,
-                    swipe = searchRefresh,
-                    cancellationToken = cancellationToken!!,
-                    additionalId = null
-                )
-            }
+        // Here the Item could be a track or an album or an artist
+        if (item is Track) {
+            return handleContextMenuTracks(
+                menuItem = menuItem,
+                tracks = listOf(item),
+                mediaPlayerManager = mediaPlayerManager,
+                fragment = this
+            )
+        } else {
+            return handleContextMenu(
+                menuItem = menuItem,
+                item = item,
+                isArtist = item is Artist,
+                mediaPlayerManager = mediaPlayerManager,
+                fragment = this
+            )
         }
-
-        return true
     }
 
     companion object {

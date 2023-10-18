@@ -3,7 +3,6 @@ package org.moire.ultrasonic.di
 
 import kotlin.math.abs
 import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.moire.ultrasonic.BuildConfig
@@ -16,9 +15,6 @@ import org.moire.ultrasonic.service.CachedMusicService
 import org.moire.ultrasonic.service.MusicService
 import org.moire.ultrasonic.service.OfflineMusicService
 import org.moire.ultrasonic.service.RESTMusicService
-import org.moire.ultrasonic.subsonic.DownloadHandler
-import org.moire.ultrasonic.subsonic.NetworkAndStorageChecker
-import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.util.Constants
 
 /**
@@ -68,8 +64,4 @@ val musicServiceModule = module {
     single<MusicService>(named(OFFLINE_MUSIC_SERVICE)) {
         OfflineMusicService()
     }
-
-    single { DownloadHandler(get(), get()) }
-    single { NetworkAndStorageChecker(androidContext()) }
-    single { ShareHandler(androidContext()) }
 }

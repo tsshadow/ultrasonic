@@ -256,7 +256,7 @@ class DownloadTask(
 
         // Download the largest size that we can display in the UI
         imageLoaderProvider.executeOn { imageLoader ->
-            imageLoader.cacheCoverArt(this)
+            imageLoader.downloadCoverArt(this@cacheMetadataAndArtwork)
             // Cache small copies of the Artist picture
             directArtist?.let { imageLoader.cacheArtistPicture(it) }
             compilationArtist?.let { imageLoader.cacheArtistPicture(it) }

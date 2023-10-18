@@ -315,6 +315,10 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         return musicService.getStreamUrl(id, maxBitRate, format)
     }
 
+    override fun isJukeboxAvailable(): Boolean {
+        return musicService.isJukeboxAvailable()
+    }
+
     @Throws(Exception::class)
     override fun updateJukeboxPlaylist(ids: List<String>?): JukeboxStatus {
         return musicService.updateJukeboxPlaylist(ids)

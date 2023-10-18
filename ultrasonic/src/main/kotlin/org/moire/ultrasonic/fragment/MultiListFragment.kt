@@ -8,8 +8,6 @@
 package org.moire.ultrasonic.fragment
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -17,15 +15,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import kotlinx.coroutines.CoroutineExceptionHandler
 import org.koin.android.ext.android.inject
+import org.koin.androidx.scope.ScopeFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.BaseAdapter
@@ -33,21 +30,19 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.model.GenericListModel
 import org.moire.ultrasonic.model.ServerSettingsModel
-import org.moire.ultrasonic.subsonic.DownloadHandler
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
-import org.moire.ultrasonic.util.CommunicationError
+import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Util
 
 /**
  * An abstract Model, which can be extended to display a list of items of type T from the API
  * @param T: The type of data which will be used (must extend GenericEntry)
  */
-abstract class MultiListFragment<T : Identifiable> : Fragment() {
+abstract class MultiListFragment<T : Identifiable> : ScopeFragment(), RefreshableFragment {
     internal val activeServerProvider: ActiveServerProvider by inject()
     internal val serverSettingsModel: ServerSettingsModel by viewModel()
     internal val imageLoaderProvider: ImageLoaderProvider by inject()
-    protected val downloadHandler: DownloadHandler by inject()
-    protected var refreshListView: SwipeRefreshLayout? = null
+    override var swipeRefresh: SwipeRefreshLayout? = null
     internal var listView: RecyclerView? = null
     internal lateinit var viewManager: LinearLayoutManager
     internal lateinit var emptyView: ConstraintLayout
@@ -97,16 +92,6 @@ abstract class MultiListFragment<T : Identifiable> : Fragment() {
      */
     open val refreshOnCreation: Boolean = true
 
-    /**
-     * The default Exception Handler for Coroutines
-     */
-    val handler = CoroutineExceptionHandler { _, exception ->
-        Handler(Looper.getMainLooper()).post {
-            CommunicationError.handleError(exception, context)
-        }
-        refreshListView?.isRefreshing = false
-    }
-
     open fun setTitle(title: String?) {
         if (title == null) {
             FragmentTitle.setTitle(
@@ -124,7 +109,7 @@ abstract class MultiListFragment<T : Identifiable> : Fragment() {
      * What to do when the list has changed
      */
     internal open val defaultObserver: ((List<T>) -> Unit) = {
-        emptyView.isVisible = it.isEmpty() && !(refreshListView?.isRefreshing?:false)
+        emptyView.isVisible = it.isEmpty() && !(swipeRefresh?.isRefreshing?:false)
         viewAdapter.submitList(it)
     }
 
@@ -132,9 +117,9 @@ abstract class MultiListFragment<T : Identifiable> : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Setup refresh handler
-        refreshListView = view.findViewById(refreshListId)
-        refreshListView?.setOnRefreshListener {
-            listModel.refresh(refreshListView!!)
+        swipeRefresh = view.findViewById(refreshListId)
+        swipeRefresh?.setOnRefreshListener {
+            listModel.refresh(swipeRefresh!!)
         }
 
         // Populate the LiveData. This starts an API request in most cases

@@ -13,35 +13,34 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.domain.Lyrics
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.util.BackgroundTask
-import org.moire.ultrasonic.util.CancellationToken
-import org.moire.ultrasonic.util.FragmentBackgroundTask
+import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Util.applyTheme
+import org.moire.ultrasonic.util.toastingExceptionHandler
 import timber.log.Timber
 
 /**
  * Displays the lyrics of a song
- *
- * TODO: This file has been converted from Java, but not modernized yet.
  */
-class LyricsFragment : Fragment() {
+class LyricsFragment : Fragment(), RefreshableFragment {
     private var artistView: TextView? = null
     private var titleView: TextView? = null
     private var textView: TextView? = null
-    private var swipe: SwipeRefreshLayout? = null
-    private var cancellationToken: CancellationToken? = null
+    override var swipeRefresh: SwipeRefreshLayout? = null
 
     private val navArgs by navArgs<LyricsFragmentArgs>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        applyTheme(this.context)
         super.onCreate(savedInstanceState)
+        applyTheme(requireContext())
     }
 
     override fun onCreateView(
@@ -53,42 +52,34 @@ class LyricsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        cancellationToken = CancellationToken()
+        super.onViewCreated(view, savedInstanceState)
         Timber.d("Lyrics set title")
         setTitle(this, R.string.download_menu_lyrics)
-        swipe = view.findViewById(R.id.lyrics_refresh)
-        swipe?.isEnabled = false
+        swipeRefresh = view.findViewById(R.id.lyrics_refresh)
+        swipeRefresh?.isEnabled = false
         artistView = view.findViewById(R.id.lyrics_artist)
         titleView = view.findViewById(R.id.lyrics_title)
         textView = view.findViewById(R.id.lyrics_text)
         load()
     }
-
-    override fun onDestroyView() {
-        cancellationToken!!.cancel()
-        super.onDestroyView()
-    }
-
     private fun load() {
-        val task: BackgroundTask<Lyrics> = object : FragmentBackgroundTask<Lyrics>(
-            activity, true, swipe, cancellationToken
+        viewLifecycleOwner.lifecycleScope.launch(
+            toastingExceptionHandler()
         ) {
-            @Throws(Throwable::class)
-            override fun doInBackground(): Lyrics {
+            val result = withContext(Dispatchers.IO) {
                 val musicService = getMusicService()
-                return musicService.getLyrics(navArgs.artist, navArgs.title)!!
+                musicService.getLyrics(navArgs.artist, navArgs.title)!!
             }
-
-            override fun done(result: Lyrics) {
+            swipeRefresh?.isRefreshing = false
+            withContext(Dispatchers.Main) {
                 if (result.artist != null) {
-                    artistView!!.text = result.artist
-                    titleView!!.text = result.title
-                    textView!!.text = result.text
+                    artistView?.text = result.artist
+                    titleView?.text = result.title
+                    textView?.text = result.text
                 } else {
-                    artistView!!.setText(R.string.lyrics_nomatch)
+                    artistView?.setText(R.string.lyrics_nomatch)
                 }
             }
         }
-        task.execute()
     }
 }

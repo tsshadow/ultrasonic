@@ -56,8 +56,11 @@ class AlbumArtContentProvider : ContentProvider(), KoinComponent {
 
         val albumArtFile = FileUtil.getAlbumArtFile(parts[1])
         Timber.d("AlbumArtContentProvider openFile id: %s; file: %s", parts[0], albumArtFile)
+
+        // TODO: Check if the dependency on the image loader could be removed.
+        // TODO: This method can be called outside of our regular lifecycle, where Koin might not exist yet
         imageLoaderProvider.executeOn {
-            it.cacheCoverArt(parts[0], albumArtFile)
+            it.downloadCoverArt(parts[0], albumArtFile)
         }
         val file = File(albumArtFile)
         if (!file.exists()) return null
