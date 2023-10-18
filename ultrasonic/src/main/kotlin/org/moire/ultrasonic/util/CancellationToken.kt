@@ -8,7 +8,9 @@ package org.moire.ultrasonic.util
 
 /**
  * This class contains a very simple implementation of a CancellationToken
- */
+ * TODO: Remove this class and refactor all user to coroutines
+ **/
+
 class CancellationToken {
     var isCancellationRequested: Boolean = false
 

@@ -20,7 +20,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.log.FileLoggerTree
 import org.moire.ultrasonic.log.FileLoggerTree.Companion.deleteLogFiles
 import org.moire.ultrasonic.log.FileLoggerTree.Companion.getLogFileNumber
@@ -108,7 +108,9 @@ class SettingsFragment :
         preferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == null || sharedPreferences == null) return
+
         Timber.d("Preference changed: %s", key)
         updateCustomPreferences()
 
@@ -298,7 +300,7 @@ class SettingsFragment :
                         SearchSuggestionProvider.MODE
                     )
                     suggestions.clearHistory()
-                    toast(activity, R.string.settings_search_history_cleared)
+                    toast(R.string.settings_search_history_cleared)
                     false
                 }
         }
@@ -330,7 +332,7 @@ class SettingsFragment :
                 Timber.w("Failed to delete %s", nomediaDir)
             }
         }
-        toast(activity, R.string.settings_hide_media_toast, false)
+        toast(R.string.settings_hide_media_toast, false)
     }
 
     private fun setCacheLocation(path: String) {

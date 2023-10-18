@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="background_task.loading">Caricamento…</string>
     <string name="background_task.network_error">Si è verificato un errore di rete. Si prega di controllare l\'indirizzo del server o riprovare più tardi.</string>
     <string name="background_task.no_network">Questo programma richiede l\'accesso alla rete. Per favore, abilita la connessione Wi-FI o la rete mobile.</string>
     <string name="background_task.not_found">Risorsa non trovata. Si prega di controllare l\'indirizzo del server.</string>
     <string name="background_task.parse_error">Risposta non comprensibile. Si prega di controllare l\'indirizzo del server.</string>
     <string name="background_task.ssl_cert_error">Errore certificato HTTPS. %1$s.</string>
     <string name="background_task.ssl_error">Anomalia connessione SSL. Si prega di controllare il certificato del server.</string>
-    <string name="background_task.wait">Attendere per favore#8230;</string>
     <string name="button_bar.bookmarks">Segnalibri</string>
     <string name="button_bar.browse">Libreria multimediale</string>
     <string name="button_bar.chat">Chat</string>
@@ -184,8 +182,6 @@
     <string name="settings.max_bitrate_unlimited">Illimitato</string>
     <string name="settings.max_bitrate_wifi">Bitrate Max - Wi-Fi</string>
     <string name="settings.max_songs">N° Max Canzoni</string>
-    <string name="settings.media_button_summary">Controlli per risposta alle chiamate, per cuffie e Bluetooth</string>
-    <string name="settings.media_button_title">Tasti Media</string>
     <string name="settings.network_timeout">Timeout Rete</string>
     <string name="settings.network_timeout_105000">105 seconds</string>
     <string name="settings.network_timeout_120000">120 seconds</string>

@@ -1,9 +1,7 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
-  <ManuallySuppressedIssues>
-    <ID>TooManyFunctions:PlaybackService.kt$PlaybackService : MediaLibraryServiceKoinComponentCoroutineScope</ID>
-    <ID>UnusedPrivateMember:UApp.kt$private fun VmPolicy.Builder.detectAllExceptSocket(): VmPolicy.Builder</ID>
-    <ID>ImplicitDefaultLocale:EditServerFragment.kt$EditServerFragment.&lt;no name provided&gt;$String.format( "%s %s", resources.getString(R.string.settings_connection_failure), getErrorMessage(error) )</ID>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
     <ID>ImplicitDefaultLocale:FileLoggerTree.kt$FileLoggerTree$String.format("Failed to write log to %s", file)</ID>
     <ID>ImplicitDefaultLocale:FileLoggerTree.kt$FileLoggerTree$String.format("Log file rotated, logging into file %s", file?.name)</ID>
     <ID>ImplicitDefaultLocale:FileLoggerTree.kt$FileLoggerTree$String.format("Logging into file %s", file?.name)</ID>
@@ -11,19 +9,11 @@
     <ID>LongMethod:EditServerFragment.kt$EditServerFragment$override fun onViewCreated(view: View, savedInstanceState: Bundle?)</ID>
     <ID>LongMethod:NavigationActivity.kt$NavigationActivity$override fun onCreate(savedInstanceState: Bundle?)</ID>
     <ID>LongMethod:PlaylistsFragment.kt$PlaylistsFragment$override fun onContextItemSelected(menuItem: MenuItem): Boolean</ID>
-    <ID>LongMethod:ShareHandler.kt$ShareHandler$private fun showDialog( fragment: Fragment, shareDetails: ShareDetails, swipe: SwipeRefreshLayout?, cancellationToken: CancellationToken, additionalId: String? )</ID>
     <ID>LongMethod:SharesFragment.kt$SharesFragment$override fun onContextItemSelected(menuItem: MenuItem): Boolean</ID>
-    <ID>LongParameterList:ServerRowAdapter.kt$ServerRowAdapter$( private var context: Context, passedData: Array&lt;ServerSetting&gt;, private val model: ServerSettingsModel, private val activeServerProvider: ActiveServerProvider, private val manageMode: Boolean, private val serverDeletedCallback: ((Int) -&gt; Unit), private val serverEditRequestedCallback: ((Int) -&gt; Unit) )</ID>
     <ID>MagicNumber:ActiveServerProvider.kt$ActiveServerProvider$8192</ID>
-    <ID>MagicNumber:JukeboxMediaPlayer.kt$JukeboxMediaPlayer$0.05f</ID>
     <ID>MagicNumber:JukeboxMediaPlayer.kt$JukeboxMediaPlayer$50</ID>
     <ID>MagicNumber:RESTMusicService.kt$RESTMusicService$206</ID>
-    <ID>NestedBlockDepth:DownloadHandler.kt$DownloadHandler$private fun downloadRecursively( fragment: Fragment, id: String, name: String?, isShare: Boolean, isDirectory: Boolean, save: Boolean, append: Boolean, autoPlay: Boolean, shuffle: Boolean, background: Boolean, playNext: Boolean, unpin: Boolean, isArtist: Boolean )</ID>
-    <ID>TooGenericExceptionCaught:FileLoggerTree.kt$FileLoggerTree$x: Throwable</ID>
-    <ID>TooGenericExceptionCaught:JukeboxMediaPlayer.kt$JukeboxMediaPlayer$x: Throwable</ID>
     <ID>TooGenericExceptionCaught:JukeboxMediaPlayer.kt$JukeboxMediaPlayer.TaskQueue$x: Throwable</ID>
     <ID>TooManyFunctions:RESTMusicService.kt$RESTMusicService : MusicService</ID>
-    <ID>UtilityClassWithPublicConstructor:FragmentTitle.kt$FragmentTitle</ID>
-  </ManuallySuppressedIssues>
-  <CurrentIssues/>
+  </CurrentIssues>
 </SmellBaseline>

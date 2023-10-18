@@ -8,7 +8,6 @@
 package org.moire.ultrasonic.util
 
 import android.Manifest.permission.POST_NOTIFICATIONS
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
@@ -31,18 +30,20 @@ import android.os.Build
 import android.os.Environment
 import android.text.TextUtils
 import android.util.DisplayMetrics
-import android.view.Gravity
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.AnyRes
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
+import androidx.navigation.fragment.findNavController
 import java.io.Closeable
 import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
@@ -85,7 +86,6 @@ object Util {
     // Used by hexEncode()
     private val HEX_DIGITS =
         charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
-    private var toast: Toast? = null
 
     // Retrieves an instance of the application Context
     fun appContext(): Context {
@@ -107,50 +107,66 @@ object Util {
             context.getString(R.string.setting_key_theme_dark) -> {
                 R.style.UltrasonicTheme_Dark
             }
+
             context.getString(R.string.setting_key_theme_black) -> {
                 R.style.UltrasonicTheme_Black
             }
+
             context.getString(R.string.setting_key_theme_light) -> {
                 R.style.UltrasonicTheme_Light
             }
+
             else -> {
                 R.style.UltrasonicTheme_DayNight
             }
         }
     }
 
+    fun getString(@StringRes resId: Int): String {
+        return applicationContext().resources.getString(resId)
+    }
+
     @JvmStatic
     @JvmOverloads
-    fun toast(context: Context?, messageId: Int, shortDuration: Boolean = true) {
-        toast(context, context!!.getString(messageId), shortDuration)
+    fun toast(messageId: Int, shortDuration: Boolean = true, context: Context?) {
+        toast(applicationContext().getString(messageId), shortDuration, context)
     }
 
     @JvmStatic
-    fun toast(context: Context?, message: CharSequence?) {
-        toast(context, message, true)
+    fun toast(message: CharSequence, context: Context?) {
+        toast(message, true, context)
     }
 
     @JvmStatic
-    @SuppressLint("ShowToast") // Invalid warning
-    fun toast(context: Context?, message: CharSequence?, shortDuration: Boolean) {
-        // If called after doing some background processing, our context might have expired!
+    // Toast needs a real context or it will throw a IllegalAccessException
+    // We wrap it in a try-catch block, because if called after doing
+    // some background processing, our context might have expired!
+    fun toast(message: CharSequence, shortDuration: Boolean, context: Context?) {
         try {
-            if (toast == null) {
-                toast = Toast.makeText(
-                    context,
-                    message,
-                    if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
-                )
-                toast!!.setGravity(Gravity.CENTER, 0, 0)
-            } else {
-                toast!!.setText(message)
-                toast!!.duration =
-                    if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
-            }
-            toast!!.show()
+            Toast.makeText(
+                context,
+                message,
+                if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
+            ).show()
         } catch (all: Exception) {
             Timber.w(all)
         }
+    }
+
+    fun Fragment.toast(message: CharSequence, shortDuration: Boolean = true) {
+        toast(
+            message,
+            shortDuration = shortDuration,
+            context = this.context
+        )
+    }
+
+    fun Fragment.toast(messageId: Int = 0, shortDuration: Boolean = true) {
+        toast(
+            messageId = messageId,
+            shortDuration = shortDuration,
+            context = this.context
+        )
     }
 
     /**
@@ -251,15 +267,16 @@ object Util {
      * @param s The string to encode.
      * @return The encoded string.
      */
-    @Suppress("TooGenericExceptionThrown", "TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionThrown")
     fun utf8HexEncode(s: String?): String? {
         if (s == null) {
             return null
         }
         val utf8: ByteArray = try {
             s.toByteArray(charset(Constants.UTF_8))
-        } catch (x: UnsupportedEncodingException) {
-            throw RuntimeException(x)
+        } catch (all: UnsupportedEncodingException) {
+            // TODO: Why is it needed to change the exception type here?
+            throw RuntimeException(all)
         }
         return hexEncode(utf8)
     }
@@ -273,7 +290,7 @@ object Util {
      * @return A string containing hexadecimal characters.
      */
     @Suppress("MagicNumber")
-    fun hexEncode(data: ByteArray): String {
+    private fun hexEncode(data: ByteArray): String {
         val length = data.size
         val out = CharArray(length shl 1)
         var j = 0
@@ -293,15 +310,16 @@ object Util {
      * @return MD5 digest as a hex string.
      */
     @JvmStatic
-    @Suppress("TooGenericExceptionThrown", "TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionThrown")
     fun md5Hex(s: String?): String? {
         return if (s == null) {
             null
         } else try {
             val md5 = MessageDigest.getInstance("MD5")
             hexEncode(md5.digest(s.toByteArray(charset(Constants.UTF_8))))
-        } catch (x: Exception) {
-            throw RuntimeException(x.message, x)
+        } catch (all: Exception) {
+            // TODO: Why is it needed to change the exception type here?
+            throw RuntimeException(all.message, all)
         }
     }
 
@@ -479,7 +497,7 @@ object Util {
 
     @JvmStatic
     fun isNullOrWhiteSpace(string: String?): Boolean {
-        return string == null || string.isEmpty() || string.trim { it <= ' ' }.isEmpty()
+        return string.isNullOrEmpty() || string.trim { it <= ' ' }.isEmpty()
     }
 
     @JvmOverloads
@@ -504,18 +522,22 @@ object Util {
                     seconds
                 )
             }
+
             hours > 0 -> {
                 String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, seconds)
             }
+
             minutes >= DEGRADE_PRECISION_AFTER -> {
                 String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
             }
+
             minutes > 0 -> String.format(
                 Locale.getDefault(),
                 "%d:%02d",
                 minutes,
                 seconds
             )
+
             else -> String.format(Locale.getDefault(), "0:%02d", seconds)
         }
     }
@@ -557,7 +579,7 @@ object Util {
             val requestPermissionLauncher =
                 fragment.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                     if (!it) {
-                        toast(applicationContext(), R.string.notification_permission_required)
+                        toast(R.string.notification_permission_required, context = fragment)
                     }
                 }
 
@@ -569,6 +591,7 @@ object Util {
             }
         }
     }
+
     fun postNotificationIfPermitted(
         notificationManagerCompat: NotificationManagerCompat,
         id: Int,
@@ -583,8 +606,8 @@ object Util {
             notificationManagerCompat.notify(id, notification)
         }
     }
+
     @JvmStatic
-    @Suppress("DEPRECATION")
     fun getVersionName(context: Context): String? {
         var versionName: String? = null
         val pm = context.packageManager
@@ -836,6 +859,13 @@ object Util {
 
         keys.forEach {
             Timber.d("${it.key}: ${it.value}")
+        }
+    }
+
+    fun Fragment.navigateToCurrent() {
+        if (Settings.shouldTransitionOnPlayback) {
+            findNavController().popBackStack(R.id.playerFragment, true)
+            findNavController().navigate(R.id.playerFragment)
         }
     }
 }

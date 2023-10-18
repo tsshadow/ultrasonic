@@ -58,6 +58,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/header_select_server"
         app:layout_constraintTop_toTopOf="@id/header_select_server"
+        app:strokeColor="@null"
         app:tint="@color/selected_menu_dark" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

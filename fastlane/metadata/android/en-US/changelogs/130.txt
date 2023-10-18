@@ -1,0 +1,5 @@
+### Features
+- Improved display of rating stars
+- Completely modernize all older code parts
+- Updates for Android 14
+- Update dependencies

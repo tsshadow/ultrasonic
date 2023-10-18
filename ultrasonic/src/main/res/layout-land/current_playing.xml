@@ -56,7 +56,7 @@
                         a:importantForAccessibility="no"
                         a:padding="10dip"
                         a:scaleType="fitCenter"
-                        a:src="@drawable/ic_star_hollow" />
+                        a:src="@drawable/star_hollow_outline" />
 
                     <ImageView
                         a:id="@+id/song_five_star_2"
@@ -69,7 +69,7 @@
                         a:importantForAccessibility="no"
                         a:padding="10dip"
                         a:scaleType="fitCenter"
-                        a:src="@drawable/ic_star_hollow" />
+                        a:src="@drawable/star_hollow_outline" />
 
                     <ImageView
                         a:id="@+id/song_five_star_3"
@@ -82,7 +82,7 @@
                         a:importantForAccessibility="no"
                         a:padding="10dip"
                         a:scaleType="fitCenter"
-                        a:src="@drawable/ic_star_hollow" />
+                        a:src="@drawable/star_hollow_outline" />
 
                     <ImageView
                         a:id="@+id/song_five_star_4"
@@ -95,7 +95,7 @@
                         a:importantForAccessibility="no"
                         a:padding="10dip"
                         a:scaleType="fitCenter"
-                        a:src="@drawable/ic_star_hollow" />
+                        a:src="@drawable/star_hollow_outline" />
 
                     <ImageView
                         a:id="@+id/song_five_star_5"
@@ -108,7 +108,7 @@
                         a:importantForAccessibility="no"
                         a:padding="10dip"
                         a:scaleType="fitCenter"
-                        a:src="@drawable/ic_star_hollow" />
+                        a:src="@drawable/star_hollow_outline" />
 
                 </LinearLayout>
 

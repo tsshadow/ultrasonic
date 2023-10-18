@@ -74,12 +74,6 @@
             app:iconSpaceReserved="false"/>
         <CheckBoxPreference
             a:defaultValue="true"
-            a:key="@string/setting_key.media_buttons"
-            a:summary="@string/settings.media_button_summary"
-            a:title="@string/settings.media_button_title"
-            app:iconSpaceReserved="false"/>
-        <CheckBoxPreference
-            a:defaultValue="true"
             a:key="@string/setting_key.download_transition"
             a:summary="@string/settings.download_transition_summary"
             a:title="@string/settings.download_transition"

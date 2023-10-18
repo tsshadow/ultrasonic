@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
@@ -23,6 +22,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import java.lang.Exception
 import kotlin.math.abs
 import org.koin.android.ext.android.inject
+import org.koin.androidx.scope.ScopeFragment
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.service.MediaPlayerManager
@@ -37,7 +37,7 @@ import timber.log.Timber
 /**
  * Contains the mini-now playing information box displayed at the bottom of the screen
  */
-class NowPlayingFragment : Fragment() {
+class NowPlayingFragment : ScopeFragment() {
 
     private var downX = 0f
     private var downY = 0f

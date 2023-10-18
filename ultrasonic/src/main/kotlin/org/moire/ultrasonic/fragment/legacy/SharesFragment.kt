@@ -1,6 +1,6 @@
 /*
  * SharesFragment.kt
- * Copyright (C) 2009-2022 Ultrasonic developers
+ * Copyright (C) 2009-2023 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
@@ -24,28 +24,29 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import java.util.Locale
-import org.koin.core.component.KoinComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.androidx.scope.ScopeFragment
+import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.domain.Share
 import org.moire.ultrasonic.fragment.FragmentTitle
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory
-import org.moire.ultrasonic.service.OfflineException
-import org.moire.ultrasonic.subsonic.DownloadAction
-import org.moire.ultrasonic.subsonic.DownloadHandler
-import org.moire.ultrasonic.util.BackgroundTask
-import org.moire.ultrasonic.util.CancellationToken
-import org.moire.ultrasonic.util.FragmentBackgroundTask
-import org.moire.ultrasonic.util.LoadingTask
+import org.moire.ultrasonic.util.DownloadAction
+import org.moire.ultrasonic.util.DownloadUtil
+import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.TimeSpanPicker
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.Util.toast
+import org.moire.ultrasonic.util.launchWithToast
+import org.moire.ultrasonic.util.toastingExceptionHandler
 import org.moire.ultrasonic.view.ShareAdapter
 
 /**
@@ -53,16 +54,16 @@ import org.moire.ultrasonic.view.ShareAdapter
  *
  * TODO: This file has been converted from Java, but not modernized yet.
  */
-class SharesFragment : Fragment(), KoinComponent {
-    private var refreshSharesListView: SwipeRefreshLayout? = null
+class SharesFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragment {
+    override var swipeRefresh: SwipeRefreshLayout? = null
     private var sharesListView: ListView? = null
     private var emptyTextView: View? = null
     private var shareAdapter: ShareAdapter? = null
-    private val downloadHandler = inject<DownloadHandler>()
-    private var cancellationToken: CancellationToken? = null
+    private val mediaPlayerManager: MediaPlayerManager by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        Util.applyTheme(this.context)
         super.onCreate(savedInstanceState)
+        Util.applyTheme(requireContext())
     }
 
     override fun onCreateView(
@@ -74,47 +75,41 @@ class SharesFragment : Fragment(), KoinComponent {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        cancellationToken = CancellationToken()
-        refreshSharesListView = view.findViewById(R.id.select_share_refresh)
+        swipeRefresh = view.findViewById(R.id.select_share_refresh)
         sharesListView = view.findViewById(R.id.select_share_list)
-        refreshSharesListView!!.setOnRefreshListener { load(true) }
+        swipeRefresh!!.setOnRefreshListener { load(true) }
         emptyTextView = view.findViewById(R.id.select_share_empty)
-        sharesListView!!.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, _, position, _ ->
-                val share = parent.getItemAtPosition(position) as Share
+        sharesListView!!.onItemClickListener = AdapterView.OnItemClickListener {
+            parent, _,
+            position, _ ->
+            val share = parent.getItemAtPosition(position) as Share
 
-                val action = NavigationGraphDirections.toTrackCollection(
-                    shareId = share.id,
-                    shareName = share.name
-                )
-                findNavController().navigate(action)
-            }
+            val action = NavigationGraphDirections.toTrackCollection(
+                shareId = share.id,
+                shareName = share.name
+            )
+            findNavController().navigate(action)
+        }
         registerForContextMenu(sharesListView!!)
         FragmentTitle.setTitle(this, R.string.button_bar_shares)
         load(false)
     }
 
-    override fun onDestroyView() {
-        cancellationToken!!.cancel()
-        super.onDestroyView()
-    }
-
     private fun load(refresh: Boolean) {
-        val task: BackgroundTask<List<Share>> = object : FragmentBackgroundTask<List<Share>>(
-            activity, true, refreshSharesListView, cancellationToken
+        viewLifecycleOwner.lifecycleScope.launch(
+            toastingExceptionHandler()
         ) {
-            @Throws(Throwable::class)
-            override fun doInBackground(): List<Share> {
+            val result = withContext(Dispatchers.IO) {
                 val musicService = MusicServiceFactory.getMusicService()
-                return musicService.getShares(refresh)
+                musicService.getShares(refresh)
             }
-
-            override fun done(result: List<Share>) {
-                sharesListView!!.adapter = ShareAdapter(context, result).also { shareAdapter = it }
-                emptyTextView!!.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
+            swipeRefresh?.isRefreshing = false
+            withContext(Dispatchers.Main) {
+                shareAdapter = ShareAdapter(requireContext(), result)
+                sharesListView?.adapter = shareAdapter
+                emptyTextView?.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
             }
         }
-        task.execute()
     }
 
     override fun onCreateContextMenu(
@@ -132,8 +127,8 @@ class SharesFragment : Fragment(), KoinComponent {
         val share = sharesListView!!.getItemAtPosition(info.position) as Share
         when (menuItem.itemId) {
             R.id.share_menu_pin -> {
-                downloadHandler.value.justDownload(
-                    DownloadAction.PIN,
+                DownloadUtil.justDownload(
+                    action = DownloadAction.PIN,
                     fragment = this,
                     id = share.id,
                     name = share.name,
@@ -142,8 +137,8 @@ class SharesFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.share_menu_unpin -> {
-                downloadHandler.value.justDownload(
-                    DownloadAction.UNPIN,
+                DownloadUtil.justDownload(
+                    action = DownloadAction.UNPIN,
                     fragment = this,
                     id = share.id,
                     name = share.name,
@@ -152,8 +147,8 @@ class SharesFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.share_menu_download -> {
-                downloadHandler.value.justDownload(
-                    DownloadAction.DOWNLOAD,
+                DownloadUtil.justDownload(
+                    action = DownloadAction.DOWNLOAD,
                     fragment = this,
                     id = share.id,
                     name = share.name,
@@ -162,22 +157,20 @@ class SharesFragment : Fragment(), KoinComponent {
                 )
             }
             R.id.share_menu_play_now -> {
-                downloadHandler.value.fetchTracksAndAddToController(
+                mediaPlayerManager.playTracksAndToast(
                     this,
-                    share.id,
-                    share.name,
                     insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
-                    autoPlay = true,
+                    id = share.id,
+                    name = share.name,
                     shuffle = false
                 )
             }
             R.id.share_menu_play_shuffled -> {
-                downloadHandler.value.fetchTracksAndAddToController(
+                mediaPlayerManager.playTracksAndToast(
                     this,
-                    share.id,
-                    share.name,
                     insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
-                    autoPlay = true,
+                    id = share.id,
+                    name = share.name,
                     shuffle = true,
                 )
             }
@@ -202,44 +195,32 @@ class SharesFragment : Fragment(), KoinComponent {
             .setTitle(R.string.common_confirm).setMessage(
                 resources.getString(R.string.delete_playlist, share.name)
             ).setPositiveButton(R.string.common_ok) { _, _ ->
-                object : LoadingTask<Any?>(activity, refreshSharesListView, cancellationToken) {
-                    @Throws(Throwable::class)
-                    override fun doInBackground(): Any? {
-                        val musicService = MusicServiceFactory.getMusicService()
-                        musicService.deleteShare(share.id)
-                        return null
-                    }
-
-                    override fun done(result: Any?) {
-                        shareAdapter!!.remove(share)
-                        shareAdapter!!.notifyDataSetChanged()
-                        Util.toast(
-                            context,
-                            resources.getString(R.string.menu_deleted_share, share.name)
-                        )
-                    }
-
-                    override fun error(error: Throwable) {
-                        val msg: String =
-                            if (error is OfflineException || error is ApiNotSupportedException) {
-                                getErrorMessage(
-                                    error
-                                )
-                            } else {
-                                String.format(
-                                    Locale.ROOT,
-                                    "%s %s",
-                                    resources.getString(
-                                        R.string.menu_deleted_share_error,
-                                        share.name
-                                    ),
-                                    getErrorMessage(error)
-                                )
-                            }
-                        Util.toast(context, msg, false)
-                    }
-                }.execute()
+                deleteShareOnServer(share)
             }.setNegativeButton(R.string.common_cancel, null).show()
+    }
+
+    private fun deleteShareOnServer(share: Share) {
+        viewLifecycleOwner.lifecycleScope.launch(
+            toastingExceptionHandler(
+                resources.getString(
+                    R.string.menu_deleted_share_error,
+                    share.name
+                )
+            )
+        ) {
+            withContext(Dispatchers.IO) {
+                val musicService = MusicServiceFactory.getMusicService()
+                musicService.deleteShare(share.id)
+            }
+
+            withContext(Dispatchers.Main) {
+                shareAdapter?.remove(share)
+                shareAdapter?.notifyDataSetChanged()
+                toast(
+                    resources.getString(R.string.menu_deleted_share, share.name)
+                )
+            }
+        }
     }
 
     private fun displayShareInfo(share: Share) {
@@ -256,18 +237,18 @@ class SharesFragment : Fragment(), KoinComponent {
                 (
                     if (share.created == null) "" else """
      
-     Creation Date: ${share.created!!.replace('T', ' ')}
+                  Creation Date: ${share.created!!.replace('T', ' ')}
                     """.trimIndent()
                     ) +
                 (
                     if (share.lastVisited == null) "" else """
      
-     Last Visited Date: ${share.lastVisited!!.replace('T', ' ')}
+                  Last Visited Date: ${share.lastVisited!!.replace('T', ' ')}
                     """.trimIndent()
                     ) +
                 if (share.expires == null) "" else """
      
-     Expiration Date: ${share.expires!!.replace('T', ' ')}
+                  Expiration Date: ${share.expires!!.replace('T', ' ')}
                 """.trimIndent()
         )
         Linkify.addLinks(message, Linkify.WEB_URLS)
@@ -298,50 +279,31 @@ class SharesFragment : Fragment(), KoinComponent {
         alertDialog.setTitle(R.string.playlist_update_info)
         alertDialog.setView(dialogView)
         alertDialog.setPositiveButton(R.string.common_ok) { _, _ ->
-            object : LoadingTask<Any?>(activity, refreshSharesListView, cancellationToken) {
-                @Throws(Throwable::class)
-                override fun doInBackground(): Any? {
-                    var millis = timeSpanPicker.getTimeSpan()
-                    if (millis > 0) {
-                        millis += System.currentTimeMillis()
-                    }
-                    val shareDescriptionText = shareDescription.text
-                    val description = shareDescriptionText?.toString()
-                    val musicService = MusicServiceFactory.getMusicService()
-                    musicService.updateShare(share.id, description, millis)
-                    return null
-                }
-
-                override fun done(result: Any?) {
-                    load(true)
-                    Util.toast(
-                        context,
-                        resources.getString(R.string.playlist_updated_info, share.name)
-                    )
-                }
-
-                override fun error(error: Throwable) {
-                    val msg: String =
-                        if (error is OfflineException || error is ApiNotSupportedException) {
-                            getErrorMessage(
-                                error
-                            )
-                        } else {
-                            String.format(
-                                Locale.ROOT,
-                                "%s %s",
-                                resources.getString(
-                                    R.string.playlist_updated_info_error,
-                                    share.name
-                                ),
-                                getErrorMessage(error)
-                            )
-                        }
-                    Util.toast(context, msg, false)
-                }
-            }.execute()
+            var millis = timeSpanPicker.getTimeSpan()
+            if (millis > 0) {
+                millis += System.currentTimeMillis()
+            }
+            updateShareOnServer(millis, shareDescription.text.toString(), share)
         }
         alertDialog.setNegativeButton(R.string.common_cancel, null)
         alertDialog.show()
+    }
+
+    private fun updateShareOnServer(
+        millis: Long,
+        description: String,
+        share: Share
+    ) {
+        launchWithToast {
+            withContext(Dispatchers.IO) {
+                val musicService = MusicServiceFactory.getMusicService()
+                musicService.updateShare(share.id, description, millis)
+            }
+
+            withContext(Dispatchers.Main) {
+                load(true)
+                resources.getString(R.string.playlist_updated_info, share.name)
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import org.moire.ultrasonic.data.RatingUpdate
+import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.domain.Track
 
 class RxBus {
@@ -32,9 +33,9 @@ class RxBus {
         var activeServerChangingObservable: Observable<Int> =
             activeServerChangingPublisher
 
-        var activeServerChangedPublisher: PublishSubject<Int> =
+        var activeServerChangedPublisher: PublishSubject<ServerSetting> =
             PublishSubject.create()
-        var activeServerChangedObservable: Observable<Int> =
+        var activeServerChangedObservable: Observable<ServerSetting> =
             activeServerChangedPublisher.observeOn(mainThread())
 
         val themeChangedEventPublisher: PublishSubject<Unit> =

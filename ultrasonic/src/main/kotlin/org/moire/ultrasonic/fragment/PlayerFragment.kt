@@ -8,13 +8,17 @@
 package org.moire.ultrasonic.fragment
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color.argb
 import android.graphics.Point
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.Menu
@@ -34,12 +38,13 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ViewFlipper
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
@@ -52,6 +57,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_IDLE
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.R as RM
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -72,12 +78,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.core.component.KoinComponent
+import org.koin.androidx.scope.ScopeFragment
+import org.koin.core.component.KoinScopeComponent
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.adapters.TrackViewBinder
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.audiofx.EqualizerController
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.shouldUseId3Tags
@@ -86,7 +92,7 @@ import org.moire.ultrasonic.databinding.CurrentPlayingBinding
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
@@ -99,6 +105,7 @@ import org.moire.ultrasonic.util.CommunicationError
 import org.moire.ultrasonic.util.ConfirmationDialog
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.Util.toast
 import org.moire.ultrasonic.util.toTrack
 import org.moire.ultrasonic.view.AutoRepeatButton
 import timber.log.Timber
@@ -109,9 +116,9 @@ import timber.log.Timber
  */
 @Suppress("LargeClass", "TooManyFunctions", "MagicNumber")
 class PlayerFragment :
-    Fragment(),
+    ScopeFragment(),
     GestureDetector.OnGestureListener,
-    KoinComponent,
+    KoinScopeComponent,
     CoroutineScope by CoroutineScope(Dispatchers.Main) {
 
     // Settings
@@ -167,8 +174,10 @@ class PlayerFragment :
     private lateinit var repeatButton: MaterialButton
     private lateinit var progressBar: SeekBar
     private lateinit var progressIndicator: CircularProgressIndicator
-    private val hollowStar = R.drawable.ic_star_hollow
-    private val fullStar = R.drawable.ic_star_full
+    private val hollowStar = R.drawable.star_hollow_outline
+    private val fullStar = R.drawable.star_full_outline
+    private lateinit var hollowStarDrawable: Drawable
+    private lateinit var fullStarDrawable: Drawable
 
     private var _binding: CurrentPlayingBinding? = null
     // This property is only valid between onCreateView and
@@ -270,6 +279,11 @@ class PlayerFragment :
         val ratingLinearLayout = view.findViewById<LinearLayout>(R.id.song_rating)
         if (!useFiveStarRating) ratingLinearLayout.isVisible = false
 
+        hollowStarDrawable = ResourcesCompat.getDrawable(resources, hollowStar, null)!!
+        fullStarDrawable = ResourcesCompat.getDrawable(resources, fullStar, null)!!
+        setLayerDrawableColors(hollowStarDrawable as LayerDrawable)
+        setLayerDrawableColors(fullStarDrawable as LayerDrawable)
+
         fiveStar1ImageView.setOnClickListener { setSongRating(1) }
         fiveStar2ImageView.setOnClickListener { setSongRating(2) }
         fiveStar3ImageView.setOnClickListener { setSongRating(3) }
@@ -342,14 +356,14 @@ class PlayerFragment :
             onPlaylistChanged()
 
             when (newRepeat) {
-                0 -> Util.toast(
-                    context, R.string.download_repeat_off
+                0 -> toast(
+                    R.string.download_repeat_off
                 )
-                1 -> Util.toast(
-                    context, R.string.download_repeat_single
+                1 -> toast(
+                    R.string.download_repeat_single
                 )
-                2 -> Util.toast(
-                    context, R.string.download_repeat_all
+                2 -> toast(
+                    R.string.download_repeat_all
                 )
                 else -> {
                 }
@@ -396,7 +410,7 @@ class PlayerFragment :
         // Query the Jukebox state in an IO Context
         ioScope.launch(CommunicationError.getHandler(context)) {
             try {
-                jukeboxAvailable = mediaPlayerManager.isJukeboxAvailable
+                jukeboxAvailable = getMusicService().isJukeboxAvailable()
             } catch (all: Exception) {
                 Timber.e(all)
             }
@@ -443,9 +457,9 @@ class PlayerFragment :
         val isEnabled = mediaPlayerManager.toggleShuffle()
 
         if (isEnabled) {
-            Util.toast(activity, R.string.download_menu_shuffle_on)
+            toast(R.string.download_menu_shuffle_on)
         } else {
-            Util.toast(activity, R.string.download_menu_shuffle_off)
+            toast(R.string.download_menu_shuffle_off)
         }
 
         updateShuffleButtonState(isEnabled)
@@ -565,8 +579,7 @@ class PlayerFragment :
             equalizerMenuItem.isVisible = isEqualizerAvailable
         }
 
-        val mediaPlayerController = mediaPlayerManager
-        val track = mediaPlayerController.currentMediaItem?.toTrack()
+        val track = mediaPlayerManager.currentMediaItem?.toTrack()
 
         if (track != null) {
             currentSong = track
@@ -586,7 +599,7 @@ class PlayerFragment :
             goToArtist.isVisible = false
         }
 
-        if (mediaPlayerController.keepScreenOn) {
+        if (mediaPlayerManager.keepScreenOn) {
             screenOption?.setTitle(R.string.download_menu_screen_off)
         } else {
             screenOption?.setTitle(R.string.download_menu_screen_on)
@@ -595,7 +608,7 @@ class PlayerFragment :
         if (jukeboxOption != null) {
             jukeboxOption.isEnabled = jukeboxAvailable
             jukeboxOption.isVisible = jukeboxAvailable
-            if (mediaPlayerController.isJukeboxEnabled) {
+            if (mediaPlayerManager.isJukeboxEnabled) {
                 jukeboxOption.setTitle(R.string.download_menu_jukebox_off)
             } else {
                 jukeboxOption.setTitle(R.string.download_menu_jukebox_on)
@@ -693,8 +706,7 @@ class PlayerFragment :
             R.id.menu_item_jukebox -> {
                 val jukeboxEnabled = !mediaPlayerManager.isJukeboxEnabled
                 mediaPlayerManager.isJukeboxEnabled = jukeboxEnabled
-                Util.toast(
-                    context,
+                toast(
                     if (jukeboxEnabled) R.string.download_jukebox_on
                     else R.string.download_jukebox_off,
                     false
@@ -746,7 +758,7 @@ class PlayerFragment :
                     R.string.download_bookmark_set_at_position,
                     bookmarkTime
                 )
-                Util.toast(context, msg)
+                toast(msg)
                 return true
             }
             R.id.menu_item_bookmark_delete -> {
@@ -762,36 +774,25 @@ class PlayerFragment :
                         Timber.e(all)
                     }
                 }.start()
-                Util.toast(context, R.string.download_bookmark_removed)
+                toast(R.string.download_bookmark_removed)
                 return true
             }
             R.id.menu_item_share -> {
-                val mediaPlayerController = mediaPlayerManager
-                val tracks: MutableList<Track?> = ArrayList()
-                val playlist = mediaPlayerController.playlist
-                for (item in playlist) {
-                    val playlistEntry = item.toTrack()
-                    tracks.add(playlistEntry)
+                val tracks = mediaPlayerManager.playlist.map {
+                    it.toTrack()
                 }
                 shareHandler.createShare(
                     this,
                     tracks = tracks,
-                    swipe = null,
-                    cancellationToken = cancellationToken,
                 )
                 return true
             }
             R.id.menu_item_share_song -> {
                 if (track == null) return true
 
-                val tracks: MutableList<Track?> = ArrayList()
-                tracks.add(track)
-
                 shareHandler.createShare(
                     this,
-                    tracks,
-                    swipe = null,
-                    cancellationToken = cancellationToken
+                    listOf(track),
                 )
                 return true
             }
@@ -808,7 +809,7 @@ class PlayerFragment :
     }
 
     private fun savePlaylistInBackground(playlistName: String) {
-        Util.toast(context, resources.getString(R.string.download_playlist_saving, playlistName))
+        toast(resources.getString(R.string.download_playlist_saving, playlistName))
         mediaPlayerManager.suggestedPlaylistName = playlistName
 
         // The playlist can be acquired only from the main thread
@@ -821,7 +822,7 @@ class PlayerFragment :
             musicService.createPlaylist(null, playlistName, entries)
         }.invokeOnCompletion {
             if (it == null || it is CancellationException) {
-                Util.toast(UApp.applicationContext(), R.string.download_playlist_done)
+                toast(R.string.download_playlist_done)
             } else {
                 Timber.e(it, "Exception has occurred in savePlaylistInBackground")
                 val msg = String.format(
@@ -830,7 +831,7 @@ class PlayerFragment :
                     resources.getString(R.string.download_playlist_error),
                     CommunicationError.getErrorMessage(it)
                 )
-                Util.toast(UApp.applicationContext(), msg)
+                toast(msg)
             }
         }
     }
@@ -944,7 +945,7 @@ class PlayerFragment :
                     item?.mediaMetadata?.title
                 )
 
-                Util.toast(context, songRemoved)
+                toast(songRemoved)
 
                 // Remove the item from the playlist
                 mediaPlayerManager.removeFromPlaylist(pos)
@@ -1045,15 +1046,14 @@ class PlayerFragment :
     }
 
     private fun onPlaylistChanged() {
-        val mediaPlayerController = mediaPlayerManager
         // Try to display playlist in play order
-        val list = mediaPlayerController.playlistInPlayOrder
+        val list = mediaPlayerManager.playlistInPlayOrder
         emptyTextView.setText(R.string.playlist_empty)
         viewAdapter.submitList(list.map(MediaItem::toTrack))
         progressIndicator.isVisible = false
         emptyView.isVisible = list.isEmpty()
 
-        updateRepeatButtonState(mediaPlayerController.repeatMode)
+        updateRepeatButtonState(mediaPlayerManager.repeatMode)
     }
 
     private fun onTrackChanged() {
@@ -1100,7 +1100,7 @@ class PlayerFragment :
                 it.loadImage(albumArtImageView, currentSong, true, 0)
             }
 
-            updateSongRating()
+            updateSongRatingDisplay()
         } else {
             currentSong = null
             songTitleTextView.text = null
@@ -1115,7 +1115,7 @@ class PlayerFragment :
             }
         }
 
-        updateSongRating()
+        updateSongRatingDisplay()
 
         updateMediaButtonActivationState()
     }
@@ -1219,14 +1219,14 @@ class PlayerFragment :
 
     @Suppress("ReturnCount")
     override fun onFling(
-        e1: MotionEvent,
+        e1: MotionEvent?,
         e2: MotionEvent,
         velocityX: Float,
         velocityY: Float
     ): Boolean {
-        val e1X = e1.x
+        val e1X = e1?.x ?: 0F
         val e2X = e2.x
-        val e1Y = e1.y
+        val e1Y = e1?.y ?: 0F
         val e2Y = e2.y
         val absX = abs(velocityX)
         val absY = abs(velocityY)
@@ -1263,7 +1263,7 @@ class PlayerFragment :
 
     override fun onLongPress(e: MotionEvent) {}
     override fun onScroll(
-        e1: MotionEvent,
+        e1: MotionEvent?,
         e2: MotionEvent,
         distanceX: Float,
         distanceY: Float
@@ -1276,20 +1276,36 @@ class PlayerFragment :
         return false
     }
 
-    private fun updateSongRating() {
+    private fun updateSongRatingDisplay() {
         val rating = currentSong?.userRating ?: 0
 
-        fiveStar1ImageView.setImageResource(if (rating > 0) fullStar else hollowStar)
-        fiveStar2ImageView.setImageResource(if (rating > 1) fullStar else hollowStar)
-        fiveStar3ImageView.setImageResource(if (rating > 2) fullStar else hollowStar)
-        fiveStar4ImageView.setImageResource(if (rating > 3) fullStar else hollowStar)
-        fiveStar5ImageView.setImageResource(if (rating > 4) fullStar else hollowStar)
+        fiveStar1ImageView.setImageDrawable(getStarForRating(rating, 0))
+        fiveStar2ImageView.setImageDrawable(getStarForRating(rating, 1))
+        fiveStar3ImageView.setImageDrawable(getStarForRating(rating, 2))
+        fiveStar4ImageView.setImageDrawable(getStarForRating(rating, 3))
+        fiveStar5ImageView.setImageDrawable(getStarForRating(rating, 4))
     }
+
+    private fun getStarForRating(rating: Int, position: Int): Drawable {
+        return if (rating > position) fullStarDrawable else hollowStarDrawable
+    }
+
+    private fun setLayerDrawableColors(drawable: LayerDrawable) {
+        drawable.apply {
+            getDrawable(0).setTint(requireContext().themeColor(RM.attr.colorSurface))
+            getDrawable(1).setTint(requireContext().themeColor(RM.attr.colorAccent))
+        }
+    }
+
+    @ColorInt
+    fun Context.themeColor(@AttrRes attrRes: Int): Int = TypedValue()
+        .apply { theme.resolveAttribute(attrRes, this, true) }
+        .data
 
     private fun setSongRating(rating: Int) {
         if (currentSong == null) return
         currentSong?.userRating = rating
-        updateSongRating()
+        updateSongRatingDisplay()
 
         RxBus.ratingSubmitter.onNext(
             RatingUpdate(

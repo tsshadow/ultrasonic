@@ -2,45 +2,46 @@
 # You need to run ./gradlew wrapper after updating the version
 gradle                 = "8.1.1"
 
-navigation             = "2.6.0"
-gradlePlugin           = "8.1.0"
+navigation             = "2.7.3"
+gradlePlugin           = "8.1.2"
 androidxcar            = "1.2.0"
-androidxcore           = "1.10.1"
+androidxcore           = "1.12.0"
 ktlint                 = "0.43.2"
-ktlintGradle           = "11.5.0"
+ktlintGradle           = "11.6.0"
 detekt                 = "1.23.0"
 preferences            = "1.2.1"
-media3                 = "1.1.0"
+media3                 = "1.1.1"
 
-androidSupport         = "1.6.0"
+androidSupport         = "1.7.0"
 materialDesign         = "1.9.0"
 constraintLayout       = "2.1.4"
+activity               = "1.8.0"
 multidex               = "2.0.1"
 room                   = "2.5.2"
-kotlin                 = "1.8.22"
-ksp                    = "1.8.22-1.0.11"
+kotlin                 = "1.9.10"
+ksp                    = "1.9.10-1.0.13"
 kotlinxCoroutines      = "1.7.3"
-viewModelKtx           = "2.6.1"
+viewModelKtx           = "2.6.2"
 swipeRefresh           = "1.1.0"
 
 retrofit               = "2.9.0"
 ## KEEP ON 2.13 branch (https://github.com/FasterXML/jackson-databind/issues/3658#issuecomment-1312633064) for compatibility with API 24
 jackson                = "2.13.5"
 okhttp                 = "4.11.0"
-koin                   = "3.4.3"
+koin                   = "3.5.0"
 picasso                = "2.8"
 
 junit4                 = "4.13.2"
 junit5                 = "5.10.0"
-mockito                = "5.4.0"
-mockitoKotlin          = "5.0.0"
+mockito                = "5.5.0"
+mockitoKotlin          = "5.1.0"
 kluent                 = "1.73"
 apacheCodecs           = "1.16.0"
 robolectric            = "4.10.3"
 timber                 = "5.0.1"
 fastScroll             = "2.0.1"
 colorPicker            = "2.2.4"
-rxJava                 = "3.1.6"
+rxJava                 = "3.1.8"
 rxAndroid              = "3.0.2"
 multiType              = "4.3.0"
 
@@ -66,6 +67,7 @@ navigationFragmentKtx   = { module = "androidx.navigation:navigation-fragment-kt
 navigationUiKtx         = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
 navigationFeature       = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "navigation" }
 navigationSafeArgs      = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation"}
+activity                = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 preferences             = { module = "androidx.preference:preference", version.ref = "preferences" }
 media3common            = { module = "androidx.media3:media3-common", version.ref = "media3" }
 media3exoplayer         = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }

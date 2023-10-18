@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="background_task.loading">Bezig met laden&#8230;</string>
     <string name="background_task.network_error">Er is een netwerkfout opgetreden. Controleer het serveradres of probeer het later opnieuw.</string>
     <string name="background_task.unsupported_api">De server-api, v %1$s, heeft geen ondersteuning voor deze functie.</string>
     <string name="background_task.no_network">Deze app vereist netwerktoegang. Schakel wifi of mobiel internet in.</string>
@@ -9,7 +8,6 @@
     <string name="background_task.parse_error">Het antwoord werd niet begrepen. Controleer het serveradres.</string>
     <string name="background_task.ssl_cert_error">HTTPS-certificaatfout: %1$s.</string>
     <string name="background_task.ssl_error">SSL-verbindingsuitzondering. Controleer het servercertificaat.</string>
-    <string name="background_task.wait">Even geduld&#8230;</string>
     <string name="button_bar.bookmarks">Bladwijzers</string>
     <string name="button_bar.browse">Mediabibliotheek</string>
     <string name="button_bar.chat">Chat</string>
@@ -233,8 +231,6 @@
     <string name="settings.max_bitrate_unlimited">Ongelimiteerd</string>
     <string name="settings.max_bitrate_wifi">Max. bitsnelheid via wifi</string>
     <string name="settings.max_songs">Max. aantal nummers</string>
-    <string name="settings.media_button_summary">Reageren op telefoon-, headset- en bluetooth-mediatoetsen.</string>
-    <string name="settings.media_button_title">Mediatoetsen</string>
     <string name="settings.network_timeout">Netwerktime-out</string>
     <string name="settings.network_timeout_105000">105 seconden</string>
     <string name="settings.network_timeout_120000">120 seconden</string>

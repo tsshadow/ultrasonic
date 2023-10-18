@@ -41,19 +41,22 @@ import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.model.TrackCollectionModel
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
-import org.moire.ultrasonic.subsonic.DownloadAction
 import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.subsonic.VideoPlayer
-import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.ConfirmationDialog
+import org.moire.ultrasonic.util.ContextMenuUtil
+import org.moire.ultrasonic.util.DownloadAction
+import org.moire.ultrasonic.util.DownloadUtil
 import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
 import org.moire.ultrasonic.util.Settings
-import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.Util.navigateToCurrent
+import org.moire.ultrasonic.util.Util.toast
+import org.moire.ultrasonic.util.toastingExceptionHandler
 import org.moire.ultrasonic.view.SortOrder
 import org.moire.ultrasonic.view.ViewCapabilities
 import timber.log.Timber
@@ -86,7 +89,6 @@ open class TrackCollectionFragment(
 
     internal val mediaPlayerManager: MediaPlayerManager by inject()
     private val shareHandler: ShareHandler by inject()
-    internal var cancellationToken: CancellationToken? = null
 
     override val listModel: TrackCollectionModel by viewModels()
     private val rxBusSubscription: CompositeDisposable = CompositeDisposable()
@@ -102,13 +104,12 @@ open class TrackCollectionFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        cancellationToken = CancellationToken()
 
         albumButtons = view.findViewById(R.id.menu_album)
 
         // Setup refresh handler
-        refreshListView = view.findViewById(refreshListId)
-        refreshListView?.setOnRefreshListener {
+        swipeRefresh = view.findViewById(refreshListId)
+        swipeRefresh?.setOnRefreshListener {
             handleRefresh()
         }
 
@@ -211,19 +212,23 @@ open class TrackCollectionFragment(
         }
 
         playNowButton?.setOnClickListener {
-            playNow(MediaPlayerManager.InsertionMode.CLEAR, toast = true)
+            playSelectedOrAllTracks(MediaPlayerManager.InsertionMode.CLEAR)
         }
 
         playNextButton?.setOnClickListener {
-            playNow(MediaPlayerManager.InsertionMode.AFTER_CURRENT, toast = true)
+            playSelectedOrAllTracks(MediaPlayerManager.InsertionMode.AFTER_CURRENT)
         }
 
         playLastButton!!.setOnClickListener {
-            playNow(MediaPlayerManager.InsertionMode.APPEND, toast = true)
+            playSelectedOrAllTracks(MediaPlayerManager.InsertionMode.APPEND)
         }
 
         pinButton?.setOnClickListener {
-            downloadBackground(true)
+            downloadSelectedOrAllTracks(true)
+        }
+
+        downloadButton?.setOnClickListener {
+            downloadSelectedOrAllTracks(false)
         }
 
         unpinButton?.setOnClickListener {
@@ -231,15 +236,11 @@ open class TrackCollectionFragment(
                 ConfirmationDialog.Builder(requireContext())
                     .setMessage(R.string.common_unpin_selection_confirmation)
                     .setPositiveButton(R.string.common_unpin) { _, _ ->
-                        unpin()
+                        unpinSelectedTracks()
                     }.show()
             } else {
-                unpin()
+                unpinSelectedTracks()
             }
-        }
-
-        downloadButton?.setOnClickListener {
-            downloadBackground(false)
         }
 
         deleteButton?.setOnClickListener {
@@ -247,10 +248,10 @@ open class TrackCollectionFragment(
                 ConfirmationDialog.Builder(requireContext())
                     .setMessage(R.string.common_delete_selection_confirmation)
                     .setPositiveButton(R.string.common_delete) { _, _ ->
-                        delete()
+                        deleteSelectedTracks()
                     }.show()
             } else {
-                delete()
+                deleteSelectedTracks()
             }
         }
     }
@@ -283,9 +284,9 @@ open class TrackCollectionFragment(
                 return true
             } else if (item.itemId == R.id.menu_item_share) {
                 shareHandler.createShare(
-                    this@TrackCollectionFragment, getSelectedTracks(),
-                    refreshListView, cancellationToken!!,
-                    navArgs.id
+                    fragment = this@TrackCollectionFragment,
+                    tracks = getSelectedOrAllTracks(),
+                    additionalId = navArgs.id
                 )
                 return true
             }
@@ -294,44 +295,8 @@ open class TrackCollectionFragment(
     }
 
     override fun onDestroyView() {
-        cancellationToken!!.cancel()
         rxBusSubscription.dispose()
         super.onDestroyView()
-    }
-
-    private fun playNow(
-        insertionMode: MediaPlayerManager.InsertionMode,
-        selectedTracks: List<Track> = getSelectedTracks(),
-        toast: Boolean = false
-    ) {
-        if (selectedTracks.isNotEmpty()) {
-            downloadHandler.addTracksToMediaController(
-                songs = selectedTracks,
-                insertionMode = insertionMode,
-                autoPlay = (insertionMode == MediaPlayerManager.InsertionMode.CLEAR),
-                playlistName = null,
-                fragment = this
-            )
-        } else {
-            playAll(false, insertionMode)
-        }
-
-        if (toast) {
-            val stringInt = when (insertionMode) {
-                MediaPlayerManager.InsertionMode.CLEAR ->
-                    R.plurals.n_songs_added_play_now
-                MediaPlayerManager.InsertionMode.AFTER_CURRENT ->
-                    R.plurals.n_songs_added_after_current
-                MediaPlayerManager.InsertionMode.APPEND ->
-                    R.plurals.n_songs_added_to_end
-            }
-            val msg = resources.getQuantityString(
-                stringInt,
-                selectedTracks.size,
-                selectedTracks.size
-            )
-            Util.toast(requireContext(), msg)
-        }
     }
 
     /**
@@ -364,31 +329,58 @@ open class TrackCollectionFragment(
 
         // Need a valid id to recurse sub directories stuff
         if (hasSubFolders && navArgs.id != null) {
-            downloadHandler.fetchTracksAndAddToController(
+            mediaPlayerManager.playTracksAndToast(
                 fragment = this,
-                id = navArgs.id!!,
                 insertionMode = insertionMode,
-                autoPlay = (insertionMode != MediaPlayerManager.InsertionMode.APPEND),
+                id = navArgs.id!!,
                 shuffle = shuffle,
                 isArtist = isArtist
             )
         } else {
-            downloadHandler.addTracksToMediaController(
-                songs = getAllSongs(),
+            mediaPlayerManager.suggestedPlaylistName = navArgs.playlistName
+            mediaPlayerManager.addToPlaylist(
+                songs = getAllTracks(),
                 insertionMode = insertionMode,
                 autoPlay = (insertionMode != MediaPlayerManager.InsertionMode.APPEND),
-                shuffle = shuffle,
-                playlistName = navArgs.playlistName,
-                fragment = this
+                shuffle = shuffle
             )
+            if (insertionMode == MediaPlayerManager.InsertionMode.CLEAR) {
+                navigateToCurrent()
+            }
         }
     }
+    private fun unpinSelectedTracks() {
+        DownloadUtil.justDownload(
+            action = DownloadAction.UNPIN,
+            fragment = this,
+            tracks = getSelectedTracks()
+        )
+    }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun getAllSongs(): List<Track> {
-        return viewAdapter.getCurrentList().filter {
-            it is Track && !it.isDirectory
-        } as List<Track>
+    private fun downloadSelectedOrAllTracks(save: Boolean) {
+        DownloadUtil.justDownload(
+            action = if (save) DownloadAction.PIN else DownloadAction.DOWNLOAD,
+            fragment = this,
+            tracks = getSelectedOrAllTracks()
+        )
+    }
+
+    private fun playSelectedOrAllTracks(
+        insertionMode: MediaPlayerManager.InsertionMode
+    ) {
+        mediaPlayerManager.playTracksAndToast(
+            fragment = this,
+            insertionMode = insertionMode,
+            tracks = getSelectedOrAllTracks()
+        )
+    }
+
+    private fun deleteSelectedTracks() {
+        DownloadUtil.justDownload(
+            action = DownloadAction.DELETE,
+            fragment = this,
+            tracks = getSelectedTracks()
+        )
     }
 
     private fun selectAllOrNone() {
@@ -403,7 +395,7 @@ open class TrackCollectionFragment(
 
         // Display toast: N tracks selected
         val toastResId = R.string.select_album_n_selected
-        Util.toast(activity, getString(toastResId, selectedCount.coerceAtLeast(0)))
+        toast(getString(toastResId, selectedCount.coerceAtLeast(0)))
     }
 
     @Synchronized
@@ -429,37 +421,6 @@ open class TrackCollectionFragment(
             downloadButton?.isVisible = show.all && show.download && !isOffline()
             deleteButton?.isVisible = show.all && show.delete
         }
-    }
-
-    private fun downloadBackground(save: Boolean, tracks: List<Track> = getSelectedTracks()) {
-        var songs = tracks
-
-        if (songs.isEmpty()) {
-            songs = getAllSongs()
-        }
-
-        val action = if (save) DownloadAction.PIN else DownloadAction.DOWNLOAD
-        downloadHandler.justDownload(
-            action = action,
-            fragment = this,
-            tracks = songs
-        )
-    }
-
-    internal fun delete(songs: List<Track> = getSelectedTracks()) {
-        downloadHandler.justDownload(
-            action = DownloadAction.DELETE,
-            fragment = this,
-            tracks = songs
-        )
-    }
-
-    internal fun unpin(songs: List<Track> = getSelectedTracks()) {
-        downloadHandler.justDownload(
-            action = DownloadAction.UNPIN,
-            fragment = this,
-            tracks = songs
-        )
     }
 
     override val defaultObserver: (List<MusicDirectory.Child>) -> Unit = {
@@ -530,6 +491,19 @@ open class TrackCollectionFragment(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
+    private fun getAllTracks(): List<Track> {
+        return viewAdapter.getCurrentList().filter {
+            it is Track && !it.isDirectory
+        } as List<Track>
+    }
+
+    fun getSelectedOrAllTracks(): List<Track> {
+        return getSelectedTracks().ifEmpty {
+            getAllTracks()
+        }
+    }
+
     override fun setTitle(title: String?) {
         setTitle(this@TrackCollectionFragment, title)
     }
@@ -561,8 +535,10 @@ open class TrackCollectionFragment(
         val offset = navArgs.offset
         val refresh2 = navArgs.refresh || refresh
 
-        listModel.viewModelScope.launch(handler) {
-            refreshListView?.isRefreshing = true
+        listModel.viewModelScope.launch(
+            toastingExceptionHandler()
+        ) {
+            swipeRefresh?.isRefreshing = true
 
             if (playlistId != null) {
                 setTitle(playlistName!!)
@@ -597,7 +573,7 @@ open class TrackCollectionFragment(
                 }
             }
 
-            refreshListView?.isRefreshing = false
+            swipeRefresh?.isRefreshing = false
         }
         return listModel.currentList
     }
@@ -606,48 +582,19 @@ open class TrackCollectionFragment(
 
     private fun displayRandom() = (sortOrder == SortOrder.RANDOM) || navArgs.getRandom
 
-    @Suppress("LongMethod")
     override fun onContextMenuItemSelected(
         menuItem: MenuItem,
         item: MusicDirectory.Child
     ): Boolean {
-        val songs = getClickedSong(item)
 
-        when (menuItem.itemId) {
-            R.id.song_menu_play_now -> {
-                playNow(MediaPlayerManager.InsertionMode.CLEAR, songs, true)
-            }
-            R.id.song_menu_play_next -> {
-                playNow(MediaPlayerManager.InsertionMode.AFTER_CURRENT, songs, true)
-            }
-            R.id.song_menu_play_last -> {
-                playNow(MediaPlayerManager.InsertionMode.APPEND, songs, true)
-            }
-            R.id.song_menu_pin -> {
-                downloadBackground(true, songs)
-            }
-            R.id.song_menu_unpin -> {
-                unpin(songs)
-            }
-            R.id.song_menu_download -> {
-                downloadBackground(false, songs)
-            }
-            R.id.song_menu_share -> {
-                if (item is Track) {
-                    shareHandler.createShare(
-                        this,
-                        tracks = listOf(item),
-                        swipe = refreshListView,
-                        cancellationToken = cancellationToken!!,
-                        additionalId = navArgs.id
-                    )
-                }
-            }
-            else -> {
-                return super.onContextItemSelected(menuItem)
-            }
-        }
-        return true
+        val tracks = getClickedSong(item)
+
+        return ContextMenuUtil.handleContextMenuTracks(
+            menuItem = menuItem,
+            tracks = tracks,
+            mediaPlayerManager = mediaPlayerManager,
+            fragment = this
+        )
     }
 
     private fun getClickedSong(item: MusicDirectory.Child): List<Track> {

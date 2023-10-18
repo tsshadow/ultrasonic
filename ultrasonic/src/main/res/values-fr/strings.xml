@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="background_task.loading">Chargement…</string>
     <string name="background_task.network_error">Une erreur réseau est survenue. Veuillez vérifier l\'adresse du serveur ou réessayer plus tard.</string>
     <string name="background_task.unsupported_api">L’API v%1$s du serveur ne supporte pas cette fonction.</string>
     <string name="background_task.no_network">Cette application requiert un accès au réseau. Veuillez activer le Wi-Fi ou le réseau mobile.</string>
@@ -8,7 +7,6 @@
     <string name="background_task.parse_error">Réponse incorrecte. Veuillez vérifier l\'adresse du serveur.</string>
     <string name="background_task.ssl_cert_error">Erreur de certificat HTTPS : %1$s.</string>
     <string name="background_task.ssl_error">Erreur de connexion SSL. Veuillez vérifier le certificat du serveur.</string>
-    <string name="background_task.wait">Veuillez patienter…</string>
     <string name="button_bar.bookmarks">Signets</string>
     <string name="button_bar.browse">Bibliothèque musicale</string>
     <string name="button_bar.chat">Salon de discussion</string>
@@ -225,8 +223,6 @@
     <string name="settings.max_bitrate_unlimited">Illimité</string>
     <string name="settings.max_bitrate_wifi">Débit maximal - Wi-Fi</string>
     <string name="settings.max_songs">Titres maximum</string>
-    <string name="settings.media_button_summary">Répondre au boutons média de l\'appareil, du casque et du Bluetooth</string>
-    <string name="settings.media_button_title">Boutons média</string>
     <string name="settings.network_timeout">Délai d\'attente de connexion</string>
     <string name="settings.network_timeout_105000">105 secondes</string>
     <string name="settings.network_timeout_120000">120 secondes</string>

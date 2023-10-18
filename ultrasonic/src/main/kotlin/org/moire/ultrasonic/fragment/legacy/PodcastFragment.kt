@@ -13,35 +13,33 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.androidx.scope.ScopeFragment
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.PodcastsChannel
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.util.BackgroundTask
-import org.moire.ultrasonic.util.CancellationToken
-import org.moire.ultrasonic.util.FragmentBackgroundTask
+import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Util.applyTheme
+import org.moire.ultrasonic.util.toastingExceptionHandler
 
 /**
  * Displays the podcasts available on the server
- *
- * TODO: This file has been converted from Java, but not modernized yet.
- * TODO: Use Coroutines
  */
-class PodcastFragment : Fragment() {
-
+class PodcastFragment : ScopeFragment(), RefreshableFragment {
     private var emptyTextView: View? = null
-    var channelItemsListView: ListView? = null
-    private var cancellationToken: CancellationToken? = null
-    private var swipeRefresh: SwipeRefreshLayout? = null
+    private var channelItemsListView: ListView? = null
+    override var swipeRefresh: SwipeRefreshLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        applyTheme(this.context)
         super.onCreate(savedInstanceState)
+        applyTheme(requireContext())
     }
 
     override fun onCreateView(
@@ -54,45 +52,33 @@ class PodcastFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        cancellationToken = CancellationToken()
         swipeRefresh = view.findViewById(R.id.podcasts_refresh)
-        swipeRefresh!!.setOnRefreshListener { load(true) }
+        swipeRefresh?.setOnRefreshListener { load(true) }
         setTitle(this, R.string.podcasts_label)
         emptyTextView = view.findViewById(R.id.select_podcasts_empty)
         channelItemsListView = view.findViewById(R.id.podcasts_channels_items_list)
-        channelItemsListView!!.setOnItemClickListener { parent, _, position, _ ->
-            val (id) = parent.getItemAtPosition(position) as PodcastsChannel
-            val action = NavigationGraphDirections.toTrackCollection(
-                podcastChannelId = id
-            )
-
+        channelItemsListView?.setOnItemClickListener { parent, _, position, _ ->
+            val id = (parent.getItemAtPosition(position) as PodcastsChannel).id
+            val action = NavigationGraphDirections.toTrackCollection(podcastChannelId = id)
             findNavController().navigate(action)
         }
         load(false)
     }
 
-    override fun onDestroyView() {
-        cancellationToken!!.cancel()
-        super.onDestroyView()
-    }
-
     private fun load(refresh: Boolean) {
-        val task: BackgroundTask<List<PodcastsChannel>> =
-            object : FragmentBackgroundTask<List<PodcastsChannel>>(
-                activity, true, swipeRefresh, cancellationToken
-            ) {
-                @Throws(Throwable::class)
-                override fun doInBackground(): List<PodcastsChannel> {
-                    val musicService = getMusicService()
-                    return musicService.getPodcastsChannels(refresh)
-                }
-
-                override fun done(result: List<PodcastsChannel>) {
-                    channelItemsListView!!.adapter =
-                        ArrayAdapter(requireContext(), R.layout.list_item_generic, result)
-                    emptyTextView!!.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
-                }
+        viewLifecycleOwner.lifecycleScope.launch(
+            toastingExceptionHandler()
+        ) {
+            val result = withContext(Dispatchers.IO) {
+                val musicService = getMusicService()
+                musicService.getPodcastsChannels(refresh)
             }
-        task.execute()
+            swipeRefresh?.isRefreshing = false
+            withContext(Dispatchers.Main) {
+                channelItemsListView?.adapter =
+                    ArrayAdapter(requireContext(), R.layout.list_item_generic, result)
+                emptyTextView?.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
+            }
+        }
     }
 }

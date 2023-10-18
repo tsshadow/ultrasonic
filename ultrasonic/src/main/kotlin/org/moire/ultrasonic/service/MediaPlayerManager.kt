@@ -7,10 +7,10 @@
 package org.moire.ultrasonic.service
 
 import android.content.ComponentName
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.IntRange
+import androidx.fragment.app.Fragment
 import androidx.media3.common.C
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
@@ -29,17 +29,20 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
-import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
 import org.moire.ultrasonic.data.RatingUpdate
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.playback.PlaybackService
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.util.DownloadUtil
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.Util.navigateToCurrent
+import org.moire.ultrasonic.util.Util.toast
+import org.moire.ultrasonic.util.launchWithToast
 import org.moire.ultrasonic.util.toMediaItem
 import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
@@ -56,11 +59,8 @@ private const val VOLUME_DELTA = 0.05f
 @Suppress("TooManyFunctions")
 class MediaPlayerManager(
     private val playbackStateSerializer: PlaybackStateSerializer,
-    private val externalStorageMonitor: ExternalStorageMonitor,
-    val context: Context
+    private val externalStorageMonitor: ExternalStorageMonitor
 ) : KoinComponent {
-
-    private val activeServerProvider: ActiveServerProvider by inject()
 
     private var created = false
     var suggestedPlaylistName: String? = null
@@ -73,8 +73,10 @@ class MediaPlayerManager(
 
     private var mainScope = CoroutineScope(Dispatchers.Main)
 
-    private var sessionToken =
-        SessionToken(context, ComponentName(context, PlaybackService::class.java))
+    private var sessionToken = SessionToken(
+        UApp.applicationContext(),
+        ComponentName(UApp.applicationContext(), PlaybackService::class.java)
+    )
 
     private var mediaControllerFuture: ListenableFuture<MediaController>? = null
 
@@ -145,12 +147,11 @@ class MediaPlayerManager(
             Timber.w(error.toString())
             if (!isJukeboxEnabled) return
 
-            val context = UApp.applicationContext()
             mainScope.launch {
-                Util.toast(
-                    context,
+                toast(
                     error.errorCode,
-                    false
+                    false,
+                    UApp.applicationContext()
                 )
             }
             isJukeboxEnabled = false
@@ -199,7 +200,7 @@ class MediaPlayerManager(
             }
 
         rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
-            val jukebox = activeServerProvider.getActiveServer().jukeboxByDefault
+            val jukebox = it.jukeboxByDefault
             // Remove all songs when changing servers before turning on Jukebox.
             // Jukebox wouldn't find the songs on the new server.
             if (jukebox) controller?.clearMediaItems()
@@ -246,10 +247,10 @@ class MediaPlayerManager(
 
     private fun createMediaController(onCreated: () -> Unit) {
         mediaControllerFuture = MediaController.Builder(
-            context,
+            UApp.applicationContext(),
             sessionToken
         )
-            // Specify mainThread explicitely
+            // Specify mainThread explicitly
             .setApplicationLooper(Looper.getMainLooper())
             .buildAsync()
 
@@ -320,17 +321,15 @@ class MediaPlayerManager(
         externalStorageMonitor.onDestroy()
         DownloadService.requestStop()
         created = false
-        Timber.i("MediaPlayerController destroyed")
+        Timber.i("MediaPlayerManager destroyed")
     }
 
     @Synchronized
     fun restore(
         state: PlaybackState,
-        autoPlay: Boolean,
-        newPlaylist: Boolean
+        autoPlay: Boolean
     ) {
-        val insertionMode = if (newPlaylist) InsertionMode.CLEAR
-        else InsertionMode.APPEND
+        val insertionMode = InsertionMode.APPEND
 
         addToPlaylist(
             state.songs,
@@ -472,6 +471,79 @@ class MediaPlayerManager(
                 play(0)
             }
         }
+    }
+
+    private suspend fun addToPlaylistAsync(
+        songs: List<Track>,
+        autoPlay: Boolean,
+        shuffle: Boolean,
+        insertionMode: InsertionMode
+    ) {
+        withContext(Dispatchers.Main) {
+            addToPlaylist(
+                songs = songs,
+                autoPlay = autoPlay,
+                shuffle = shuffle,
+                insertionMode = insertionMode
+            )
+        }
+    }
+
+    @Suppress("LongParameterList")
+    fun playTracksAndToast(
+        fragment: Fragment,
+        insertionMode: InsertionMode,
+        tracks: List<Track> = listOf(),
+        id: String? = null,
+        name: String? = "",
+        isShare: Boolean = false,
+        isDirectory: Boolean = true,
+        shuffle: Boolean = false,
+        isArtist: Boolean = false
+    ) {
+
+        fragment.launchWithToast {
+
+            val list: List<Track> =
+                tracks.ifEmpty {
+                    requireNotNull(id)
+                    DownloadUtil.getTracksFromServerAsync(isArtist, id, isDirectory, name, isShare)
+                }
+
+            addToPlaylistAsync(
+                songs = list,
+                insertionMode = insertionMode,
+                autoPlay = (insertionMode == InsertionMode.CLEAR),
+                shuffle = shuffle,
+            )
+
+            if (insertionMode == InsertionMode.CLEAR) {
+                fragment.navigateToCurrent()
+            }
+
+            when (insertionMode) {
+                InsertionMode.AFTER_CURRENT ->
+                    quantize(R.plurals.n_songs_added_after_current, list)
+
+                InsertionMode.APPEND ->
+                    quantize(R.plurals.n_songs_added_to_end, list)
+
+                InsertionMode.CLEAR -> {
+                    if (Settings.shouldTransitionOnPlayback)
+                        null
+                    else
+                        quantize(R.plurals.n_songs_added_play_now, list)
+                }
+            }
+        }
+    }
+
+    private fun quantize(resId: Int, tracks: List<Track>): String {
+        return UApp.applicationContext().resources.getQuantityString(
+            resId,
+            tracks.size,
+            tracks.size
+        )
     }
 
     @set:Synchronized
@@ -649,21 +721,6 @@ class MediaPlayerManager(
         Timber.i("MediaPlayerController released")
     }
 
-    /**
-     * This function calls the music service directly and
-     * therefore can't be called from the main thread
-     */
-    val isJukeboxAvailable: Boolean
-        get() {
-            try {
-                val username = activeServerProvider.getActiveServer().userName
-                return getMusicService().getUser(username).jukeboxRole
-            } catch (all: Exception) {
-                Timber.w(all, "Error getting user information")
-            }
-            return false
-        }
-
     fun adjustVolume(up: Boolean) {
         val delta = if (up) VOLUME_DELTA else -VOLUME_DELTA
         var gain = controller?.volume ?: return
@@ -676,7 +733,7 @@ class MediaPlayerManager(
     /*
     * Sets the rating of the current track
     */
-    fun setRating(rating: Rating) {
+    private fun setRating(rating: Rating) {
         if (controller is MediaController) {
             (controller as MediaController).setRating(rating)
         }
@@ -724,7 +781,7 @@ class MediaPlayerManager(
     val currentMediaItemIndex: Int
         get() = controller?.currentMediaItemIndex ?: -1
 
-    fun getCurrentShuffleIndex(): Int {
+    private fun getCurrentShuffleIndex(): Int {
         val currentMediaItemIndex = controller?.currentMediaItemIndex ?: return -1
         return getShuffledIndexOf(currentMediaItemIndex)
     }
@@ -768,9 +825,8 @@ class MediaPlayerManager(
      * in the shuffled timeline.
      * @return The index of the item in the shuffled timeline, or [C.INDEX_UNSET] if not found.
      */
-    fun getShuffledIndexOf(searchPosition: Int): Int {
-        return getWindowIndexWhere(false) {
-            _, windowIndex ->
+    private fun getShuffledIndexOf(searchPosition: Int): Int {
+        return getWindowIndexWhere(false) { _, windowIndex ->
             windowIndex == searchPosition
         }
     }
@@ -784,8 +840,7 @@ class MediaPlayerManager(
      * @return the index of the item in the unshuffled timeline, or [C.INDEX_UNSET] if not found.
      */
     fun getUnshuffledIndexOf(shufflePosition: Int): Int {
-        return getWindowIndexWhere(true) {
-            count, _ ->
+        return getWindowIndexWhere(true) { count, _ ->
             count == shufflePosition
         }
     }

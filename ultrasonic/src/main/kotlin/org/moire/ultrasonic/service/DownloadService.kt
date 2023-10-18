@@ -29,8 +29,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.domain.Track
@@ -61,6 +63,7 @@ private const val CHECK_INTERVAL = 5000L
 class DownloadService : Service(), KoinComponent {
     private var scope: CoroutineScope? = null
     private val storageMonitor: ExternalStorageMonitor by inject()
+    private val cacheCleaner: CacheCleaner by inject()
     private val binder: IBinder = SimpleServiceBinder(this)
 
     private var isInForeground = false
@@ -153,7 +156,7 @@ class DownloadService : Service(), KoinComponent {
 
         // Stop Executor service when done downloading
         if (activeDownloads.isEmpty()) {
-            CacheCleaner().cleanSpace()
+            cacheCleaner.cleanSpace()
             stopSelf()
         }
 
@@ -279,7 +282,17 @@ class DownloadService : Service(), KoinComponent {
             updateSaveFlag: Boolean = false
         ) {
             CoroutineScope(Dispatchers.IO).launch {
+                downloadAsync(tracks, save, isHighPriority, updateSaveFlag)
+            }
+        }
 
+        suspend fun downloadAsync(
+            tracks: List<Track>,
+            save: Boolean = false,
+            isHighPriority: Boolean = false,
+            updateSaveFlag: Boolean = false
+        ) {
+            withContext(Dispatchers.IO) {
                 // Remove tracks which are already downloaded and update the save flag
                 // if needed
                 var filteredTracks = if (updateSaveFlag) {
@@ -384,8 +397,14 @@ class DownloadService : Service(), KoinComponent {
             failedList.clear()
         }
 
-        fun delete(track: Track) {
+        private fun delete(track: Track) {
             CoroutineScope(Dispatchers.IO).launch {
+                deleteAsync(track)
+            }
+        }
+
+        private suspend fun deleteAsync(track: Track) {
+            withContext(Dispatchers.IO) {
                 downloadQueue.get(track.id)?.let { downloadQueue.remove(it) }
                 failedList[track.id]?.let { downloadQueue.remove(it) }
                 cancelDownload(track)
@@ -394,7 +413,8 @@ class DownloadService : Service(), KoinComponent {
                 Storage.delete(track.getCompleteFile())
                 Storage.delete(track.getPinnedFile())
                 postState(track, DownloadState.IDLE)
-                CacheCleaner().cleanDatabaseSelective(track)
+                val cacheCleaner: CacheCleaner by inject(CacheCleaner::class.java)
+                cacheCleaner.cleanDatabaseSelective(track)
                 Util.scanMedia(track.getPinnedFile())
             }
         }
@@ -409,22 +429,38 @@ class DownloadService : Service(), KoinComponent {
             tracks.forEach(::delete)
         }
 
-        fun unpin(track: Track) {
-            // Update Pinned flag of items in progress
-            downloadQueue.get(track.id)?.pinned = false
-            activeDownloads[track.id]?.downloadTrack?.pinned = false
-            failedList[track.id]?.pinned = false
+        suspend fun unpinAsync(tracks: List<Track>) {
+            tracks.forEach { unpinAsync(it) }
+        }
 
-            val pinnedFile = track.getPinnedFile()
-            if (!Storage.isPathExists(pinnedFile)) return
-            val file = Storage.getFromPath(track.getPinnedFile()) ?: return
-            try {
-                Storage.rename(file, track.getCompleteFile())
-            } catch (ignored: FileAlreadyExistsException) {
-                // Play console has revealed a crash when for some reason both files exist
-                Storage.delete(file.path)
+        suspend fun deleteAsync(tracks: List<Track>) {
+            tracks.forEach { deleteAsync(it) }
+        }
+
+        private fun unpin(track: Track) {
+            CoroutineScope(Dispatchers.IO).launch {
+                unpinAsync(track)
             }
-            postState(track, DownloadState.DONE)
+        }
+
+        private suspend fun unpinAsync(track: Track) {
+            withContext(Dispatchers.IO) {
+                // Update Pinned flag of items in progress
+                downloadQueue.get(track.id)?.pinned = false
+                activeDownloads[track.id]?.downloadTrack?.pinned = false
+                failedList[track.id]?.pinned = false
+
+                val pinnedFile = track.getPinnedFile()
+                if (!Storage.isPathExists(pinnedFile)) return@withContext
+                val file = Storage.getFromPath(track.getPinnedFile()) ?: return@withContext
+                try {
+                    Storage.rename(file, track.getCompleteFile())
+                } catch (ignored: FileAlreadyExistsException) {
+                    // Play console has revealed a crash when for some reason both files exist
+                    Storage.delete(file.path)
+                }
+                postState(track, DownloadState.DONE)
+            }
         }
 
         @Suppress("ReturnCount")
@@ -474,12 +510,16 @@ class DownloadService : Service(), KoinComponent {
         }
 
         private fun startService() {
-            val context = UApp.applicationContext()
-            val intent = Intent(context, DownloadService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
+            try {
+                val context = UApp.applicationContext()
+                val intent = Intent(context, DownloadService::class.java)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
+            } catch (e: IllegalStateException) {
+                Timber.w(e, "Failed to start download service: the app is in the background")
             }
         }
 

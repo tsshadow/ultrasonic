@@ -190,17 +190,18 @@ class ImageLoader(
         if (artist.coverArt == null) return
         val key = FileUtil.getArtistArtKey(artist.name, false)
         val file = FileUtil.getAlbumArtFile(key)
-        cacheCoverArt(artist.coverArt!!, file)
+        downloadCoverArt(artist.coverArt!!, file)
     }
 
     /**
      * Download a cover art file of a Track and cache it on disk
      */
-    fun cacheCoverArt(track: Track) {
-        cacheCoverArt(track.coverArt!!, FileUtil.getAlbumArtFile(track))
+    fun downloadCoverArt(track: Track) {
+        if (track.coverArt == null) return
+        downloadCoverArt(track.coverArt!!, FileUtil.getAlbumArtFile(track))
     }
 
-    fun cacheCoverArt(id: String, file: String) = launch {
+    fun downloadCoverArt(id: String, file: String) = launch {
         if (id.isBlank()) return@launch
 
         withContext(Dispatchers.IO) {

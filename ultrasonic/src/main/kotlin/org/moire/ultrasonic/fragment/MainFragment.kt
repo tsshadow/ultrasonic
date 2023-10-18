@@ -20,7 +20,11 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import java.lang.ref.SoftReference
-import org.koin.core.component.KoinComponent
+import kotlin.collections.HashMap
+import kotlin.collections.hashMapOf
+import kotlin.collections.set
+import org.koin.androidx.scope.ScopeFragment
+import org.koin.core.component.KoinScopeComponent
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
@@ -34,7 +38,7 @@ import org.moire.ultrasonic.view.SortOrder
 import org.moire.ultrasonic.view.ViewCapabilities
 import timber.log.Timber
 
-class MainFragment : Fragment(), KoinComponent {
+class MainFragment : ScopeFragment(), KoinScopeComponent {
 
     private var filterButtonBar: FilterButtonBar? = null
     private var layoutType: LayoutType = LayoutType.COVER

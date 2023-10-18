@@ -41,7 +41,7 @@ object Storage {
         if (rootNotFoundError) {
             Settings.customCacheLocation = false
             Settings.cacheLocationUri = ""
-            Util.toast(UApp.applicationContext(), R.string.settings_cache_location_error)
+            Util.toast(R.string.settings_cache_location_error, true, UApp.applicationContext())
         }
     }
 

@@ -31,7 +31,6 @@ import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
-import timber.log.Timber
 
 const val INDICATOR_THICKNESS_INDEFINITE = 5
 const val INDICATOR_THICKNESS_DEFINITE = 10
@@ -78,10 +77,6 @@ class TrackViewHolder(val view: View) :
     private var isPlayingCached = false
 
     private var rxBusSubscription: CompositeDisposable? = null
-
-    init {
-        Timber.v("New ViewHolder created")
-    }
 
     @Suppress("ComplexMethod")
     fun setSong(
