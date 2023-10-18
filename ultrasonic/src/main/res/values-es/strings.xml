@@ -456,4 +456,5 @@
         <item quantity="many">%d canciones añadidas a la cola de reproducción</item>
         <item quantity="other">%d canciones añadidas a la cola de reproducción</item>
     </plurals>
+    <string name="settings.share_options">Opciones</string>
 </resources>
