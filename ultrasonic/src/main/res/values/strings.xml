@@ -356,6 +356,7 @@
     <string name="save_as_defaults">Save as default</string>
     <string name="share_comment">Comment</string>
     <string name="settings.share_expiration">Time To Expiration</string>
+    <string name="settings.share_options">Options</string>
     <string name="download_song_removed">\"%s\" was removed from playlist</string>
     <string name="download.share_playlist">Share Playlist</string>
     <string name="download.share_song">Share Current Song</string>

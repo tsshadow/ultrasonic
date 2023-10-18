@@ -73,7 +73,7 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>(), Koi
                 currentSetting.musicFolderId = it.id
                 serverSettingsModel.updateItem(currentSetting)
             }
-            listModel.refresh(refreshListView!!)
+            listModel.refresh(swipeRefresh!!)
         }
 
         viewAdapter.register(
@@ -90,7 +90,7 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>(), Koi
      * What to do when the list has changed
      */
     override val defaultObserver: (List<T>) -> Unit = {
-        emptyView.isVisible = it.isEmpty() && !(refreshListView?.isRefreshing ?: false)
+        emptyView.isVisible = it.isEmpty() && !(swipeRefresh?.isRefreshing ?: false)
 
         if (showFolderHeader()) {
             val list = mutableListOf<Identifiable>(folderHeader)

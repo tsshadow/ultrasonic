@@ -197,6 +197,7 @@ class ImageLoader(
      * Download a cover art file of a Track and cache it on disk
      */
     fun downloadCoverArt(track: Track) {
+        if (track.coverArt == null) return
         downloadCoverArt(track.coverArt!!, FileUtil.getAlbumArtFile(track))
     }
 

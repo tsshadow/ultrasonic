@@ -34,39 +34,32 @@ import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.model.SearchListModel
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.subsonic.VideoPlayer.Companion.playVideo
-import org.moire.ultrasonic.util.CancellationToken
-import org.moire.ultrasonic.util.CommunicationError
 import org.moire.ultrasonic.util.ContextMenuUtil.handleContextMenu
 import org.moire.ultrasonic.util.ContextMenuUtil.handleContextMenuTracks
+import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.toast
+import org.moire.ultrasonic.util.toastingExceptionHandler
 
 /**
  * Initiates a search on the media library and displays the results
 
  */
-class SearchFragment : MultiListFragment<Identifiable>(), KoinScopeComponent {
+class SearchFragment : MultiListFragment<Identifiable>(), KoinScopeComponent, RefreshableFragment {
     private var searchResult: SearchResult? = null
-    private var searchRefresh: SwipeRefreshLayout? = null
-
+    override var swipeRefresh: SwipeRefreshLayout? = null
     private val mediaPlayerManager: MediaPlayerManager by inject()
-
-    private var cancellationToken: CancellationToken? = null
-
     private val navArgs by navArgs<SearchFragmentArgs>()
-
     override val listModel: SearchListModel by viewModels()
-
     override val mainLayout: Int = R.layout.search
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        cancellationToken = CancellationToken()
         setTitle(this, R.string.search_title)
 
         listModel.searchResult.observe(
@@ -79,8 +72,8 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinScopeComponent {
             }
         }
 
-        searchRefresh = view.findViewById(R.id.swipe_refresh_view)
-        searchRefresh!!.isEnabled = false
+        swipeRefresh = view.findViewById(R.id.swipe_refresh_view)
+        swipeRefresh!!.isEnabled = false
 
         registerForContextMenu(listView!!)
 
@@ -129,17 +122,17 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinScopeComponent {
 
     override fun onDestroyView() {
         Util.hideKeyboard(activity)
-        cancellationToken?.cancel()
         super.onDestroyView()
     }
 
     private fun search(query: String, autoplay: Boolean) {
-        listModel.viewModelScope.launch(CommunicationError.getHandler(context)) {
-            refreshListView?.isRefreshing = true
-            listModel.search(query)
-            refreshListView?.isRefreshing = false
-        }.invokeOnCompletion {
-            if (it == null && autoplay) {
+        listModel.viewModelScope.launch(
+            toastingExceptionHandler()
+        ) {
+            swipeRefresh?.isRefreshing = true
+            val result = listModel.search(query)
+            swipeRefresh?.isRefreshing = false
+            if (result != null && autoplay) {
                 autoplay()
             }
         }

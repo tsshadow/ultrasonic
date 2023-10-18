@@ -25,48 +25,46 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.scope.ScopeFragment
 import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Playlist
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.service.OfflineException
-import org.moire.ultrasonic.util.BackgroundTask
 import org.moire.ultrasonic.util.CacheCleaner
-import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.ConfirmationDialog
 import org.moire.ultrasonic.util.DownloadAction
 import org.moire.ultrasonic.util.DownloadUtil
-import org.moire.ultrasonic.util.FragmentBackgroundTask
 import org.moire.ultrasonic.util.InfoDialog
-import org.moire.ultrasonic.util.LoadingTask
+import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.Util.toast
+import org.moire.ultrasonic.util.toastingExceptionHandler
 
 /**
  * Displays the playlists stored on the server
  *
  * TODO: This file has been converted from Java, but not modernized yet.
  */
-class PlaylistsFragment : ScopeFragment(), KoinScopeComponent {
-    private var refreshPlaylistsListView: SwipeRefreshLayout? = null
+@Suppress("InstanceOfCheckForException")
+class PlaylistsFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragment {
+    override var swipeRefresh: SwipeRefreshLayout? = null
     private var playlistsListView: ListView? = null
     private var emptyTextView: View? = null
     private var playlistAdapter: ArrayAdapter<Playlist>? = null
 
-    private var cancellationToken: CancellationToken? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        applyTheme(this.context)
         super.onCreate(savedInstanceState)
+        applyTheme(requireContext())
     }
 
     override fun onCreateView(
@@ -78,17 +76,16 @@ class PlaylistsFragment : ScopeFragment(), KoinScopeComponent {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        cancellationToken = CancellationToken()
-        refreshPlaylistsListView = view.findViewById(R.id.select_playlist_refresh)
+        swipeRefresh = view.findViewById(R.id.select_playlist_refresh)
         playlistsListView = view.findViewById(R.id.select_playlist_list)
-        refreshPlaylistsListView!!.setOnRefreshListener { load(true) }
+        swipeRefresh?.setOnRefreshListener { load(true) }
         emptyTextView = view.findViewById(R.id.select_playlist_empty)
-        playlistsListView!!.setOnItemClickListener { parent, _, position, _ ->
-            val (id1, name) = parent.getItemAtPosition(position) as Playlist
+        playlistsListView?.setOnItemClickListener { parent, _, position, _ ->
+            val (id, name) = parent.getItemAtPosition(position) as Playlist
 
             val action = NavigationGraphDirections.toTrackCollection(
-                id = id1,
-                playlistId = id1,
+                id = id,
+                playlistId = id,
                 name = name,
                 playlistName = name,
             )
@@ -99,33 +96,25 @@ class PlaylistsFragment : ScopeFragment(), KoinScopeComponent {
         load(false)
     }
 
-    override fun onDestroyView() {
-        cancellationToken!!.cancel()
-        super.onDestroyView()
-    }
-
     private fun load(refresh: Boolean) {
-        val task: BackgroundTask<List<Playlist>> =
-            object : FragmentBackgroundTask<List<Playlist>>(
-                activity, true, refreshPlaylistsListView, cancellationToken
-            ) {
-                @Throws(Throwable::class)
-                override fun doInBackground(): List<Playlist> {
-                    val musicService = getMusicService()
-                    val playlists = musicService.getPlaylists(refresh)
-                    val cacheCleaner: CacheCleaner by inject()
-                    if (!isOffline()) cacheCleaner.cleanPlaylists(playlists)
-                    return playlists
-                }
-
-                override fun done(result: List<Playlist>) {
-                    playlistAdapter =
-                        ArrayAdapter(requireContext(), R.layout.list_item_generic, result)
-                    playlistsListView!!.adapter = playlistAdapter
-                    emptyTextView!!.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
-                }
+        val cacheCleaner: CacheCleaner by inject()
+        viewLifecycleOwner.lifecycleScope.launch(
+            toastingExceptionHandler()
+        ) {
+            val result = withContext(Dispatchers.IO) {
+                val musicService = getMusicService()
+                val playlists = musicService.getPlaylists(refresh)
+                playlists
             }
-        task.execute()
+            swipeRefresh?.isRefreshing = false
+            withContext(Dispatchers.Main) {
+                playlistAdapter =
+                    ArrayAdapter(requireContext(), R.layout.list_item_generic, result)
+                playlistsListView?.adapter = playlistAdapter
+                emptyTextView?.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
+            }
+            if (!isOffline()) cacheCleaner.cleanPlaylists(result)
+        }
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenuInfo?) {
@@ -143,7 +132,7 @@ class PlaylistsFragment : ScopeFragment(), KoinScopeComponent {
 
     override fun onContextItemSelected(menuItem: MenuItem): Boolean {
         val info = menuItem.menuInfo as AdapterContextMenuInfo
-        val playlist = playlistsListView!!.getItemAtPosition(info.position) as Playlist
+        val playlist = playlistsListView?.getItemAtPosition(info.position) as Playlist
         when (menuItem.itemId) {
             R.id.playlist_menu_pin -> {
                 DownloadUtil.justDownload(
@@ -214,57 +203,45 @@ class PlaylistsFragment : ScopeFragment(), KoinScopeComponent {
             .setTitle(R.string.common_confirm).setMessage(
                 resources.getString(R.string.delete_playlist, playlist.name)
             ).setPositiveButton(R.string.common_ok) { _, _ ->
-                object : LoadingTask<Any?>(activity, refreshPlaylistsListView, cancellationToken) {
-                    @Throws(Throwable::class)
-                    override fun doInBackground(): Any? {
+                viewLifecycleOwner.lifecycleScope.launch(
+                    toastingExceptionHandler(
+                        resources.getString(
+                            R.string.menu_deleted_playlist_error,
+                            playlist.name
+                        )
+                    )
+                ) {
+                    withContext(Dispatchers.IO) {
                         val musicService = getMusicService()
                         musicService.deletePlaylist(playlist.id)
-                        return null
                     }
 
-                    override fun done(result: Any?) {
-                        playlistAdapter!!.remove(playlist)
-                        playlistAdapter!!.notifyDataSetChanged()
+                    withContext(Dispatchers.Main) {
+                        playlistAdapter?.remove(playlist)
+                        playlistAdapter?.notifyDataSetChanged()
                         toast(
                             resources.getString(R.string.menu_deleted_playlist, playlist.name)
                         )
                     }
-
-                    override fun error(error: Throwable) {
-                        val msg: String =
-                            if (error is OfflineException || error is ApiNotSupportedException)
-                                getErrorMessage(
-                                    error
-                                ) else String.format(
-                                Locale.ROOT,
-                                "%s %s",
-                                resources.getString(
-                                    R.string.menu_deleted_playlist_error,
-                                    playlist.name
-                                ),
-                                getErrorMessage(error)
-                            )
-                        toast(msg, false)
-                    }
-                }.execute()
+                }
             }.setNegativeButton(R.string.common_cancel, null).show()
     }
 
     private fun displayPlaylistInfo(playlist: Playlist) {
-        val textView = TextView(context)
+        val textView = TextView(requireContext())
         textView.setPadding(5, 5, 5, 5)
         val message: Spannable = SpannableString(
             """
-                  Owner: ${playlist.owner}
-                  Comments: ${playlist.comment}
-                  Song Count: ${playlist.songCount}
+              Owner: ${playlist.owner}
+              Comments: ${playlist.comment}
+              Song Count: ${playlist.songCount}
             """.trimIndent() +
                 if (playlist.public == null) "" else """
-     
-     Public: ${playlist.public}
+ 
+ Public: ${playlist.public}
                 """.trimIndent() + """
-          
-          Creation Date: ${playlist.created.replace('T', ' ')}
+      
+  Creation Date: ${playlist.created.replace('T', ' ')}
                 """.trimIndent()
         )
         Linkify.addLinks(message, Linkify.WEB_URLS)
@@ -293,42 +270,31 @@ class PlaylistsFragment : ScopeFragment(), KoinScopeComponent {
         alertDialog.setTitle(R.string.playlist_update_info)
         alertDialog.setView(dialogView)
         alertDialog.setPositiveButton(R.string.common_ok) { _, _ ->
-            object : LoadingTask<Any?>(activity, refreshPlaylistsListView, cancellationToken) {
-                @Throws(Throwable::class)
-                override fun doInBackground(): Any? {
-                    val nameBoxText = nameBox.text
-                    val commentBoxText = commentBox.text
-                    val name = nameBoxText?.toString()
-                    val comment = commentBoxText?.toString()
-                    val musicService = getMusicService()
+            viewLifecycleOwner.lifecycleScope.launch(
+                toastingExceptionHandler(
+                    resources.getString(
+                        R.string.playlist_updated_info_error,
+                        playlist.name
+                    )
+                )
+            ) {
+                val nameBoxText = nameBox.text
+                val commentBoxText = commentBox.text
+                val name = nameBoxText?.toString()
+                val comment = commentBoxText?.toString()
+                val musicService = getMusicService()
+
+                withContext(Dispatchers.IO) {
                     musicService.updatePlaylist(playlist.id, name, comment, publicBox.isChecked)
-                    return null
                 }
 
-                override fun done(result: Any?) {
+                withContext(Dispatchers.Main) {
                     load(true)
                     toast(
                         resources.getString(R.string.playlist_updated_info, playlist.name)
                     )
                 }
-
-                override fun error(error: Throwable) {
-                    val msg: String =
-                        if (error is OfflineException || error is ApiNotSupportedException)
-                            getErrorMessage(
-                                error
-                            ) else String.format(
-                            Locale.ROOT,
-                            "%s %s",
-                            resources.getString(
-                                R.string.playlist_updated_info_error,
-                                playlist.name
-                            ),
-                            getErrorMessage(error)
-                        )
-                    toast(msg, false)
-                }
-            }.execute()
+            }
         }
         alertDialog.setNegativeButton(R.string.common_cancel, null)
         alertDialog.show()

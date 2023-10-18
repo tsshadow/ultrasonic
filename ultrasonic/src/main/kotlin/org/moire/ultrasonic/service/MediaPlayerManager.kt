@@ -11,7 +11,6 @@ import android.os.Handler
 import android.os.Looper
 import androidx.annotation.IntRange
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.C
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
@@ -502,9 +501,8 @@ class MediaPlayerManager(
         shuffle: Boolean = false,
         isArtist: Boolean = false
     ) {
-        val scope = fragment.activity?.lifecycleScope ?: fragment.lifecycleScope
 
-        scope.launchWithToast {
+        fragment.launchWithToast {
 
             val list: List<Track> =
                 tracks.ifEmpty {

@@ -20,7 +20,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
-import org.moire.ultrasonic.fragment.FragmentTitle.Companion.setTitle
+import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.log.FileLoggerTree
 import org.moire.ultrasonic.log.FileLoggerTree.Companion.deleteLogFiles
 import org.moire.ultrasonic.log.FileLoggerTree.Companion.getLogFileNumber

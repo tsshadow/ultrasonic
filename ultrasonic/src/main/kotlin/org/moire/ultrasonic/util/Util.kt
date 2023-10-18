@@ -30,7 +30,6 @@ import android.os.Build
 import android.os.Environment
 import android.text.TextUtils
 import android.util.DisplayMetrics
-import android.view.Gravity
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -87,7 +86,6 @@ object Util {
     // Used by hexEncode()
     private val HEX_DIGITS =
         charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
-    private var toast: Toast? = null
 
     // Retrieves an instance of the application Context
     fun appContext(): Context {
@@ -145,19 +143,11 @@ object Util {
     // some background processing, our context might have expired!
     fun toast(message: CharSequence, shortDuration: Boolean, context: Context?) {
         try {
-            if (toast == null) {
-                toast = Toast.makeText(
-                    context,
-                    message,
-                    if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
-                )
-                toast!!.setGravity(Gravity.CENTER, 0, 0)
-            } else {
-                toast!!.setText(message)
-                toast!!.duration =
-                    if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
-            }
-            toast!!.show()
+            Toast.makeText(
+                context,
+                message,
+                if (shortDuration) Toast.LENGTH_SHORT else Toast.LENGTH_LONG
+            ).show()
         } catch (all: Exception) {
             Timber.w(all)
         }
@@ -277,15 +267,16 @@ object Util {
      * @param s The string to encode.
      * @return The encoded string.
      */
-    @Suppress("TooGenericExceptionThrown", "TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionThrown")
     fun utf8HexEncode(s: String?): String? {
         if (s == null) {
             return null
         }
         val utf8: ByteArray = try {
             s.toByteArray(charset(Constants.UTF_8))
-        } catch (x: UnsupportedEncodingException) {
-            throw RuntimeException(x)
+        } catch (all: UnsupportedEncodingException) {
+            // TODO: Why is it needed to change the exception type here?
+            throw RuntimeException(all)
         }
         return hexEncode(utf8)
     }
@@ -299,7 +290,7 @@ object Util {
      * @return A string containing hexadecimal characters.
      */
     @Suppress("MagicNumber")
-    fun hexEncode(data: ByteArray): String {
+    private fun hexEncode(data: ByteArray): String {
         val length = data.size
         val out = CharArray(length shl 1)
         var j = 0
@@ -319,15 +310,16 @@ object Util {
      * @return MD5 digest as a hex string.
      */
     @JvmStatic
-    @Suppress("TooGenericExceptionThrown", "TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionThrown")
     fun md5Hex(s: String?): String? {
         return if (s == null) {
             null
         } else try {
             val md5 = MessageDigest.getInstance("MD5")
             hexEncode(md5.digest(s.toByteArray(charset(Constants.UTF_8))))
-        } catch (x: Exception) {
-            throw RuntimeException(x.message, x)
+        } catch (all: Exception) {
+            // TODO: Why is it needed to change the exception type here?
+            throw RuntimeException(all.message, all)
         }
     }
 
