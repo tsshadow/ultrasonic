@@ -403,7 +403,12 @@ object Util {
     fun createWifiLock(tag: String?): WifiLock {
         val wm =
             appContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        return wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, tag)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            return wm.createWifiLock(WifiManager.WIFI_MODE_FULL_LOW_LATENCY, tag)
+        } else {
+            @Suppress("DEPRECATION")
+            return wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, tag)
+        }
     }
 
     fun getScaledHeight(height: Double, width: Double, newWidth: Int): Int {
