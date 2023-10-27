@@ -91,7 +91,7 @@ interface GenericDao<T> {
      */
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     @JvmSuppressWildcards
-    fun insertIgnoring(obj: List<T>?): List<Long>
+    fun insertIgnoring(obj: List<T>): List<Long>
 
     /**
      * Update an object from the database.
@@ -109,7 +109,7 @@ interface GenericDao<T> {
      */
     @Update
     @JvmSuppressWildcards
-    fun update(obj: List<T>?)
+    fun update(obj: List<T>)
 
     /**
      * Delete an object from the database
