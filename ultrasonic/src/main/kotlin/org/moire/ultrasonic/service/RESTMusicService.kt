@@ -511,7 +511,7 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun updateJukeboxPlaylist(
-        ids: List<String>?
+        ids: List<String>
     ): JukeboxStatus {
         val response = API.jukeboxControl(JukeboxAction.SET, null, null, ids, null)
             .execute().throwOnFailure()
@@ -533,6 +533,14 @@ open class RESTMusicService(
     @Throws(Exception::class)
     override fun stopJukebox(): JukeboxStatus {
         val response = API.jukeboxControl(JukeboxAction.STOP, null, null, null, null)
+            .execute().throwOnFailure()
+
+        return response.body()!!.jukebox.toDomainEntity()
+    }
+
+    @Throws(Exception::class)
+    override fun clearJukebox(): JukeboxStatus {
+        val response = API.jukeboxControl(JukeboxAction.CLEAR, null, null, null, null)
             .execute().throwOnFailure()
 
         return response.body()!!.jukebox.toDomainEntity()

@@ -53,7 +53,7 @@ private const val QUEUE_POLL_INTERVAL_SECONDS = 1L
  * TODO: Persist RC state?
  * TODO: Minimize status updates.
  */
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "DeprecatedCallableAddReplaceWith")
 @SuppressLint("UnsafeOptInUsageError")
 class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
     private val tasks = TaskQueue()
@@ -314,6 +314,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun increaseDeviceVolume(flags: Int) {
         gain = (gain + 1).coerceAtMost(MAX_GAIN)
+        @Suppress("DEPRECATION")
         deviceVolume = gain
     }
 
@@ -324,6 +325,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun decreaseDeviceVolume(flags: Int) {
         gain = (gain - 1).coerceAtLeast(0)
+        @Suppress("DEPRECATION")
         deviceVolume = gain
     }
 
@@ -334,6 +336,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun setDeviceMuted(muted: Boolean, flags: Int) {
         gain = 0
+        @Suppress("DEPRECATION")
         deviceVolume = gain
     }
 
@@ -583,7 +586,13 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         for (item in playlist) {
             ids.add(item.mediaId)
         }
-        tasks.add(SetPlaylist(ids))
+
+        if (ids.isNotEmpty()) {
+            tasks.add(SetPlaylist(ids))
+        } else {
+            tasks.add(ClearPlaylist())
+        }
+
         Handler(Looper.getMainLooper()).post {
             listeners.sendEvent(
                 Player.EVENT_TIMELINE_CHANGED
@@ -681,6 +690,13 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         @Throws(Exception::class)
         override fun execute(): JukeboxStatus {
             return musicService.stopJukebox()
+        }
+    }
+
+    private inner class ClearPlaylist : JukeboxTask() {
+        @Throws(Exception::class)
+        override fun execute(): JukeboxStatus {
+            return musicService.clearJukebox()
         }
     }
 

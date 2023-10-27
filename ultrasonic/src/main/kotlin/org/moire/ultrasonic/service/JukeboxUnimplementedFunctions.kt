@@ -23,7 +23,7 @@ import androidx.media3.common.Tracks
  * This class helps to hide the unused (thus unimplemented) functions
  * of the crowded Player interface, so the JukeboxMediaPlayer class can be a bit clearer.
  */
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "DeprecatedCallableAddReplaceWith")
 @SuppressLint("UnsafeOptInUsageError")
 abstract class JukeboxUnimplementedFunctions : Player {
 
