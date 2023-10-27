@@ -320,7 +320,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun updateJukeboxPlaylist(ids: List<String>?): JukeboxStatus {
+    override fun updateJukeboxPlaylist(ids: List<String>): JukeboxStatus {
         return musicService.updateJukeboxPlaylist(ids)
     }
 
@@ -332,6 +332,11 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     @Throws(Exception::class)
     override fun stopJukebox(): JukeboxStatus {
         return musicService.stopJukebox()
+    }
+
+    @Throws(Exception::class)
+    override fun clearJukebox(): JukeboxStatus {
+        return musicService.clearJukebox()
     }
 
     @Throws(Exception::class)

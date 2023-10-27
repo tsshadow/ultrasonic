@@ -141,13 +141,16 @@ interface MusicService {
     fun isJukeboxAvailable(): Boolean
 
     @Throws(Exception::class)
-    fun updateJukeboxPlaylist(ids: List<String>?): JukeboxStatus
+    fun updateJukeboxPlaylist(ids: List<String>): JukeboxStatus
 
     @Throws(Exception::class)
     fun skipJukebox(index: Int, offsetSeconds: Int): JukeboxStatus
 
     @Throws(Exception::class)
     fun stopJukebox(): JukeboxStatus
+
+    @Throws(Exception::class)
+    fun clearJukebox(): JukeboxStatus
 
     @Throws(Exception::class)
     fun startJukebox(): JukeboxStatus

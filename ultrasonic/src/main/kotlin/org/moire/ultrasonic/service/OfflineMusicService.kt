@@ -340,7 +340,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(Exception::class)
-    override fun updateJukeboxPlaylist(ids: List<String>?): JukeboxStatus {
+    override fun updateJukeboxPlaylist(ids: List<String>): JukeboxStatus {
         throw OfflineException("Jukebox not available in offline mode")
     }
 
@@ -351,6 +351,10 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Throws(Exception::class)
     override fun stopJukebox(): JukeboxStatus {
+        throw OfflineException("Jukebox not available in offline mode")
+    }
+    @Throws(Exception::class)
+    override fun clearJukebox(): JukeboxStatus {
         throw OfflineException("Jukebox not available in offline mode")
     }
 
