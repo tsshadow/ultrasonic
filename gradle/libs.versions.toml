@@ -32,7 +32,7 @@ koin                   = "3.5.0"
 picasso                = "2.8"
 
 junit4                 = "4.13.2"
-junit5                 = "5.10.0"
+junit5                 = "5.10.1"
 mockito                = "5.7.0"
 mockitoKotlin          = "5.1.0"
 kluent                 = "1.73"
