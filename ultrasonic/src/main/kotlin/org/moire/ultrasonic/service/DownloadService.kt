@@ -200,26 +200,6 @@ class DownloadService : Service(), KoinComponent {
         }
     }
 
-    private fun updateLiveData() {
-        val temp: MutableList<Track> = ArrayList()
-        temp.addAll(activeDownloads.values.map { it.downloadTrack.track })
-        temp.addAll(downloadQueue.map { x -> x.track })
-        observableDownloads.postValue(temp.distinct().sorted())
-    }
-
-    private fun clearDownloads() {
-        // Clear the pending queue
-        while (!downloadQueue.isEmpty()) {
-            postState(downloadQueue.remove().track, DownloadState.IDLE)
-        }
-        // Cancel all active downloads
-        for (download in activeDownloads) {
-            download.value.cancel()
-        }
-        activeDownloads.clear()
-        updateLiveData()
-    }
-
     // We should use a single notification builder, otherwise the notification may not be updated
     // Set some values that never change
     private val notificationBuilder: NotificationCompat.Builder by lazy {
@@ -342,6 +322,26 @@ class DownloadService : Service(), KoinComponent {
                 }
                 true
             }
+        }
+
+        private fun updateLiveData() {
+            val temp: MutableList<Track> = ArrayList()
+            temp.addAll(activeDownloads.values.map { it.downloadTrack.track })
+            temp.addAll(downloadQueue.map { x -> x.track })
+            observableDownloads.postValue(temp.distinct().sorted())
+        }
+
+        fun clearDownloads() {
+            // Clear the pending queue
+            while (!downloadQueue.isEmpty()) {
+                postState(downloadQueue.remove().track, DownloadState.IDLE)
+            }
+            // Cancel all active downloads
+            for (download in activeDownloads) {
+                download.value.cancel()
+            }
+            activeDownloads.clear()
+            updateLiveData()
         }
 
         private fun setSaveFlagForTracks(
