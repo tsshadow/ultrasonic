@@ -42,6 +42,10 @@ class ExternalStorageMonitor {
     }
 
     fun onDestroy() {
-        applicationContext().unregisterReceiver(ejectEventReceiver)
+        // avoid race conditions
+        try {
+            applicationContext().unregisterReceiver(ejectEventReceiver)
+        } catch (ignored: Exception) {
+        }
     }
 }
