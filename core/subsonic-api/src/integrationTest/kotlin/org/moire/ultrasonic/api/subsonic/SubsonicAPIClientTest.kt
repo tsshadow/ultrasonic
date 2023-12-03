@@ -8,7 +8,8 @@ import org.moire.ultrasonic.api.subsonic.rules.MockWebServerRule
  * Base class for integration tests for [SubsonicAPIClient] class.
  */
 abstract class SubsonicAPIClientTest {
-    @JvmField @Rule val mockWebServerRule = MockWebServerRule()
+    @JvmField @Rule
+    val mockWebServerRule = MockWebServerRule()
 
     protected lateinit var config: SubsonicClientConfiguration
     protected lateinit var client: SubsonicAPIClient

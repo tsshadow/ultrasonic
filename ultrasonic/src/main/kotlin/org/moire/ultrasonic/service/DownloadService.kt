@@ -216,7 +216,6 @@ class DownloadService : Service(), KoinComponent {
     }
 
     private fun updateNotification() {
-
         val notification = buildForegroundNotification()
 
         if (isInForeground) {
@@ -344,10 +343,7 @@ class DownloadService : Service(), KoinComponent {
             updateLiveData()
         }
 
-        private fun setSaveFlagForTracks(
-            shouldPin: Boolean,
-            tracks: List<Track>
-        ): List<Track> {
+        private fun setSaveFlagForTracks(shouldPin: Boolean, tracks: List<Track>): List<Track> {
             // Walk through the tracks. If a track is pinned or complete and needs to be changed
             // to the other state, rename it, but don't return it, thereby excluding it from
             // further processing.

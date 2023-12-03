@@ -10,7 +10,8 @@ class GetSongsByGenreResponse(
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("songsByGenre") private val songsByGenreList = SongsByGenreWrapper()
+    @JsonProperty("songsByGenre")
+    private val songsByGenreList = SongsByGenreWrapper()
 
     val songsList get() = songsByGenreList.songsList
 }

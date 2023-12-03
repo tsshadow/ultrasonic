@@ -45,7 +45,8 @@ class BluetoothIntentReceiver : BroadcastReceiver() {
                 connectionStatus = Constants.PREFERENCE_VALUE_ALL
             }
             BluetoothDevice.ACTION_ACL_DISCONNECTED,
-            BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED -> {
+            BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED
+            -> {
                 disconnectionStatus = Constants.PREFERENCE_VALUE_ALL
             }
         }

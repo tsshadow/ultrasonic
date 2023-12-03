@@ -6,6 +6,7 @@ import okhttp3.Interceptor.Chain
 import okhttp3.Response
 
 internal const val SOCKET_READ_TIMEOUT_DOWNLOAD = 30 * 1000
+
 // Allow 20 seconds extra timeout pear MB offset.
 internal const val TIMEOUT_MILLIS_PER_OFFSET_BYTE = 0.02
 

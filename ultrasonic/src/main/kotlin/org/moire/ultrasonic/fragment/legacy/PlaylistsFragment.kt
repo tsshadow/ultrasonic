@@ -87,7 +87,7 @@ class PlaylistsFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragme
                 id = id,
                 playlistId = id,
                 name = name,
-                playlistName = name,
+                playlistName = name
             )
             findNavController().navigate(action)
         }
@@ -120,10 +120,14 @@ class PlaylistsFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragme
     override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenuInfo?) {
         super.onCreateContextMenu(menu, view, menuInfo)
         val inflater = requireActivity().menuInflater
-        if (isOffline()) inflater.inflate(
-            R.menu.select_playlist_context_offline,
-            menu
-        ) else inflater.inflate(R.menu.select_playlist_context, menu)
+        if (isOffline()) {
+            inflater.inflate(
+                R.menu.select_playlist_context_offline,
+                menu
+            )
+        } else {
+            inflater.inflate(R.menu.select_playlist_context, menu)
+        }
         val downloadMenuItem = menu.findItem(R.id.playlist_menu_download)
         if (downloadMenuItem != null) {
             downloadMenuItem.isVisible = !isOffline()
@@ -236,13 +240,17 @@ class PlaylistsFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragme
               Comments: ${playlist.comment}
               Song Count: ${playlist.songCount}
             """.trimIndent() +
-                if (playlist.public == null) "" else """
+                if (playlist.public == null) {
+                    ""
+                } else {
+                    """
  
  Public: ${playlist.public}
-                """.trimIndent() + """
+                    """.trimIndent() + """
       
   Creation Date: ${playlist.created.replace('T', ' ')}
-                """.trimIndent()
+                    """.trimIndent()
+                }
         )
         Linkify.addLinks(message, Linkify.WEB_URLS)
         textView.text = message

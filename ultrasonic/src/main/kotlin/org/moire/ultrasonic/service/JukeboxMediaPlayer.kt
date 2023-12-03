@@ -109,8 +109,8 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         stop()
         startProcessTasks()
     }
-    @Suppress("MagicNumber")
 
+    @Suppress("MagicNumber")
     override fun release() {
         tasks.clear()
         stop()
@@ -210,7 +210,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
             Player.COMMAND_GET_TIMELINE,
             Player.COMMAND_GET_DEVICE_VOLUME,
             Player.COMMAND_ADJUST_DEVICE_VOLUME_WITH_FLAGS,
-            Player.COMMAND_SET_DEVICE_VOLUME_WITH_FLAGS,
+            Player.COMMAND_SET_DEVICE_VOLUME_WITH_FLAGS
         )
         if (isPlaying) commandsBuilder.add(Player.COMMAND_STOP)
         if (playlist.isNotEmpty()) {
@@ -227,10 +227,12 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
                 Player.COMMAND_SEEK_TO_PREVIOUS,
                 Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM
             )
-            if (currentIndex < playlist.size - 1) commandsBuilder.addAll(
-                Player.COMMAND_SEEK_TO_NEXT,
-                Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM,
-            )
+            if (currentIndex < playlist.size - 1) {
+                commandsBuilder.addAll(
+                    Player.COMMAND_SEEK_TO_NEXT,
+                    Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM
+                )
+            }
         }
         return commandsBuilder.build()
     }
@@ -524,8 +526,11 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
             shouldUpdateCommands = true
             currentIndex = jukeboxStatus.currentPlayingIndex ?: 0
             val currentMedia =
-                if (currentIndex > 0 && currentIndex < playlist.size) playlist[currentIndex]
-                else MediaItem.EMPTY
+                if (currentIndex > 0 && currentIndex < playlist.size) {
+                    playlist[currentIndex]
+                } else {
+                    MediaItem.EMPTY
+                }
 
             Handler(Looper.getMainLooper()).post {
                 listeners.queueEvent(Player.EVENT_MEDIA_ITEM_TRANSITION) {

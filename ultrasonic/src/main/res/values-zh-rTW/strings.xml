@@ -255,7 +255,6 @@
     <string name="settings.preload_100">100 首歌</string>
     <string name="settings.theme_light">明色</string>
     <string name="settings.max_bitrate_96">96 Kbps</string>
-    <string name="util.bytes_format.kilobyte">0 KB</string>
     <string name="settings.override_language">覆寫當前語言</string>
     <string name="settings.preload_5">5 首歌</string>
     <string name="settings.search_250">250</string>
@@ -283,12 +282,9 @@
     <string name="settings.other_title">其他設定</string>
     <string name="settings.search_15">15</string>
     <string name="settings.server_color">伺服器顏色</string>
-    <string name="util.bytes_format.byte">0 B</string>
-    <string name="util.bytes_format.gigabyte">0.00 GB</string>
     <string name="settings.server_username">用戶名</string>
     <string name="settings.theme_dark">暗色</string>
     <string name="util.no_time" tools:ignore="TypographyDashes">-:--</string>
-    <string name="util.bytes_format.megabyte">0.00 MB</string>
     <string name="settings.preload_1000">1000 首歌</string>
     <string name="settings.server_password">密碼</string>
     <string name="settings.share_days">天</string>

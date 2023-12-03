@@ -78,6 +78,7 @@ class BooleanSetting(private val key: String, private val defaultValue: Boolean 
         sharedPreferences.edit { putBoolean(key, value) }
 
     constructor(stringId: Int, defaultValue: Boolean = false) : this(
-        Util.appContext().getString(stringId), defaultValue
+        Util.appContext().getString(stringId),
+        defaultValue
     )
 }

@@ -1,5 +1,6 @@
 // Collection of function to convert subsonic api jukebox responses to app entities
 @file:JvmName("APIJukeboxConverter")
+
 package org.moire.ultrasonic.domain
 
 import org.moire.ultrasonic.api.subsonic.models.JukeboxStatus as ApiJukeboxStatus

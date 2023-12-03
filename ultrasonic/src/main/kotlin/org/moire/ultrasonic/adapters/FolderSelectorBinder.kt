@@ -78,7 +78,10 @@ class FolderSelectorBinder(context: Context) :
             val popup = PopupMenu(weakContext.get()!!, layout)
 
             var menuItem = popup.menu.add(
-                MENU_GROUP_MUSIC_FOLDER, -1, 0, R.string.select_artist_all_folders
+                MENU_GROUP_MUSIC_FOLDER,
+                -1,
+                0,
+                R.string.select_artist_all_folders
             )
 
             if (selectedFolderId == null || selectedFolderId!!.isEmpty()) {

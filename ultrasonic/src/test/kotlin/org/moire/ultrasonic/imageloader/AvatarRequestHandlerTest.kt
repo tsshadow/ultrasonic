@@ -67,7 +67,8 @@ class AvatarRequestHandlerTest {
         ).thenReturn(streamResponse)
 
         val response = handler.load(
-            createLoadAvatarRequest("some-username").buildRequest(), 0
+            createLoadAvatarRequest("some-username").buildRequest(),
+            0
         )
 
         response.loadedFrom `should be equal to` Picasso.LoadedFrom.NETWORK

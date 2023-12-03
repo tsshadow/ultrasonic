@@ -273,8 +273,9 @@ class MediaLibrarySessionCallback :
             var lastCarConnectionType = -1
 
             CarConnection(UApp.applicationContext()).type.observeForever {
-                if (lastCarConnectionType == it)
+                if (lastCarConnectionType == it) {
                     return@observeForever
+                }
 
                 lastCarConnectionType = it
 
@@ -296,8 +297,9 @@ class MediaLibrarySessionCallback :
                         }
                 }
             }
-        } else
+        } else {
             Timber.d("Car app library not available")
+        }
     }
 
     override fun onPostConnect(session: MediaSession, controller: MediaSession.ControllerInfo) {
@@ -313,28 +315,29 @@ class MediaLibrarySessionCallback :
     private fun getHeartCommandButton(sessionCommand: SessionCommand, willHeart: Boolean) =
         CommandButton.Builder()
             .setDisplayName(
-                if (willHeart)
+                if (willHeart) {
                     "Love"
-                else
+                } else {
                     "Dislike"
+                }
             )
             .setIconResId(
-                if (willHeart)
+                if (willHeart) {
                     R.drawable.ic_star_hollow
-                else
+                } else {
                     R.drawable.ic_star_full
+                }
             )
             .setSessionCommand(sessionCommand)
             .setEnabled(true)
             .build()
 
-    private fun getShuffleCommandButton(sessionCommand: SessionCommand) =
-        CommandButton.Builder()
-            .setDisplayName("Shuffle")
-            .setIconResId(R.drawable.media_shuffle)
-            .setSessionCommand(sessionCommand)
-            .setEnabled(true)
-            .build()
+    private fun getShuffleCommandButton(sessionCommand: SessionCommand) = CommandButton.Builder()
+        .setDisplayName("Shuffle")
+        .setIconResId(R.drawable.media_shuffle)
+        .setSessionCommand(sessionCommand)
+        .setEnabled(true)
+        .build()
 
     private fun getPlaceholderButton() = CommandButton.Builder()
         .setDisplayName("Placeholder")
@@ -514,22 +517,23 @@ class MediaLibrarySessionCallback :
         controller: MediaSession.ControllerInfo,
         mediaItems: MutableList<MediaItem>
     ): ListenableFuture<List<MediaItem>> {
-
         Timber.i("onAddMediaItems")
 
         if (mediaItems.isEmpty()) return Futures.immediateFuture(mediaItems)
         // Return early if its a search
-        if (mediaItems[0].requestMetadata.searchQuery != null)
+        if (mediaItems[0].requestMetadata.searchQuery != null) {
             return playFromSearch(mediaItems[0].requestMetadata.searchQuery!!)
+        }
 
         val updatedMediaItems: List<MediaItem> =
             mediaItems.mapNotNull { mediaItem ->
-                if (mediaItem.requestMetadata.mediaUri != null)
+                if (mediaItem.requestMetadata.mediaUri != null) {
                     mediaItem.buildUpon()
                         .setUri(mediaItem.requestMetadata.mediaUri)
                         .build()
-                else
+                } else {
                     null
+                }
             }
 
         return if (updatedMediaItems.isNotEmpty()) {
@@ -552,12 +556,16 @@ class MediaLibrarySessionCallback :
         val tracks = when (mediaIdParts.first()) {
             MEDIA_PLAYLIST_ITEM -> playPlaylist(mediaIdParts[1], mediaIdParts[2])
             MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
-                mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
+                mediaIdParts[1],
+                mediaIdParts[2],
+                mediaIdParts[3]
             )
 
             MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[1], mediaIdParts[2])
             MEDIA_ALBUM_SONG_ITEM -> playAlbumSong(
-                mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
+                mediaIdParts[1],
+                mediaIdParts[2],
+                mediaIdParts[3]
             )
 
             MEDIA_SONG_STARRED_ID -> playStarredSongs()
@@ -569,7 +577,8 @@ class MediaLibrarySessionCallback :
             MEDIA_BOOKMARK_ITEM -> playBookmark(mediaIdParts[1])
             MEDIA_PODCAST_ITEM -> playPodcast(mediaIdParts[1])
             MEDIA_PODCAST_EPISODE_ITEM -> playPodcastEpisode(
-                mediaIdParts[1], mediaIdParts[2]
+                mediaIdParts[1],
+                mediaIdParts[2]
             )
 
             MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
@@ -588,7 +597,7 @@ class MediaLibrarySessionCallback :
 
     @Suppress("ReturnCount", "ComplexMethod")
     private fun onLoadChildren(
-        parentId: String,
+        parentId: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("AutoMediaBrowserService onLoadChildren called. ParentId: %s", parentId)
 
@@ -601,7 +610,8 @@ class MediaLibrarySessionCallback :
             MEDIA_ARTIST_SECTION -> getArtists(parentIdParts[1])
             MEDIA_ALBUM_ID -> getAlbums(AlbumListType.SORTED_BY_NAME)
             MEDIA_ALBUM_PAGE_ID -> getAlbums(
-                AlbumListType.fromName(parentIdParts[1]), parentIdParts[2].toInt()
+                AlbumListType.fromName(parentIdParts[1]),
+                parentIdParts[2].toInt()
             )
 
             MEDIA_PLAYLIST_ID -> getPlaylists()
@@ -617,7 +627,8 @@ class MediaLibrarySessionCallback :
             MEDIA_PODCAST_ID -> getPodcasts()
             MEDIA_PLAYLIST_ITEM -> getPlaylist(parentIdParts[1], parentIdParts[2])
             MEDIA_ARTIST_ITEM -> getAlbumsForArtist(
-                parentIdParts[1], parentIdParts[2]
+                parentIdParts[1],
+                parentIdParts[2]
             )
 
             MEDIA_ALBUM_ITEM -> getSongsForAlbum(parentIdParts[1], parentIdParts[2])
@@ -627,10 +638,7 @@ class MediaLibrarySessionCallback :
         }
     }
 
-    private fun playFromSearch(
-        query: String,
-    ): ListenableFuture<List<MediaItem>> {
-
+    private fun playFromSearch(query: String): ListenableFuture<List<MediaItem>> {
         Timber.w("App state: %s", UApp.instance != null)
 
         Timber.i("AutoMediaBrowserService onSearch query: %s", query)
@@ -651,7 +659,6 @@ class MediaLibrarySessionCallback :
 
             // TODO Add More... button to categories
             if (searchResult != null) {
-
                 searchResult.albums.map { album ->
                     mediaItems.add(
                         album.title ?: "",
@@ -704,12 +711,16 @@ class MediaLibrarySessionCallback :
         return when (mediaIdParts.first()) {
             MEDIA_PLAYLIST_ITEM -> playPlaylist(mediaIdParts[1], mediaIdParts[2])
             MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
-                mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
+                mediaIdParts[1],
+                mediaIdParts[2],
+                mediaIdParts[3]
             )
 
             MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[1], mediaIdParts[2])
             MEDIA_ALBUM_SONG_ITEM -> playAlbumSong(
-                mediaIdParts[1], mediaIdParts[2], mediaIdParts[3]
+                mediaIdParts[1],
+                mediaIdParts[2],
+                mediaIdParts[3]
             )
 
             MEDIA_SONG_STARRED_ID -> playStarredSongs()
@@ -721,7 +732,8 @@ class MediaLibrarySessionCallback :
             MEDIA_BOOKMARK_ITEM -> playBookmark(mediaIdParts[1])
             MEDIA_PODCAST_ITEM -> playPodcast(mediaIdParts[1])
             MEDIA_PODCAST_EPISODE_ITEM -> playPodcastEpisode(
-                mediaIdParts[1], mediaIdParts[2]
+                mediaIdParts[1],
+                mediaIdParts[2]
             )
 
             MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
@@ -743,7 +755,7 @@ class MediaLibrarySessionCallback :
     private fun getRootItems(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        if (!isOffline)
+        if (!isOffline) {
             mediaItems.add(
                 R.string.music_library_label,
                 MEDIA_LIBRARY_ID,
@@ -752,6 +764,7 @@ class MediaLibrarySessionCallback :
                 mediaType = MEDIA_TYPE_FOLDER_MIXED,
                 icon = R.drawable.ic_library
             )
+        }
 
         mediaItems.add(
             R.string.main_artists_title,
@@ -762,7 +775,7 @@ class MediaLibrarySessionCallback :
             icon = R.drawable.ic_artist
         )
 
-        if (!isOffline)
+        if (!isOffline) {
             mediaItems.add(
                 R.string.main_albums_title,
                 MEDIA_ALBUM_ID,
@@ -771,6 +784,7 @@ class MediaLibrarySessionCallback :
                 mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
                 icon = R.drawable.ic_menu_browse
             )
+        }
 
         mediaItems.add(
             R.string.playlist_label,
@@ -815,28 +829,28 @@ class MediaLibrarySessionCallback :
             R.string.main_albums_recent,
             MEDIA_ALBUM_RECENT_ID,
             R.string.main_albums_title,
-            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS
         )
 
         mediaItems.add(
             R.string.main_albums_frequent,
             MEDIA_ALBUM_FREQUENT_ID,
             R.string.main_albums_title,
-            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS
         )
 
         mediaItems.add(
             R.string.main_albums_random,
             MEDIA_ALBUM_RANDOM_ID,
             R.string.main_albums_title,
-            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS
         )
 
         mediaItems.add(
             R.string.main_albums_starred,
             MEDIA_ALBUM_STARRED_ID,
             R.string.main_albums_title,
-            mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
+            mediaType = MEDIA_TYPE_FOLDER_ALBUMS
         )
 
         // Other
@@ -869,10 +883,11 @@ class MediaLibrarySessionCallback :
             }.await()
 
             if (artists != null) {
-                if (section != null)
+                if (section != null) {
                     artists = artists.filter { artist ->
                         getSectionFromName(artist.name ?: "") == section
                     }
+                }
 
                 // If there are too many artists, create alphabetic index of them
                 if (section == null && artists.count() > DISPLAY_LIMIT) {
@@ -942,28 +957,30 @@ class MediaLibrarySessionCallback :
             if (songs != null) {
                 if (songs.getChildren(includeDirs = true, includeFiles = false).isEmpty() &&
                     songs.getChildren(includeDirs = false, includeFiles = true).isNotEmpty()
-                )
+                ) {
                     mediaItems.addPlayAllItem(listOf(MEDIA_ALBUM_ITEM, id, name).joinToString("|"))
+                }
 
                 // TODO: Paging is not implemented for songs, is it necessary at all?
                 val items = songs.getChildren().take(DISPLAY_LIMIT).toMutableList()
 
                 items.sortWith { o1, o2 ->
-                    if (o1.isDirectory && o2.isDirectory)
+                    if (o1.isDirectory && o2.isDirectory) {
                         (o1.title ?: "").compareTo(o2.title ?: "")
-                    else if (o1.isDirectory)
+                    } else if (o1.isDirectory) {
                         -1
-                    else
+                    } else {
                         1
+                    }
                 }
 
                 items.map { item ->
-                    if (item.isDirectory)
+                    if (item.isDirectory) {
                         mediaItems.add(
                             item.title ?: "",
                             listOf(MEDIA_ALBUM_ITEM, item.id, item.name).joinToString("|")
                         )
-                    else if (item is Track)
+                    } else if (item is Track) {
                         mediaItems.add(
                             item.toMediaItem(
                                 listOf(
@@ -974,6 +991,7 @@ class MediaLibrarySessionCallback :
                                 ).joinToString("|")
                             )
                         )
+                    }
                 }
             }
 
@@ -994,13 +1012,19 @@ class MediaLibrarySessionCallback :
                 if (ActiveServerProvider.shouldUseId3Tags()) {
                     callWithErrorHandling {
                         musicService.getAlbumList2(
-                            type, DISPLAY_LIMIT, offset, null
+                            type,
+                            DISPLAY_LIMIT,
+                            offset,
+                            null
                         )
                     }
                 } else {
                     callWithErrorHandling {
                         musicService.getAlbumList(
-                            type, DISPLAY_LIMIT, offset, null
+                            type,
+                            DISPLAY_LIMIT,
+                            offset,
+                            null
                         )
                     }
                 }
@@ -1014,12 +1038,13 @@ class MediaLibrarySessionCallback :
                 )
             }
 
-            if ((albums?.size ?: 0) >= DISPLAY_LIMIT)
+            if ((albums?.size ?: 0) >= DISPLAY_LIMIT) {
                 mediaItems.add(
                     R.string.search_more,
                     listOf(MEDIA_ALBUM_PAGE_ID, type.typeName, (page ?: 0) + 1).joinToString("|"),
                     null
                 )
+            }
 
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
@@ -1038,7 +1063,7 @@ class MediaLibrarySessionCallback :
                     playlist.name,
                     listOf(MEDIA_PLAYLIST_ITEM, playlist.id, playlist.name)
                         .joinToString("|"),
-                    mediaType = MEDIA_TYPE_PLAYLIST,
+                    mediaType = MEDIA_TYPE_PLAYLIST
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -1047,7 +1072,7 @@ class MediaLibrarySessionCallback :
 
     private fun getPlaylist(
         id: String,
-        name: String,
+        name: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
@@ -1057,10 +1082,11 @@ class MediaLibrarySessionCallback :
             }.await()
 
             if (content != null) {
-                if (content.size > 1)
+                if (content.size > 1) {
                     mediaItems.addPlayAllItem(
                         listOf(MEDIA_PLAYLIST_ITEM, id, name).joinToString("|")
                     )
+                }
 
                 // Playlist should be cached as it may contain random elements
                 playlistCache = content.getTracks()
@@ -1132,7 +1158,7 @@ class MediaLibrarySessionCallback :
                 mediaItems.add(
                     podcast.title ?: "",
                     listOf(MEDIA_PODCAST_ITEM, podcast.id).joinToString("|"),
-                    mediaType = MEDIA_TYPE_FOLDER_MIXED,
+                    mediaType = MEDIA_TYPE_FOLDER_MIXED
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -1149,8 +1175,9 @@ class MediaLibrarySessionCallback :
             }.await()
 
             if (episodes != null) {
-                if (episodes.getTracks().count() > 1)
+                if (episodes.getTracks().count() > 1) {
                     mediaItems.addPlayAllItem(listOf(MEDIA_PODCAST_ITEM, id).joinToString("|"))
+                }
 
                 episodes.getTracks().map { episode ->
                     mediaItems.add(
@@ -1235,7 +1262,7 @@ class MediaLibrarySessionCallback :
                     share.name ?: "",
                     listOf(MEDIA_SHARE_ITEM, share.id)
                         .joinToString("|"),
-                    mediaType = MEDIA_TYPE_FOLDER_MIXED,
+                    mediaType = MEDIA_TYPE_FOLDER_MIXED
                 )
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -1254,9 +1281,9 @@ class MediaLibrarySessionCallback :
 
             val selectedShare = shares?.firstOrNull { share -> share.id == id }
             if (selectedShare != null) {
-
-                if (selectedShare.getEntries().count() > 1)
+                if (selectedShare.getEntries().count() > 1) {
                     mediaItems.addPlayAllItem(listOf(MEDIA_SHARE_ITEM, id).joinToString("|"))
+                }
 
                 selectedShare.getEntries().map { song ->
                     mediaItems.add(
@@ -1302,8 +1329,9 @@ class MediaLibrarySessionCallback :
             }.await()
 
             if (songs != null) {
-                if (songs.songs.count() > 1)
+                if (songs.songs.count() > 1) {
                     mediaItems.addPlayAllItem(listOf(MEDIA_SONG_STARRED_ID).joinToString("|"))
+                }
 
                 // TODO: Paging is not implemented for songs, is it necessary at all?
                 val items = songs.songs.take(DISPLAY_LIMIT)
@@ -1350,8 +1378,9 @@ class MediaLibrarySessionCallback :
             }.await()
 
             if (songs != null) {
-                if (songs.size > 1)
+                if (songs.size > 1) {
                     mediaItems.addPlayAllItem(listOf(MEDIA_SONG_RANDOM_ID).joinToString("|"))
+                }
 
                 // TODO: Paging is not implemented for songs, is it necessary at all?
                 val items = songs.getTracks()
@@ -1416,7 +1445,6 @@ class MediaLibrarySessionCallback :
         mediaType: Int = MEDIA_TYPE_MIXED,
         isBrowsable: Boolean = false
     ) {
-
         val mediaItem = buildMediaItem(
             title,
             mediaId,
@@ -1446,19 +1474,21 @@ class MediaLibrarySessionCallback :
             isBrowsable = isBrowsable,
             imageUri = if (icon != null) {
                 Util.getUriToDrawable(applicationContext, icon)
-            } else null,
+            } else {
+                null
+            },
             group = if (groupNameId != null) {
                 applicationContext.getString(groupNameId)
-            } else null,
+            } else {
+                null
+            },
             mediaType = mediaType
         )
 
         this.add(mediaItem)
     }
 
-    private fun MutableList<MediaItem>.addPlayAllItem(
-        mediaId: String,
-    ) {
+    private fun MutableList<MediaItem>.addPlayAllItem(mediaId: String) {
         this.add(
             R.string.select_album_play_all,
             mediaId,
@@ -1513,8 +1543,7 @@ class MediaLibrarySessionCallback :
         }
     }
 
-    private fun MediaSession.canShuffle() =
-        player.mediaItemCount > 2
+    private fun MediaSession.canShuffle() = player.mediaItemCount > 2
 
     private fun MediaSession.buildCustomCommands(
         isHeart: Boolean = false,
@@ -1531,22 +1560,25 @@ class MediaLibrarySessionCallback :
                 if (
                     player.repeatMode != Player.REPEAT_MODE_ALL &&
                     player.currentMediaItemIndex == player.mediaItemCount - 1
-                )
+                ) {
                     add(placeholderButton)
+                }
 
                 // due to the previous placeholder this heart button will always appear to the left
                 // of the default playback items
                 add(
-                    if (isHeart)
+                    if (isHeart) {
                         heartButtonToggleOff
-                    else
+                    } else {
                         heartButtonToggleOn
+                    }
                 )
 
                 // both the shuffle and the active repeat mode button will end up in the overflow
                 // menu if both are available at the same time
-                if (canShuffle)
+                if (canShuffle) {
                     add(shuffleButton)
+                }
 
                 add(
                     when (player.repeatMode) {
@@ -1564,8 +1596,9 @@ class MediaLibrarySessionCallback :
 
         // 3 was chosen because that leaves at least two other songs to be shuffled around
         @Suppress("MagicNumber")
-        if (player.mediaItemCount < 3)
+        if (player.mediaItemCount < 3) {
             return
+        }
 
         val mediaItemsToShuffle = mutableListOf<MediaItem>()
 

@@ -155,8 +155,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
      * Cached in the RoomDB
      */
     @Throws(Exception::class)
-    override fun getAlbumsOfArtist(id: String, name: String?, refresh: Boolean):
-        List<Album> {
+    override fun getAlbumsOfArtist(id: String, name: String?, refresh: Boolean): List<Album> {
         checkSettingsChanged()
 
         var result: List<Album>
@@ -481,11 +480,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun createShare(
-        ids: List<String>,
-        description: String?,
-        expires: Long?
-    ): List<Share> {
+    override fun createShare(ids: List<String>, description: String?, expires: Long?): List<Share> {
         return musicService.createShare(ids, description, expires)
     }
 

@@ -6,7 +6,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
-import org.moire.ultrasonic.fragment.SearchFragment
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.util.Settings
 
@@ -31,9 +30,9 @@ class SearchListModel(application: Application) : GenericListModel(application) 
 
     fun trimResultLength(
         result: SearchResult,
-        maxArtists: Int = SearchFragment.DEFAULT_ARTISTS,
-        maxAlbums: Int = SearchFragment.DEFAULT_ALBUMS,
-        maxSongs: Int = SearchFragment.DEFAULT_SONGS
+        maxArtists: Int = Settings.defaultArtists,
+        maxAlbums: Int = Settings.defaultAlbums,
+        maxSongs: Int = Settings.defaultSongs
     ): SearchResult {
         return SearchResult(
             artists = result.artists.take(maxArtists),

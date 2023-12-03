@@ -10,7 +10,8 @@ class BookmarksResponse(
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("bookmarks") private val bookmarksWrapper = BookmarkWrapper()
+    @JsonProperty("bookmarks")
+    private val bookmarksWrapper = BookmarkWrapper()
 
     val bookmarkList: List<Bookmark> get() = bookmarksWrapper.bookmarkList
 }

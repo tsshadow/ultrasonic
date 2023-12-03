@@ -29,8 +29,10 @@ import timber.log.Timber
  * thrown during the communication with a Subsonic server
  */
 object CommunicationError {
-    fun getHandler(context: Context?, handler: ((CoroutineContext, Throwable) -> Unit)? = null):
-        CoroutineExceptionHandler {
+    fun getHandler(
+        context: Context?,
+        handler: ((CoroutineContext, Throwable) -> Unit)? = null
+    ): CoroutineExceptionHandler {
         return CoroutineExceptionHandler { coroutineContext, exception ->
             Handler(Looper.getMainLooper()).post {
                 handleError(exception, context)
@@ -68,14 +70,16 @@ object CommunicationError {
             ) {
                 context.resources
                     .getString(
-                        R.string.background_task_ssl_cert_error, error.cause?.cause?.message
+                        R.string.background_task_ssl_cert_error,
+                        error.cause?.cause?.message
                     )
             } else {
                 context.resources.getString(R.string.background_task_ssl_error)
             }
         } else if (error is ApiNotSupportedException) {
             return context.resources.getString(
-                R.string.background_task_unsupported_api, error.serverApiVersion
+                R.string.background_task_unsupported_api,
+                error.serverApiVersion
             )
         } else if (error is IOException) {
             return context.resources.getString(R.string.background_task_network_error)

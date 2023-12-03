@@ -243,10 +243,7 @@
     <string name="settings.wifi_required_summary">定額制接続でのみメディアをダウンロードします</string>
     <string name="settings.wifi_required_title">Wi-Fi接続時のみダウンロード</string>
     <string name="song_details.kbps">%d kbps</string>
-    <string name="util.bytes_format.byte">0 B</string>
-    <string name="util.bytes_format.gigabyte">0.00 GB</string>
     <string name="download.menu_clear_playlist">プレイリストを消去</string>
-    <string name="util.bytes_format.megabyte">0.00 MB</string>
     <string name="util.no_time" tools:ignore="TypographyDashes">-:--</string>
     <string name="util.zero_time">0:00</string>
     <string name="widget.initial_text">タップして音楽を選択</string>
@@ -413,7 +410,6 @@
     <string name="settings.theme_title">テーマ</string>
     <string name="settings.use_id3_offline_summary">この設定を有効にすると、Ultrasonic 4.0以降でダウンロードした音楽のみが表示されます。それ以前のバージョンでダウンロードしたファイルには、必要なメタデータが含まれていません。固定モードと保存モードを切り替えることで、不足メタデータのダウンロードができます。</string>
     <string name="settings.show_now_playing_details">再生中に詳細を表示</string>
-    <string name="util.bytes_format.kilobyte">0 KB</string>
     <string name="widget.sdcard_busy">SDカード利用不可</string>
     <string name="settings.sharing_always_ask_for_details">常に詳細を確認</string>
     <string name="settings.share_expiration_default">デフォルトの有効期限</string>

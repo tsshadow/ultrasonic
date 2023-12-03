@@ -180,6 +180,7 @@ class PlayerFragment :
     private lateinit var fullStarDrawable: Drawable
 
     private var _binding: CurrentPlayingBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -333,8 +334,9 @@ class PlayerFragment :
         }
 
         playButton.setOnClickListener {
-            if (!mediaPlayerManager.isJukeboxEnabled)
+            if (!mediaPlayerManager.isJukeboxEnabled) {
                 networkAndStorageChecker.warnIfNetworkOrStorageUnavailable()
+            }
 
             launch(CommunicationError.getHandler(context)) {
                 mediaPlayerManager.play()
@@ -637,10 +639,7 @@ class PlayerFragment :
         return popup
     }
 
-    private fun onContextMenuItemSelected(
-        menuItem: MenuItem,
-        item: MusicDirectory.Child
-    ): Boolean {
+    private fun onContextMenuItemSelected(menuItem: MenuItem, item: MusicDirectory.Child): Boolean {
         if (item !is Track) return false
         return menuItemSelected(menuItem.itemId, item)
     }
@@ -707,8 +706,11 @@ class PlayerFragment :
                 val jukeboxEnabled = !mediaPlayerManager.isJukeboxEnabled
                 mediaPlayerManager.isJukeboxEnabled = jukeboxEnabled
                 toast(
-                    if (jukeboxEnabled) R.string.download_jukebox_on
-                    else R.string.download_jukebox_off,
+                    if (jukeboxEnabled) {
+                        R.string.download_jukebox_on
+                    } else {
+                        R.string.download_jukebox_off
+                    },
                     false
                 )
                 return true
@@ -783,7 +785,7 @@ class PlayerFragment :
                 }
                 shareHandler.createShare(
                     this,
-                    tracks = tracks,
+                    tracks = tracks
                 )
                 return true
             }
@@ -792,7 +794,7 @@ class PlayerFragment :
 
                 shareHandler.createShare(
                     this,
-                    listOf(track),
+                    listOf(track)
                 )
                 return true
             }
@@ -876,7 +878,7 @@ class PlayerFragment :
                 onContextMenuClick = { menu, id -> onContextMenuItemSelected(menu, id) },
                 checkable = false,
                 draggable = true,
-                lifecycleOwner = viewLifecycleOwner,
+                lifecycleOwner = viewLifecycleOwner
             ) { view, track -> onCreateContextMenu(view, track) }.apply {
                 this.startDrag = { holder ->
                     dragTouchHelper.startDrag(holder)
@@ -898,7 +900,6 @@ class PlayerFragment :
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-
                 val from = viewHolder.bindingAdapterPosition
                 val to = target.bindingAdapterPosition
 
@@ -951,10 +952,7 @@ class PlayerFragment :
                 mediaPlayerManager.removeFromPlaylist(pos)
             }
 
-            override fun onSelectedChanged(
-                viewHolder: RecyclerView.ViewHolder?,
-                actionState: Int
-            ) {
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
                 super.onSelectedChanged(viewHolder, actionState)
 
                 if (actionState == ACTION_STATE_DRAG) {
@@ -1009,8 +1007,10 @@ class PlayerFragment :
 
                     if (dX > 0) {
                         canvas.clipRect(
-                            itemView.left.toFloat(), itemView.top.toFloat(),
-                            dX, itemView.bottom.toFloat()
+                            itemView.left.toFloat(),
+                            itemView.top.toFloat(),
+                            dX,
+                            itemView.bottom.toFloat()
                         )
                         canvas.drawColor(backgroundColor)
                         val left = itemView.left + Util.dpToPx(16, activity!!)
@@ -1019,8 +1019,10 @@ class PlayerFragment :
                         drawable?.draw(canvas)
                     } else {
                         canvas.clipRect(
-                            itemView.right.toFloat() + dX, itemView.top.toFloat(),
-                            itemView.right.toFloat(), itemView.bottom.toFloat(),
+                            itemView.right.toFloat() + dX,
+                            itemView.top.toFloat(),
+                            itemView.right.toFloat(),
+                            itemView.bottom.toFloat()
                         )
                         canvas.drawColor(backgroundColor)
                         val left = itemView.right - Util.dpToPx(16, activity!!) - iconSize
@@ -1034,7 +1036,13 @@ class PlayerFragment :
                     viewHolder.itemView.translationX = dX
                 } else {
                     super.onChildDraw(
-                        canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive
+                        canvas,
+                        recyclerView,
+                        viewHolder,
+                        dX,
+                        dY,
+                        actionState,
+                        isCurrentlyActive
                     )
                 }
             }
@@ -1070,8 +1078,9 @@ class PlayerFragment :
             songTitleTextView.text = currentSong!!.title
             artistTextView.text = currentSong!!.artist
             albumTextView.text = currentSong!!.album
-            if (currentSong!!.year != null && Settings.showNowPlayingDetails)
+            if (currentSong!!.year != null && Settings.showNowPlayingDetails) {
                 albumTextView.append(String.format(Locale.ROOT, " (%d)", currentSong!!.year))
+            }
 
             if (Settings.showNowPlayingDetails) {
                 genreTextView.text = currentSong!!.genre
@@ -1079,11 +1088,12 @@ class PlayerFragment :
                     (currentSong!!.genre != null && currentSong!!.genre!!.isNotBlank())
 
                 var bitRate = ""
-                if (currentSong!!.bitRate != null && currentSong!!.bitRate!! > 0)
+                if (currentSong!!.bitRate != null && currentSong!!.bitRate!! > 0) {
                     bitRate = String.format(
                         Util.appContext().getString(R.string.song_details_kbps),
                         currentSong!!.bitRate
                     )
+                }
                 bitrateFormatTextView.text = String.format(
                     Locale.ROOT, "%s %s",
                     bitRate, currentSong!!.suffix

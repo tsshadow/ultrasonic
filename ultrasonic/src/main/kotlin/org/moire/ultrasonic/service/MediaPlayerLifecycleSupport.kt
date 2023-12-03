@@ -58,7 +58,6 @@ class MediaPlayerLifecycleSupport(
     }
 
     private fun onCreate(autoPlay: Boolean, afterRestore: Runnable?) {
-
         if (created) {
             afterRestore?.run()
             return
@@ -87,7 +86,6 @@ class MediaPlayerLifecycleSupport(
     }
 
     private fun onDestroy() {
-
         if (!created) return
         rxBusSubscription.dispose()
 
@@ -100,7 +98,6 @@ class MediaPlayerLifecycleSupport(
     }
 
     fun receiveIntent(intent: Intent?) {
-
         if (intent == null) return
 
         val intentAction = intent.action
@@ -130,7 +127,6 @@ class MediaPlayerLifecycleSupport(
      * while Ultrasonic is running.
      */
     private fun registerHeadsetReceiver() {
-
         headsetEventReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val extras = intent.extras ?: return
@@ -161,7 +157,6 @@ class MediaPlayerLifecycleSupport(
 
     @Suppress("MagicNumber", "ComplexMethod")
     private fun handleKeyEvent(event: KeyEvent) {
-
         if (event.action != KeyEvent.ACTION_DOWN || event.repeatCount > 0) return
 
         val keyCode: Int = event.keyCode
@@ -177,7 +172,8 @@ class MediaPlayerLifecycleSupport(
         onCreate(autoStart) {
             when (keyCode) {
                 KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
-                KeyEvent.KEYCODE_HEADSETHOOK -> mediaPlayerManager.togglePlayPause()
+                KeyEvent.KEYCODE_HEADSETHOOK
+                -> mediaPlayerManager.togglePlayPause()
                 KeyEvent.KEYCODE_MEDIA_PREVIOUS -> mediaPlayerManager.seekToPrevious()
                 KeyEvent.KEYCODE_MEDIA_NEXT -> mediaPlayerManager.seekToNext()
                 KeyEvent.KEYCODE_MEDIA_STOP -> mediaPlayerManager.stop()
@@ -200,12 +196,12 @@ class MediaPlayerLifecycleSupport(
      */
     @Suppress("ComplexMethod")
     private fun handleUltrasonicIntent(action: String) {
-
         val isRunning = created
 
         // If Ultrasonic is not running, do nothing to stop or pause
-        if (!isRunning && (action == Constants.CMD_PAUSE || action == Constants.CMD_STOP))
+        if (!isRunning && (action == Constants.CMD_PAUSE || action == Constants.CMD_STOP)) {
             return
+        }
 
         val autoStart = action == Constants.CMD_PLAY ||
             action == Constants.CMD_RESUME_OR_PLAY ||

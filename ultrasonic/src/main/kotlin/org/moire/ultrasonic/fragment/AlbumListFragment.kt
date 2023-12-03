@@ -65,10 +65,7 @@ class AlbumListFragment(
     /**
      * The central function to pass a query to the model and return a LiveData object
      */
-    override fun getLiveData(
-        refresh: Boolean,
-        append: Boolean
-    ): LiveData<List<Album>> {
+    override fun getLiveData(refresh: Boolean, append: Boolean): LiveData<List<Album>> {
         fetchAlbums(refresh)
 
         return listModel.list

@@ -65,10 +65,7 @@ class CoverArtRequestHandler(private val client: SubsonicAPIClient) : RequestHan
         throw IOException("${response.apiError}")
     }
 
-    private fun getAlbumArtBitmapFromDisk(
-        filename: String,
-        size: Int?
-    ): Bitmap? {
+    private fun getAlbumArtBitmapFromDisk(filename: String, size: Int?): Bitmap? {
         val albumArtFile = FileUtil.getAlbumArtFile(filename)
         val bitmap: Bitmap? = null
         if (File(albumArtFile).exists()) {
@@ -77,11 +74,7 @@ class CoverArtRequestHandler(private val client: SubsonicAPIClient) : RequestHan
         return null
     }
 
-    private fun getBitmapFromDisk(
-        path: String,
-        size: Int?,
-        bitmap: Bitmap?
-    ): Bitmap? {
+    private fun getBitmapFromDisk(path: String, size: Int?, bitmap: Bitmap?): Bitmap? {
         var bitmap1 = bitmap
         val opt = BitmapFactory.Options()
         if (size != null && size > 0) {

@@ -34,7 +34,6 @@ object DownloadUtil {
         isArtist: Boolean = false,
         tracks: List<Track>? = null
     ) {
-
         // Launch the Job
         fragment.launchWithToast {
             val tracksToDownload: List<Track> = tracks
@@ -87,10 +86,11 @@ object DownloadUtil {
             return getSongsForArtist(id)
         } else {
             if (isDirectory) {
-                root = if (ActiveServerProvider.shouldUseId3Tags())
+                root = if (ActiveServerProvider.shouldUseId3Tags()) {
                     musicService.getAlbumAsDir(id, name, false)
-                else
+                } else {
                     musicService.getMusicDirectory(id, name, false)
+                }
             } else if (isShare) {
                 root = MusicDirectory()
                 val shares = musicService.getShares(true)
@@ -107,10 +107,7 @@ object DownloadUtil {
 
     @Suppress("DestructuringDeclarationWithTooManyEntries")
     @Throws(Exception::class)
-    private fun getSongsRecursively(
-        parent: MusicDirectory,
-        songs: MutableList<Track>
-    ) {
+    private fun getSongsRecursively(parent: MusicDirectory, songs: MutableList<Track>) {
         if (songs.size > Constants.MAX_SONGS_RECURSIVE) {
             return
         }
@@ -121,18 +118,17 @@ object DownloadUtil {
         }
         val musicService = MusicServiceFactory.getMusicService()
         for ((id1, _, _, title) in parent.getAlbums()) {
-            val root: MusicDirectory = if (ActiveServerProvider.shouldUseId3Tags())
+            val root: MusicDirectory = if (ActiveServerProvider.shouldUseId3Tags()) {
                 musicService.getAlbumAsDir(id1, title, false)
-            else
+            } else {
                 musicService.getMusicDirectory(id1, title, false)
+            }
             getSongsRecursively(root, songs)
         }
     }
 
     @Throws(Exception::class)
-    private fun getSongsForArtist(
-        id: String
-    ): MutableList<Track> {
+    private fun getSongsForArtist(id: String): MutableList<Track> {
         val songs: MutableList<Track> = LinkedList()
         val musicService = MusicServiceFactory.getMusicService()
         val artist = musicService.getAlbumsOfArtist(id, "", false)
@@ -191,5 +187,8 @@ object DownloadUtil {
 }
 
 enum class DownloadAction {
-    DOWNLOAD, PIN, UNPIN, DELETE
+    DOWNLOAD,
+    PIN,
+    UNPIN,
+    DELETE
 }

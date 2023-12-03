@@ -39,9 +39,7 @@ class CachedDataSource(
             )
         }
 
-        private fun createDataSourceInternal(
-            upstreamDataSource: DataSource
-        ): CachedDataSource {
+        private fun createDataSourceInternal(upstreamDataSource: DataSource): CachedDataSource {
             return CachedDataSource(
                 upstreamDataSource
             )
@@ -93,7 +91,9 @@ class CachedDataSource(
                 readInternal(buffer, offset, length)
             } catch (e: IOException) {
                 throw HttpDataSourceException.createForIOException(
-                    e, Util.castNonNull(dataSpec), HttpDataSourceException.TYPE_READ
+                    e,
+                    Util.castNonNull(dataSpec),
+                    HttpDataSourceException.TYPE_READ
                 )
             }
         } else {

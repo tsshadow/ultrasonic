@@ -32,7 +32,7 @@ import org.moire.ultrasonic.util.LayoutType
  */
 open class AlbumRowDelegate(
     open val onItemClick: (Album) -> Unit,
-    open val onContextMenuClick: (MenuItem, Album) -> Boolean,
+    open val onContextMenuClick: (MenuItem, Album) -> Boolean
 ) : ItemViewDelegate<Album, AlbumRowDelegate.ListViewHolder>(), KoinComponent {
 
     private val starDrawable: Int = R.drawable.ic_star_full
@@ -61,8 +61,11 @@ open class AlbumRowDelegate(
         val imageLoaderProvider: ImageLoaderProvider by inject()
         imageLoaderProvider.executeOn {
             it.loadImage(
-                holder.coverArt, item,
-                false, 0, R.drawable.unknown_album
+                holder.coverArt,
+                item,
+                false,
+                0,
+                R.drawable.unknown_album
             )
         }
     }

@@ -16,8 +16,12 @@ class APIBookmarkConverterTest : BaseTest() {
     @Test
     fun `Should convert to domain entity`() {
         val entity = Bookmark(
-            412313L, "Awesemo", "Nice", Calendar.getInstance(),
-            Calendar.getInstance(), MusicDirectoryChild(id = "12333")
+            412313L,
+            "Awesemo",
+            "Nice",
+            Calendar.getInstance(),
+            Calendar.getInstance(),
+            MusicDirectoryChild(id = "12333")
         )
 
         val domainEntity = entity.toDomainEntity(serverId)

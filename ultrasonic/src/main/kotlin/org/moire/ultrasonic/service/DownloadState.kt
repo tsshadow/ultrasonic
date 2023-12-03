@@ -8,7 +8,15 @@
 package org.moire.ultrasonic.service
 
 enum class DownloadState {
-    IDLE, QUEUED, DOWNLOADING, RETRYING, FAILED, CANCELLED, DONE, PINNED, UNKNOWN;
+    IDLE,
+    QUEUED,
+    DOWNLOADING,
+    RETRYING,
+    FAILED,
+    CANCELLED,
+    DONE,
+    PINNED,
+    UNKNOWN;
 
     companion object {
         fun DownloadState.isFinalState(): Boolean {
@@ -17,7 +25,8 @@ enum class DownloadState {
                 FAILED,
                 CANCELLED,
                 DONE,
-                PINNED -> true
+                PINNED
+                -> true
                 else -> false
             }
         }

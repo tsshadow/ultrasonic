@@ -47,11 +47,7 @@ class ShareHandler {
     private var textViewExpiration: TextView? = null
     private val pattern = Pattern.compile(":")
 
-    fun share(
-        fragment: Fragment,
-        shareDetails: ShareDetails,
-        additionalId: String?
-    ) {
+    fun share(fragment: Fragment, shareDetails: ShareDetails, additionalId: String?) {
         val scope = fragment.activity?.lifecycleScope ?: fragment.lifecycleScope
         scope.launch {
             val share = createShareOnServer(shareDetails, additionalId)
@@ -65,11 +61,11 @@ class ShareHandler {
     ): Share? {
         return withContext(Dispatchers.IO) {
             return@withContext try {
-
                 val ids: MutableList<String> = ArrayList()
 
-                if (!shareDetails.shareOnServer && shareDetails.entries.size == 1)
+                if (!shareDetails.shareOnServer && shareDetails.entries.size == 1) {
                     return@withContext null
+                }
                 if (shareDetails.entries.isEmpty()) {
                     additionalId.ifNotNull {
                         ids.add(it)
@@ -94,10 +90,11 @@ class ShareHandler {
                 )
 
                 // Return the share
-                if (shares.isNotEmpty())
+                if (shares.isNotEmpty()) {
                     shares[0]
-                else
+                } else {
                     null
+                }
             } catch (ignored: Exception) {
                 null
             }
@@ -118,7 +115,10 @@ class ShareHandler {
                 intent.putExtra(
                     Intent.EXTRA_TEXT,
                     String.format(
-                        Locale.ROOT, "%s\n\n%s", Settings.shareGreeting, result.url
+                        Locale.ROOT,
+                        "%s\n\n%s",
+                        Settings.shareGreeting,
+                        result.url
                     )
                 )
             } else {
@@ -126,15 +126,18 @@ class ShareHandler {
                 val textBuilder = StringBuilder()
                 textBuilder.appendLine(Settings.shareGreeting)
 
-                if (!shareDetails.entries[0].title.isNullOrEmpty())
+                if (!shareDetails.entries[0].title.isNullOrEmpty()) {
                     textBuilder.append(getString(R.string.common_title))
                         .append(": ").appendLine(shareDetails.entries[0].title)
-                if (!shareDetails.entries[0].artist.isNullOrEmpty())
+                }
+                if (!shareDetails.entries[0].artist.isNullOrEmpty()) {
                     textBuilder.append(getString(R.string.common_artist))
                         .append(": ").appendLine(shareDetails.entries[0].artist)
-                if (!shareDetails.entries[0].album.isNullOrEmpty())
+                }
+                if (!shareDetails.entries[0].album.isNullOrEmpty()) {
                     textBuilder.append(getString(R.string.common_album))
                         .append(": ").append(shareDetails.entries[0].album)
+                }
 
                 intent.putExtra(Intent.EXTRA_TEXT, textBuilder.toString())
             }
@@ -148,11 +151,7 @@ class ShareHandler {
         }
     }
 
-    fun createShare(
-        fragment: Fragment,
-        tracks: List<Track>,
-        additionalId: String? = null
-    ) {
+    fun createShare(fragment: Fragment, tracks: List<Track>, additionalId: String? = null) {
         if (tracks.isEmpty()) return
         val askForDetails = Settings.shouldAskForShareDetails
         val shareDetails = ShareDetails(tracks)
@@ -167,11 +166,7 @@ class ShareHandler {
     }
 
     @SuppressLint("InflateParams")
-    private fun showDialog(
-        fragment: Fragment,
-        shareDetails: ShareDetails,
-        additionalId: String?
-    ) {
+    private fun showDialog(fragment: Fragment, shareDetails: ShareDetails, additionalId: String?) {
         val layout = LayoutInflater.from(fragment.context).inflate(R.layout.share_details, null)
 
         if (layout != null) {
@@ -258,8 +253,11 @@ class ShareHandler {
                 val timeSpanType: String = timeSpanPicker!!.timeSpanType!!
                 val timeSpanAmount: Int = timeSpanPicker!!.timeSpanAmount
                 Settings.defaultShareExpiration =
-                    if (!noExpirationCheckBox!!.isChecked && timeSpanAmount > 0)
-                        String.format("%d:%s", timeSpanAmount, timeSpanType) else ""
+                    if (!noExpirationCheckBox!!.isChecked && timeSpanAmount > 0) {
+                        String.format("%d:%s", timeSpanAmount, timeSpanType)
+                    } else {
+                        ""
+                    }
 
                 Settings.defaultShareDescription = shareDetails.description!!
                 Settings.shareOnServer = shareDetails.shareOnServer

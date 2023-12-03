@@ -10,7 +10,8 @@ class GenresResponse(
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("genres") private val genresWrapper = GenresWrapper()
+    @JsonProperty("genres")
+    private val genresWrapper = GenresWrapper()
     val genresList: List<Genre> get() = genresWrapper.genresList
 }
 

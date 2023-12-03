@@ -10,7 +10,8 @@ class SharesResponse(
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("shares") private val wrappedShares = SharesWrapper()
+    @JsonProperty("shares")
+    private val wrappedShares = SharesWrapper()
 
     val shares get() = wrappedShares.share
 }

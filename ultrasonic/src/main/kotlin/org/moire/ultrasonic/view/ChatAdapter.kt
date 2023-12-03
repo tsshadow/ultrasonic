@@ -26,7 +26,9 @@ import org.moire.ultrasonic.subsonic.ImageLoaderProvider
 
 class ChatAdapter(private val context: Context, private val messages: List<ChatMessage>) :
     ArrayAdapter<ChatMessage>(
-        context, R.layout.chat_item, messages
+        context,
+        R.layout.chat_item,
+        messages
     ),
     KoinComponent {
 
@@ -90,10 +92,7 @@ class ChatAdapter(private val context: Context, private val messages: List<ChatM
         view.tag = holder
     }
 
-    private fun setData(
-        holder: ViewHolder,
-        message: ChatMessage
-    ) {
+    private fun setData(holder: ViewHolder, message: ChatMessage) {
         holder.chatMessage = message
         val timeFormat = DateFormat.getTimeFormat(context)
         val messageTimeFormatted = "[${timeFormat.format(message.time)}]"

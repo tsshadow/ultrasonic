@@ -26,7 +26,9 @@ import timber.log.Timber
  */
 class TimeSpanPicker(private var mContext: Context, attrs: AttributeSet?, defStyle: Int) :
     LinearLayout(
-        mContext, attrs, defStyle
+        mContext,
+        attrs,
+        defStyle
     ),
     AdapterView.OnItemSelectedListener {
     private val timeSpanEditText: EditText
@@ -72,9 +74,14 @@ class TimeSpanPicker(private var mContext: Context, attrs: AttributeSet?, defSty
     }
 
     fun getTimeSpan(): Long {
-        return if (!timeSpanDisableCheckbox.isChecked) getTimeSpanFromDialog(
-            mContext, dialog
-        ) else -1L
+        return if (!timeSpanDisableCheckbox.isChecked) {
+            getTimeSpanFromDialog(
+                mContext,
+                dialog
+            )
+        } else {
+            -1L
+        }
     }
 
     val timeSpanEnabled: Boolean
@@ -142,11 +149,7 @@ class TimeSpanPicker(private var mContext: Context, attrs: AttributeSet?, defSty
             return calculateTimeSpan(context, timeSpanType, timeSpanAmount)
         }
 
-        fun calculateTimeSpan(
-            context: Context,
-            timeSpanType: String,
-            timeSpanAmount: Long
-        ): Long {
+        fun calculateTimeSpan(context: Context, timeSpanType: String, timeSpanAmount: Long): Long {
             val resources = context.resources
 
             return when (timeSpanType) {

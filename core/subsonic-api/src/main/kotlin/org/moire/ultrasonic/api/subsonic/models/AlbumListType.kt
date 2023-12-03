@@ -23,7 +23,8 @@ enum class AlbumListType(val typeName: String) {
     SORTED_BY_ARTIST("alphabeticalByArtist"),
     STARRED("starred"),
     BY_YEAR("byYear"),
-    BY_GENRE("byGenre");
+    BY_GENRE("byGenre")
+    ;
 
     override fun toString(): String {
         return typeName

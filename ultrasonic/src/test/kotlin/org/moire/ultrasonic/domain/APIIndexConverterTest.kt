@@ -23,7 +23,8 @@ class APIIndexConverterTest : BaseTest() {
             Artist(id = "12", name = "Teebee")
         )
         val entity = Indexes(
-            lastModified = 154, ignoredArticles = "Le Tre Ze",
+            lastModified = 154,
+            ignoredArticles = "Le Tre Ze",
             indexList = listOf(
                 Index(name = "A", artists = artistsA),
                 Index(name = "T", artists = artistsT)

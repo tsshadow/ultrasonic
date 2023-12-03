@@ -80,8 +80,9 @@ class SharesFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragment 
         swipeRefresh!!.setOnRefreshListener { load(true) }
         emptyTextView = view.findViewById(R.id.select_share_empty)
         sharesListView!!.onItemClickListener = AdapterView.OnItemClickListener {
-            parent, _,
-            position, _ ->
+                parent, _,
+                position, _
+            ->
             val share = parent.getItemAtPosition(position) as Share
 
             val action = NavigationGraphDirections.toTrackCollection(
@@ -171,7 +172,7 @@ class SharesFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragment 
                     insertionMode = MediaPlayerManager.InsertionMode.CLEAR,
                     id = share.id,
                     name = share.name,
-                    shuffle = true,
+                    shuffle = true
                 )
             }
             R.id.share_menu_delete -> {
@@ -235,21 +236,33 @@ class SharesFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragment 
                   Visit Count: ${share.visitCount}
             """.trimIndent() +
                 (
-                    if (share.created == null) "" else """
+                    if (share.created == null) {
+                        ""
+                    } else {
+                        """
      
                   Creation Date: ${share.created!!.replace('T', ' ')}
-                    """.trimIndent()
+                        """.trimIndent()
+                    }
                     ) +
                 (
-                    if (share.lastVisited == null) "" else """
+                    if (share.lastVisited == null) {
+                        ""
+                    } else {
+                        """
      
                   Last Visited Date: ${share.lastVisited!!.replace('T', ' ')}
-                    """.trimIndent()
+                        """.trimIndent()
+                    }
                     ) +
-                if (share.expires == null) "" else """
+                if (share.expires == null) {
+                    ""
+                } else {
+                    """
      
                   Expiration Date: ${share.expires!!.replace('T', ' ')}
-                """.trimIndent()
+                    """.trimIndent()
+                }
         )
         Linkify.addLinks(message, Linkify.WEB_URLS)
         textView.text = message
@@ -289,11 +302,7 @@ class SharesFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragment 
         alertDialog.show()
     }
 
-    private fun updateShareOnServer(
-        millis: Long,
-        description: String,
-        share: Share
-    ) {
+    private fun updateShareOnServer(millis: Long, description: String, share: Share) {
         launchWithToast {
             withContext(Dispatchers.IO) {
                 val musicService = MusicServiceFactory.getMusicService()

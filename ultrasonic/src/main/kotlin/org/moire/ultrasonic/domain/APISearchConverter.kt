@@ -8,6 +8,7 @@
 // Converts SearchResult entities from [org.moire.ultrasonic.api.subsonic.SubsonicAPIClient]
 // to app domain entities.
 @file:JvmName("APISearchConverter")
+
 package org.moire.ultrasonic.domain
 
 import org.moire.ultrasonic.api.subsonic.models.SearchResult as APISearchResult
@@ -15,7 +16,8 @@ import org.moire.ultrasonic.api.subsonic.models.SearchThreeResult
 import org.moire.ultrasonic.api.subsonic.models.SearchTwoResult
 
 fun APISearchResult.toDomainEntity(serverId: Int): SearchResult = SearchResult(
-    emptyList(), emptyList(),
+    emptyList(),
+    emptyList(),
     this.matchList.map { it.toTrackEntity(serverId) }
 )
 

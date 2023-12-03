@@ -29,10 +29,12 @@ enum class SubsonicAPIVersions(val subsonicVersions: String, val restApiVersion:
     V1_13_0("5.3", "1.13.0"),
     V1_14_0("6.0", "1.14.0"),
     V1_15_0("6.1", "1.15.0"),
-    V1_16_0("6.1.2", "1.16.0");
+    V1_16_0("6.1.2", "1.16.0")
+    ;
 
     companion object {
-        @JvmStatic @Throws(IllegalArgumentException::class)
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
         fun getClosestKnownClientApiVersion(apiVersion: String): SubsonicAPIVersions {
             val versionComponents = apiVersion.split(".")
 
@@ -41,8 +43,11 @@ enum class SubsonicAPIVersions(val subsonicVersions: String, val restApiVersion:
             try {
                 val majorVersion = versionComponents[0].toInt()
                 val minorVersion = versionComponents[1].toInt()
-                val patchVersion = if (versionComponents.size > 2) versionComponents[2].toInt()
-                else 0
+                val patchVersion = if (versionComponents.size > 2) {
+                    versionComponents[2].toInt()
+                } else {
+                    0
+                }
 
                 when (majorVersion) {
                     1 -> when {

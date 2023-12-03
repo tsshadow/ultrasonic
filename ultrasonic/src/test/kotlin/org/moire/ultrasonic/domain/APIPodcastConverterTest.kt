@@ -13,9 +13,14 @@ class APIPodcastConverterTest {
     @Test
     fun `Should convert podcast channel entity to domain entity`() {
         val entity = PodcastChannel(
-            id = "452", url = "some-url", title = "some-title",
-            description = "some-description", coverArt = "cA", originalImageUrl = "image-url",
-            status = "podcast-status", errorMessage = "some-error-message"
+            id = "452",
+            url = "some-url",
+            title = "some-title",
+            description = "some-description",
+            coverArt = "cA",
+            originalImageUrl = "image-url",
+            status = "podcast-status",
+            errorMessage = "some-error-message"
         )
 
         val converterEntity = entity.toDomainEntity()

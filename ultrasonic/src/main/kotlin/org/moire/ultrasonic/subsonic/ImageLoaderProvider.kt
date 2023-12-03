@@ -68,7 +68,9 @@ class ImageLoaderProvider :
         val config by lazy {
             var defaultSize = 0
             val fallbackImage = ResourcesCompat.getDrawable(
-                UApp.applicationContext().resources, R.drawable.unknown_album, null
+                UApp.applicationContext().resources,
+                R.drawable.unknown_album,
+                null
             )
 
             // Determine the density-dependent image sizes by taking the fallback album

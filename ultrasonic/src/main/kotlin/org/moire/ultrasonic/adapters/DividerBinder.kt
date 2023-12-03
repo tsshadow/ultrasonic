@@ -23,10 +23,7 @@ class DividerBinder : ItemViewBinder<DividerBinder.Divider, DividerBinder.ViewHo
         holder.textView.setText(item.stringId)
     }
 
-    override fun onCreateViewHolder(
-        inflater: LayoutInflater,
-        parent: ViewGroup
-    ): ViewHolder {
+    override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
         return ViewHolder(inflater.inflate(layout, parent, false))
     }
 

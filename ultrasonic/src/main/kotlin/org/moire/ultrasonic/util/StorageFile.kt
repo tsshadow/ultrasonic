@@ -107,8 +107,9 @@ class StorageFile(
 
     @Synchronized
     override fun getOrCreateFileFromPath(path: String): AbstractFile {
-        if (storageFilePathDictionary.containsKey(path))
+        if (storageFilePathDictionary.containsKey(path)) {
             return storageFilePathDictionary[path]!!
+        }
 
         val parent = getStorageFileForParentDirectory(path)
             ?: throw IOException("Parent directory doesn't exist")
@@ -126,8 +127,9 @@ class StorageFile(
     }
 
     override fun getFromPath(path: String): StorageFile? {
-        if (storageFilePathDictionary.containsKey(path))
+        if (storageFilePathDictionary.containsKey(path)) {
             return storageFilePathDictionary[path]!!
+        }
         if (notExistingPathDictionary.contains(path)) return null
 
         val parent = getStorageFileForParentDirectory(path)
@@ -274,8 +276,9 @@ class StorageFile(
 
         private fun getStorageFileForParentDirectory(path: String): StorageFile? {
             val parentPath = FileUtil.getParentPath(path) ?: return null
-            if (storageFilePathDictionary.containsKey(parentPath))
+            if (storageFilePathDictionary.containsKey(parentPath)) {
                 return storageFilePathDictionary[parentPath]!!
+            }
             if (notExistingPathDictionary.contains(parentPath)) return null
 
             val parent = findStorageFileForParentDirectory(parentPath)

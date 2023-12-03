@@ -116,7 +116,7 @@ class SettableAsyncListDiffer<T> {
     private var mReadOnlyList = emptyList<T>()
 
     // Max generation of currently scheduled runnable
-    private var mMaxScheduledGeneration/* synthetic access */ = 0
+    private var mMaxScheduledGeneration = 0
 
     /**
      * Get the current List - any diffing to present this list has already been computed and
@@ -176,10 +176,7 @@ class SettableAsyncListDiffer<T> {
      * @param commitCallback Optional runnable that is executed when the List is committed, if
      * it is committed.
      */
-    fun submitList(
-        newList: List<T>?,
-        commitCallback: Runnable?
-    ) {
+    fun submitList(newList: List<T>?, commitCallback: Runnable?) {
         // incrementing generation means any currently-running diffs are discarded when they finish
         val runGeneration = ++mMaxScheduledGeneration
         if (newList === mList) {
@@ -220,15 +217,14 @@ class SettableAsyncListDiffer<T> {
                     return newList.size
                 }
 
-                override fun areItemsTheSame(
-                    oldItemPosition: Int,
-                    newItemPosition: Int
-                ): Boolean {
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                     val oldItem: T? = oldList[oldItemPosition]
                     val newItem: T? = newList[newItemPosition]
                     return if (oldItem != null && newItem != null) {
                         mConfig!!.diffCallback.areItemsTheSame(oldItem, newItem)
-                    } else oldItem == null && newItem == null
+                    } else {
+                        oldItem == null && newItem == null
+                    }
                     // If both items are null we consider them the same.
                 }
 
@@ -264,11 +260,7 @@ class SettableAsyncListDiffer<T> {
         }
     }
 
-    private fun latchList(
-        newList: List<T>,
-        diffResult: DiffResult,
-        commitCallback: Runnable?
-    ) {
+    private fun latchList(newList: List<T>, diffResult: DiffResult, commitCallback: Runnable?) {
         val previousList = mReadOnlyList
         mList = newList
         // notify last, after list is updated
@@ -277,10 +269,7 @@ class SettableAsyncListDiffer<T> {
         onCurrentListChanged(previousList, commitCallback)
     }
 
-    private fun onCurrentListChanged(
-        previousList: List<T>,
-        commitCallback: Runnable?
-    ) {
+    private fun onCurrentListChanged(previousList: List<T>, commitCallback: Runnable?) {
         // current list is always mReadOnlyList
         for (listener in mListeners) {
             listener.onCurrentListChanged(previousList, mReadOnlyList)

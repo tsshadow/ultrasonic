@@ -240,8 +240,9 @@ class PlaybackService :
         // Create a renderer with HW rendering support
         val renderer = DefaultRenderersFactory(this)
 
-        if (Settings.useHwOffload)
+        if (Settings.useHwOffload) {
             renderer.setEnableAudioOffload(true)
+        }
 
         // Create the player
         val player = ExoPlayer.Builder(this)
@@ -258,8 +259,9 @@ class PlaybackService :
         equalizer = EqualizerController.create(player.audioSessionId)
 
         // Enable audio offload
-        if (Settings.useHwOffload)
+        if (Settings.useHwOffload) {
             player.experimentalSetOffloadSchedulingEnabled(true)
+        }
 
         return player
     }

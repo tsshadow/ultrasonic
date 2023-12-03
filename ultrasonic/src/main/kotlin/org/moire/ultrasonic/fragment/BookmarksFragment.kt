@@ -68,7 +68,6 @@ class BookmarksFragment : TrackCollectionFragment() {
      */
     private fun playNow(songs: List<Track>) {
         if (songs.isNotEmpty()) {
-
             mediaPlayerManager.addToPlaylist(
                 songs = songs,
                 autoPlay = false,

@@ -77,7 +77,6 @@ internal class ServerRowAdapter(
      */
     @Suppress("LongMethod")
     override fun getView(pos: Int, convertView: View?, parent: ViewGroup?): View? {
-
         var vi: View? = convertView
         if (vi == null) vi = inflater.inflate(R.layout.server_row, parent, false)
 

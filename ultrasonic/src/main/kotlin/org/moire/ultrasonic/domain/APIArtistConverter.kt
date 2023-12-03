@@ -8,6 +8,7 @@
 // Converts Artist entity from [org.moire.ultrasonic.api.subsonic.SubsonicAPIClient]
 // to app domain entities.
 @file:JvmName("APIArtistConverter")
+
 package org.moire.ultrasonic.domain
 
 import org.moire.ultrasonic.api.subsonic.models.Artist as APIArtist

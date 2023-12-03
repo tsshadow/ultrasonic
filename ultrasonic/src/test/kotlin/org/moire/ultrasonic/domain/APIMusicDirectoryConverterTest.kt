@@ -15,8 +15,13 @@ class APIMusicDirectoryConverterTest : BaseTest() {
     @Test
     fun `Should convert MusicDirectory entity`() {
         val entity = MusicDirectory(
-            id = "1982", parent = "345", name = "some-name", userRating = 3,
-            averageRating = 3.4f, starred = Calendar.getInstance(), playCount = 10,
+            id = "1982",
+            parent = "345",
+            name = "some-name",
+            userRating = 3,
+            averageRating = 3.4f,
+            starred = Calendar.getInstance(),
+            playCount = 10,
             childList = listOf(MusicDirectoryChild("1"), MusicDirectoryChild("2"))
         )
 
@@ -80,8 +85,10 @@ class APIMusicDirectoryConverterTest : BaseTest() {
     @Test
     fun `Should convert MusicDirectoryChild podcast entity`() {
         val entity = MusicDirectoryChild(
-            id = "584", streamId = "394",
-            artist = "some-artist", publishDate = Calendar.getInstance()
+            id = "584",
+            streamId = "394",
+            artist = "some-artist",
+            publishDate = Calendar.getInstance()
         )
 
         val convertedEntity = entity.toTrackEntity(serverId)

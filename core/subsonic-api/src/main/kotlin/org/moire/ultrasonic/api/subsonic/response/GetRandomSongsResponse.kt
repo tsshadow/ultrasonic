@@ -10,7 +10,8 @@ class GetRandomSongsResponse(
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("randomSongs") private val songsWrapper = RandomSongsWrapper()
+    @JsonProperty("randomSongs")
+    private val songsWrapper = RandomSongsWrapper()
 
     val songsList
         get() = songsWrapper.songsList
