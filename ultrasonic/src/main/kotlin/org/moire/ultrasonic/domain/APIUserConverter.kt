@@ -1,5 +1,6 @@
 // Helper functions to convert User entity to domain entity
 @file:JvmName("APIUserConverter")
+
 package org.moire.ultrasonic.domain
 
 import org.moire.ultrasonic.api.subsonic.models.User

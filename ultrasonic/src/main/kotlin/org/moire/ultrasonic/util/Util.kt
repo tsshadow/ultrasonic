@@ -78,10 +78,6 @@ object Util {
     private val GIGA_BYTE_FORMAT = DecimalFormat("0.00 GB")
     private val MEGA_BYTE_FORMAT = DecimalFormat("0.00 MB")
     private val KILO_BYTE_FORMAT = DecimalFormat("0 KB")
-    private var GIGA_BYTE_LOCALIZED_FORMAT: DecimalFormat? = null
-    private var MEGA_BYTE_LOCALIZED_FORMAT: DecimalFormat? = null
-    private var KILO_BYTE_LOCALIZED_FORMAT: DecimalFormat? = null
-    private var BYTE_LOCALIZED_FORMAT: DecimalFormat? = null
 
     // Used by hexEncode()
     private val HEX_DIGITS =
@@ -137,10 +133,10 @@ object Util {
         toast(message, true, context)
     }
 
-    @JvmStatic
     // Toast needs a real context or it will throw a IllegalAccessException
     // We wrap it in a try-catch block, because if called after doing
     // some background processing, our context might have expired!
+    @JvmStatic
     fun toast(message: CharSequence, shortDuration: Boolean, context: Context?) {
         try {
             Toast.makeText(
@@ -186,7 +182,6 @@ object Util {
     @JvmStatic
     @Synchronized
     fun formatBytes(byteCount: Long): String {
-
         // More than 1 GB?
         if (byteCount >= KBYTE * KBYTE * KBYTE) {
             return GIGA_BYTE_FORMAT.format(byteCount.toDouble() / (KBYTE * KBYTE * KBYTE))
@@ -200,60 +195,9 @@ object Util {
         // More than 1 KB?
         return if (byteCount >= KBYTE) {
             KILO_BYTE_FORMAT.format(byteCount.toDouble() / KBYTE)
-        } else "$byteCount B"
-    }
-
-    /**
-     * Converts a byte-count to a formatted string suitable for display to the user.
-     * For instance:
-     *
-     *  * `format(918)` returns *"918 B"*.
-     *  * `format(98765)` returns *"96 KB"*.
-     *  * `format(1238476)` returns *"1.2 MB"*.
-     *
-     * This method assumes that 1 KB is 1024 bytes.
-     * This version of the method returns a localized string.
-     *
-     * @param byteCount The number of bytes.
-     * @return The formatted string.
-     */
-    @Synchronized
-    @Suppress("ReturnCount")
-    fun formatLocalizedBytes(byteCount: Long, context: Context): String {
-
-        // More than 1 GB?
-        if (byteCount >= KBYTE * KBYTE * KBYTE) {
-            if (GIGA_BYTE_LOCALIZED_FORMAT == null) {
-                GIGA_BYTE_LOCALIZED_FORMAT =
-                    DecimalFormat(context.resources.getString(R.string.util_bytes_format_gigabyte))
-            }
-            return GIGA_BYTE_LOCALIZED_FORMAT!!
-                .format(byteCount.toDouble() / (KBYTE * KBYTE * KBYTE))
+        } else {
+            "$byteCount B"
         }
-
-        // More than 1 MB?
-        if (byteCount >= KBYTE * KBYTE) {
-            if (MEGA_BYTE_LOCALIZED_FORMAT == null) {
-                MEGA_BYTE_LOCALIZED_FORMAT =
-                    DecimalFormat(context.resources.getString(R.string.util_bytes_format_megabyte))
-            }
-            return MEGA_BYTE_LOCALIZED_FORMAT!!
-                .format(byteCount.toDouble() / (KBYTE * KBYTE))
-        }
-
-        // More than 1 KB?
-        if (byteCount >= KBYTE) {
-            if (KILO_BYTE_LOCALIZED_FORMAT == null) {
-                KILO_BYTE_LOCALIZED_FORMAT =
-                    DecimalFormat(context.resources.getString(R.string.util_bytes_format_kilobyte))
-            }
-            return KILO_BYTE_LOCALIZED_FORMAT!!.format(byteCount.toDouble() / KBYTE)
-        }
-        if (BYTE_LOCALIZED_FORMAT == null) {
-            BYTE_LOCALIZED_FORMAT =
-                DecimalFormat(context.resources.getString(R.string.util_bytes_format_byte))
-        }
-        return BYTE_LOCALIZED_FORMAT!!.format(byteCount.toDouble())
     }
 
     @Suppress("SuspiciousEqualsCombination")
@@ -314,12 +258,14 @@ object Util {
     fun md5Hex(s: String?): String? {
         return if (s == null) {
             null
-        } else try {
-            val md5 = MessageDigest.getInstance("MD5")
-            hexEncode(md5.digest(s.toByteArray(charset(Constants.UTF_8))))
-        } catch (all: Exception) {
-            // TODO: Why is it needed to change the exception type here?
-            throw RuntimeException(all.message, all)
+        } else {
+            try {
+                val md5 = MessageDigest.getInstance("MD5")
+                hexEncode(md5.digest(s.toByteArray(charset(Constants.UTF_8))))
+            } catch (all: Exception) {
+                // TODO: Why is it needed to change the exception type here?
+                throw RuntimeException(all.message, all)
+            }
         }
     }
 
@@ -485,7 +431,6 @@ object Util {
         val width = options.outWidth
         var inSampleSize = 1
         if (height > reqHeight || width > reqWidth) {
-
             // Calculate ratios of height and width to requested height and
             // width
             val heightRatio = (height.toFloat() / reqHeight.toFloat()).roundToInt()
@@ -554,7 +499,6 @@ object Util {
         notificationManager: NotificationManagerCompat
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
             // The suggested importance of a startForeground service notification is IMPORTANCE_LOW
             val channel = NotificationChannel(
                 id,
@@ -576,11 +520,10 @@ object Util {
     ) {
         if (ContextCompat.checkSelfPermission(
                 applicationContext(),
-                POST_NOTIFICATIONS,
+                POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
         ) {
-
             val requestPermissionLauncher =
                 fragment.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                     if (!it) {
@@ -604,7 +547,7 @@ object Util {
     ) {
         if (ContextCompat.checkSelfPermission(
                 applicationContext(),
-                POST_NOTIFICATIONS,
+                POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
         ) {
@@ -644,8 +587,10 @@ object Util {
     fun scanMedia(file: String?) {
         // TODO this doesn't work for URIs
         MediaScannerConnection.scanFile(
-            applicationContext(), arrayOf(file),
-            null, null
+            applicationContext(),
+            arrayOf(file),
+            null,
+            null
         )
     }
 
@@ -683,7 +628,7 @@ object Util {
         val trackNumber: String,
         val duration: String,
         var bitrate: String?,
-        var fileFormat: String?,
+        var fileFormat: String?
     )
 
     @Suppress("ComplexMethod", "LongMethod")
@@ -694,10 +639,11 @@ object Util {
 
         val duration = song.duration
 
-        if (song.bitRate != null && song.bitRate!! > 0)
+        if (song.bitRate != null && song.bitRate!! > 0) {
             bitRate = String.format(
                 appContext().getString(R.string.song_details_kbps), song.bitRate
             )
+        }
 
         val fileFormat: String?
         val suffix = song.suffix
@@ -705,20 +651,27 @@ object Util {
 
         fileFormat = if (
             TextUtils.isEmpty(transcodedSuffix) || transcodedSuffix == suffix || song.isVideo
-        ) suffix else String.format(Locale.ROOT, "%s > %s", suffix, transcodedSuffix)
+        ) {
+            suffix
+        } else {
+            String.format(Locale.ROOT, "%s > %s", suffix, transcodedSuffix)
+        }
 
         val artistName = song.artist
 
         if (artistName != null) {
             if (Settings.shouldDisplayBitrateWithArtist && (
-                !bitRate.isNullOrBlank() || !fileFormat.isNullOrBlank()
-                )
+                    !bitRate.isNullOrBlank() || !fileFormat.isNullOrBlank()
+                    )
             ) {
                 artist.append(artistName).append(" (").append(
                     String.format(
                         appContext().getString(R.string.song_details_all),
-                        if (bitRate == null) ""
-                        else String.format(Locale.ROOT, "%s ", bitRate),
+                        if (bitRate == null) {
+                            ""
+                        } else {
+                            String.format(Locale.ROOT, "%s ", bitRate)
+                        },
                         fileFormat
                     )
                 ).append(')')
@@ -740,8 +693,11 @@ object Util {
             title.append(" (").append(
                 String.format(
                     appContext().getString(R.string.song_details_all),
-                    if (bitRate == null) ""
-                    else String.format(Locale.ROOT, "%s ", bitRate),
+                    if (bitRate == null) {
+                        ""
+                    } else {
+                        String.format(Locale.ROOT, "%s ", bitRate)
+                    },
                     fileFormat
                 )
             ).append(')')
@@ -753,7 +709,7 @@ object Util {
             trackNumber = trackText,
             duration = formatTotalDuration(duration?.toLong()),
             bitrate = bitRate,
-            fileFormat = fileFormat,
+            fileFormat = fileFormat
         )
     }
 

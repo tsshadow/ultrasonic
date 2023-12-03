@@ -1,4 +1,5 @@
 @file:JvmName("MusicServiceModule")
+
 package org.moire.ultrasonic.di
 
 import kotlin.math.abs

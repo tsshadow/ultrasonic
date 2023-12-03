@@ -9,7 +9,8 @@ package org.moire.ultrasonic.util
 
 enum class LayoutType(val value: Int) {
     LIST(0),
-    COVER(1);
+    COVER(1)
+    ;
 
     companion object {
         private val map = values().associateBy { it.value }

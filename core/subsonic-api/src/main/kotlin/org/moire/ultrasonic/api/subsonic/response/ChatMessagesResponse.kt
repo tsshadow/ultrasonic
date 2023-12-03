@@ -10,7 +10,8 @@ class ChatMessagesResponse(
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("chatMessages") private val wrapper = ChatMessagesWrapper()
+    @JsonProperty("chatMessages")
+    private val wrapper = ChatMessagesWrapper()
 
     val chatMessages: List<ChatMessage> get() = wrapper.messagesList
 }

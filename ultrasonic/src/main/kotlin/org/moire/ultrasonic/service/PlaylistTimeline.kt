@@ -59,11 +59,17 @@ class PlaylistTimeline @JvmOverloads constructor(
             return windowIndex
         }
         if (windowIndex == getLastWindowIndex(shuffleModeEnabled)) {
-            return if (repeatMode == Player.REPEAT_MODE_ALL) getFirstWindowIndex(shuffleModeEnabled)
-            else C.INDEX_UNSET
+            return if (repeatMode == Player.REPEAT_MODE_ALL) {
+                getFirstWindowIndex(shuffleModeEnabled)
+            } else {
+                C.INDEX_UNSET
+            }
         }
-        return if (shuffleModeEnabled) shuffledIndices[indicesInShuffled[windowIndex] + 1]
-        else windowIndex + 1
+        return if (shuffleModeEnabled) {
+            shuffledIndices[indicesInShuffled[windowIndex] + 1]
+        } else {
+            windowIndex + 1
+        }
     }
 
     override fun getPreviousWindowIndex(
@@ -75,11 +81,17 @@ class PlaylistTimeline @JvmOverloads constructor(
             return windowIndex
         }
         if (windowIndex == getFirstWindowIndex(shuffleModeEnabled)) {
-            return if (repeatMode == Player.REPEAT_MODE_ALL) getLastWindowIndex(shuffleModeEnabled)
-            else C.INDEX_UNSET
+            return if (repeatMode == Player.REPEAT_MODE_ALL) {
+                getLastWindowIndex(shuffleModeEnabled)
+            } else {
+                C.INDEX_UNSET
+            }
         }
-        return if (shuffleModeEnabled) shuffledIndices[indicesInShuffled[windowIndex] - 1]
-        else windowIndex - 1
+        return if (shuffleModeEnabled) {
+            shuffledIndices[indicesInShuffled[windowIndex] - 1]
+        } else {
+            windowIndex - 1
+        }
     }
 
     override fun getLastWindowIndex(shuffleModeEnabled: Boolean): Int {

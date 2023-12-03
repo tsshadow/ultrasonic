@@ -92,7 +92,13 @@ internal class ApiVersionCheckWrapper(
         checkVersion(V1_4_0)
         checkParamVersion(musicFolderId, V1_12_0)
         return api.search2(
-            query, artistCount, artistOffset, albumCount, albumOffset, songCount, musicFolderId
+            query,
+            artistCount,
+            artistOffset,
+            albumCount,
+            albumOffset,
+            songCount,
+            musicFolderId
         )
     }
 
@@ -108,7 +114,13 @@ internal class ApiVersionCheckWrapper(
         checkVersion(V1_8_0)
         checkParamVersion(musicFolderId, V1_12_0)
         return api.search3(
-            query, artistCount, artistOffset, albumCount, albumOffset, songCount, musicFolderId
+            query,
+            artistCount,
+            artistOffset,
+            albumCount,
+            albumOffset,
+            songCount,
+            musicFolderId
         )
     }
 
@@ -228,7 +240,13 @@ internal class ApiVersionCheckWrapper(
         checkParamVersion(estimateContentLength, V1_8_0)
         checkParamVersion(converted, V1_14_0)
         return api.stream(
-            id, maxBitRate, format, timeOffset, videoSize, estimateContentLength, converted
+            id,
+            maxBitRate,
+            format,
+            timeOffset,
+            videoSize,
+            estimateContentLength,
+            converted
         )
     }
 
@@ -335,8 +353,9 @@ internal class ApiVersionCheckWrapper(
     private fun checkVersion(expectedVersion: SubsonicAPIVersions) {
         // If it is true, it is probably the first call with this server
         if (!isRealProtocolVersion) return
-        if (currentApiVersion < expectedVersion)
+        if (currentApiVersion < expectedVersion) {
             throw ApiNotSupportedException(currentApiVersion)
+        }
     }
 
     private fun checkParamVersion(param: Any?, expectedVersion: SubsonicAPIVersions) {

@@ -13,10 +13,7 @@ class MusicDirectory : ArrayList<MusicDirectory.Child>() {
     var name: String? = null
 
     @JvmOverloads
-    fun getChildren(
-        includeDirs: Boolean = true,
-        includeFiles: Boolean = true
-    ): List<Child> {
+    fun getChildren(includeDirs: Boolean = true, includeFiles: Boolean = true): List<Child> {
         if (includeDirs && includeFiles) {
             return toList()
         }

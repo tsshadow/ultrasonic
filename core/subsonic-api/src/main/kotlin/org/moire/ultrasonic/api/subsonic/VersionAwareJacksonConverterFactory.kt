@@ -48,7 +48,10 @@ class VersionAwareJacksonConverterFactory(
         retrofit: Retrofit
     ): Converter<*, RequestBody>? {
         return jacksonConverterFactory?.requestBodyConverter(
-            type, parameterAnnotations, methodAnnotations, retrofit
+            type,
+            parameterAnnotations,
+            methodAnnotations,
+            retrofit
         )
     }
 
@@ -63,7 +66,7 @@ class VersionAwareJacksonConverterFactory(
         }
     }
 
-    class VersionAwareResponseBodyConverter<T> (
+    class VersionAwareResponseBodyConverter<T>(
         private val notifier: (SubsonicAPIVersions) -> Unit = {},
         private val adapter: ObjectReader
     ) : Converter<ResponseBody, T> {

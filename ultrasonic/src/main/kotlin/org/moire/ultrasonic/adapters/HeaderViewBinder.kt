@@ -46,7 +46,6 @@ class HeaderViewBinder(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, item: AlbumHeader) {
-
         val context = weakContext.get() ?: return
         val resources = context.resources
 
@@ -98,7 +97,8 @@ class HeaderViewBinder(
         holder.yearView.text = year
 
         val songs = resources.getQuantityString(
-            R.plurals.n_songs, item.childCount,
+            R.plurals.n_songs,
+            item.childCount,
             item.childCount
         )
         holder.songCountView.text = songs

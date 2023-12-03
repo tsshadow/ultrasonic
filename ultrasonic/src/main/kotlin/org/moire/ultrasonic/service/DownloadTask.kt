@@ -91,7 +91,8 @@ class DownloadTask(
 
         // Attempt partial HTTP GET, appending to the file if it exists.
         val (inStream, isPartial) = musicService.getDownloadInputStream(
-            downloadTrack.track, fileLength,
+            downloadTrack.track,
+            fileLength,
             if (downloadTrack.pinned) Settings.maxBitRatePinning else Settings.maxBitRate,
             downloadTrack.pinned && Settings.pinWithHighestQuality
         )
@@ -228,8 +229,9 @@ class DownloadTask(
         }
 
         // Cache the artist
-        if (artistId != null)
+        if (artistId != null) {
             directArtist = cacheArtist(onlineDB, offlineDB, artistId)
+        }
 
         // Now cache the album
         if (albumId != null) {
@@ -246,8 +248,9 @@ class DownloadTask(
                 offlineDB.albumDao().insert(album)
 
                 // If the album is a Compilation, also cache the Album artist
-                if (album.artistId != null && album.artistId != artistId)
+                if (album.artistId != null && album.artistId != artistId) {
                     compilationArtist = cacheArtist(onlineDB, offlineDB, album.artistId!!)
+                }
             }
         }
 

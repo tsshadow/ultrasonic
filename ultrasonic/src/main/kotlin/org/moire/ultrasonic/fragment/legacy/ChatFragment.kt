@@ -112,9 +112,10 @@ class ChatFragment : Fragment(), KoinComponent, RefreshableFragment {
         })
         messageEditText.setOnEditorActionListener(
             OnEditorActionListener {
-                _: TextView?,
-                actionId: Int,
-                event: KeyEvent ->
+                    _: TextView?,
+                    actionId: Int,
+                    event: KeyEvent
+                ->
                 if (actionId == EditorInfo.IME_ACTION_SEND ||
                     (actionId == EditorInfo.IME_NULL && event.action == KeyEvent.ACTION_DOWN)
                 ) {
@@ -170,7 +171,8 @@ class ChatFragment : Fragment(), KoinComponent, RefreshableFragment {
                         requireActivity().runOnUiThread { load() }
                     }
                 },
-                refreshInterval.toLong(), refreshInterval.toLong()
+                refreshInterval.toLong(),
+                refreshInterval.toLong()
             )
         }
     }

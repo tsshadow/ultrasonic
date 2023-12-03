@@ -13,8 +13,11 @@ class APIUserConverterTest {
     @Test
     fun `Should convert to domain entity`() {
         val entity = User(
-            username = "Awsemo", email = "none@none.net", scrobblingEnabled = false,
-            shareRole = true, streamRole = true
+            username = "Awsemo",
+            email = "none@none.net",
+            scrobblingEnabled = false,
+            shareRole = true,
+            streamRole = true
         )
 
         val domainEntity = entity.toDomainEntity()

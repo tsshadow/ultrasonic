@@ -31,8 +31,11 @@ fun APIPlaylist.toMusicDirectoryDomainEntity(serverId: Int): MusicDirectory =
     }
 
 fun APIPlaylist.toDomainEntity(): Playlist = Playlist(
-    this.id, this.name, this.owner,
-    this.comment, this.songCount.toString(),
+    this.id,
+    this.name,
+    this.owner,
+    this.comment,
+    this.songCount.toString(),
     this.created.ifNotNull { playlistDateFormat.format(it.time) } ?: "",
     public
 )

@@ -41,7 +41,6 @@ import org.moire.ultrasonic.subsonic.VideoPlayer.Companion.playVideo
 import org.moire.ultrasonic.util.ContextMenuUtil.handleContextMenu
 import org.moire.ultrasonic.util.ContextMenuUtil.handleContextMenuTracks
 import org.moire.ultrasonic.util.RefreshableFragment
-import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.toast
 import org.moire.ultrasonic.util.toastingExceptionHandler
@@ -143,7 +142,6 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinScopeComponent, Re
 
         val artists = result.artists
         if (artists.isNotEmpty()) {
-
             list.add(DividerBinder.Divider(R.string.search_artists))
             list.addAll(artists)
             if (searchResult!!.artists.size > artists.size) {
@@ -282,11 +280,5 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinScopeComponent, Re
                 fragment = this
             )
         }
-    }
-
-    companion object {
-        var DEFAULT_ARTISTS = Settings.defaultArtists
-        var DEFAULT_ALBUMS = Settings.defaultAlbums
-        var DEFAULT_SONGS = Settings.defaultSongs
     }
 }

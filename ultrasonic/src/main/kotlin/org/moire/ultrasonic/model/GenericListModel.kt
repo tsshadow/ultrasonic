@@ -67,10 +67,7 @@ open class GenericListModel(application: Application) :
     /**
      * Trigger a load() and notify the UI that we are loading
      */
-    fun backgroundLoadFromServer(
-        refresh: Boolean,
-        swipe: SwipeRefreshLayout
-    ) {
+    fun backgroundLoadFromServer(refresh: Boolean, swipe: SwipeRefreshLayout) {
         viewModelScope.launch {
             swipe.isRefreshing = true
             loadFromServer(refresh, swipe)
@@ -81,10 +78,7 @@ open class GenericListModel(application: Application) :
     /**
      * Calls the load() function with error handling
      */
-    private suspend fun loadFromServer(
-        refresh: Boolean,
-        swipe: SwipeRefreshLayout
-    ) {
+    private suspend fun loadFromServer(refresh: Boolean, swipe: SwipeRefreshLayout) {
         withContext(Dispatchers.IO) {
             val musicService = MusicServiceFactory.getMusicService()
             val isOffline = ActiveServerProvider.isOffline()

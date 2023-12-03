@@ -10,7 +10,8 @@ class MusicFoldersResponse(
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("musicFolders") private val wrapper = MusicFoldersWrapper()
+    @JsonProperty("musicFolders")
+    private val wrapper = MusicFoldersWrapper()
 
     val musicFolders get() = wrapper.musicFolders
 }

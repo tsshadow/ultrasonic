@@ -160,11 +160,7 @@ open class UltrasonicAppWidgetProvider : AppWidgetProvider() {
         /**
          * Update Track details in widgets
          */
-        private fun updateTrack(
-            context: Context,
-            views: RemoteViews,
-            currentSong: Track?
-        ) {
+        private fun updateTrack(context: Context, views: RemoteViews, currentSong: Track?) {
             Timber.d("Updating Widget")
             val res = context.resources
             val title = currentSong?.title

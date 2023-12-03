@@ -261,10 +261,14 @@ object FileUtil {
             if (cachedUltrasonicDirectory != null) return cachedUltrasonicDirectory!!
 
             @Suppress("DEPRECATION")
-            cachedUltrasonicDirectory = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) File(
-                Environment.getExternalStorageDirectory(),
-                "Android/data/org.moire.ultrasonic"
-            ) else UApp.applicationContext().getExternalFilesDir(null)!!
+            cachedUltrasonicDirectory = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                File(
+                    Environment.getExternalStorageDirectory(),
+                    "Android/data/org.moire.ultrasonic"
+                )
+            } else {
+                UApp.applicationContext().getExternalFilesDir(null)!!
+            }
 
             return cachedUltrasonicDirectory!!
         }
@@ -489,11 +493,7 @@ object FileUtil {
         }
     }
 
-    fun savePlaylist(
-        playlistFile: File?,
-        playlist: MusicDirectory,
-        name: String
-    ) {
+    fun savePlaylist(playlistFile: File?, playlist: MusicDirectory, name: String) {
         val fw = FileWriter(playlistFile)
         val bw = BufferedWriter(fw)
 

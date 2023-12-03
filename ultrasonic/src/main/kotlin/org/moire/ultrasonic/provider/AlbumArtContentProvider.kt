@@ -38,7 +38,9 @@ class AlbumArtContentProvider : ContentProvider(), KoinComponent {
                 .path(
                     String.format(
                         Locale.ROOT,
-                        "%s|%s", track!!.coverArt, FileUtil.getAlbumArtKey(track, true)
+                        "%s|%s",
+                        track!!.coverArt,
+                        FileUtil.getAlbumArtKey(track, true)
                     )
                 )
                 .build()

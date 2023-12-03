@@ -22,11 +22,7 @@ class AlbumListModel(application: Application) : GenericListModel(application) {
     private var lastType: AlbumListType? = null
     private var loadedUntil: Int = 0
 
-    suspend fun getAlbumsOfArtist(
-        refresh: Boolean,
-        id: String,
-        name: String?
-    ) {
+    suspend fun getAlbumsOfArtist(refresh: Boolean, id: String, name: String?) {
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             list.postValue(service.getAlbumsOfArtist(id, name, refresh))

@@ -53,8 +53,8 @@ class SelectGenreFragment : Fragment(), RefreshableFragment {
         swipeRefresh?.setOnRefreshListener { load(true) }
 
         genreListView?.setOnItemClickListener {
-            parent: AdapterView<*>, _: View?,
-            position: Int, _: Long
+                parent: AdapterView<*>, _: View?,
+                position: Int, _: Long
             ->
             val genre = parent.getItemAtPosition(position) as Genre
 

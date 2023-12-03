@@ -79,7 +79,8 @@ object Settings {
 
     @JvmStatic
     var cacheLocationUri by StringSetting(
-        getKey(R.string.setting_key_cache_location), ""
+        getKey(R.string.setting_key_cache_location),
+        ""
     )
 
     @JvmStatic

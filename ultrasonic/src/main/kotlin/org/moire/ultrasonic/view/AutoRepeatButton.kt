@@ -56,13 +56,16 @@ class AutoRepeatButton : MaterialButton {
     }
 
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
-        context!!, attrs, defStyle
+        context!!,
+        attrs,
+        defStyle
     ) {
         commonConstructorCode()
     }
 
     constructor(context: Context?, attrs: AttributeSet?) : super(
-        context!!, attrs
+        context!!,
+        attrs
     ) {
         commonConstructorCode()
     }

@@ -113,13 +113,9 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     /*
-    * Especially when dealing with indexes, this method can return Albums, Entries or a mix of both!
-    */
-    override fun getMusicDirectory(
-        id: String,
-        name: String?,
-        refresh: Boolean
-    ): MusicDirectory {
+     * Especially when dealing with indexes, this method can return Albums, Entries or a mix of both!
+     */
+    override fun getMusicDirectory(id: String, name: String?, refresh: Boolean): MusicDirectory {
         val dir = Storage.getFromPath(id)
         val result = MusicDirectory()
         result.name = dir?.name ?: return result
@@ -353,6 +349,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     override fun stopJukebox(): JukeboxStatus {
         throw OfflineException("Jukebox not available in offline mode")
     }
+
     @Throws(Exception::class)
     override fun clearJukebox(): JukeboxStatus {
         throw OfflineException("Jukebox not available in offline mode")
@@ -394,11 +391,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(Exception::class)
-    override fun createShare(
-        ids: List<String>,
-        description: String?,
-        expires: Long?
-    ): List<Share> {
+    override fun createShare(ids: List<String>, description: String?, expires: Long?): List<Share> {
         throw OfflineException("Creating shares not available in offline mode")
     }
 
@@ -498,7 +491,6 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Throws(OfflineException::class)
     override fun getAlbumAsDir(id: String, name: String?, refresh: Boolean): MusicDirectory {
-
         Timber.i("Starting album query...")
 
         val list = cachedTracks
@@ -637,10 +629,11 @@ class OfflineMusicService : MusicService, KoinComponent {
 
         val slashIndex = string.indexOf('/')
 
-        return if (slashIndex > 0)
+        return if (slashIndex > 0) {
             string.substring(0, slashIndex).toIntOrNull()
-        else
+        } else {
             string.toIntOrNull()
+        }
     }
 
     /*
@@ -651,10 +644,11 @@ class OfflineMusicService : MusicService, KoinComponent {
 
         val duration: Long? = string.toLongOrNull()
 
-        return if (duration != null)
+        return if (duration != null) {
             TimeUnit.MILLISECONDS.toSeconds(duration).toInt()
-        else
+        } else {
             null
+        }
     }
 
     // TODO: Simplify this deeply nested and complicated function

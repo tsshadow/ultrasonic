@@ -58,7 +58,6 @@ class MainFragment : ScopeFragment(), KoinScopeComponent {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         FragmentTitle.setTitle(this, R.string.music_library_label)
 
         // Load last layout from settings
@@ -133,10 +132,7 @@ class MainFragment : ScopeFragment(), KoinScopeComponent {
         return findFragmentAtPosition(childFragmentManager, viewPager.currentItem)
     }
 
-    private fun findFragmentAtPosition(
-        fragmentManager: FragmentManager,
-        position: Int
-    ): Fragment? {
+    private fun findFragmentAtPosition(fragmentManager: FragmentManager, position: Int): Fragment? {
         // If a fragment was recently created and never shown the fragment manager might not
         // hold a reference to it. Fallback on the WeakMap instead.
         return fragmentManager.findFragmentByTag("f$position")
@@ -172,7 +168,6 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
     }
 
     override fun createFragment(position: Int): Fragment {
-
         Timber.i("Creating new fragment at position: $position")
 
         val action = when (position) {

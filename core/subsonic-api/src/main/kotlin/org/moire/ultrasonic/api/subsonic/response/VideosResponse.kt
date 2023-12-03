@@ -10,7 +10,8 @@ class VideosResponse(
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("videos") private val videosWrapper = VideosWrapper()
+    @JsonProperty("videos")
+    private val videosWrapper = VideosWrapper()
 
     val videosList: List<MusicDirectoryChild> get() = videosWrapper.videosList
 }

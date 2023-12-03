@@ -86,7 +86,8 @@ class EditServerFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         requireActivity().onBackPressedDispatcher.addCallback(
-            this, confirmCloseCallback
+            this,
+            confirmCloseCallback
         )
         super.onAttach(context)
     }
@@ -186,7 +187,7 @@ class EditServerFragment : Fragment() {
                     }
                 )
                 .setNegativeButton(getString(R.string.common_cancel)) {
-                    dialogInterface, _ ->
+                        dialogInterface, _ ->
                     dialogInterface.dismiss()
                 }
                 .setBottomSpace(DIALOG_PADDING)
@@ -199,7 +200,8 @@ class EditServerFragment : Fragment() {
     }
 
     private val confirmCloseCallback = object : OnBackPressedCallback(
-        true // default to enabled
+        // default to enabled
+        true
     ) {
         override fun handleOnBackPressed() {
             finishActivity()
@@ -231,35 +233,46 @@ class EditServerFragment : Fragment() {
     }
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
         savedInstanceState.putString(
-            ::serverNameEditText.name, serverNameEditText!!.editText?.text.toString()
+            ::serverNameEditText.name,
+            serverNameEditText!!.editText?.text.toString()
         )
         savedInstanceState.putString(
-            ::serverAddressEditText.name, serverAddressEditText!!.editText?.text.toString()
+            ::serverAddressEditText.name,
+            serverAddressEditText!!.editText?.text.toString()
         )
         savedInstanceState.putString(
-            ::userNameEditText.name, userNameEditText!!.editText?.text.toString()
+            ::userNameEditText.name,
+            userNameEditText!!.editText?.text.toString()
         )
         savedInstanceState.putString(
-            ::passwordEditText.name, passwordEditText!!.editText?.text.toString()
+            ::passwordEditText.name,
+            passwordEditText!!.editText?.text.toString()
         )
         savedInstanceState.putBoolean(
-            ::selfSignedSwitch.name, selfSignedSwitch!!.isChecked
+            ::selfSignedSwitch.name,
+            selfSignedSwitch!!.isChecked
         )
         savedInstanceState.putBoolean(
-            ::plaintextSwitch.name, plaintextSwitch!!.isChecked
+            ::plaintextSwitch.name,
+            plaintextSwitch!!.isChecked
         )
         savedInstanceState.putBoolean(
-            ::jukeboxSwitch.name, jukeboxSwitch!!.isChecked
+            ::jukeboxSwitch.name,
+            jukeboxSwitch!!.isChecked
         )
         savedInstanceState.putInt(
-            ::serverColorImageView.name, currentColor
+            ::serverColorImageView.name,
+            currentColor
         )
-        if (selectedColor != null)
+        if (selectedColor != null) {
             savedInstanceState.putInt(
-                ::selectedColor.name, selectedColor!!
+                ::selectedColor.name,
+                selectedColor!!
             )
+        }
         savedInstanceState.putBoolean(
-            ::isInstanceStateSaved.name, true
+            ::isInstanceStateSaved.name,
+            true
         )
 
         super.onSaveInstanceState(savedInstanceState)
@@ -286,8 +299,9 @@ class EditServerFragment : Fragment() {
         plaintextSwitch!!.isChecked = savedInstanceState.getBoolean(::plaintextSwitch.name)
         jukeboxSwitch!!.isChecked = savedInstanceState.getBoolean(::jukeboxSwitch.name)
         updateColor(savedInstanceState.getInt(::serverColorImageView.name))
-        if (savedInstanceState.containsKey(::selectedColor.name))
+        if (savedInstanceState.containsKey(::selectedColor.name)) {
             selectedColor = savedInstanceState.getInt(::selectedColor.name)
+        }
         isInstanceStateSaved = savedInstanceState.getBoolean(::isInstanceStateSaved.name)
     }
 
@@ -434,7 +448,7 @@ class EditServerFragment : Fragment() {
             serverSetting.shareSupport,
             serverSetting.podcastSupport,
             serverSetting.videoSupport,
-            serverSetting.jukeboxSupport,
+            serverSetting.jukeboxSupport
         ).any { x -> x == false }
 
         var progressString = String.format(
@@ -445,7 +459,7 @@ class EditServerFragment : Fragment() {
                     |%s - ${resources.getString(R.string.button_bar_podcasts)}
                     |%s - ${resources.getString(R.string.main_videos)}
                     |%s - ${resources.getString(R.string.jukebox)}
-                    """.trimMargin(),
+            """.trimMargin(),
             boolToMark(serverSetting.chatSupport),
             boolToMark(serverSetting.bookmarkSupport),
             boolToMark(serverSetting.shareSupport),
@@ -453,15 +467,17 @@ class EditServerFragment : Fragment() {
             boolToMark(serverSetting.videoSupport),
             boolToMark(serverSetting.jukeboxSupport)
         )
-        if (isAnyDisabled)
+        if (isAnyDisabled) {
             progressString += "\n\n" + resources.getString(R.string.server_editor_disabled_feature)
+        }
 
         return progressString
     }
 
     private fun boolToMark(value: Boolean?): String {
-        if (value == null)
+        if (value == null) {
             return "⌛"
+        }
         return if (value) "✔️" else "❌"
     }
 

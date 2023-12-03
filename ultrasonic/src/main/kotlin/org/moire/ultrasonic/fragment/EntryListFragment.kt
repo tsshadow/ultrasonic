@@ -54,7 +54,7 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>(), Koi
             id = item.id,
             name = item.name,
             parentId = item.id,
-            isArtist = (item is Artist),
+            isArtist = (item is Artist)
         )
 
         findNavController().navigate(action)

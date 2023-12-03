@@ -10,7 +10,8 @@ class GetPodcastsResponse(
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("podcasts") private val channelsWrapper = PodcastChannelWrapper()
+    @JsonProperty("podcasts")
+    private val channelsWrapper = PodcastChannelWrapper()
 
     val podcastChannels: List<PodcastChannel>
         get() = channelsWrapper.channelsList

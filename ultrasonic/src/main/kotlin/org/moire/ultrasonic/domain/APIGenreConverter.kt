@@ -1,5 +1,6 @@
 // Collection of functions to convert api Genre entity to domain entity
 @file:JvmName("ApiGenreConverter")
+
 package org.moire.ultrasonic.domain
 
 import org.moire.ultrasonic.api.subsonic.models.Genre as APIGenre

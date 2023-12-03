@@ -399,14 +399,10 @@
     <string name="settings.show_now_playing_details_summary">Vis mer sporinfo i «Spilles nå» (sjanger, år, bitrate)</string>
     <string name="settings.summary.force_plain_text_password">Dette tvinger programmet til å alltid sende passordet ukryptert. Nyttig hvis Subsonic-tjeneren ikke støtter det nye identitetbekreftelses-API-et for brukere.</string>
     <string name="settings.use_folder_for_album_artist_summary">Antaat toppnivåmappen er navnet på albumsartisten</string>
-    <string name="util.bytes_format.byte">0 B</string>
     <string name="settings.show_artist_picture">Vis artistbilde i artistliste</string>
     <string name="settings.share_expiration_default">Forvalgt utløpstid</string>
     <string name="settings.use_id3_summary">Bruk ID3-etikettmetoder istedenfor filsystemsbaserte metoder</string>
     <string name="settings.use_id3_offline">Bruk ID3-metode også når frakoblet</string>
-    <string name="util.bytes_format.gigabyte">0,00 GB</string>
-    <string name="util.bytes_format.kilobyte">0 KB</string>
-    <string name="util.bytes_format.megabyte">0,00 MB</string>
     <string name="settings.sharing_title">Deling</string>
     <string name="menu_deleted_share">Slettet %s-deling</string>
     <string name="settings.use_id3_offline_summary">Viser kun musikken som er lastet ned med Ultrasonic 4.0 eller senere. Tidligere nedlastinger har ikke nødvendig metadata nedlastet. Du kan veksle mellom festingsmodus og lagringsmodus for å utløse nedlasting av manglende metadata.</string>

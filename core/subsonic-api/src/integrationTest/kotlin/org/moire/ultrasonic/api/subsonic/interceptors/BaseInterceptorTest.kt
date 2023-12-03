@@ -11,7 +11,8 @@ import org.moire.ultrasonic.api.subsonic.rules.MockWebServerRule
  * Base class for testing [okhttp3.Interceptor] implementations.
  */
 abstract class BaseInterceptorTest {
-    @Rule @JvmField val mockWebServerRule = MockWebServerRule()
+    @Rule @JvmField
+    val mockWebServerRule = MockWebServerRule()
 
     lateinit var client: OkHttpClient
 

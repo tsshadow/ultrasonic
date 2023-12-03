@@ -11,7 +11,8 @@ class GetAlbumList2Response(
     version: SubsonicAPIVersions,
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
-    @JsonProperty("albumList2") private val albumWrapper2 = AlbumWrapper2()
+    @JsonProperty("albumList2")
+    private val albumWrapper2 = AlbumWrapper2()
 
     val albumList: List<Album>
         get() = albumWrapper2.albumList

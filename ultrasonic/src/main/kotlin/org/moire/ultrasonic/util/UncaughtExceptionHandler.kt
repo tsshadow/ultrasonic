@@ -26,7 +26,9 @@ class UncaughtExceptionHandler(
             val logMessage = String.format(
                 "Android API level: %s\nUltrasonic version name: %s\n" +
                     "Ultrasonic version code: %s\n\n",
-                Build.VERSION.SDK_INT, Util.getVersionName(context), Util.getVersionCode(context)
+                Build.VERSION.SDK_INT,
+                Util.getVersionName(context),
+                Util.getVersionCode(context)
             )
             printWriter.println(logMessage)
             throwable.printStackTrace(printWriter)

@@ -50,7 +50,8 @@ class EqualizerController : CoroutineScope by CoroutineScope(Dispatchers.IO) {
         launch {
             try {
                 val settings = deserialize<EqualizerSettings>(
-                    UApp.applicationContext(), "equalizer.dat"
+                    UApp.applicationContext(),
+                    "equalizer.dat"
                 )
                 settings?.apply(equalizer!!)
             } catch (all: Throwable) {

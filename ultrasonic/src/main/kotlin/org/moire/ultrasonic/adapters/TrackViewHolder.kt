@@ -79,12 +79,7 @@ class TrackViewHolder(val view: View) :
     private var rxBusSubscription: CompositeDisposable? = null
 
     @Suppress("ComplexMethod")
-    fun setSong(
-        song: Track,
-        checkable: Boolean,
-        draggable: Boolean,
-        isSelected: Boolean = false
-    ) {
+    fun setSong(song: Track, checkable: Boolean, draggable: Boolean, isSelected: Boolean = false) {
         val useFiveStarRating = Settings.useFiveStarRating
         entry = song
 
@@ -171,7 +166,10 @@ class TrackViewHolder(val view: View) :
         if (isPlaying && !isPlayingCached) {
             isPlayingCached = true
             title.setCompoundDrawablesWithIntrinsicBounds(
-                playingIcon, null, null, null
+                playingIcon,
+                null,
+                null,
+                null
             )
             val color = MaterialColors.getColor(view, COLOR_HIGHLIGHT)
             songLayout.setBackgroundColor(color)
@@ -179,7 +177,10 @@ class TrackViewHolder(val view: View) :
         } else if (!isPlaying && isPlayingCached) {
             isPlayingCached = false
             title.setCompoundDrawablesWithIntrinsicBounds(
-                0, 0, 0, 0
+                0,
+                0,
+                0,
+                0
             )
             songLayout.setBackgroundColor(Color.TRANSPARENT)
             songLayout.elevation = 0F
@@ -257,7 +258,8 @@ class TrackViewHolder(val view: View) :
                 showProgress()
             }
             DownloadState.RETRYING,
-            DownloadState.QUEUED -> {
+            DownloadState.QUEUED
+            -> {
                 showIndefiniteProgress()
             }
             else -> {

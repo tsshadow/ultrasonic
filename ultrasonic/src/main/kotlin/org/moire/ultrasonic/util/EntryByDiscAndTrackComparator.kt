@@ -25,10 +25,12 @@ class EntryByDiscAndTrackComparator : Comparator<MusicDirectory.Child> {
         val trackComparison = compare(trackX ?: 0, trackY ?: 0)
         return if (trackComparison != 0) {
             trackComparison
-        } else compare(
-            pathX ?: "",
-            pathY ?: ""
-        )
+        } else {
+            compare(
+                pathX ?: "",
+                pathY ?: ""
+            )
+        }
     }
 
     companion object {
@@ -45,7 +47,9 @@ class EntryByDiscAndTrackComparator : Comparator<MusicDirectory.Child> {
             }
             return if (b == null) {
                 1
-            } else a.compareTo(b)
+            } else {
+                a.compareTo(b)
+            }
         }
     }
 }

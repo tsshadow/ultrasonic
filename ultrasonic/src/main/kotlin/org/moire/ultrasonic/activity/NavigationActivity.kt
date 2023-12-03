@@ -204,10 +204,11 @@ class NavigationActivity : ScopeActivity() {
         }
 
         rxBusSubscription += RxBus.playerStateObservable.subscribe {
-            if (it.state == STATE_READY)
+            if (it.state == STATE_READY) {
                 showNowPlaying()
-            else
+            } else {
                 hideNowPlaying()
+            }
         }
 
         rxBusSubscription += RxBus.themeChangedEventObservable.subscribe {
@@ -314,8 +315,11 @@ class NavigationActivity : ScopeActivity() {
         // Lifecycle support's constructor registers some event receivers so it should be created early
         lifecycleSupport.onCreate()
 
-        if (!nowPlayingHidden) showNowPlaying()
-        else hideNowPlaying()
+        if (!nowPlayingHidden) {
+            showNowPlaying()
+        } else {
+            hideNowPlaying()
+        }
     }
 
     /*
@@ -334,21 +338,24 @@ class NavigationActivity : ScopeActivity() {
 
         val activeServer = activeServerProvider.getActiveServer()
 
-        if (cachedServerCount == 0)
+        if (cachedServerCount == 0) {
             selectServerButton?.text = getString(R.string.main_setup_server, activeServer.name)
-        else selectServerButton?.text = activeServer.name
+        } else {
+            selectServerButton?.text = activeServer.name
+        }
 
         val foregroundColor =
             ServerColor.getForegroundColor(this, activeServer.color, showVectorBackground)
         val backgroundColor =
             ServerColor.getBackgroundColor(this, activeServer.color)
 
-        if (activeServer.index == 0)
+        if (activeServer.index == 0) {
             selectServerButton?.icon =
                 ContextCompat.getDrawable(this, R.drawable.ic_menu_screen_on_off)
-        else
+        } else {
             selectServerButton?.icon =
                 ContextCompat.getDrawable(this, R.drawable.ic_menu_select_server)
+        }
 
         selectServerButton?.iconTint = ColorStateList.valueOf(foregroundColor)
         selectServerButton?.setTextColor(foregroundColor)
@@ -406,8 +413,9 @@ class NavigationActivity : ScopeActivity() {
             navigationView?.getHeaderView(0)?.findViewById(R.id.edit_server_button)
 
         val onClick: (View) -> Unit = {
-            if (drawerLayout?.isDrawerVisible(GravityCompat.START) == true)
+            if (drawerLayout?.isDrawerVisible(GravityCompat.START) == true) {
                 this.drawerLayout?.closeDrawer(GravityCompat.START)
+            }
             navController.navigate(R.id.serverSelectorFragment)
         }
 
@@ -473,7 +481,8 @@ class NavigationActivity : ScopeActivity() {
     private fun handleSearchIntent(query: String?, autoPlay: Boolean) {
         val suggestions = SearchRecentSuggestions(
             this,
-            SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE
+            SearchSuggestionProvider.AUTHORITY,
+            SearchSuggestionProvider.MODE
         )
         suggestions.saveRecentQuery(query, null)
 
@@ -528,7 +537,6 @@ class NavigationActivity : ScopeActivity() {
 
     private fun showWelcomeDialog() {
         if (!UApp.instance!!.setupDialogDisplayed) {
-
             Settings.firstInstalledVersion = Util.getVersionCode(UApp.applicationContext())
 
             InfoDialog.Builder(this)

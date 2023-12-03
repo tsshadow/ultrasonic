@@ -90,10 +90,7 @@ interface SubsonicAPIDefinition {
     ): Call<SubsonicResponse>
 
     @GET("setRating.view")
-    fun setRating(
-        @Query("id") id: String,
-        @Query("rating") rating: Int
-    ): Call<SubsonicResponse>
+    fun setRating(@Query("id") id: String, @Query("rating") rating: Int): Call<SubsonicResponse>
 
     @GET("getArtist.view")
     fun getArtist(@Query("id") id: String): Call<GetArtistResponse>
@@ -158,8 +155,7 @@ interface SubsonicAPIDefinition {
         @Query("public") public: Boolean? = null,
         @Query("songIdToAdd") songIdsToAdd: List<String>? = null,
         @Query("songIndexToRemove") songIndexesToRemove: List<Int>? = null
-    ):
-        Call<SubsonicResponse>
+    ): Call<SubsonicResponse>
 
     @GET("getPodcasts.view")
     fun getPodcasts(
@@ -227,10 +223,7 @@ interface SubsonicAPIDefinition {
 
     @Streaming
     @GET("getCoverArt.view")
-    fun getCoverArt(
-        @Query("id") id: String,
-        @Query("size") size: Long? = null
-    ): Call<ResponseBody>
+    fun getCoverArt(@Query("id") id: String, @Query("size") size: Long? = null): Call<ResponseBody>
 
     @Streaming
     @GET("stream.view")

@@ -7,6 +7,7 @@
 
 // Contains helper method to convert subsonic api share to domain model
 @file:JvmName("APIShareConverter")
+
 package org.moire.ultrasonic.domain
 
 import java.text.SimpleDateFormat

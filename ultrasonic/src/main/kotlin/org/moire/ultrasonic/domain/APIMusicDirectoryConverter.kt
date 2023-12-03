@@ -6,6 +6,7 @@
  */
 
 @file:JvmName("APIMusicDirectoryConverter")
+
 package org.moire.ultrasonic.domain
 
 import java.text.DateFormat
@@ -35,10 +36,7 @@ fun MusicDirectoryChild.toAlbumEntity(serverId: Int): Album = Album(id, serverId
     populateCommonProps(this, this@toAlbumEntity)
 }
 
-private fun populateCommonProps(
-    entry: MusicDirectory.Child,
-    source: MusicDirectoryChild
-) {
+private fun populateCommonProps(entry: MusicDirectory.Child, source: MusicDirectoryChild) {
     entry.parent = source.parent
     entry.isDirectory = source.isDir
     entry.title = source.title
@@ -63,10 +61,7 @@ private fun populateCommonProps(
     }
 }
 
-private fun populateTrackProps(
-    track: Track,
-    source: MusicDirectoryChild
-) {
+private fun populateTrackProps(track: Track, source: MusicDirectoryChild) {
     track.size = source.size
     track.contentType = source.contentType
     track.suffix = source.suffix
@@ -84,10 +79,11 @@ fun List<MusicDirectoryChild>.toDomainEntityList(serverId: Int): List<MusicDirec
     val newList: MutableList<MusicDirectory.Child> = mutableListOf()
 
     forEach {
-        if (it.isDir)
+        if (it.isDir) {
             newList.add(it.toAlbumEntity(serverId))
-        else
+        } else {
             newList.add(it.toTrackEntity(serverId))
+        }
     }
 
     return newList

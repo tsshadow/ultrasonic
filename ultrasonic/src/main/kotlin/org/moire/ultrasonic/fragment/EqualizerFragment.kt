@@ -92,7 +92,9 @@ class EqualizerFragment : Fragment() {
         }
         for (preset in 0 until equalizer!!.numberOfPresets) {
             val menuItem = menu.add(
-                MENU_GROUP_PRESET, preset, preset,
+                MENU_GROUP_PRESET,
+                preset,
+                preset,
                 equalizer!!.getPresetName(
                     preset.toShort()
                 )
@@ -188,11 +190,7 @@ class EqualizerFragment : Fragment() {
         updateLevelText(levelTextView, bandLevel)
 
         bar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-            override fun onProgressChanged(
-                seekBar: SeekBar,
-                progress: Int,
-                fromUser: Boolean
-            ) {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 val level = (progress + minEQLevel).toShort()
                 if (fromUser) {
                     try {

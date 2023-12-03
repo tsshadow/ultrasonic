@@ -1,5 +1,6 @@
 // Contains helper functions to convert from api ChatMessage entity to domain entity
 @file:JvmName("APIChatMessageConverter")
+
 package org.moire.ultrasonic.domain
 
 import org.moire.ultrasonic.api.subsonic.models.ChatMessage as ApiChatMessage

@@ -27,7 +27,9 @@ class APIArtistConverterTest : BaseTest() {
     @Test
     fun `Should convert Artist entity to domain MusicDirectory entity`() {
         val entity = Artist(
-            id = "101", name = "artist-name", coverArt = "some-art",
+            id = "101",
+            name = "artist-name",
+            coverArt = "some-art",
             albumCount = 10,
             albumsList = listOf(
                 Album(

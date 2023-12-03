@@ -72,9 +72,7 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getMusicFolders(
-        refresh: Boolean
-    ): List<MusicFolder> {
+    override fun getMusicFolders(refresh: Boolean): List<MusicFolder> {
         val response = API.getMusicFolders().execute().throwOnFailure()
 
         return response.body()!!.musicFolders.toDomainEntityList(activeServerId)
@@ -84,10 +82,7 @@ open class RESTMusicService(
      *  Retrieves the artists for a given music folder     *
      */
     @Throws(Exception::class)
-    override fun getIndexes(
-        musicFolderId: String?,
-        refresh: Boolean
-    ): List<Index> {
+    override fun getIndexes(musicFolderId: String?, refresh: Boolean): List<Index> {
         val response = API.getIndexes(musicFolderId, null).execute().throwOnFailure()
 
         return response.body()!!.indexes.toIndexList(
@@ -97,88 +92,57 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getArtists(
-        refresh: Boolean
-    ): List<Artist> {
+    override fun getArtists(refresh: Boolean): List<Artist> {
         val response = API.getArtists(null).execute().throwOnFailure()
 
         return response.body()!!.indexes.toArtistList(activeServerId)
     }
 
     @Throws(Exception::class)
-    override fun star(
-        id: String?,
-        albumId: String?,
-        artistId: String?
-    ) {
+    override fun star(id: String?, albumId: String?, artistId: String?) {
         API.star(id, albumId, artistId).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
-    override fun unstar(
-        id: String?,
-        albumId: String?,
-        artistId: String?
-    ) {
+    override fun unstar(id: String?, albumId: String?, artistId: String?) {
         API.unstar(id, albumId, artistId).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
-    override fun setRating(
-        id: String,
-        rating: Int
-    ) {
+    override fun setRating(id: String, rating: Int) {
         API.setRating(id, rating).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
-    override fun getMusicDirectory(
-        id: String,
-        name: String?,
-        refresh: Boolean
-    ): MusicDirectory {
+    override fun getMusicDirectory(id: String, name: String?, refresh: Boolean): MusicDirectory {
         val response = API.getMusicDirectory(id).execute().throwOnFailure()
 
         return response.body()!!.musicDirectory.toDomainEntity(activeServerId)
     }
 
     @Throws(Exception::class)
-    override fun getAlbumsOfArtist(
-        id: String,
-        name: String?,
-        refresh: Boolean
-    ): List<Album> {
+    override fun getAlbumsOfArtist(id: String, name: String?, refresh: Boolean): List<Album> {
         val response = API.getArtist(id).execute().throwOnFailure()
 
         return response.body()!!.artist.toDomainEntityList(activeServerId)
     }
 
     @Throws(Exception::class)
-    override fun getAlbumAsDir(
-        id: String,
-        name: String?,
-        refresh: Boolean
-    ): MusicDirectory {
+    override fun getAlbumAsDir(id: String, name: String?, refresh: Boolean): MusicDirectory {
         val response = API.getAlbum(id).execute().throwOnFailure()
 
         return response.body()!!.album.toMusicDirectoryDomainEntity(activeServerId)
     }
 
     @Throws(Exception::class)
-    override fun getAlbum(
-        id: String,
-        name: String?,
-        refresh: Boolean
-    ): Album {
+    override fun getAlbum(id: String, name: String?, refresh: Boolean): Album {
         val response = API.getAlbum(id).execute().throwOnFailure()
 
         return response.body()!!.album.toDomainEntity(activeServerId)
     }
 
     @Throws(Exception::class)
-    override fun search(
-        criteria: SearchCriteria
-    ): SearchResult {
+    override fun search(criteria: SearchCriteria): SearchResult {
         return try {
             if (shouldUseId3Tags()) {
                 search3(criteria)
@@ -195,9 +159,7 @@ open class RESTMusicService(
      * Search using the "search" REST method.
      */
     @Throws(Exception::class)
-    private fun searchOld(
-        criteria: SearchCriteria
-    ): SearchResult {
+    private fun searchOld(criteria: SearchCriteria): SearchResult {
         val response =
             API.search(null, null, null, criteria.query, criteria.songCount, null, null)
                 .execute().throwOnFailure()
@@ -209,36 +171,39 @@ open class RESTMusicService(
      * Search using the "search2" REST method, available in 1.4.0 and later.
      */
     @Throws(Exception::class)
-    private fun search2(
-        criteria: SearchCriteria
-    ): SearchResult {
+    private fun search2(criteria: SearchCriteria): SearchResult {
         requireNotNull(criteria.query) { "Query param is null" }
         val response = API.search2(
-            criteria.query, criteria.artistCount, null, criteria.albumCount, null,
-            criteria.songCount, null
+            criteria.query,
+            criteria.artistCount,
+            null,
+            criteria.albumCount,
+            null,
+            criteria.songCount,
+            null
         ).execute().throwOnFailure()
 
         return response.body()!!.searchResult.toDomainEntity(activeServerId)
     }
 
     @Throws(Exception::class)
-    private fun search3(
-        criteria: SearchCriteria
-    ): SearchResult {
+    private fun search3(criteria: SearchCriteria): SearchResult {
         requireNotNull(criteria.query) { "Query param is null" }
         val response = API.search3(
-            criteria.query, criteria.artistCount, null, criteria.albumCount, null,
-            criteria.songCount, null
+            criteria.query,
+            criteria.artistCount,
+            null,
+            criteria.albumCount,
+            null,
+            criteria.songCount,
+            null
         ).execute().throwOnFailure()
 
         return response.body()!!.searchResult.toDomainEntity(activeServerId)
     }
 
     @Throws(Exception::class)
-    override fun getPlaylist(
-        id: String,
-        name: String
-    ): MusicDirectory {
+    override fun getPlaylist(id: String, name: String): MusicDirectory {
         val response = API.getPlaylist(id).execute().throwOnFailure()
 
         val playlist = response.body()!!.playlist.toMusicDirectoryDomainEntity(activeServerId)
@@ -248,21 +213,17 @@ open class RESTMusicService(
     }
 
     @Throws(IOException::class)
-    private fun savePlaylist(
-        name: String,
-        playlist: MusicDirectory
-    ) {
+    private fun savePlaylist(name: String, playlist: MusicDirectory) {
         val playlistFile = FileUtil.getPlaylistFile(
-            activeServerProvider.getActiveServer().name, name
+            activeServerProvider.getActiveServer().name,
+            name
         )
 
         FileUtil.savePlaylist(playlistFile, playlist, name)
     }
 
     @Throws(Exception::class)
-    override fun getPlaylists(
-        refresh: Boolean
-    ): List<Playlist> {
+    override fun getPlaylists(refresh: Boolean): List<Playlist> {
         val response = API.getPlaylists(null).execute().throwOnFailure()
 
         return response.body()!!.playlists.toDomainEntitiesList()
@@ -274,11 +235,7 @@ open class RESTMusicService(
      * String is required when creating
      */
     @Throws(Exception::class)
-    override fun createPlaylist(
-        id: String?,
-        name: String?,
-        tracks: List<Track>
-    ) {
+    override fun createPlaylist(id: String?, name: String?, tracks: List<Track>) {
         require(id != null || name != null) { "Either id or name is required." }
         val pSongIds: MutableList<String> = ArrayList(tracks.size)
 
@@ -290,36 +247,25 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun deletePlaylist(
-        id: String
-    ) {
+    override fun deletePlaylist(id: String) {
         API.deletePlaylist(id).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
-    override fun updatePlaylist(
-        id: String,
-        name: String?,
-        comment: String?,
-        pub: Boolean
-    ) {
+    override fun updatePlaylist(id: String, name: String?, comment: String?, pub: Boolean) {
         API.updatePlaylist(id, name, comment, pub, null, null)
             .execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
-    override fun getPodcastsChannels(
-        refresh: Boolean
-    ): List<PodcastsChannel> {
+    override fun getPodcastsChannels(refresh: Boolean): List<PodcastsChannel> {
         val response = API.getPodcasts(false, null).execute().throwOnFailure()
 
         return response.body()!!.podcastChannels.toDomainEntitiesList()
     }
 
     @Throws(Exception::class)
-    override fun getPodcastEpisodes(
-        podcastChannelId: String?
-    ): MusicDirectory {
+    override fun getPodcastEpisodes(podcastChannelId: String?): MusicDirectory {
         val response = API.getPodcasts(true, podcastChannelId).execute().throwOnFailure()
 
         val podcastEntries = response.body()!!.podcastChannels[0].episodeList
@@ -340,20 +286,14 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getLyrics(
-        artist: String,
-        title: String
-    ): Lyrics {
+    override fun getLyrics(artist: String, title: String): Lyrics {
         val response = API.getLyrics(artist, title).execute().throwOnFailure()
 
         return response.body()!!.lyrics.toDomainEntity()
     }
 
     @Throws(Exception::class)
-    override fun scrobble(
-        id: String,
-        submission: Boolean
-    ) {
+    override fun scrobble(id: String, submission: Boolean) {
         API.scrobble(id, null, submission).execute().throwOnFailure()
     }
 
@@ -398,9 +338,7 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getRandomSongs(
-        size: Int
-    ): MusicDirectory {
+    override fun getRandomSongs(size: Int): MusicDirectory {
         val response = API.getRandomSongs(
             size,
             null,
@@ -464,11 +402,7 @@ open class RESTMusicService(
      * call because that could take a long time.
      */
     @Throws(Exception::class)
-    override fun getStreamUrl(
-        id: String,
-        maxBitRate: Int?,
-        format: String?
-    ): String {
+    override fun getStreamUrl(id: String, maxBitRate: Int?, format: String?): String {
         Timber.i("Start")
 
         // Get the request from Retrofit, but don't execute it!
@@ -510,9 +444,7 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun updateJukeboxPlaylist(
-        ids: List<String>
-    ): JukeboxStatus {
+    override fun updateJukeboxPlaylist(ids: List<String>): JukeboxStatus {
         val response = API.jukeboxControl(JukeboxAction.SET, null, null, ids, null)
             .execute().throwOnFailure()
 
@@ -520,10 +452,7 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun skipJukebox(
-        index: Int,
-        offsetSeconds: Int
-    ): JukeboxStatus {
+    override fun skipJukebox(index: Int, offsetSeconds: Int): JukeboxStatus {
         val response = API.jukeboxControl(JukeboxAction.SKIP, index, offsetSeconds, null, null)
             .execute().throwOnFailure()
 
@@ -563,9 +492,7 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun setJukeboxGain(
-        gain: Float
-    ): JukeboxStatus {
+    override fun setJukeboxGain(gain: Float): JukeboxStatus {
         val response = API.jukeboxControl(JukeboxAction.SET_GAIN, null, null, null, gain)
             .execute().throwOnFailure()
 
@@ -573,29 +500,21 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getShares(
-        refresh: Boolean
-    ): List<Share> {
+    override fun getShares(refresh: Boolean): List<Share> {
         val response = API.getShares().execute().throwOnFailure()
 
         return response.body()!!.shares.toDomainEntitiesList(activeServerId)
     }
 
     @Throws(Exception::class)
-    override fun getGenres(
-        refresh: Boolean
-    ): List<Genre> {
+    override fun getGenres(refresh: Boolean): List<Genre> {
         val response = API.getGenres().execute().throwOnFailure()
 
         return response.body()!!.genresList.toDomainEntityList()
     }
 
     @Throws(Exception::class)
-    override fun getSongsByGenre(
-        genre: String,
-        count: Int,
-        offset: Int
-    ): MusicDirectory {
+    override fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory {
         val response = API.getSongsByGenre(genre, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
@@ -605,27 +524,21 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getUser(
-        username: String
-    ): UserInfo {
+    override fun getUser(username: String): UserInfo {
         val response = API.getUser(username).execute().throwOnFailure()
 
         return response.body()!!.user.toDomainEntity()
     }
 
     @Throws(Exception::class)
-    override fun getChatMessages(
-        since: Long?
-    ): List<ChatMessage> {
+    override fun getChatMessages(since: Long?): List<ChatMessage> {
         val response = API.getChatMessages(since).execute().throwOnFailure()
 
         return response.body()!!.chatMessages.toDomainEntitiesList()
     }
 
     @Throws(Exception::class)
-    override fun addChatMessage(
-        message: String
-    ) {
+    override fun addChatMessage(message: String) {
         API.addChatMessage(message).execute().throwOnFailure()
     }
 
@@ -637,24 +550,17 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun createBookmark(
-        id: String,
-        position: Int
-    ) {
+    override fun createBookmark(id: String, position: Int) {
         API.createBookmark(id, position.toLong(), null).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
-    override fun deleteBookmark(
-        id: String
-    ) {
+    override fun deleteBookmark(id: String) {
         API.deleteBookmark(id).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
-    override fun getVideos(
-        refresh: Boolean
-    ): MusicDirectory {
+    override fun getVideos(refresh: Boolean): MusicDirectory {
         val response = API.getVideos().execute().throwOnFailure()
 
         val musicDirectory = MusicDirectory()
@@ -664,29 +570,19 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun createShare(
-        ids: List<String>,
-        description: String?,
-        expires: Long?
-    ): List<Share> {
+    override fun createShare(ids: List<String>, description: String?, expires: Long?): List<Share> {
         val response = API.createShare(ids, description, expires).execute().throwOnFailure()
 
         return response.body()!!.shares.toDomainEntitiesList(activeServerId)
     }
 
     @Throws(Exception::class)
-    override fun deleteShare(
-        id: String
-    ) {
+    override fun deleteShare(id: String) {
         API.deleteShare(id).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
-    override fun updateShare(
-        id: String,
-        description: String?,
-        expires: Long?
-    ) {
+    override fun updateShare(id: String, description: String?, expires: Long?) {
         var expiresValue: Long? = expires
         if (expires != null && expires == 0L) {
             expiresValue = null

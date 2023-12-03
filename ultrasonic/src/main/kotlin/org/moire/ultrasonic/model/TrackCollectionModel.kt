@@ -30,13 +30,9 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     private var loadedUntil: Int = 0
 
     /*
-    * Especially when dealing with indexes, this method can return Albums, Entries or a mix of both!
-    */
-    suspend fun getMusicDirectory(
-        refresh: Boolean,
-        id: String,
-        name: String?
-    ) {
+     * Especially when dealing with indexes, this method can return Albums, Entries or a mix of both!
+     */
+    suspend fun getMusicDirectory(refresh: Boolean, id: String, name: String?) {
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getMusicDirectory(id, name, refresh)
@@ -46,9 +42,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     }
 
     suspend fun getAlbum(refresh: Boolean, id: String, name: String?) {
-
         withContext(Dispatchers.IO) {
-
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory: MusicDirectory = service.getAlbumAsDir(id, name, refresh)
             currentListIsSortable = true
@@ -74,9 +68,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     }
 
     suspend fun getStarred() {
-
         withContext(Dispatchers.IO) {
-
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory: MusicDirectory
 
@@ -122,7 +114,6 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     }
 
     suspend fun getPodcastEpisodes(podcastChannelId: String) {
-
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getPodcastEpisodes(podcastChannelId)
@@ -134,7 +125,6 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     }
 
     suspend fun getShare(shareId: String) {
-
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = MusicDirectory()
@@ -174,10 +164,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
     }
 
     @Synchronized
-    fun calculateButtonState(
-        selection: List<Track>,
-        onComplete: (ButtonStates) -> Unit
-    ) {
+    fun calculateButtonState(selection: List<Track>, onComplete: (ButtonStates) -> Unit) {
         val enabled = selection.isNotEmpty()
         var unpinEnabled = false
         var deleteEnabled = false

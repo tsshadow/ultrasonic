@@ -38,7 +38,7 @@ import timber.log.Timber
 class ImageLoader(
     context: Context,
     apiClient: SubsonicAPIClient,
-    private val config: ImageLoaderConfig,
+    private val config: ImageLoaderConfig
 ) : CoroutineScope by CoroutineScope(Dispatchers.Main + SupervisorJob()) {
     private val cacheInProgress: ConcurrentHashMap<String, CountDownLatch> = ConcurrentHashMap()
 
@@ -112,7 +112,10 @@ class ImageLoader(
         val requestedSize = resolveSize(size, large)
 
         val request = ImageRequest.CoverArt(
-            id!!, cacheKey!!, null, requestedSize,
+            id!!,
+            cacheKey!!,
+            null,
+            requestedSize,
             placeHolderDrawableRes = defaultResourceId,
             errorDrawableRes = defaultResourceId
         )
@@ -157,7 +160,10 @@ class ImageLoader(
 
         if (id != null && key != null && id.isNotEmpty() && view is ImageView) {
             val request = ImageRequest.CoverArt(
-                id, key, view, requestedSize,
+                id,
+                key,
+                view,
+                requestedSize,
                 placeHolderDrawableRes = defaultResourceId,
                 errorDrawableRes = defaultResourceId
             )
@@ -170,13 +176,11 @@ class ImageLoader(
     /**
      * Load the avatar of a given user into an ImageView
      */
-    fun loadAvatarImage(
-        view: ImageView,
-        username: String
-    ) {
+    fun loadAvatarImage(view: ImageView, username: String) {
         if (username.isNotEmpty()) {
             val request = ImageRequest.Avatar(
-                username, view,
+                username,
+                view,
                 placeHolderDrawableRes = R.drawable.ic_contact_picture,
                 errorDrawableRes = R.drawable.ic_contact_picture
             )
@@ -284,7 +288,7 @@ sealed class ImageRequest(
         imageView: ImageView?,
         val size: Int,
         placeHolderDrawableRes: Int? = null,
-        errorDrawableRes: Int? = null,
+        errorDrawableRes: Int? = null
     ) : ImageRequest(
         placeHolderDrawableRes,
         errorDrawableRes,

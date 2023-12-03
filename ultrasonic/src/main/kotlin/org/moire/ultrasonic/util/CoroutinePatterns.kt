@@ -31,9 +31,7 @@ object CoroutinePatterns {
     }
 }
 
-fun Fragment.toastingExceptionHandler(
-    prefix: String = ""
-): CoroutineExceptionHandler {
+fun Fragment.toastingExceptionHandler(prefix: String = ""): CoroutineExceptionHandler {
     return CoroutineExceptionHandler { _, exception ->
         // Stop the spinner if applicable
         if (this is RefreshableFragment) {
@@ -48,9 +46,7 @@ fun Fragment.toastingExceptionHandler(
 * This extension can be only  started from a fragment
 * because it needs the fragments scope to create the toast
  */
-fun Fragment.launchWithToast(
-    block: suspend CoroutineScope.() -> String?
-) {
+fun Fragment.launchWithToast(block: suspend CoroutineScope.() -> String?) {
     // Get the scope
     val scope = activity?.lifecycleScope ?: lifecycleScope
 

@@ -51,7 +51,8 @@ class ActiveServerProvider(
                 }
                 Timber.d(
                     "getActiveServer retrieved from DataBase, id: %s cachedServer: %s",
-                    serverId, cachedServer
+                    serverId,
+                    cachedServer
                 )
             }
 

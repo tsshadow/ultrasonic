@@ -20,7 +20,8 @@ open class SubsonicResponse(
 ) {
     @JsonDeserialize(using = Status.Companion.StatusJsonDeserializer::class)
     enum class Status(val jsonValue: String) {
-        OK("ok"), ERROR("failed");
+        OK("ok"),
+        ERROR("failed");
 
         companion object {
             fun getStatusFromJson(jsonValue: String) =

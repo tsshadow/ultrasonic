@@ -29,6 +29,7 @@ class RxBus {
 
         var activeServerChangingPublisher: PublishSubject<Int> =
             PublishSubject.create()
+
         // Subscribers should be called synchronously, not on another thread
         var activeServerChangingObservable: Observable<Int> =
             activeServerChangingPublisher

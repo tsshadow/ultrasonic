@@ -96,9 +96,11 @@ abstract class MultiListFragment<T : Identifiable> : ScopeFragment(), Refreshabl
         if (title == null) {
             FragmentTitle.setTitle(
                 this,
-                if (listModel.isOffline())
+                if (listModel.isOffline()) {
                     R.string.music_library_label_offline
-                else R.string.music_library_label
+                } else {
+                    R.string.music_library_label
+                }
             )
         } else {
             FragmentTitle.setTitle(this, title)

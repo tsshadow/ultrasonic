@@ -58,10 +58,7 @@ object MediaItemConverter {
  * Extension function to convert a Track to an MediaItem, using the cache if possible
  */
 @Suppress("LongMethod")
-fun Track.toMediaItem(
-    mediaId: String = id,
-): MediaItem {
-
+fun Track.toMediaItem(mediaId: String = id): MediaItem {
     // Check Cache
     val cachedItem = MediaItemConverter.mediaItemCache[mediaId]?.get()
     if (cachedItem != null) return cachedItem
@@ -85,8 +82,11 @@ fun Track.toMediaItem(
         imageUri = artworkUri,
         starred = starred,
         group = null,
-        mediaType = if (isDirectory) MEDIA_TYPE_FOLDER_MIXED
-        else MEDIA_TYPE_MUSIC
+        mediaType = if (isDirectory) {
+            MEDIA_TYPE_FOLDER_MIXED
+        } else {
+            MEDIA_TYPE_MUSIC
+        }
     )
 
     val metadataBuilder = mediaItem.mediaMetadata.buildUpon()
@@ -111,9 +111,12 @@ fun Track.toMediaItem(
     mediaItem.mediaMetadata.extras?.putBoolean("isVideo", isVideo)
     mediaItem.mediaMetadata.extras?.putBoolean("starred", starred)
     mediaItem.mediaMetadata.extras?.putString("type", type)
-    if (created != null) mediaItem.mediaMetadata.extras?.putString(
-        "created", DateFormat.getDateInstance().format(created!!)
-    )
+    if (created != null) {
+        mediaItem.mediaMetadata.extras?.putString(
+            "created",
+            DateFormat.getDateInstance().format(created!!)
+        )
+    }
     mediaItem.mediaMetadata.extras?.putInt("closeness", closeness)
     mediaItem.mediaMetadata.extras?.putInt("bookmarkPosition", bookmarkPosition)
     mediaItem.mediaMetadata.extras?.putString("name", name)
@@ -141,7 +144,6 @@ fun Track.toMediaItem(
  */
 @Suppress("ComplexMethod")
 fun MediaItem.toTrack(): Track {
-
     // Check Cache
     val cachedTrack = MediaItemConverter.trackCache[mediaId]?.get()
     if (cachedTrack != null) return cachedTrack
@@ -168,13 +170,22 @@ fun MediaItem.toTrack(): Track {
         mediaMetadata.extras?.getString("transcodedContentType"),
         mediaMetadata.extras?.getString("transcodedSuffix"),
         mediaMetadata.extras?.getString("coverArt"),
-        if (mediaMetadata.extras?.containsKey("size") == true)
-            mediaMetadata.extras?.getLong("size") else null,
+        if (mediaMetadata.extras?.containsKey("size") == true) {
+            mediaMetadata.extras?.getLong("size")
+        } else {
+            null
+        },
         mediaMetadata.totalTrackCount?.toLong(),
-        if (mediaMetadata.extras?.containsKey("duration") == true)
-            mediaMetadata.extras?.getInt("duration") else null,
-        if (mediaMetadata.extras?.containsKey("bitRate") == true)
-            mediaMetadata.extras?.getInt("bitRate") else null,
+        if (mediaMetadata.extras?.containsKey("duration") == true) {
+            mediaMetadata.extras?.getInt("duration")
+        } else {
+            null
+        },
+        if (mediaMetadata.extras?.containsKey("bitRate") == true) {
+            mediaMetadata.extras?.getInt("bitRate")
+        } else {
+            null
+        },
         mediaMetadata.extras?.getString("path"),
         mediaMetadata.extras?.getBoolean("isVideo") ?: false,
         mediaMetadata.extras?.getBoolean("starred", false) ?: false,
@@ -185,7 +196,7 @@ fun MediaItem.toTrack(): Track {
         mediaMetadata.extras?.getInt("bookmarkPosition", 0) ?: 0,
         mediaMetadata.extras?.getInt("userRating", 0) ?: 0,
         mediaMetadata.extras?.getFloat("averageRating", 0F) ?: 0F,
-        mediaMetadata.extras?.getString("name"),
+        mediaMetadata.extras?.getString("name")
     )
     if (mediaMetadata.userRating is HeartRating) {
         track.starred = (mediaMetadata.userRating as HeartRating).isHeart
@@ -199,11 +210,15 @@ fun MediaItem.toTrack(): Track {
 }
 
 private fun safeParseDate(created: String?): Date? {
-    return if (created != null) try {
-        DateFormat.getDateInstance().parse(created)
-    } catch (_: ParseException) {
+    return if (created != null) {
+        try {
+            DateFormat.getDateInstance().parse(created)
+        } catch (_: ParseException) {
+            null
+        }
+    } else {
         null
-    } else null
+    }
 }
 
 /**
@@ -224,9 +239,8 @@ fun buildMediaItem(
     imageUri: Uri? = null,
     starred: Boolean = false,
     group: String? = null,
-    mediaType: @MediaMetadata.MediaType Int? = null,
+    mediaType: @MediaMetadata.MediaType Int? = null
 ): MediaItem {
-
     val metadataBuilder = MediaMetadata.Builder()
         .setAlbumTitle(album)
         .setTitle(title)
@@ -255,7 +269,9 @@ fun buildMediaItem(
                 )
             }
         )
-    } else metadataBuilder.setExtras(Bundle())
+    } else {
+        metadataBuilder.setExtras(Bundle())
+    }
 
     val metadata = metadataBuilder.build()
 

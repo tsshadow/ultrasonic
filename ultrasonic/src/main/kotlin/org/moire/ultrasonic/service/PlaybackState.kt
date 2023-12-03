@@ -25,6 +25,6 @@ fun PlaybackState.toMediaItemsWithStartPosition(): MediaSession.MediaItemsWithSt
     return MediaSession.MediaItemsWithStartPosition(
         songs.map { it.toMediaItem() },
         currentPlayingIndex,
-        currentPlayingPosition.toLong(),
+        currentPlayingPosition.toLong()
     )
 }

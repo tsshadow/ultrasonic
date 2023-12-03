@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:max-line-length")
+
 package org.moire.ultrasonic.data
 
 import androidx.room.Database
@@ -265,21 +267,27 @@ val MIGRATION_5_4: Migration = object : Migration(5, 4) {
         database.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
     }
 }
-/* ktlint-disable max-line-length */
 val MIGRATION_5_6: Migration = object : Migration(5, 6) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("CREATE TABLE IF NOT EXISTS `_new_ServerSetting` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `index` INTEGER NOT NULL, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `color` INTEGER, `userName` TEXT NOT NULL, `password` TEXT NOT NULL, `jukeboxByDefault` INTEGER NOT NULL, `allowSelfSignedCertificate` INTEGER NOT NULL, `forcePlainTextPassword` INTEGER NOT NULL, `musicFolderId` TEXT, `minimumApiVersion` TEXT, `chatSupport` INTEGER, `bookmarkSupport` INTEGER, `shareSupport` INTEGER, `podcastSupport` INTEGER, `jukeboxSupport` INTEGER, `videoSupport` INTEGER)")
-        database.execSQL("INSERT INTO `_new_ServerSetting` (`musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`forcePlainTextPassword`,`id`,`allowSelfSignedCertificate`,`chatSupport`) SELECT `musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`ldapSupport`,`id`,`allowSelfSignedCertificate`,`chatSupport` FROM `ServerSetting`")
+        database.execSQL(
+            "CREATE TABLE IF NOT EXISTS `_new_ServerSetting` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `index` INTEGER NOT NULL, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `color` INTEGER, `userName` TEXT NOT NULL, `password` TEXT NOT NULL, `jukeboxByDefault` INTEGER NOT NULL, `allowSelfSignedCertificate` INTEGER NOT NULL, `forcePlainTextPassword` INTEGER NOT NULL, `musicFolderId` TEXT, `minimumApiVersion` TEXT, `chatSupport` INTEGER, `bookmarkSupport` INTEGER, `shareSupport` INTEGER, `podcastSupport` INTEGER, `jukeboxSupport` INTEGER, `videoSupport` INTEGER)"
+        )
+        database.execSQL(
+            "INSERT INTO `_new_ServerSetting` (`musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`forcePlainTextPassword`,`id`,`allowSelfSignedCertificate`,`chatSupport`) SELECT `musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`ldapSupport`,`id`,`allowSelfSignedCertificate`,`chatSupport` FROM `ServerSetting`"
+        )
         database.execSQL("DROP TABLE `ServerSetting`")
         database.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
     }
 }
 val MIGRATION_6_5: Migration = object : Migration(6, 5) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("CREATE TABLE IF NOT EXISTS `_new_ServerSetting` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `index` INTEGER NOT NULL, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `color` INTEGER, `userName` TEXT NOT NULL, `password` TEXT NOT NULL, `jukeboxByDefault` INTEGER NOT NULL, `allowSelfSignedCertificate` INTEGER NOT NULL, `ldapSupport` INTEGER NOT NULL, `musicFolderId` TEXT, `minimumApiVersion` TEXT, `chatSupport` INTEGER, `bookmarkSupport` INTEGER, `shareSupport` INTEGER, `podcastSupport` INTEGER)")
-        database.execSQL("INSERT INTO `_new_ServerSetting` (`musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`ldapSupport`,`id`,`allowSelfSignedCertificate`,`chatSupport`) SELECT `musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`forcePlainTextPassword`,`id`,`allowSelfSignedCertificate`,`chatSupport` FROM `ServerSetting`")
+        database.execSQL(
+            "CREATE TABLE IF NOT EXISTS `_new_ServerSetting` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `index` INTEGER NOT NULL, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `color` INTEGER, `userName` TEXT NOT NULL, `password` TEXT NOT NULL, `jukeboxByDefault` INTEGER NOT NULL, `allowSelfSignedCertificate` INTEGER NOT NULL, `ldapSupport` INTEGER NOT NULL, `musicFolderId` TEXT, `minimumApiVersion` TEXT, `chatSupport` INTEGER, `bookmarkSupport` INTEGER, `shareSupport` INTEGER, `podcastSupport` INTEGER)"
+        )
+        database.execSQL(
+            "INSERT INTO `_new_ServerSetting` (`musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`ldapSupport`,`id`,`allowSelfSignedCertificate`,`chatSupport`) SELECT `musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`forcePlainTextPassword`,`id`,`allowSelfSignedCertificate`,`chatSupport` FROM `ServerSetting`"
+        )
         database.execSQL("DROP TABLE `ServerSetting`")
         database.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
     }
 }
-/* ktlint-enable max-line-length */

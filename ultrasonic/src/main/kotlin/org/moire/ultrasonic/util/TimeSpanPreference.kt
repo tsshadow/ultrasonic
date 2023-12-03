@@ -9,7 +9,8 @@ import org.moire.ultrasonic.R
  * Created by Joshua Bahnsen on 12/22/13.
  */
 class TimeSpanPreference(mContext: Context, attrs: AttributeSet?) : DialogPreference(
-    mContext, attrs
+    mContext,
+    attrs
 ) {
     init {
         setPositiveButtonText(android.R.string.ok)
@@ -22,6 +23,8 @@ class TimeSpanPreference(mContext: Context, attrs: AttributeSet?) : DialogPrefer
             val persisted = getPersistedString("")
             return if ("" != persisted) {
                 persisted.replace(':', ' ')
-            } else context.resources.getString(R.string.time_span_disabled)
+            } else {
+                context.resources.getString(R.string.time_span_disabled)
+            }
         }
 }

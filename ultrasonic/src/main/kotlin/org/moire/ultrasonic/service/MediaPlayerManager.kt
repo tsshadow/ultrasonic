@@ -325,10 +325,7 @@ class MediaPlayerManager(
     }
 
     @Synchronized
-    fun restore(
-        state: PlaybackState,
-        autoPlay: Boolean
-    ) {
+    fun restore(state: PlaybackState, autoPlay: Boolean) {
         val insertionMode = InsertionMode.APPEND
 
         addToPlaylist(
@@ -398,7 +395,9 @@ class MediaPlayerManager(
         // This case would throw an exception in Media3. It can happen when an inconsistent state is saved.
         if (controller?.currentTimeline?.isEmpty != false ||
             index >= controller!!.currentTimeline.windowCount
-        ) return
+        ) {
+            return
+        }
 
         Timber.i("SeekTo: %s %s", index, position)
         controller?.seekTo(index, position.toLong())
@@ -501,9 +500,7 @@ class MediaPlayerManager(
         shuffle: Boolean = false,
         isArtist: Boolean = false
     ) {
-
         fragment.launchWithToast {
-
             val list: List<Track> =
                 tracks.ifEmpty {
                     requireNotNull(id)
@@ -514,7 +511,7 @@ class MediaPlayerManager(
                 songs = list,
                 insertionMode = insertionMode,
                 autoPlay = (insertionMode == InsertionMode.CLEAR),
-                shuffle = shuffle,
+                shuffle = shuffle
             )
 
             if (insertionMode == InsertionMode.CLEAR) {
@@ -529,10 +526,11 @@ class MediaPlayerManager(
                     quantize(R.plurals.n_songs_added_to_end, list)
 
                 InsertionMode.CLEAR -> {
-                    if (Settings.shouldTransitionOnPlayback)
+                    if (Settings.shouldTransitionOnPlayback) {
                         null
-                    else
+                    } else {
                         quantize(R.plurals.n_songs_added_play_now, list)
+                    }
                 }
             }
         }
@@ -585,12 +583,15 @@ class MediaPlayerManager(
     @Synchronized
     @JvmOverloads
     fun clear(serialize: Boolean = true) {
-
         controller?.clearMediaItems()
 
         if (controller != null && serialize) {
             playbackStateSerializer.serializeAsync(
-                listOf(), -1, 0, isShufflePlayEnabled, repeatMode
+                listOf(),
+                -1,
+                0,
+                isShufflePlayEnabled,
+                repeatMode
             )
         }
     }
@@ -731,8 +732,8 @@ class MediaPlayerManager(
     }
 
     /*
-    * Sets the rating of the current track
-    */
+     * Sets the rating of the current track
+     */
     private fun setRating(rating: Rating) {
         if (controller is MediaController) {
             (controller as MediaController).setRating(rating)
@@ -740,9 +741,9 @@ class MediaPlayerManager(
     }
 
     /*
-    * This legacy function simply emits a rating update,
-    * which will then be processed by both the RatingManager as well as the controller
-    */
+     * This legacy function simply emits a rating update,
+     * which will then be processed by both the RatingManager as well as the controller
+     */
     fun legacyToggleStar() {
         if (currentMediaItem == null) return
         val track = currentMediaItem!!.toTrack()
@@ -878,7 +879,9 @@ class MediaPlayerManager(
     }
 
     enum class InsertionMode {
-        CLEAR, APPEND, AFTER_CURRENT
+        CLEAR,
+        APPEND,
+        AFTER_CURRENT
     }
 
     enum class PlayerBackend { JUKEBOX, LOCAL }

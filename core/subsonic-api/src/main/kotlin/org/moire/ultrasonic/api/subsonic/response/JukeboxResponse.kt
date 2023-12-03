@@ -11,11 +11,13 @@ class JukeboxResponse(
     error: SubsonicError?,
     var jukebox: JukeboxStatus = JukeboxStatus()
 ) : SubsonicResponse(status, version, error) {
-    @JsonSetter("jukeboxStatus") fun setJukeboxStatus(jukebox: JukeboxStatus) {
+    @JsonSetter("jukeboxStatus")
+    fun setJukeboxStatus(jukebox: JukeboxStatus) {
         this.jukebox = jukebox
     }
 
-    @JsonSetter("jukeboxPlaylist") fun setJukeboxPlaylist(jukebox: JukeboxStatus) {
+    @JsonSetter("jukeboxPlaylist")
+    fun setJukeboxPlaylist(jukebox: JukeboxStatus) {
         this.jukebox = jukebox
     }
 }

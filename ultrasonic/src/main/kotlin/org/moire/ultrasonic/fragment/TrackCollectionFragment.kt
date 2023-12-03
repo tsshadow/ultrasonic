@@ -365,9 +365,7 @@ open class TrackCollectionFragment(
         )
     }
 
-    private fun playSelectedOrAllTracks(
-        insertionMode: MediaPlayerManager.InsertionMode
-    ) {
+    private fun playSelectedOrAllTracks(insertionMode: MediaPlayerManager.InsertionMode) {
         mediaPlayerManager.playTracksAndToast(
             fragment = this,
             insertionMode = insertionMode,
@@ -403,9 +401,7 @@ open class TrackCollectionFragment(
         listModel.calculateButtonState(selection, ::updateButtonState)
     }
 
-    private fun updateButtonState(
-        show: TrackCollectionModel.Companion.ButtonStates,
-    ) {
+    private fun updateButtonState(show: TrackCollectionModel.Companion.ButtonStates) {
         // We are coming back from unknown context
         // and need to ensure Main Thread in order to manipulate the UI
         // If view is null, our view was disposed in the meantime
@@ -484,10 +480,11 @@ open class TrackCollectionFragment(
     internal fun getSelectedTracks(): List<Track> {
         // Walk through selected set and get the Entries based on the saved ids.
         return viewAdapter.getCurrentList().mapNotNull {
-            if (it is Track && viewAdapter.isSelected(it.longId))
+            if (it is Track && viewAdapter.isSelected(it.longId)) {
                 it
-            else
+            } else {
                 null
+            }
         }
     }
 
@@ -586,7 +583,6 @@ open class TrackCollectionFragment(
         menuItem: MenuItem,
         item: MusicDirectory.Child
     ): Boolean {
-
         val tracks = getClickedSong(item)
 
         return ContextMenuUtil.handleContextMenuTracks(
@@ -600,10 +596,11 @@ open class TrackCollectionFragment(
     private fun getClickedSong(item: MusicDirectory.Child): List<Track> {
         // This can probably be done better
         return viewAdapter.getCurrentList().mapNotNull {
-            if (it is Track && (it.id == item.id))
+            if (it is Track && (it.id == item.id)) {
                 it
-            else
+            } else {
                 null
+            }
         }
     }
 

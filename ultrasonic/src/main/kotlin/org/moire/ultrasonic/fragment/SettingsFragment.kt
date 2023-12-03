@@ -258,7 +258,8 @@ class SettingsFragment :
         val choice = intArrayOf(defaultChoice)
         ConfirmationDialog.Builder(requireContext()).setTitle(title)
             .setSingleChoiceItems(
-                R.array.bluetoothDeviceSettingNames, defaultChoice
+                R.array.bluetoothDeviceSettingNames,
+                defaultChoice
             ) { _: DialogInterface?, i: Int -> choice[0] = i }
             .setNegativeButton(R.string.common_cancel) { dialogInterface: DialogInterface, _: Int ->
                 dialogInterface.cancel()

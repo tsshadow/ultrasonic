@@ -49,8 +49,11 @@ class RatingManager : CoroutineScope by CoroutineScope(Dispatchers.Default) {
                 var success = false
                 withContext(Dispatchers.IO) {
                     try {
-                        if (update.rating.isHeart) service.star(id)
-                        else service.unstar(id)
+                        if (update.rating.isHeart) {
+                            service.star(id)
+                        } else {
+                            service.unstar(id)
+                        }
                         success = true
                     } catch (all: Exception) {
                         Timber.e(all)
