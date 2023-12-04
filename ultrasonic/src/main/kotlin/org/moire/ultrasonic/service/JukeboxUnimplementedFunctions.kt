@@ -12,6 +12,7 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.TextureView
+import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackParameters
@@ -26,6 +27,10 @@ import androidx.media3.common.Tracks
 @Suppress("TooManyFunctions", "DeprecatedCallableAddReplaceWith")
 @SuppressLint("UnsafeOptInUsageError")
 abstract class JukeboxUnimplementedFunctions : Player {
+
+    override fun setAudioAttributes(audioAttributes: AudioAttributes, handleAudioFocus: Boolean) {
+        TODO("Not yet implemented")
+    }
 
     override fun setMediaItems(mediaItems: MutableList<MediaItem>) {
         TODO("Not yet implemented")

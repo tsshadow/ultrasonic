@@ -20,10 +20,10 @@ import androidx.media3.common.C
 import androidx.media3.common.C.USAGE_MEDIA
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.ResolvingDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
-import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.ShuffleOrder
@@ -237,33 +237,37 @@ class PlaybackService :
         val cacheDataSourceFactory: DataSource.Factory =
             CachedDataSource.Factory(resolvingDataSource)
 
-        // Create a renderer with HW rendering support
-        val renderer = DefaultRenderersFactory(this)
-
-        if (Settings.useHwOffload) {
-            renderer.setEnableAudioOffload(true)
-        }
-
         // Create the player
         val player = ExoPlayer.Builder(this)
             .setAudioAttributes(getAudioAttributes(), true)
             .setWakeMode(getWakeModeFlag())
             .setHandleAudioBecomingNoisy(true)
             .setMediaSourceFactory(DefaultMediaSourceFactory(cacheDataSourceFactory))
-            .setRenderersFactory(renderer)
             .setSeekBackIncrementMs(Settings.seekInterval.toLong())
             .setSeekForwardIncrementMs(Settings.seekInterval.toLong())
             .build()
 
+        // Enable audio offload
+        if (Settings.useHwOffload) {
+            player.enableOffload()
+        }
+
         // Setup Equalizer
         equalizer = EqualizerController.create(player.audioSessionId)
 
-        // Enable audio offload
-        if (Settings.useHwOffload) {
-            player.experimentalSetOffloadSchedulingEnabled(true)
-        }
-
         return player
+    }
+
+    private fun ExoPlayer.enableOffload() {
+        trackSelectionParameters = trackSelectionParameters.buildUpon()
+            .setAudioOffloadPreferences(
+                TrackSelectionParameters.AudioOffloadPreferences
+                    .Builder()
+                    .setAudioOffloadMode(
+                        TrackSelectionParameters.AudioOffloadPreferences.AUDIO_OFFLOAD_MODE_ENABLED
+                    )
+                    .build()
+            ).build()
     }
 
     private fun createShuffleListFromCurrentIndex(
