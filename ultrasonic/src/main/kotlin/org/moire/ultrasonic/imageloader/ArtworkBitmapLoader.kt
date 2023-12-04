@@ -46,6 +46,10 @@ class ArtworkBitmapLoader : BitmapLoader, KoinComponent {
         }
     }
 
+    override fun loadBitmap(uri: Uri, options: BitmapFactory.Options?): ListenableFuture<Bitmap> {
+        return loadBitmap(uri)
+    }
+
     private fun decode(data: ByteArray): Bitmap {
         val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
         return bitmap ?: throw IllegalArgumentException("Could not decode bitmap")
