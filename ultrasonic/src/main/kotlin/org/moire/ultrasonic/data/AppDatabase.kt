@@ -33,8 +33,8 @@ val MIGRATION_1_2: Migration = object : Migration(1, 2) {
 }
 
 val MIGRATION_2_1: Migration = object : Migration(2, 1) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS ServerSettingMigration (
                     id INTEGER NOT NULL PRIMARY KEY,
@@ -50,7 +50,7 @@ val MIGRATION_2_1: Migration = object : Migration(2, 1) {
                 )
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
                 INSERT INTO ServerSettingMigration (
                     id, [index], name, url, userName, password, jukeboxByDefault,
@@ -62,10 +62,10 @@ val MIGRATION_2_1: Migration = object : Migration(2, 1) {
                 FROM ServerSetting
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             "DROP TABLE ServerSetting"
         )
-        database.execSQL(
+        db.execSQL(
             "ALTER TABLE ServerSettingMigration RENAME TO ServerSetting"
         )
     }
@@ -89,8 +89,8 @@ val MIGRATION_2_3: Migration = object : Migration(2, 3) {
 }
 
 val MIGRATION_3_2: Migration = object : Migration(3, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS ServerSettingMigration (
                     id INTEGER NOT NULL PRIMARY KEY,
@@ -107,7 +107,7 @@ val MIGRATION_3_2: Migration = object : Migration(3, 2) {
                 )
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
                 INSERT INTO ServerSettingMigration (
                     id, [index], name, url, userName, password, jukeboxByDefault,
@@ -119,26 +119,26 @@ val MIGRATION_3_2: Migration = object : Migration(3, 2) {
                 FROM ServerSetting
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             "DROP TABLE ServerSetting"
         )
-        database.execSQL(
+        db.execSQL(
             "ALTER TABLE ServerSettingMigration RENAME TO ServerSetting"
         )
     }
 }
 
 val MIGRATION_3_4: Migration = object : Migration(3, 4) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             "ALTER TABLE ServerSetting ADD COLUMN color INTEGER"
         )
     }
 }
 
 val MIGRATION_4_3: Migration = object : Migration(4, 3) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS ServerSettingMigration (
                     id INTEGER NOT NULL PRIMARY KEY,
@@ -159,7 +159,7 @@ val MIGRATION_4_3: Migration = object : Migration(4, 3) {
                 )
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
                 INSERT INTO ServerSettingMigration (
                     id, [index], name, url, userName, password, jukeboxByDefault,
@@ -173,18 +173,18 @@ val MIGRATION_4_3: Migration = object : Migration(4, 3) {
                 FROM ServerSetting
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             "DROP TABLE ServerSetting"
         )
-        database.execSQL(
+        db.execSQL(
             "ALTER TABLE ServerSettingMigration RENAME TO ServerSetting"
         )
     }
 }
 
 val MIGRATION_4_5: Migration = object : Migration(4, 5) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                     CREATE TABLE IF NOT EXISTS `_new_ServerSetting` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
@@ -206,7 +206,7 @@ val MIGRATION_4_5: Migration = object : Migration(4, 5) {
                     )
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
                     INSERT INTO `_new_ServerSetting` (
                     `ldapSupport`,`musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,
@@ -220,14 +220,14 @@ val MIGRATION_4_5: Migration = object : Migration(4, 5) {
                     FROM `ServerSetting`
             """.trimIndent()
         )
-        database.execSQL("DROP TABLE `ServerSetting`")
-        database.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
+        db.execSQL("DROP TABLE `ServerSetting`")
+        db.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
     }
 }
 
 val MIGRATION_5_4: Migration = object : Migration(5, 4) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                     CREATE TABLE IF NOT EXISTS `_new_ServerSetting` (
                     `id` INTEGER PRIMARY KEY NOT NULL, 
@@ -249,7 +249,7 @@ val MIGRATION_5_4: Migration = object : Migration(5, 4) {
                     )
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
                     INSERT INTO `_new_ServerSetting` (
                     `ldapSupport`,`musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,
@@ -263,31 +263,31 @@ val MIGRATION_5_4: Migration = object : Migration(5, 4) {
                     FROM `ServerSetting`
             """.trimIndent()
         )
-        database.execSQL("DROP TABLE `ServerSetting`")
-        database.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
+        db.execSQL("DROP TABLE `ServerSetting`")
+        db.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
     }
 }
 val MIGRATION_5_6: Migration = object : Migration(5, 6) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `_new_ServerSetting` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `index` INTEGER NOT NULL, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `color` INTEGER, `userName` TEXT NOT NULL, `password` TEXT NOT NULL, `jukeboxByDefault` INTEGER NOT NULL, `allowSelfSignedCertificate` INTEGER NOT NULL, `forcePlainTextPassword` INTEGER NOT NULL, `musicFolderId` TEXT, `minimumApiVersion` TEXT, `chatSupport` INTEGER, `bookmarkSupport` INTEGER, `shareSupport` INTEGER, `podcastSupport` INTEGER, `jukeboxSupport` INTEGER, `videoSupport` INTEGER)"
         )
-        database.execSQL(
+        db.execSQL(
             "INSERT INTO `_new_ServerSetting` (`musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`forcePlainTextPassword`,`id`,`allowSelfSignedCertificate`,`chatSupport`) SELECT `musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`ldapSupport`,`id`,`allowSelfSignedCertificate`,`chatSupport` FROM `ServerSetting`"
         )
-        database.execSQL("DROP TABLE `ServerSetting`")
-        database.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
+        db.execSQL("DROP TABLE `ServerSetting`")
+        db.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
     }
 }
 val MIGRATION_6_5: Migration = object : Migration(6, 5) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `_new_ServerSetting` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `index` INTEGER NOT NULL, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `color` INTEGER, `userName` TEXT NOT NULL, `password` TEXT NOT NULL, `jukeboxByDefault` INTEGER NOT NULL, `allowSelfSignedCertificate` INTEGER NOT NULL, `ldapSupport` INTEGER NOT NULL, `musicFolderId` TEXT, `minimumApiVersion` TEXT, `chatSupport` INTEGER, `bookmarkSupport` INTEGER, `shareSupport` INTEGER, `podcastSupport` INTEGER)"
         )
-        database.execSQL(
+        db.execSQL(
             "INSERT INTO `_new_ServerSetting` (`musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`ldapSupport`,`id`,`allowSelfSignedCertificate`,`chatSupport`) SELECT `musicFolderId`,`color`,`index`,`userName`,`minimumApiVersion`,`jukeboxByDefault`,`url`,`password`,`shareSupport`,`bookmarkSupport`,`name`,`podcastSupport`,`forcePlainTextPassword`,`id`,`allowSelfSignedCertificate`,`chatSupport` FROM `ServerSetting`"
         )
-        database.execSQL("DROP TABLE `ServerSetting`")
-        database.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
+        db.execSQL("DROP TABLE `ServerSetting`")
+        db.execSQL("ALTER TABLE `_new_ServerSetting` RENAME TO `ServerSetting`")
     }
 }
