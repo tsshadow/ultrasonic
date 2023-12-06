@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
     <string name="background_task.network_error">Ocorreu um erro de rede. Verifique o endereço do servidor ou tente mais tarde.</string>
-    <string name="background_task.unsupported_api">O servidor api v%1$s não tem suporte para esta função.</string>
+    <string name="background_task.unsupported_api">O servidor API v%1$s não tem suporte para esta função.</string>
     <string name="background_task.no_network">Este aplicativo requer acesso à rede. Ligue o Wi-Fi ou a rede de dados.</string>
     <string name="background_task.not_found">Recurso não encontrado. Verifique o endereço do servidor.</string>
     <string name="background_task.parse_error">Não entendi a resposta. Verifique o endereço do servidor.</string>
@@ -67,16 +66,16 @@
     <string name="download.menu_save">Salvar Playlist</string>
     <string name="download.menu_screen_off">Tela Desligada</string>
     <string name="download.menu_screen_on">Tela Ligada</string>
-    <string name="download.menu_show_album">Mostrar Álbum</string>
+    <string name="download.menu_show_album">Ir para Álbum</string>
     <string name="download.menu_shuffle">Misturar</string>
     <string name="download.menu_shuffle_on">Modo aleatório ativado</string>
     <string name="download.menu_shuffle_off">Modo aleatório desativado</string>
     <string name="download.playerstate_loading">Carregando…</string>
     <string name="download.playerstate_playing_shuffle">Tocando misturado</string>
-    <string name="download.playlist_done">Playlist salva com sucesso.</string>
+    <string name="download.playlist_done">Playlist salva.</string>
     <string name="download.playlist_error">Falha ao salvar a playlist, Tente mais tarde.</string>
     <string name="download.playlist_name">Entre o nome da playlist:</string>
-    <string name="download.playlist_saving">Salvando playlist \"%s\"&#8230;</string>
+    <string name="download.playlist_saving">Salvando playlist \"%s\"…</string>
     <string name="download.playlist_title">Salvar Playlist</string>
     <string name="download.repeat_all">Repetir Tudo</string>
     <string name="download.repeat_off">Repetição Desligada</string>
@@ -85,7 +84,7 @@
     <string name="equalizer.label">Equalizador</string>
     <string name="equalizer.preset">Selecionar Configuração Prévia</string>
     <string name="error.label">Erro</string>
-    <string name="jukebox.is_default">Jukebox por padrão</string>
+    <string name="jukebox.is_default">Jukebox por Padrão</string>
     <string name="lyrics.nomatch">Nenhuma letra encontrada</string>
     <string name="language.default">Padrão do sistema</string>
     <string name="language.zh_CN">Chinês (China)</string>
@@ -109,7 +108,7 @@
     <string name="main.albums_newest">Recentemente Adicionados</string>
     <string name="main.albums_random">Aleatórios</string>
     <string name="main.albums_recent">Recentemente Tocados</string>
-    <string name="main.albums_starred">Favoritos</string>
+    <string name="main.albums_starred">Estrelado</string>
     <string name="main.albums_title">Álbuns</string>
     <string name="main.artists_title">Artistas</string>
     <string name="main.genres_title">Gêneros</string>
@@ -206,9 +205,9 @@
     <string name="settings.disc_sort_summary">Classificar músicas pelo número do álbum e faixas</string>
     <string name="settings.display_bitrate">Mostrar Taxa de Bits e Sufixo de Arquivo</string>
     <string name="settings.display_bitrate_summary">Adicionar o nome do artista com a taxa de bits e sufixo do arquivo</string>
-    <string name="settings.download_transition">Mostrar Agora Tocando ao Reproduzir</string>
+    <string name="settings.download_transition">Mostrar Tocando Agora ao Reproduzir</string>
     <string name="settings.download_transition_summary">Alternar para Tocando Agora após iniciar o playback na visualização de mídia </string>
-    <string name="settings.hide_media_summary">Esconder arquivos de músicas de outros aplicativos</string>
+    <string name="settings.hide_media_summary">Esconder arquivos de músicas de outros aplicativos.</string>
     <string name="settings.hide_media_title">Esconder de Outros</string>
     <string name="settings.hide_media_toast">Será efetivado na próxima vez que o Android procurar por músicas em seu celular.</string>
     <string name="settings.increment_time">Pular Intervalo</string>
@@ -241,7 +240,7 @@
     <string name="settings.notifications_title">Notificações</string>
     <string name="settings.network_title">Rede</string>
     <string name="settings.other_title">Outras Configurações</string>
-    <string name="settings.override_language">Sobrescrever o idioma</string>
+    <string name="settings.override_language">Sobrescrever o Idioma</string>
     <string name="settings.override_language_summary">Você precisa reiniciar o aplicativo após alterar o idioma</string>
     <string name="settings.playback_control_title">Configurações de Controle de Reprodução</string>
     <string name="settings.playback.resume_on_bluetooth_device">Retomar ao Conectar Dispositivo Bluetooth</string>
@@ -250,9 +249,9 @@
     <string name="settings.playback.bluetooth_a2dp">Somente dispositivos de áudio (A2DP)</string>
     <string name="settings.playback.bluetooth_disabled">Desativado</string>
     <string name="settings.playback.resume_play_on_headphones_plug.title">Retomar ao Inserir Fone de Ouvido</string>
-    <string name="settings.playback.resume_play_on_headphones_plug.summary">O aplicativo retomará a reprodução em pausa na inserção dos fones de ouvido no dispositivo</string>
+    <string name="settings.playback.resume_play_on_headphones_plug.summary">O aplicativo retomará a reprodução em pausa na inserção dos fones de ouvido no dispositivo.</string>
     <string name="settings.preload">Músicas a Pré-carregar</string>
-    <string name="settings.parallel_downloads">Quantas músicas baixar em paralelo</string>
+    <string name="settings.parallel_downloads">Músicas a Baixar em Paralelo</string>
     <string name="settings.preload_1">1 música</string>
     <string name="settings.preload_10">10 músicas</string>
     <string name="settings.preload_2">2 músicas</string>
@@ -283,7 +282,7 @@
     <string name="settings.server_scaling_summary">Baixar imagens reduzidas do servidor ao invés do tamanho completo (economiza banda)</string>
     <string name="settings.server_scaling_title">Reduzir Arte dos Álbuns</string>
     <string name="settings.server_username">Login</string>
-    <string name="settings.server_color">Cor do servidor</string>
+    <string name="settings.server_color">Cor do Servidor</string>
     <string name="settings.show_now_playing">Mostrar Reprodução Atual</string>
     <string name="settings.show_now_playing_summary">Mostrar a faixa tocada atualmente em todas as atividades</string>
     <string name="settings.show_track_number">Mostrar o Número da Faixa</string>
@@ -294,7 +293,7 @@
     <string name="settings.theme_dark">Escuro</string>
     <string name="settings.theme_black">Negro</string>
     <string name="settings.theme_title">Tema</string>
-    <string name="settings.title.allow_self_signed_certificate">Permitir certificado HTTPS auto-assinado</string>
+    <string name="settings.title.allow_self_signed_certificate">Permitir Certificado HTTPS Auto-assinado</string>
     <string name="settings.title.force_plain_text_password">Forçar autenticação não criptografada</string>
     <string name="settings.summary.force_plain_text_password">Isso força o aplicativo a enviar a senha sem criptografia. É útil se o servidor Subsonic não suporta a nova API de autenticação de usuários.</string>
     <string name="settings.use_folder_for_album_artist">Usar Pasta para Nome do Artista</string>
@@ -303,7 +302,7 @@
     <string name="settings.show_now_playing_details">Mostrar detalhes em Tocando Agora</string>
     <string name="settings.use_id3">Navegar Usando Etiquetas ID3</string>
     <string name="settings.use_id3_summary">Usar as etiquetas ID3 ao invés do sistema de arquivos</string>
-    <string name="settings.use_id3_offline">Usar método ID3 quando offline também</string>
+    <string name="settings.use_id3_offline">Usar método ID3 quando offline</string>
     <string name="settings.show_artist_picture">Mostrar Foto do Artista na Lista</string>
     <string name="settings.show_artist_picture_summary">Mostrar a imagem do artista na lista de artistas, se disponível</string>
     <string name="main.video" tools:ignore="UnusedResources">Vídeo</string>
@@ -323,7 +322,7 @@
     <string name="do_not_show_dialog_again">Não mostrar este diálogo novamente</string>
     <string name="share_set_share_options">Configurações de Compartilhamento</string>
     <string name="share_on_server">Criar Compartilhamento no Servidor</string>
-    <string name="settings.share_on_server_summary">Compartilhar cria o compartilhamento no servidor e compartilha sua URL. Se desativado, somente os detalhes da música são compartilhados</string>
+    <string name="settings.share_on_server_summary">Cria o compartilhamento no servidor e compartilha sua URL. Se desativado, somente os detalhes da música são compartilhados</string>
     <string name="no_expiration">Não Expira</string>
     <string name="download.toggle_playlist">Alternar Playlist</string>
     <string name="download.bookmark_set">Definir como Favorito</string>
@@ -349,9 +348,9 @@
     <string name="share_default_greeting">Confira esta música que compartilhei do %s</string>
     <string name="share_via">Compartilhar músicas via</string>
     <string name="menu.share">Compartilhar</string>
-    <string name="download.menu_show_artist">Mostrar Artista</string>
+    <string name="download.menu_show_artist">Ir para Artista</string>
     <string name="common_multiple_years">Anos Múltiplos</string>
-    <string name="settings.show_confirmation_dialog">Mostrar caixa de diálogo de confirmação</string>
+    <string name="settings.show_confirmation_dialog">Mostrar Diálogo de Confirmação</string>
     <string name="settings.show_confirmation_dialog_summary">Exibe uma caixa de diálogo de confirmação antes de excluir ou desafixar músicas</string>
     <string name="settings.debug.title">Opções de Depuração</string>
     <string name="settings.debug.log_to_file">Log de Depuração em Arquivo</string>
@@ -376,7 +375,6 @@
     <string name="server_editor.advanced">Configurações avançadas</string>
     <string name="server_editor.disabled_feature">Um ou mais recursos foram desativados porque o servidor não os suporta.\nVocê pode rodar este teste novamente a qualquer momento.</string>
     <string name="server_menu.demo">Servidor Demonstração</string>
-
     <string name="about.webpage">Visitar a página web</string>
     <string name="about.report">Reportar um erro</string>
     <string name="about.text"><b>Ultrasonic</b> é um cliente gratuito e open-source para Android de streaming de música para API de servidores compatíveis com Subsonic (version 1.7.0 ou maior).\n\nCom <b>Ultrasonic</b> você pode facilmente reproduzir online ou baixar música de seu computador doméstico para seu telefone Android usando um servidor de mídia compatível com Subsonic. O software do servidor Subsonic necessita uma configuração independente do Ultrasonic.\n\nPor padrão, o servidor Ultrasonic não é configurado. Uma vez que você configurou seu próprio servidor, altere a configuração no Ultrasonic para poder conectá-lo.</string>
@@ -415,9 +413,8 @@
         <item quantity="many">%d músicas adicionadas após a atual</item>
         <item quantity="other">%d músicas adicionadas após a atual</item>
     </plurals>
-
     <!-- Subsonic api errors -->
-    <string name="api.subsonic.generic">Erro de api genérico: %1$s</string>
+    <string name="api.subsonic.generic">Erro genérico de API: %1$s</string>
     <string name="api.subsonic.generic.no.message">nenhuma mensagem fornecida pelo servidor</string>
     <string name="api.subsonic.token_auth_not_supported_for_ldap">A autenticação por token não é suportada para usuários LDAP.</string>
     <string name="api.subsonic.not_authenticated">Login ou senha errada.</string>
@@ -427,11 +424,33 @@
     <string name="api.subsonic.trial_period_is_over">O período de avaliação acabou.</string>
     <string name="api.subsonic.upgrade_client">Versões incompativeis. Atualize o aplicativo Ultrasonic para Android.</string>
     <string name="api.subsonic.upgrade_server">Versões incompativeis. Atualize o servidor Ultrasonic.</string>
-
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Avaliar Músicas com Estrelas</string>
     <string name="settings.five_star_rating_description">Usar o sistema de classificação de 5 estrelas em vez de estrelar/não estrelar itens.</string>
-
-    <string name="settings.use_hw_offload_title">Usar a reprodução por hardware (experimental)</string>
-    <string name="settings.use_hw_offload_description">Tenta reproduzir a mídia usando o chip decodificador de mídia do telefone. Isso pode melhorar o uso da bateria.</string>
-    </resources>
+    <string name="settings.use_hw_offload_title">Usar Reprodução por Hardware (experimental)</string>
+    <string name="settings.use_hw_offload_description">Tenta reproduzir a mídia usando o chip decodificador de mídia do telefone. Isso pode melhorar o uso da bateria. Alguns usuários relatam falhas na reprodução ao ativar esta opção!</string>
+    <string name="jukebox">Jukebox</string>
+    <string name="download.menu_unstar">Desfavoritar</string>
+    <string name="settings.preload_1000">1000 músicas</string>
+    <string name="settings.share_options">Opções</string>
+    <string name="settings.use_id3_offline_summary">Se você ativar esta configuração, ela mostrará apenas as músicas que você baixou com o Ultrasonic 4.0 ou posterior. Os downloads anteriores não têm os metadados necessários baixados. Você pode alternar entre os modos Fixar e Salvar para acionar o download dos metadados ausentes.</string>
+    <string name="albumArt">Arte do álbum</string>
+    <string name="settings.preload_100">100 músicas</string>
+    <string name="supported_server_features">Recursos suportados</string>
+    <string name="foreground_exception_text">Pressione o botão play na notificação de mídia se ainda estiver presente. Caso contrário, abra o aplicativo para iniciar a reprodução e reconectar a sessão ao controlador</string>
+    <string name="settings.preload_500">500 músicas</string>
+    <string name="main.albums_by_year">Cronológico</string>
+    <string name="settings.preload_50">50 músicas</string>
+    <string name="shortcut_play_random_songs_long">Tocar músicas aleatórias</string>
+    <string name="shortcut_play_random_songs_short">Músicas aleatórias</string>
+    <string name="settings.max_bitrate_pinning">Max Bitrate - Ao fixar música permanentemente</string>
+    <string name="list_view">Lista</string>
+    <string name="grid_view">Capa</string>
+    <string name="foreground_exception_title">A reprodução não pode ser retomada</string>
+    <plurals name="n_songs_added_play_now">
+        <item quantity="one">%d música adicionada na fila</item>
+        <item quantity="many">%d músicas adicionadas na fila</item>
+        <item quantity="other">%d músicas adicionadas na fila</item>
+    </plurals>
+    <string name="chat.user_avatar">Imagem do Avatar</string>
+</resources>
