@@ -635,7 +635,7 @@ open class RESTMusicService(
     @Throws(Exception::class)
     override fun getSongsByGenre(
         genre: String,
-        year: Int,
+        year: Int?,
         ratingMin: Int,
         ratingMax: Int,
         count: Int,
@@ -722,7 +722,7 @@ open class RESTMusicService(
     @Throws(Exception::class)
     override fun getSongsByMood(
         mood: String,
-        year: Int,
+        year: Int?,
         ratingMin: Int,
         ratingMax: Int,
         count: Int,

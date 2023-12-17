@@ -260,7 +260,7 @@ internal class ApiVersionCheckWrapper(
 
     override fun getSongsByGenre(
         genre: String,
-        year: Int,
+        year: Int?,
         ratingMin: Int,
         ratingMax: Int,
         count: Int,
@@ -274,7 +274,7 @@ internal class ApiVersionCheckWrapper(
 
     override fun getSongsByMood(
         mood: String,
-        year: Int,
+        year: Int?,
         ratingMin: Int,
         ratingMax: Int,
         count: Int,
