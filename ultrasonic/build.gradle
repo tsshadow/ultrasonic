@@ -75,6 +75,7 @@ android {
         warning 'ImpliedQuantity'
         disable 'ObsoleteLintCustomCheck'
     }
+    namespace 'org.moire.ultrasonic'
 
 }
 

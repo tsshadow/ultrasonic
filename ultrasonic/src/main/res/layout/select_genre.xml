@@ -14,7 +14,7 @@
 
     <LinearLayout
         a:layout_width="match_parent"
-        a:layout_height="wrap_content"
+        a:layout_height="40dp"
         a:orientation="horizontal">
         <TextView
             a:id="@+id/textView"
@@ -23,17 +23,18 @@
             a:layout_weight=".20"
             a:text="Year" />
 
-        <EditText
+        <Spinner
             a:id="@+id/selectYear"
             a:layout_width="0dp"
-            a:layout_height="wrap_content"
+            a:layout_height="match_parent"
             a:layout_weight=".80"
-            a:inputType="text" />
+            a:inputType="text"
+            a:spinnerMode="dropdown" />
     </LinearLayout>
 
     <LinearLayout
         a:layout_width="match_parent"
-        a:layout_height="wrap_content"
+        a:layout_height="40dp"
         a:orientation="horizontal">
 
         <TextView
@@ -48,12 +49,13 @@
             a:layout_height="wrap_content"
             a:layout_weight=".10"
             a:text="From" />
-        <EditText
+        <Spinner
             a:id="@+id/ratingMin"
             a:layout_width="0dp"
-            a:layout_height="wrap_content"
+            a:layout_height="match_parent"
             a:layout_weight=".30"
-            a:inputType="text" />
+            a:inputType="text"
+            a:spinnerMode="dropdown" />
 
         <TextView
             a:id="@+id/textView"
@@ -61,12 +63,13 @@
             a:layout_height="wrap_content"
             a:layout_weight=".10"
             a:text="To" />
-        <EditText
+        <Spinner
             a:id="@+id/ratingMax"
             a:layout_width="0dp"
-            a:layout_height="wrap_content"
+            a:layout_height="match_parent"
             a:layout_weight=".30"
-            a:inputType="text" />
+            a:inputType="text"
+            a:spinnerMode="dropdown" />
     </LinearLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"

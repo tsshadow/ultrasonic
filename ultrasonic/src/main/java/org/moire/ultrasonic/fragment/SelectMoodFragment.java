@@ -5,8 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +29,7 @@ import org.moire.ultrasonic.view.MoodAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import timber.log.Timber;
 
@@ -38,9 +40,9 @@ public class SelectMoodFragment extends Fragment {
 
     private SwipeRefreshLayout refreshMoodListView;
     private ListView moodListView;
-    private EditText yearEditBox;
-    private EditText ratingMin;
-    private EditText ratingMax;
+    private Spinner yearSpinner;
+    private Spinner ratingMin;
+    private Spinner ratingMax;
     private View emptyView;
     private CancellationToken cancellationToken;
 
@@ -80,9 +82,17 @@ public class SelectMoodFragment extends Fragment {
                 {
                     Bundle bundle = new Bundle();
                     bundle.putString(Constants.INTENT_MOOD_NAME, mood.getName());
-                    bundle.putString(Constants.INTENT_YEAR_NAME, yearEditBox.getText().toString());
-                    bundle.putString(Constants.INTENT_RATING_MIN, ratingMin.getText().toString());
-                    bundle.putString(Constants.INTENT_RATING_MAX, ratingMax.getText().toString());
+                    if (yearSpinner.getSelectedItem() != null) {
+                        bundle.putString(Constants.INTENT_YEAR_NAME, yearSpinner.getSelectedItem().toString());
+                    }
+
+                    if (ratingMin.getSelectedItem() != null) {
+                        bundle.putString(Constants.INTENT_RATING_MIN, ratingMin.getSelectedItem().toString());
+                    }
+
+                    if (ratingMax.getSelectedItem() != null) {
+                        bundle.putString(Constants.INTENT_RATING_MAX, ratingMax.getSelectedItem().toString());
+                    }
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.getMaxSongs());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0);
                     Navigation.findNavController(view).navigate(R.id.trackCollectionFragment, bundle);
@@ -92,9 +102,31 @@ public class SelectMoodFragment extends Fragment {
 
         emptyView = view.findViewById(R.id.select_mood_empty);
         registerForContextMenu(moodListView);
-        yearEditBox = (EditText)view.findViewById(R.id.selectYear);
-        ratingMin = (EditText)view.findViewById(R.id.ratingMin);
-        ratingMax = (EditText)view.findViewById(R.id.ratingMax);
+
+
+        yearSpinner = (Spinner)view.findViewById(R.id.selectYear);
+        ratingMin = (Spinner)view.findViewById(R.id.ratingMin);
+        ratingMax = (Spinner)view.findViewById(R.id.ratingMax);
+
+        ArrayAdapter<CharSequence> ratingAdapter = ArrayAdapter.createFromResource(
+                requireContext(),
+                R.array.ratingValues,
+                android.R.layout.simple_spinner_item
+        );
+        ratingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        ArrayAdapter<CharSequence> yearAdapter = ArrayAdapter.createFromResource(
+                requireContext(),
+                R.array.yearValues,
+                android.R.layout.simple_spinner_item
+        );
+        yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        yearSpinner.setAdapter(yearAdapter);
+        ratingMin.setAdapter(ratingAdapter);
+        ratingMax.setAdapter(ratingAdapter);
+
+        ratingMax.setSelection(5);
 
         FragmentTitle.Companion.setTitle(this, R.string.main_mood_title);
         load(false);
