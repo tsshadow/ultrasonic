@@ -269,7 +269,7 @@ class MediaPlayerController(
             songs,
             cachePermanently = false,
             autoPlay = false,
-            shuffle = false,
+            shuffle = true,
             insertionMode = insertionMode
         )
 
