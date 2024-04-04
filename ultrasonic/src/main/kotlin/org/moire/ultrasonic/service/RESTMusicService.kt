@@ -635,13 +635,14 @@ open class RESTMusicService(
     @Throws(Exception::class)
     override fun getSongsByGenre(
         genre: String,
-        year: Int?,
+        length: String?,
+        year: String?,
         ratingMin: Int,
         ratingMax: Int,
         count: Int,
         offset: Int
     ): MusicDirectory {
-        val response = API.getSongsByGenre(genre, year, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+        val response = API.getSongsByGenre(genre, length, year, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
@@ -722,13 +723,14 @@ open class RESTMusicService(
     @Throws(Exception::class)
     override fun getSongsByMood(
         mood: String,
-        year: Int?,
+        length: String?,
+        year: String?,
         ratingMin: Int,
         ratingMax: Int,
         count: Int,
         offset: Int
     ): MusicDirectory {
-        val response = API.getSongsByMood(mood, year, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+        val response = API.getSongsByMood(mood, length, year, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))

@@ -37,6 +37,7 @@ object Constants {
     const val INTENT_STARRED = "subsonic.starred"
     const val INTENT_RANDOM = "subsonic.random"
     const val INTENT_GENRE_NAME = "subsonic.genre"
+    const val INTENT_LENGTH_NAME = "subsonic.length"
     const val INTENT_CUSTOM1_NAME = "subsonic.custom1"
     const val INTENT_CUSTOM2_NAME = "subsonic.custom2"
     const val INTENT_CUSTOM3_NAME = "subsonic.custom3"

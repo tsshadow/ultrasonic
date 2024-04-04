@@ -29,7 +29,6 @@ import org.moire.ultrasonic.view.MoodAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import timber.log.Timber;
 
@@ -40,6 +39,7 @@ public class SelectMoodFragment extends Fragment {
 
     private SwipeRefreshLayout refreshMoodListView;
     private ListView moodListView;
+    private Spinner lengthSpinner;
     private Spinner yearSpinner;
     private Spinner ratingMin;
     private Spinner ratingMax;
@@ -93,6 +93,10 @@ public class SelectMoodFragment extends Fragment {
                     if (ratingMax.getSelectedItem() != null) {
                         bundle.putString(Constants.INTENT_RATING_MAX, ratingMax.getSelectedItem().toString());
                     }
+
+                    if (lengthSpinner.getSelectedItem() != null) {
+                        bundle.putString(Constants.INTENT_LENGTH_NAME, lengthSpinner.getSelectedItem().toString());
+                    }
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_SIZE, Settings.getMaxSongs());
                     bundle.putInt(Constants.INTENT_ALBUM_LIST_OFFSET, 0);
                     Navigation.findNavController(view).navigate(R.id.trackCollectionFragment, bundle);
@@ -107,6 +111,7 @@ public class SelectMoodFragment extends Fragment {
         yearSpinner = (Spinner)view.findViewById(R.id.selectYear);
         ratingMin = (Spinner)view.findViewById(R.id.ratingMin);
         ratingMax = (Spinner)view.findViewById(R.id.ratingMax);
+        lengthSpinner = (Spinner)view.findViewById(R.id.select_length_list);
 
         ArrayAdapter<CharSequence> ratingAdapter = ArrayAdapter.createFromResource(
                 requireContext(),
@@ -122,9 +127,16 @@ public class SelectMoodFragment extends Fragment {
         );
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        ArrayAdapter<CharSequence> lengthAdapter = ArrayAdapter.createFromResource(
+                requireContext(),
+                R.array.lengthValues,
+                android.R.layout.simple_spinner_item
+        );
+
         yearSpinner.setAdapter(yearAdapter);
         ratingMin.setAdapter(ratingAdapter);
         ratingMax.setAdapter(ratingAdapter);
+        lengthSpinner.setAdapter(lengthAdapter);
 
         ratingMax.setSelection(5);
 

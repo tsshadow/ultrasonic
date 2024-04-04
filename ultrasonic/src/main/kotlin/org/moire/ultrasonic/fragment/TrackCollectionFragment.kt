@@ -571,6 +571,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         val shareId = args.getString(Constants.INTENT_SHARE_ID)
         val shareName = args.getString(Constants.INTENT_SHARE_NAME)
         val genreName = args.getString(Constants.INTENT_GENRE_NAME)
+        val lengthName = args.getString(Constants.INTENT_LENGTH_NAME)
         val moodName = args.getString(Constants.INTENT_MOOD_NAME)
         val yearName = args.getString(Constants.INTENT_YEAR_NAME)
         val ratingMin = args.getString(Constants.INTENT_RATING_MIN)
@@ -599,7 +600,8 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 setTitle(genreName)
                 listModel.getSongsForGenre(
                     genreName,
-                    if (yearName != null && yearName != "")  yearName.toInt() else null,
+                    if (lengthName != null && lengthName != "")  lengthName else null,
+                    if (yearName != null && yearName != "")  yearName else null,
                     if (ratingMin != null && ratingMin != "") ratingMin.toInt() else 0,
                     if (ratingMax != null && ratingMax != "") ratingMax.toInt() else 10,
                     albumListSize,
@@ -608,7 +610,8 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
                 setTitle(moodName)
                 listModel.getSongsByMood(
                     moodName,
-                    if (yearName != null && yearName != "")  yearName.toInt() else null,
+                    if (lengthName != null && lengthName != "")  lengthName else null,
+                    if (yearName != null && yearName != "")  yearName else null,
                     if (ratingMin != null && ratingMin != "") ratingMin.toInt() else 0,
                     if (ratingMax != null && ratingMax != "") ratingMax.toInt() else 5,
                     albumListSize,

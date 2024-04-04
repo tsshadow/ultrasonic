@@ -2,7 +2,7 @@
 <LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
     a:layout_width="fill_parent"
     a:layout_height="fill_parent"
-    a:orientation="vertical" >
+    a:orientation="vertical">
 
     <TextView
         a:id="@+id/select_mood_empty"
@@ -16,6 +16,7 @@
         a:layout_width="match_parent"
         a:layout_height="40dp"
         a:orientation="horizontal">
+
         <TextView
             a:id="@+id/textView"
             a:layout_width="0dp"
@@ -43,12 +44,14 @@
             a:layout_height="wrap_content"
             a:layout_weight=".20"
             a:text="Rating" />
+
         <TextView
             a:id="@+id/textView"
             a:layout_width="0dp"
             a:layout_height="wrap_content"
             a:layout_weight=".10"
             a:text="From" />
+
         <Spinner
             a:id="@+id/ratingMin"
             a:layout_width="0dp"
@@ -63,6 +66,7 @@
             a:layout_height="wrap_content"
             a:layout_weight=".10"
             a:text="To" />
+
         <Spinner
             a:id="@+id/ratingMax"
             a:layout_width="0dp"
@@ -72,10 +76,28 @@
             a:spinnerMode="dropdown" />
     </LinearLayout>
 
+    <LinearLayout
+        a:layout_width="match_parent"
+        a:layout_height="40dp">
+
+        <TextView
+            a:id="@+id/textView"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_weight=".10"
+            a:text="length:" />
+
+        <Spinner
+            a:id="@+id/select_length_list"
+            a:layout_width="0dp"
+            a:layout_height="match_parent"
+            a:layout_weight=".30"
+            a:inputType="text"
+            a:spinnerMode="dropdown" />
+    </LinearLayout>
 
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/select_mood_refresh"
         android:layout_width="fill_parent"
         android:layout_height="0dip"
@@ -87,5 +109,4 @@
             android:layout_height="match_parent" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 </LinearLayout>

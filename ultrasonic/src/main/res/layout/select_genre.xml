@@ -71,7 +71,25 @@
             a:inputType="text"
             a:spinnerMode="dropdown" />
     </LinearLayout>
+    <LinearLayout
+        a:layout_width="match_parent"
+        a:layout_height="40dp">
 
+        <TextView
+            a:id="@+id/textView"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_weight=".10"
+            a:text="length:" />
+
+        <Spinner
+            a:id="@+id/select_length_list"
+            a:layout_width="0dp"
+            a:layout_height="match_parent"
+            a:layout_weight=".30"
+            a:inputType="text"
+            a:spinnerMode="dropdown" />
+    </LinearLayout>
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/select_genre_refresh"
         android:layout_width="fill_parent"

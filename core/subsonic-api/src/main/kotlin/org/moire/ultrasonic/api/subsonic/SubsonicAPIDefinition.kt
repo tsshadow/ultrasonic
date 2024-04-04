@@ -271,7 +271,8 @@ interface SubsonicAPIDefinition {
     @GET("getSongsByGenre.view")
     fun getSongsByGenre(
         @Query("genre") genre: String,
-        @Query("year") year: Int? = null,
+        @Query("length") length: String? = null,
+        @Query("year") year: String? = null,
         @Query("ratingMin") ratingMin: Int = 0,
         @Query("ratingMax") ratingMax: Int = 5,
         @Query("count") count: Int = 10,
@@ -326,7 +327,8 @@ interface SubsonicAPIDefinition {
     @GET("getSongsByMood.view")
     fun getSongsByMood(
         @Query("mood") mood: String,
-        @Query("year") year: Int? = null,
+        @Query("length") length: String? = null,
+        @Query("year") year: String? = null,
         @Query("ratingMin") ratingMin: Int = 0,
         @Query("ratingMax") ratingMax: Int = 5,
         @Query("count") count: Int = 50,

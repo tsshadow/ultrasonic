@@ -326,4 +326,9 @@
         <item>1993</item>
         <item>1992</item>
     </string-array>
+    <string-array name="lengthValues">
+        <item></item>
+        <item>short</item>
+        <item>long</item>
+    </string-array>
 </resources>

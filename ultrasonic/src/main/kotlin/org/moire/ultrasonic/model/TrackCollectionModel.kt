@@ -51,23 +51,24 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
-    suspend fun getSongsForGenre(genre: String, year: Int?, ratingMin: Int, ratingMax: Int, count: Int, offset: Int) {
+    suspend fun getSongsForGenre(genre: String, length: String?, year: String?, ratingMin: Int, ratingMax: Int, count: Int, offset: Int) {
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByGenre(genre, year, ratingMin, ratingMax, count, offset)
+            val musicDirectory = service.getSongsByGenre(genre, length, year, ratingMin, ratingMax, count, offset)
             updateList(musicDirectory)
         }
     }
 
     suspend fun getSongsByMood(mood: String,
-                               year: Int?,
+                               length: String?,
+                               year: String?,
                                ratingMin: Int,
                                ratingMax: Int,
                                count: Int,
                                offset: Int) {
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByMood(mood, year, ratingMin, ratingMax,  count, offset)
+            val musicDirectory = service.getSongsByMood(mood, length, year, ratingMin, ratingMax,  count, offset)
             updateList(musicDirectory)
         }
     }
