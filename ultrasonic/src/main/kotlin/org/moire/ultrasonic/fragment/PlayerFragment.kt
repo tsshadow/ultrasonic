@@ -228,7 +228,7 @@ class PlayerFragment :
         val nextButton: AutoRepeatButton = view.findViewById(R.id.button_next)
         shuffleButton = view.findViewById(R.id.button_shuffle)
         updateShuffleButtonState(mediaPlayerController.isShufflePlayEnabled)
-        updateRepeatButtonState(2)
+        updateRepeatButtonState(mediaPlayerController.repeatMode)
 
         val ratingLinearLayout = view.findViewById<LinearLayout>(R.id.song_rating)
         if (!useFiveStarRating) ratingLinearLayout.isVisible = false
@@ -1004,7 +1004,7 @@ class PlayerFragment :
 
         emptyTextView.isVisible = list.isEmpty()
 
-        updateRepeatButtonState(2)
+        updateRepeatButtonState(mediaPlayerController.repeatMode)
     }
 
     private fun onCurrentChanged() {
