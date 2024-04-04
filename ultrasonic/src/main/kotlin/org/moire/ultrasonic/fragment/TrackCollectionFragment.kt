@@ -255,7 +255,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
         if (selectedSongs.isNotEmpty()) {
             downloadHandler.download(
                 this, append, false, !append, playNext = false,
-                shuffle = false, songs = selectedSongs
+                shuffle = true, songs = selectedSongs
             )
         } else {
             playAll(false, append)
@@ -275,7 +275,7 @@ open class TrackCollectionFragment : MultiListFragment<MusicDirectory.Child>() {
             }
         }
 
-    private fun playAll(shuffle: Boolean = false, append: Boolean = false) {
+    private fun playAll(shuffle: Boolean = true, append: Boolean = false) {
         var hasSubFolders = false
 
         for (item in viewAdapter.getCurrentList()) {
