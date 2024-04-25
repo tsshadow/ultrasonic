@@ -112,6 +112,28 @@
             app:argType="string"
             app:nullable="true" />
         <argument
+            android:name="moodName"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="year"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="length"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="ratingMin"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="ratingMax"
+            android:defaultValue="5"
+            app:argType="integer" />
+        <argument
             android:name="shareId"
             android:defaultValue="@null"
             app:argType="string"

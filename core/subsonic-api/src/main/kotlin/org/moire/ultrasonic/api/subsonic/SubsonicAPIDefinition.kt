@@ -289,6 +289,10 @@ interface SubsonicAPIDefinition {
     @GET("getSongsByGenre.view")
     fun getSongsByGenre(
         @Query("genre") genre: String,
+        @Query("year") year: Int? = null,
+        @Query("count") length: String? = null,
+        @Query("count") ratingMin: Int? = null,
+        @Query("count") ratingMax: Int? = null,
         @Query("count") count: Int = 10,
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null

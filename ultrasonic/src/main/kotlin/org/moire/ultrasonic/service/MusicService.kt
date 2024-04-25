@@ -114,7 +114,10 @@ interface MusicService {
     fun getRandomSongs(size: Int): MusicDirectory
 
     @Throws(Exception::class)
-    fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory
+    fun getSongsByGenre(genre: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory
+
+    @Throws(Exception::class)
+    fun getSongsByMood(mood: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
     fun getStarred(): SearchResult

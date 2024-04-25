@@ -524,6 +524,11 @@ open class TrackCollectionFragment(
         val shareId = navArgs.shareId
         val shareName = navArgs.shareName
         val genreName = navArgs.genreName
+        val moodName = navArgs.moodName
+        val year = navArgs.year
+        val length = navArgs.length
+        val ratingMin = navArgs.ratingMin
+        val ratingMax = navArgs.ratingMax
 
         val getStarredTracks = displayStarred()
         val getVideos = navArgs.getVideos
@@ -548,7 +553,10 @@ open class TrackCollectionFragment(
                 listModel.getShare(shareId)
             } else if (genreName != null) {
                 setTitle(genreName)
-                listModel.getSongsForGenre(genreName, size, offset, append)
+                listModel.getSongsForGenre(genreName, year, length, ratingMin, ratingMax, size, offset, append)
+            } else if (moodName != null) {
+                setTitle(moodName)
+                listModel.getSongsForMood(moodName, year, length, ratingMin, ratingMax, size, offset, append)
             } else if (getStarredTracks) {
                 setTitle(getString(R.string.main_songs_starred))
                 listModel.getStarred()

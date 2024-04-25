@@ -50,7 +50,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
-    suspend fun getSongsForGenre(genre: String, count: Int, offset: Int, append: Boolean) {
+    suspend fun getSongsForGenre(genre: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, append: Boolean) {
         // Handle the logic for endless scrolling:
         // If appending the existing list, set the offset from where to load
         var newOffset = offset
@@ -58,7 +58,24 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByGenre(genre, count, newOffset)
+            val musicDirectory = service.getSongsByGenre(genre, year, length, ratingMin, ratingMax, count, newOffset)
+            currentListIsSortable = false
+            updateList(musicDirectory, append)
+
+            // Update current offset
+            loadedUntil = newOffset
+        }
+    }
+
+    suspend fun getSongsForMood(mood: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, append: Boolean) {
+        // Handle the logic for endless scrolling:
+        // If appending the existing list, set the offset from where to load
+        var newOffset = offset
+        if (append) newOffset += (count + loadedUntil)
+
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getSongsByMood(mood, year, length, ratingMin, ratingMax, count, newOffset)
             currentListIsSortable = false
             updateList(musicDirectory, append)
 

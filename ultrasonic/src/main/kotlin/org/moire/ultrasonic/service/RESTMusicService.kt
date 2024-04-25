@@ -514,8 +514,31 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getSongsByGenre(genre: String, count: Int, offset: Int): MusicDirectory {
-        val response = API.getSongsByGenre(genre, count, offset, null).execute().throwOnFailure()
+    override fun getSongsByGenre(
+        genre: String,
+        year: Int?,
+        length: String?,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int): MusicDirectory {
+        val response = API.getSongsByGenre(genre, year, length, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
+
+        return result
+    }
+    @Throws(Exception::class)
+    override fun getSongsByMood(
+        mood: String,
+        year: Int?,
+        length: String?,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int): MusicDirectory {
+        val response = API.getSongsByGenre(mood, year, length, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
