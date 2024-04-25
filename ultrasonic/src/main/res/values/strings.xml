@@ -115,6 +115,7 @@
     <string name="main.albums_title">Albums</string>
     <string name="main.artists_title">Artists</string>
     <string name="main.genres_title">Genres</string>
+    <string name="main.moods_title">Moods</string>
     <string name="main.offline">Offline</string>
     <string name="main.setup_server">%s - Set up Server</string>
     <string name="main.songs_random">Random</string>
@@ -152,6 +153,7 @@
     <string name="select_artist.all_folders">All Folders</string>
     <string name="select_artist.folder">Select Folder</string>
     <string name="select_genre.empty">No genres found</string>
+    <string name="select_mood.empty">No moods found</string>
     <string name="select_playlist.empty">No saved playlists on server</string>
     <string name="settings.appearance_title">Appearance</string>
     <string name="settings.increment_time_0">Disabled</string>

@@ -16,6 +16,7 @@ import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lyrics
+import org.moire.ultrasonic.domain.Mood
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.MusicFolder
 import org.moire.ultrasonic.domain.Playlist
@@ -36,6 +37,9 @@ interface MusicService {
 
     @Throws(Exception::class)
     fun getGenres(refresh: Boolean): List<Genre>
+
+    @Throws(Exception::class)
+    fun getMoods(refresh: Boolean): List<Mood>
 
     @Throws(Exception::class)
     fun star(id: String?, albumId: String? = null, artistId: String? = null)

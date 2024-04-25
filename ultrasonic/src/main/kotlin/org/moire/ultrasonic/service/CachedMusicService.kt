@@ -22,6 +22,7 @@ import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lyrics
+import org.moire.ultrasonic.domain.Mood
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.MusicFolder
 import org.moire.ultrasonic.domain.Playlist
@@ -50,6 +51,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     private val cachedPodcastsChannels =
         TimeLimitedCache<List<PodcastsChannel>?>(3600, TimeUnit.SECONDS)
     private val cachedGenres = TimeLimitedCache<List<Genre>>(10 * 3600, TimeUnit.SECONDS)
+    private val cachedMoods = TimeLimitedCache<List<Mood>>(10 * 3600, TimeUnit.SECONDS)
 
     // New Room Database
     private var cachedArtists = metaDatabase.artistDao()
@@ -407,6 +409,28 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         sorted.sortWith { genre, genre2 ->
             genre.name.compareTo(
                 genre2.name,
+                ignoreCase = true
+            )
+        }
+        return sorted
+    }
+
+    @Throws(Exception::class)
+    override fun getMoods(refresh: Boolean): List<Mood> {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedMoods.clear()
+        }
+        var result = cachedMoods.get()
+        if (result == null) {
+            result = musicService.getMoods(refresh)
+            cachedMoods.set(result)
+        }
+
+        val sorted = result.toMutableList()
+        sorted.sortWith { mood, mood2 ->
+            mood.name.compareTo(
+                mood2.name,
                 ignoreCase = true
             )
         }

@@ -30,6 +30,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.fragment.legacy.SelectGenreFragment
+import org.moire.ultrasonic.fragment.legacy.SelectMoodFragment
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.view.EMPTY_CAPABILITIES
@@ -164,7 +165,7 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
     override fun getItemCount(): Int {
         // Hide Genre tab when offline
-        return if (ActiveServerProvider.isOffline()) 3 else 4
+        return if (ActiveServerProvider.isOffline()) 3 else 5
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -177,14 +178,16 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
                 size = Settings.maxAlbums
             )
             2 -> NavigationGraphDirections.toTrackCollection()
-            else -> NavigationGraphDirections.toGenreList()
+            3 -> NavigationGraphDirections.toGenreList()
+            else -> NavigationGraphDirections.toMoodList()
         }
 
         val fragment = when (position) {
             0 -> ArtistListFragment()
             1 -> AlbumListFragment(layoutType)
             2 -> TrackCollectionFragment(SortOrder.RANDOM)
-            else -> SelectGenreFragment()
+            3 -> SelectGenreFragment()
+            else -> SelectMoodFragment()
         }
 
         fragmentMap[position] = SoftReference(fragment)
@@ -206,6 +209,7 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
             1 -> context.getString(R.string.main_albums_title)
             2 -> context.getString(R.string.main_songs_title)
             3 -> context.getString(R.string.main_genres_title)
+            4 -> context.getString(R.string.main_moods_title)
             else -> "Unknown"
         }
     }

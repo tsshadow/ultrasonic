@@ -27,6 +27,7 @@ import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lyrics
+import org.moire.ultrasonic.domain.Mood
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.MusicFolder
 import org.moire.ultrasonic.domain.Playlist
@@ -511,6 +512,12 @@ open class RESTMusicService(
         val response = API.getGenres().execute().throwOnFailure()
 
         return response.body()!!.genresList.toDomainEntityList()
+    }
+    @Throws(Exception::class)
+    override fun getMoods(refresh: Boolean): List<Mood> {
+        val response = API.getMoods().execute().throwOnFailure()
+
+        return response.body()!!.moodsList.toDomainEntityList()
     }
 
     @Throws(Exception::class)

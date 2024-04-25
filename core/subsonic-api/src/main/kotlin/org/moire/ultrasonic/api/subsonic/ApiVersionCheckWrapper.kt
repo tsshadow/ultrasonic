@@ -38,6 +38,7 @@ import org.moire.ultrasonic.api.subsonic.response.GetStarredResponse
 import org.moire.ultrasonic.api.subsonic.response.GetStarredTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.GetUserResponse
 import org.moire.ultrasonic.api.subsonic.response.JukeboxResponse
+import org.moire.ultrasonic.api.subsonic.response.MoodsResponse
 import org.moire.ultrasonic.api.subsonic.response.SearchThreeResponse
 import org.moire.ultrasonic.api.subsonic.response.SearchTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.SharesResponse
@@ -293,6 +294,10 @@ internal class ApiVersionCheckWrapper(
     override fun getGenres(): Call<GenresResponse> {
         checkVersion(V1_9_0)
         return api.getGenres()
+    }
+    override fun getMoods(): Call<MoodsResponse> {
+        checkVersion(V1_9_0)
+        return api.getMoods()
     }
 
     override fun getSongsByGenre(

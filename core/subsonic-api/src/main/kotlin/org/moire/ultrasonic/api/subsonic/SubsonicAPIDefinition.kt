@@ -31,6 +31,7 @@ import org.moire.ultrasonic.api.subsonic.response.GetStarredTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.GetUserResponse
 import org.moire.ultrasonic.api.subsonic.response.JukeboxResponse
 import org.moire.ultrasonic.api.subsonic.response.LicenseResponse
+import org.moire.ultrasonic.api.subsonic.response.MoodsResponse
 import org.moire.ultrasonic.api.subsonic.response.MusicFoldersResponse
 import org.moire.ultrasonic.api.subsonic.response.SearchResponse
 import org.moire.ultrasonic.api.subsonic.response.SearchThreeResponse
@@ -285,6 +286,9 @@ interface SubsonicAPIDefinition {
 
     @GET("getGenres.view")
     fun getGenres(): Call<GenresResponse>
+
+    @GET("getMoods.view")
+    fun getMoods(): Call<MoodsResponse>
 
     @GET("getSongsByGenre.view")
     fun getSongsByGenre(
