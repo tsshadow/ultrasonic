@@ -30,7 +30,8 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.fragment.legacy.SelectGenreFragment
-import org.moire.ultrasonic.fragment.legacy.SelectMoodFragment
+import org.moire.ultrasonic.fragment.tsshadow.LandingPageFragment
+import org.moire.ultrasonic.fragment.tsshadow.SelectMoodFragment
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.view.EMPTY_CAPABILITIES
@@ -172,22 +173,24 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
         Timber.i("Creating new fragment at position: $position")
 
         val action = when (position) {
-            0 -> NavigationGraphDirections.toArtistList()
-            1 -> NavigationGraphDirections.toAlbumList(
+            0 -> NavigationGraphDirections.toLandingPage()
+            1 -> NavigationGraphDirections.toGenreList()
+            2 -> NavigationGraphDirections.toMoodList()
+            3 -> NavigationGraphDirections.toTrackCollection()
+            4 -> NavigationGraphDirections.toAlbumList(
                 AlbumListType.NEWEST,
                 size = Settings.maxAlbums
             )
-            2 -> NavigationGraphDirections.toTrackCollection()
-            3 -> NavigationGraphDirections.toGenreList()
-            else -> NavigationGraphDirections.toMoodList()
+            else -> NavigationGraphDirections.toArtistList()
         }
 
         val fragment = when (position) {
-            0 -> ArtistListFragment()
-            1 -> AlbumListFragment(layoutType)
-            2 -> TrackCollectionFragment(SortOrder.RANDOM)
-            3 -> SelectGenreFragment()
-            else -> SelectMoodFragment()
+            0 -> LandingPageFragment()
+            1 -> SelectGenreFragment()
+            2 -> SelectMoodFragment()
+            3 -> TrackCollectionFragment(SortOrder.RANDOM)
+            4 -> AlbumListFragment(layoutType)
+            else -> ArtistListFragment()
         }
 
         fragmentMap[position] = SoftReference(fragment)
@@ -205,11 +208,12 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
     fun getTitleForFragment(pos: Int, context: Context): String {
         return when (pos) {
-            0 -> context.getString(R.string.main_artists_title)
-            1 -> context.getString(R.string.main_albums_title)
-            2 -> context.getString(R.string.main_songs_title)
-            3 -> context.getString(R.string.main_genres_title)
-            4 -> context.getString(R.string.main_moods_title)
+            0 -> context.getString(R.string.main_landing_page_title)
+            1 -> context.getString(R.string.main_genres_title)
+            2 -> context.getString(R.string.main_moods_title)
+            3 -> context.getString(R.string.main_songs_title)
+            4 -> context.getString(R.string.main_albums_title)
+            5 -> context.getString(R.string.main_artists_title)
             else -> "Unknown"
         }
     }

@@ -1,11 +1,11 @@
 /*
  * SelectMoodFragment.kt
- * Copyright (C) 2009-2023 Ultrasonic developers
+ * Copyright (C) 2009-2024 Ultrasonic developers
  *
  * Distributed under terms of the GNU GPLv3 license.
  */
 
-package org.moire.ultrasonic.fragment.legacy
+package org.moire.ultrasonic.fragment.tsshadow
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -58,7 +58,7 @@ class SelectMoodFragment : Fragment(), RefreshableFragment {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.select_mood, container, false)
+        return inflater.inflate(R.layout.tsshadow_select_mood, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -97,7 +97,7 @@ class SelectMoodFragment : Fragment(), RefreshableFragment {
         val yearAdapter = ArrayAdapter<Int>(requireContext(),android.R.layout.simple_spinner_item, years)
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        var lengths = arrayOf("short","long");
+        var lengths = arrayOf("","short","long");
         val lengthAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_item, lengths)
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 

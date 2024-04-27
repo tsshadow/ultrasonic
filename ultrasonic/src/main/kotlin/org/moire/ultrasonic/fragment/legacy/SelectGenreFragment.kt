@@ -97,7 +97,7 @@ class SelectGenreFragment : Fragment(), RefreshableFragment {
         val yearAdapter = ArrayAdapter<Int>(requireContext(),android.R.layout.simple_spinner_item, years)
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        var lengths = arrayOf("short","long");
+        var lengths = arrayOf("","short","long");
         val lengthAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_item, lengths)
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 

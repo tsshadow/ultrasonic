@@ -26,6 +26,9 @@
         android:id="@+id/toMoodList"
         app:destination="@id/selectMoodFragment" />
     <action
+        android:id="@+id/toLandingPage"
+        app:destination="@id/landingPageFragment" />
+    <action
         android:id="@+id/toSearchFragment"
         app:destination="@id/searchFragment" />
     <action
@@ -274,7 +277,11 @@
     </fragment>
     <fragment
         android:id="@+id/selectMoodFragment"
-        android:name="org.moire.ultrasonic.fragment.legacy.selectMoodFragment">
+        android:name="org.moire.ultrasonic.fragment.tsshadow.selectMoodFragment">
+    </fragment>
+    <fragment
+        android:id="@+id/landingPageFragment"
+        android:name="org.moire.ultrasonic.fragment.tsshadow.LandingPageFragment">
     </fragment>
     <fragment
         android:id="@+id/playerFragment"
