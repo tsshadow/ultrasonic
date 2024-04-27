@@ -545,7 +545,7 @@ open class RESTMusicService(
         ratingMax: Int?,
         count: Int,
         offset: Int): MusicDirectory {
-        val response = API.getSongsByGenre(mood, year, length, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+        val response = API.getSongsByMood(mood, year, length, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))

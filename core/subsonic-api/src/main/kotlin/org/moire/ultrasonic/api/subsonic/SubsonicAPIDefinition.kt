@@ -26,6 +26,7 @@ import org.moire.ultrasonic.api.subsonic.response.GetPlaylistsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetPodcastsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetRandomSongsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetSongsByGenreResponse
+import org.moire.ultrasonic.api.subsonic.response.GetSongsByMoodResponse
 import org.moire.ultrasonic.api.subsonic.response.GetStarredResponse
 import org.moire.ultrasonic.api.subsonic.response.GetStarredTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.GetUserResponse
@@ -294,13 +295,24 @@ interface SubsonicAPIDefinition {
     fun getSongsByGenre(
         @Query("genre") genre: String,
         @Query("year") year: Int? = null,
-        @Query("count") length: String? = null,
-        @Query("count") ratingMin: Int? = null,
-        @Query("count") ratingMax: Int? = null,
+        @Query("length") length: String? = null,
+        @Query("ratingMin") ratingMin: Int? = null,
+        @Query("ratingMax") ratingMax: Int? = null,
         @Query("count") count: Int = 10,
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByGenreResponse>
+    @GET("getSongsByMood.view")
+    fun getSongsByMood(
+        @Query("mood") mood: String,
+        @Query("year") year: Int? = null,
+        @Query("length") length: String? = null,
+        @Query("ratingMin") ratingMin: Int? = null,
+        @Query("ratingMax") ratingMax: Int? = null,
+        @Query("count") count: Int = 10,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByMoodResponse>
 
     @GET("getUser.view")
     fun getUser(@Query("username") username: String): Call<GetUserResponse>

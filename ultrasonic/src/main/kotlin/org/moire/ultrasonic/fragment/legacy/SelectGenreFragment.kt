@@ -80,7 +80,7 @@ class SelectGenreFragment : Fragment(), RefreshableFragment {
                 genreName = genre.name,
                 size = maxSongs,
                 offset = 0,
-                year = yearSpinner?.getSelectedItem() as Int,
+                year = yearSpinner?.getSelectedItem() as String,
                 length = lengthSpinner?.getSelectedItem() as String?,
                 ratingMin = ratingMin?.getSelectedItem() as Int,
                 ratingMax = ratingMax?.getSelectedItem() as Int,
@@ -93,8 +93,8 @@ class SelectGenreFragment : Fragment(), RefreshableFragment {
         ratingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
 
-        var years = arrayOf(0,2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999, 1998, 1997, 1996, 1995, 1994, 1993, 1992);
-        val yearAdapter = ArrayAdapter<Int>(requireContext(),android.R.layout.simple_spinner_item, years)
+        var years = arrayOf("All", "2024", "2023", "2022", "2021", "2020", "2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002", "2001", "2000", "1999", "1998", "1997", "1996", "1995", "1994", "1993", "1992");
+        val yearAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_item, years)
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         var lengths = arrayOf("","short","long");

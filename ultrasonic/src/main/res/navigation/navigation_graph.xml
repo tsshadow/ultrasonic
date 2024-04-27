@@ -124,8 +124,9 @@
             app:nullable="true" />
         <argument
             android:name="year"
-            android:defaultValue="0"
-            app:argType="integer" />
+            android:defaultValue=""
+            app:argType="string"
+            app:nullable="true" />
         <argument
             android:name="length"
             android:defaultValue="@null"

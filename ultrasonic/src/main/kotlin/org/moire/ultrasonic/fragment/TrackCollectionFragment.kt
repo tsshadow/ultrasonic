@@ -553,10 +553,10 @@ open class TrackCollectionFragment(
                 listModel.getShare(shareId)
             } else if (genreName != null) {
                 setTitle(genreName)
-                listModel.getSongsForGenre(genreName, year, length, ratingMin, ratingMax, size, offset, append)
+                listModel.getSongsForGenre(genreName, year?.toIntOrNull(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
             } else if (moodName != null) {
                 setTitle(moodName)
-                listModel.getSongsForMood(moodName, year, length, ratingMin, ratingMax, size, offset, append)
+                listModel.getSongsForMood(moodName,year?.toIntOrNull() , if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
             } else if (getStarredTracks) {
                 setTitle(getString(R.string.main_songs_starred))
                 listModel.getStarred()
