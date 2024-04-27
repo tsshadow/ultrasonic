@@ -151,6 +151,30 @@ class ServerSettingsModel(
         return demo.index
     }
 
+    fun addPersonalServer(): Int {
+        val lms = LMS_CONFIG.copy()
+
+        runBlocking {
+            lms.index = (repository.count() ?: 0) + 1
+            repository.insert(lms)
+            Timber.d("Added LMS server")
+        }
+
+        return lms.index
+    }
+
+    fun addPersonalAlphaServer(): Int {
+        val lmsAlpha = LMS_ALPHA_CONFIG.copy()
+
+        runBlocking {
+            lmsAlpha.index = (repository.count() ?: 0) + 1
+            repository.insert(lmsAlpha)
+            Timber.d("Added LMS Alpha server")
+        }
+
+        return lmsAlpha.index
+    }
+
     /**
      * Checks if there are any missing indexes in the ServerSetting list
      * For displaying the Server Settings in a ListView, it is mandatory that their indexes
@@ -205,6 +229,41 @@ class ServerSettingsModel(
             bookmarkSupport = true,
             shareSupport = true,
             podcastSupport = true
+        )
+        private val LMS_CONFIG = ServerSetting(
+            id = 0,
+            index = 0,
+            name = UApp.applicationContext().getString(R.string.server_menu_lms),
+            url = "https://lms.teunschriks.nl",
+            userName = "teun",
+            password = "******",
+            jukeboxByDefault = false,
+            allowSelfSignedCertificate = true,
+            forcePlainTextPassword = true,
+            musicFolderId = null,
+            minimumApiVersion = "1.13.0",
+            chatSupport = false,
+            bookmarkSupport = false,
+            shareSupport = true,
+            podcastSupport = false
+        )
+
+        private val LMS_ALPHA_CONFIG = ServerSetting(
+            id = 0,
+            index = 0,
+            name = UApp.applicationContext().getString(R.string.server_menu_lmsalpha),
+            url = "https://lms-alpha.teunschriks.nl",
+            userName = "teun",
+            password = "******",
+            jukeboxByDefault = false,
+            allowSelfSignedCertificate = true,
+            forcePlainTextPassword = true,
+            musicFolderId = null,
+            minimumApiVersion = "1.13.0",
+            chatSupport = false,
+            bookmarkSupport = true,
+            shareSupport = false,
+            podcastSupport = false
         )
     }
 }

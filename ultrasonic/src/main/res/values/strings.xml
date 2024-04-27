@@ -391,6 +391,8 @@
     <string name="server_editor.advanced">Advanced settings</string>
     <string name="server_editor.disabled_feature">One or more features were disabled because the server doesn\'t support them.\nYou can run this test again anytime.</string>
     <string name="server_menu.demo">Demo Server</string>
+    <string name="server_menu.lms">LMS</string>
+    <string name="server_menu.lmsalpha">LMS Alpha</string>
 
     <string name="about.webpage">Visit webpage</string>
     <string name="about.report">Report a bug</string>

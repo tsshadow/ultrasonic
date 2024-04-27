@@ -552,8 +552,10 @@ class NavigationActivity : ScopeActivity() {
                     UApp.instance!!.setupDialogDisplayed = true
                     // Add the demo server
                     val activeServerProvider: ActiveServerProvider by inject()
-                    val demoIndex = serverSettingsModel.addDemoServer()
-                    activeServerProvider.setActiveServerByIndex(demoIndex)
+                    serverSettingsModel.addDemoServer()
+                    val lmsIndex = serverSettingsModel.addPersonalServer()
+                    serverSettingsModel.addPersonalAlphaServer()
+                    activeServerProvider.setActiveServerByIndex(lmsIndex)
                     findNavController(R.id.nav_host_fragment).navigate(R.id.mainFragment)
                     dialog.dismiss()
                 }.show()
