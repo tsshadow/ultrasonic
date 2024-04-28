@@ -43,18 +43,24 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
+import org.moire.ultrasonic.api.subsonic.models.Mood
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.RatingUpdate
+import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
+import org.moire.ultrasonic.util.StringIntSetting
+import org.moire.ultrasonic.util.TimeLimitedCache
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.buildMediaItem
 import org.moire.ultrasonic.util.toMediaItem
 import org.moire.ultrasonic.util.toTrack
+import org.moire.ultrasonic.view.GenreAdapter
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 private const val MEDIA_ROOT_ID = "MEDIA_ROOT_ID"
 private const val MEDIA_ALBUM_ID = "MEDIA_ALBUM_ID"
@@ -86,6 +92,10 @@ private const val MEDIA_BOOKMARK_ITEM = "MEDIA_BOOKMARK_ITEM"
 private const val MEDIA_PODCAST_ITEM = "MEDIA_PODCAST_ITEM"
 private const val MEDIA_PODCAST_EPISODE_ITEM = "MEDIA_PODCAST_EPISODE_ITEM"
 private const val MEDIA_SEARCH_SONG_ITEM = "MEDIA_SEARCH_SONG_ITEM"
+private const val MEDIA_GENRES = "MEDIA_GENRES"
+private const val MEDIA_GENRE = "MEDIA_GENRE"
+private const val MEDIA_MOODS = "MEDIA_MOODS"
+private const val MEDIA_MOOD = "MEDIA_MOOD"
 
 // Currently the display limit for long lists is 100 items
 private const val DISPLAY_LIMIT = 100
@@ -621,6 +631,10 @@ class MediaLibrarySessionCallback :
             MEDIA_ALBUM_RANDOM_ID -> getAlbums(AlbumListType.RANDOM)
             MEDIA_ALBUM_STARRED_ID -> getAlbums(AlbumListType.STARRED)
             MEDIA_SONG_RANDOM_ID -> getRandomSongs()
+            MEDIA_GENRES -> getGenres()
+            MEDIA_GENRE -> getGenre(parentIdParts[1])
+            MEDIA_MOODS -> getMoods()
+            MEDIA_MOOD -> getMood(parentIdParts[1])
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
             MEDIA_SHARE_ID -> getShares()
             MEDIA_BOOKMARK_ID -> getBookmarks()
@@ -800,6 +814,23 @@ class MediaLibrarySessionCallback :
 
     private fun getLibrary(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        // Custom
+        mediaItems.add(
+            R.string.main_genres_title,
+            MEDIA_GENRES,
+            R.string.main_tsshadow_title,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
+        )
+
+        mediaItems.add(
+            R.string.main_moods_title,
+            MEDIA_MOODS,
+            R.string.main_tsshadow_title,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
+        )
 
         // Songs
         mediaItems.add(
@@ -1410,6 +1441,105 @@ class MediaLibrarySessionCallback :
         return null
     }
 
+    private fun getGenres(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        return mainScope.future {
+            val genres = serviceScope.future {
+                callWithErrorHandling { musicService.getGenres(true) }
+            }.await()
+
+            genres?.forEach {
+                mediaItems.add(
+                    it.name,
+                    MEDIA_GENRE + "|" + it.name,
+                    R.string.main_tsshadow_title,
+                    isBrowsable = true,
+                    mediaType = MEDIA_TYPE_PLAYLIST);
+
+            }
+            return@future LibraryResult.ofItemList(mediaItems, null)
+        }
+    }
+    private fun getGenre(genre: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        return mainScope.future {
+            val songs = serviceScope.future {
+                callWithErrorHandling { musicService.getSongsByGenre(genre, null, null, null, null, 500, 0) }
+            }.await()
+
+            if (songs != null) {
+
+                if (songs.size > 1) {
+                    mediaItems.addPlayAllItem(listOf(MEDIA_SONG_RANDOM_ID).joinToString("|"))
+                }
+
+                // TODO: Paging is not implemented for songs, is it necessary at all?
+                val items = songs.getTracks()
+                randomSongsCache = items
+                items.map { song ->
+                    mediaItems.add(
+                        song.toMediaItem(
+                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
+                        )
+                    )
+                }
+            }
+            return@future LibraryResult.ofItemList(mediaItems, null)
+        }
+    }
+
+    private fun getMoods(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        return mainScope.future {
+            val moods = serviceScope.future {
+                callWithErrorHandling { musicService.getMoods(true) }
+            }.await()
+
+            moods?.forEach {
+                mediaItems.add(
+                    it.name,
+                    MEDIA_MOOD + "|" + it.name,
+                    R.string.main_tsshadow_title,
+                    isBrowsable = true,
+                    mediaType = MEDIA_TYPE_PLAYLIST);
+
+            }
+            return@future LibraryResult.ofItemList(mediaItems, null)
+        }
+    }
+
+    private fun getMood(mood: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        return mainScope.future {
+            val songs = serviceScope.future {
+                callWithErrorHandling { musicService.getSongsByMood(mood, null, null, null, null, 500, 0) }
+            }.await()
+
+            if (songs != null) {
+
+                if (songs.size > 1) {
+                    mediaItems.addPlayAllItem(listOf(MEDIA_SONG_RANDOM_ID).joinToString("|"))
+                }
+
+                // TODO: Paging is not implemented for songs, is it necessary at all?
+                val items = songs.getTracks()
+                randomSongsCache = items
+                items.map { song ->
+                    mediaItems.add(
+                        song.toMediaItem(
+                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
+                        )
+                    )
+                }
+            }
+            return@future LibraryResult.ofItemList(mediaItems, null)
+        }
+    }
+
     private fun playRandomSong(songId: String): List<Track>? {
         // If there is no cache, we can't play the selected song.
         if (randomSongsCache != null) {
@@ -1469,6 +1599,37 @@ class MediaLibrarySessionCallback :
 
         val mediaItem = buildMediaItem(
             applicationContext.getString(resId),
+            mediaId,
+            isPlayable = !isBrowsable,
+            isBrowsable = isBrowsable,
+            imageUri = if (icon != null) {
+                Util.getUriToDrawable(applicationContext, icon)
+            } else {
+                null
+            },
+            group = if (groupNameId != null) {
+                applicationContext.getString(groupNameId)
+            } else {
+                null
+            },
+            mediaType = mediaType
+        )
+
+        this.add(mediaItem)
+    }
+    @Suppress("LongParameterList")
+    private fun MutableList<MediaItem>.add(
+        resId: String,
+        mediaId: String,
+        groupNameId: Int?,
+        isBrowsable: Boolean = true,
+        mediaType: Int = MEDIA_TYPE_FOLDER_MIXED,
+        icon: Int? = null
+    ){
+        val applicationContext = UApp.applicationContext()
+
+        val mediaItem = buildMediaItem(
+            resId,
             mediaId,
             isPlayable = !isBrowsable,
             isBrowsable = isBrowsable,
