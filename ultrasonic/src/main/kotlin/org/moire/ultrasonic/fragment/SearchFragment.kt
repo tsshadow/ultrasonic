@@ -224,7 +224,7 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinScopeComponent, Re
         mediaPlayerManager.addToPlaylist(
             listOf(song),
             autoPlay = false,
-            shuffle = false,
+            shuffle = true,
             insertionMode = MediaPlayerManager.InsertionMode.APPEND
         )
         mediaPlayerManager.play(mediaPlayerManager.mediaItemCount - 1)
