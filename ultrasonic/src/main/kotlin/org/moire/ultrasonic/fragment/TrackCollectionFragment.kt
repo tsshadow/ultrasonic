@@ -313,7 +313,7 @@ open class TrackCollectionFragment(
         }
 
     private fun playAll(
-        shuffle: Boolean = false,
+        shuffle: Boolean = true,
         insertionMode: MediaPlayerManager.InsertionMode = MediaPlayerManager.InsertionMode.CLEAR
     ) {
         var hasSubFolders = false
