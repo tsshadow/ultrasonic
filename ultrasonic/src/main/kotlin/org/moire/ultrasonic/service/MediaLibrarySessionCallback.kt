@@ -43,25 +43,19 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.api.subsonic.models.Mood
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.RatingUpdate
-import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
-import org.moire.ultrasonic.util.StringIntSetting
-import org.moire.ultrasonic.util.TimeLimitedCache
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.buildMediaItem
 import org.moire.ultrasonic.util.toMediaItem
 import org.moire.ultrasonic.util.toTrack
-import org.moire.ultrasonic.view.GenreAdapter
 import timber.log.Timber
 import java.util.Calendar
-import java.util.concurrent.TimeUnit
 
 private const val MEDIA_ROOT_ID = "MEDIA_ROOT_ID"
 private const val MEDIA_ALBUM_ID = "MEDIA_ALBUM_ID"
@@ -615,7 +609,7 @@ class MediaLibrarySessionCallback :
         parentId: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("AutoMediaBrowserService onLoadChildren called. ParentId: %s", parentId)
-        val year = Calendar.getInstance().get(Calendar.YEAR);
+        val year = Calendar.getInstance().get(Calendar.YEAR)
         val parentIdParts = parentId.split('|')
 
         return when (parentIdParts.first()) {
@@ -1480,7 +1474,7 @@ class MediaLibrarySessionCallback :
                     mediaIdPrefix + "|" + it.name,
                     R.string.main_genres_title,
                     isBrowsable = true,
-                    mediaType = MEDIA_TYPE_PLAYLIST);
+                    mediaType = MEDIA_TYPE_PLAYLIST)
 
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
@@ -1530,7 +1524,7 @@ class MediaLibrarySessionCallback :
                     mediaIdPrefix + "|" + it.name,
                     R.string.main_moods_title,
                     isBrowsable = true,
-                    mediaType = MEDIA_TYPE_PLAYLIST);
+                    mediaType = MEDIA_TYPE_PLAYLIST)
 
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
