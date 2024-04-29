@@ -115,10 +115,12 @@
     <string name="main.albums_title">Albums</string>
     <string name="main.artists_title">Artists</string>
     <string name="main.genres_title">Genres</string>
-    <string name="main.landing_page_title">Home</string>
     <string name="main.moods_title">Moods</string>
-    <string name="main.title_all">All</string>
-    <string name="main.title_last_year">Last Year</string>
+    <string name="main.title_all_songs">All (songs)</string>
+    <string name="main.title_all_livesets">All (livesets)</string>
+    <string name="main.title_all_songs_last_year">This year (songs)</string>
+    <string name="main.title_all_livesets_last_year">This Year (livesets)</string>
+    <string name="main.landing_page_title">Home</string>
     <string name="main.offline">Offline</string>
     <string name="main.setup_server">%s - Set up Server</string>
     <string name="main.songs_random">Random</string>
