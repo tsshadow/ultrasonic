@@ -649,7 +649,7 @@ class MediaLibrarySessionCallback :
             MEDIA_GENRE_SONGS -> getGenre(parentIdParts[1], null, "short")
             MEDIA_GENRES_SONGS_LAST_YEAR -> getGenres(year, "short")
             MEDIA_GENRE_SONGS_LAST_YEAR -> getGenre(parentIdParts[1],year, "short")
-            // Genre -> Livesets
+            // Genre -> livesets
             MEDIA_GENRES_LIVESETS -> getGenres(null, "long")
             MEDIA_GENRE_LIVESETS -> getGenre(parentIdParts[1], null, "long")
             MEDIA_GENRES_LIVESETS_LAST_YEAR -> getGenres(year, "long")
@@ -659,11 +659,11 @@ class MediaLibrarySessionCallback :
             MEDIA_MOOD_SONGS -> getMood(parentIdParts[1],null, "short")
             MEDIA_MOODS_SONGS_LAST_YEAR -> getMoods(year, "short")
             MEDIA_MOOD_SONGS_LAST_YEAR -> getMood(parentIdParts[1], year, "short")
-            // Mood -> liveset
-            MEDIA_MOODS_SONGS -> getMoods(null, "long")
-            MEDIA_MOOD_SONGS -> getMood(parentIdParts[1],null, "long")
-            MEDIA_MOODS_SONGS_LAST_YEAR -> getMoods(year, "long")
-            MEDIA_MOOD_SONGS_LAST_YEAR -> getMood(parentIdParts[1], year, "long")
+            // Mood -> livesets
+            MEDIA_MOODS_LIVESETS -> getMoods(null, "long")
+            MEDIA_MOOD_LIVESETS -> getMood(parentIdParts[1],null, "long")
+            MEDIA_MOODS_LIVESETS_LAST_YEAR -> getMoods(year, "long")
+            MEDIA_MOOD_LIVESETS_LAST_YEAR -> getMood(parentIdParts[1], year, "long")
 
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
             MEDIA_SHARE_ID -> getShares()
@@ -1522,20 +1522,17 @@ class MediaLibrarySessionCallback :
                 callWithErrorHandling { musicService.getGenres(true) }
             }.await()
 
-            var mediaIdPrefix: String? = null;
-            if (year != null) {
+            val mediaIdPrefix = if (year != null) {
                 if (length == "short") {
-                    mediaIdPrefix = MEDIA_GENRE_SONGS
+                    MEDIA_GENRE_SONGS
                 } else {
-                    mediaIdPrefix = MEDIA_GENRE_LIVESETS
+                    MEDIA_GENRE_LIVESETS
                 }
-            }
-            else
-            {
+            } else {
                 if (length == "short") {
-                    mediaIdPrefix = MEDIA_GENRE_SONGS_LAST_YEAR
+                    MEDIA_GENRE_SONGS_LAST_YEAR
                 } else {
-                    mediaIdPrefix = MEDIA_GENRE_LIVESETS_LAST_YEAR
+                    MEDIA_GENRE_LIVESETS_LAST_YEAR
                 }
             }
 
@@ -1589,20 +1586,17 @@ class MediaLibrarySessionCallback :
                 callWithErrorHandling { musicService.getMoods(true) }
             }.await()
 
-            var mediaIdPrefix: String? = null;
-            if (year != null) {
+            val mediaIdPrefix = if (year != null) {
                 if (length == "short") {
-                    mediaIdPrefix = MEDIA_MOOD_SONGS
+                    MEDIA_MOOD_SONGS
                 } else {
-                    mediaIdPrefix = MEDIA_MOOD_LIVESETS
+                    MEDIA_MOOD_LIVESETS
                 }
-            }
-            else
-            {
+            } else {
                 if (length == "short") {
-                    mediaIdPrefix = MEDIA_MOOD_SONGS_LAST_YEAR
+                    MEDIA_MOOD_SONGS_LAST_YEAR
                 } else {
-                    mediaIdPrefix = MEDIA_MOOD_LIVESETS_LAST_YEAR
+                    MEDIA_MOOD_LIVESETS_LAST_YEAR
                 }
             }
             moods?.forEach {
