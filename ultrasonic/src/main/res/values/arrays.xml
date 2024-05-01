@@ -23,6 +23,8 @@
         <item>100</item>
         <item>500</item>
         <item>1000</item>
+        <item>10000</item>
+        <item>100000</item>
         <item>-1</item>
     </string-array>
     <string-array name="preloadCountNames" translatable="false">
@@ -35,6 +37,8 @@
         <item>@string/settings.preload_100</item>
         <item>@string/settings.preload_500</item>
         <item>@string/settings.preload_1000</item>
+        <item>@string/settings.preload_10000</item>
+        <item>@string/settings.preload_100000</item>
         <item>@string/settings.preload_unlimited</item>
     </string-array>
     <string-array name="cacheSizeValues" translatable="false">
@@ -206,8 +210,9 @@
         <item>100</item>
         <item>250</item>
         <item>500</item>
-        <item>5000</item>
-        <item>50000</item>
+        <item>1000</item>
+        <item>10000</item>
+        <item>100000</item>
     </string-array>
     <string-array name="searchNames" translatable="false">
         <item>@string/settings.search_1</item>
@@ -224,6 +229,9 @@
         <item>@string/settings.search_100</item>
         <item>@string/settings.search_250</item>
         <item>@string/settings.search_500</item>
+        <item>@string/settings.search_1000</item>
+        <item>@string/settings.search_10000</item>
+        <item>@string/settings.search_100000</item>
     </string-array>
     <string-array name="shareExpirationNames" translatable="false">
         <item>@string/settings.share_minutes</item>

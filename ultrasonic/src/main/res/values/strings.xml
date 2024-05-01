@@ -272,6 +272,8 @@
     <string name="settings.preload_100">100 songs</string>
     <string name="settings.preload_500">500 songs</string>
     <string name="settings.preload_1000">1000 songs</string>
+    <string name="settings.preload_10000">10k songs</string>
+    <string name="settings.preload_100000">100k songs</string>
     <string name="settings.preload_unlimited">Unlimited</string>
     <string name="settings.scrobble_summary">Remember to set up your user and password in the Scrobble service(s) on the server</string>
     <string name="settings.scrobble_title">Scrobble my plays</string>
@@ -288,6 +290,9 @@
     <string name="settings.search_5">5</string>
     <string name="settings.search_50">50</string>
     <string name="settings.search_500">500</string>
+    <string name="settings.search_1000">1000</string>
+    <string name="settings.search_10000">10k</string>
+    <string name="settings.search_100000">100k</string>
     <string name="settings.search_75">75</string>
     <string name="settings.search_history_cleared">Search history cleared</string>
     <string name="settings.search_title">Search Settings</string>
