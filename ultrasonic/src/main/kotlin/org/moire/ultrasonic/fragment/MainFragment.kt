@@ -32,6 +32,7 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.fragment.legacy.SelectGenreFragment
 import org.moire.ultrasonic.fragment.tsshadow.LandingPageFragment
 import org.moire.ultrasonic.fragment.tsshadow.SelectMoodFragment
+import org.moire.ultrasonic.fragment.tsshadow.SelectYearFragment
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.view.EMPTY_CAPABILITIES
@@ -166,7 +167,7 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
     override fun getItemCount(): Int {
         // Hide Genre tab when offline
-        return if (ActiveServerProvider.isOffline()) 3 else 5
+        return if (ActiveServerProvider.isOffline()) 3 else 7
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -176,8 +177,9 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
             0 -> NavigationGraphDirections.toLandingPage()
             1 -> NavigationGraphDirections.toGenreList()
             2 -> NavigationGraphDirections.toMoodList()
-            3 -> NavigationGraphDirections.toTrackCollection()
-            4 -> NavigationGraphDirections.toAlbumList(
+            3 -> NavigationGraphDirections.toYearList()
+            4 -> NavigationGraphDirections.toTrackCollection()
+            5 -> NavigationGraphDirections.toAlbumList(
                 AlbumListType.NEWEST,
                 size = Settings.maxAlbums
             )
@@ -188,8 +190,9 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
             0 -> LandingPageFragment()
             1 -> SelectGenreFragment()
             2 -> SelectMoodFragment()
-            3 -> TrackCollectionFragment(SortOrder.RANDOM)
-            4 -> AlbumListFragment(layoutType)
+            3 -> SelectYearFragment()
+            4 -> TrackCollectionFragment(SortOrder.RANDOM)
+            5 -> AlbumListFragment(layoutType)
             else -> ArtistListFragment()
         }
 
@@ -211,9 +214,10 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
             0 -> context.getString(R.string.main_landing_page_title)
             1 -> context.getString(R.string.main_genres_title)
             2 -> context.getString(R.string.main_moods_title)
-            3 -> context.getString(R.string.main_songs_title)
-            4 -> context.getString(R.string.main_albums_title)
-            5 -> context.getString(R.string.main_artists_title)
+            3 -> context.getString(R.string.main_years_title)
+            4 -> context.getString(R.string.main_songs_title)
+            5 -> context.getString(R.string.main_albums_title)
+            6 -> context.getString(R.string.main_artists_title)
             else -> "Unknown"
         }
     }

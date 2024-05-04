@@ -84,6 +84,23 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
+    suspend fun getSongsForYear(year: Int, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, append: Boolean) {
+        // Handle the logic for endless scrolling:
+        // If appending the existing list, set the offset from where to load
+        var newOffset = offset
+        if (append) newOffset += (count + loadedUntil)
+
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getSongsByYear(year, length, ratingMin, ratingMax, count, newOffset)
+            currentListIsSortable = false
+            updateList(musicDirectory, append)
+
+            // Update current offset
+            loadedUntil = newOffset
+        }
+    }
+
     suspend fun getStarred() {
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()

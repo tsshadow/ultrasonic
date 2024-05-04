@@ -854,7 +854,7 @@ class MediaLibrarySessionCallback :
             mediaType = MEDIA_TYPE_PLAYLIST
         )
         mediaItems.add(
-            R.string.main_title_all_songs_last_year,
+            R.string.main_title_songs_last_year,
             MEDIA_GENRES_SONGS_LAST_YEAR,
             R.string.main_genres_title,
             isBrowsable = true,
@@ -868,7 +868,7 @@ class MediaLibrarySessionCallback :
             mediaType = MEDIA_TYPE_PLAYLIST
         )
         mediaItems.add(
-            R.string.main_title_all_livesets_last_year,
+            R.string.main_title_livesets_last_year,
             MEDIA_GENRES_LIVESETS_LAST_YEAR,
             R.string.main_genres_title,
             isBrowsable = true,
@@ -884,7 +884,7 @@ class MediaLibrarySessionCallback :
             mediaType = MEDIA_TYPE_PLAYLIST
         )
         mediaItems.add(
-            R.string.main_title_all_songs_last_year,
+            R.string.main_title_songs_last_year,
             MEDIA_MOODS_SONGS_LAST_YEAR,
             R.string.main_moods_title,
             isBrowsable = true,
@@ -898,7 +898,7 @@ class MediaLibrarySessionCallback :
             mediaType = MEDIA_TYPE_PLAYLIST
         )
         mediaItems.add(
-            R.string.main_title_all_livesets_last_year,
+            R.string.main_title_livesets_last_year,
             MEDIA_MOODS_LIVESETS_LAST_YEAR,
             R.string.main_moods_title,
             isBrowsable = true,
@@ -1517,12 +1517,13 @@ class MediaLibrarySessionCallback :
     private fun getGenres(year: Int?, length: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
+        Timber.i("getGenres: year=$year length=$length")
         return mainScope.future {
             val genres = serviceScope.future {
                 callWithErrorHandling { musicService.getGenres(true) }
             }.await()
 
-            val mediaIdPrefix = if (year != null) {
+            val mediaIdPrefix = if (year == null) {
                 if (length == "short") {
                     MEDIA_GENRE_SONGS
                 } else {
@@ -1535,6 +1536,7 @@ class MediaLibrarySessionCallback :
                     MEDIA_GENRE_LIVESETS_LAST_YEAR
                 }
             }
+            Timber.i("getGenres: mediaIdPrefix=$mediaIdPrefix $year")
 
 
             genres?.forEach {
@@ -1549,9 +1551,11 @@ class MediaLibrarySessionCallback :
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
     }
+
     private fun getGenre(genre: String, year: Int?, length: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
+        Timber.i("getGenre: genre=$genre year=$year length=$length")
         return mainScope.future {
             val songs = serviceScope.future {
                 callWithErrorHandling { musicService.getSongsByGenre(genre, year, length, null, null, 500, 0) }
@@ -1581,12 +1585,13 @@ class MediaLibrarySessionCallback :
     private fun getMoods(year: Int?, length: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
+        Timber.i("getMoods: year=$year length=$length")
         return mainScope.future {
             val moods = serviceScope.future {
                 callWithErrorHandling { musicService.getMoods(true) }
             }.await()
 
-            val mediaIdPrefix = if (year != null) {
+            val mediaIdPrefix = if (year == null) {
                 if (length == "short") {
                     MEDIA_MOOD_SONGS
                 } else {
@@ -1615,6 +1620,7 @@ class MediaLibrarySessionCallback :
     private fun getMood(mood: String, year: Int?, length: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
+        Timber.i("getMood:  mood=$mood year=$year length=$length")
         return mainScope.future {
             val songs = serviceScope.future {
                 callWithErrorHandling { musicService.getSongsByMood(mood, year, length, null, null, 500, 0) }

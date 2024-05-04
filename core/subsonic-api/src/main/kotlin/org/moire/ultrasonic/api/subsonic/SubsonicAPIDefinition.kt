@@ -27,6 +27,7 @@ import org.moire.ultrasonic.api.subsonic.response.GetPodcastsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetRandomSongsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetSongsByGenreResponse
 import org.moire.ultrasonic.api.subsonic.response.GetSongsByMoodResponse
+import org.moire.ultrasonic.api.subsonic.response.GetSongsByYearResponse
 import org.moire.ultrasonic.api.subsonic.response.GetStarredResponse
 import org.moire.ultrasonic.api.subsonic.response.GetStarredTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.GetUserResponse
@@ -40,6 +41,7 @@ import org.moire.ultrasonic.api.subsonic.response.SearchTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.SharesResponse
 import org.moire.ultrasonic.api.subsonic.response.SubsonicResponse
 import org.moire.ultrasonic.api.subsonic.response.VideosResponse
+import org.moire.ultrasonic.api.subsonic.response.YearsResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -291,6 +293,9 @@ interface SubsonicAPIDefinition {
     @GET("getMoods.view")
     fun getMoods(): Call<MoodsResponse>
 
+    @GET("getYears.view")
+    fun getYears(): Call<YearsResponse>
+
     @GET("getSongsByGenre.view")
     fun getSongsByGenre(
         @Query("genre") genre: String,
@@ -313,6 +318,16 @@ interface SubsonicAPIDefinition {
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByMoodResponse>
+    @GET("getSongsByYear.view")
+    fun getSongsByYear(
+        @Query("year") year: Int? = null,
+        @Query("length") length: String? = null,
+        @Query("ratingMin") ratingMin: Int? = null,
+        @Query("ratingMax") ratingMax: Int? = null,
+        @Query("count") count: Int = 10,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsByYearResponse>
 
     @GET("getUser.view")
     fun getUser(@Query("username") username: String): Call<GetUserResponse>

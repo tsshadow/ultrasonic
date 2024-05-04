@@ -26,6 +26,9 @@
         android:id="@+id/toMoodList"
         app:destination="@id/selectMoodFragment" />
     <action
+        android:id="@+id/toYearList"
+        app:destination="@id/selectYearFragment" />
+    <action
         android:id="@+id/toLandingPage"
         app:destination="@id/landingPageFragment" />
     <action
@@ -119,6 +122,11 @@
             app:nullable="true" />
         <argument
             android:name="moodName"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="yearName"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
@@ -279,6 +287,10 @@
     <fragment
         android:id="@+id/selectMoodFragment"
         android:name="org.moire.ultrasonic.fragment.tsshadow.selectMoodFragment">
+    </fragment>
+    <fragment
+        android:id="@+id/selectYearFragment"
+        android:name="org.moire.ultrasonic.fragment.tsshadow.selectYearFragment">
     </fragment>
     <fragment
         android:id="@+id/landingPageFragment"

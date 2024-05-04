@@ -32,6 +32,7 @@ import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Share
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
+import org.moire.ultrasonic.domain.Year
 import org.moire.ultrasonic.util.LRUCache
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.TimeLimitedCache
@@ -52,6 +53,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         TimeLimitedCache<List<PodcastsChannel>?>(3600, TimeUnit.SECONDS)
     private val cachedGenres = TimeLimitedCache<List<Genre>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedMoods = TimeLimitedCache<List<Mood>>(10 * 3600, TimeUnit.SECONDS)
+    private val cachedYears = TimeLimitedCache<List<Year>>(10 * 3600, TimeUnit.SECONDS)
 
     // New Room Database
     private var cachedArtists = metaDatabase.artistDao()
@@ -436,6 +438,27 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         }
         return sorted
     }
+    @Throws(Exception::class)
+    override fun getYears(refresh: Boolean): List<Year> {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedYears.clear()
+        }
+        var result = cachedYears.get()
+        if (result == null) {
+            result = musicService.getYears(refresh)
+            cachedYears.set(result)
+        }
+
+        val sorted = result.toMutableList()
+        sorted.sortWith { Year, Year2 ->
+            Year.name.compareTo(
+                Year2.name,
+                ignoreCase = true
+            )
+        }
+        return sorted
+    }
 
     @Throws(Exception::class)
     override fun getSongsByGenre(
@@ -462,6 +485,18 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         offset: Int
     ): MusicDirectory {
         return musicService.getSongsByMood(mood, year, length, ratingMin, ratingMax, count, offset)
+    }
+
+    @Throws(Exception::class)
+    override fun getSongsByYear(
+        year: Int,
+        length: String?,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int
+    ): MusicDirectory {
+        return musicService.getSongsByYear(year, length, ratingMin, ratingMax, count, offset)
     }
 
     @Throws(Exception::class)

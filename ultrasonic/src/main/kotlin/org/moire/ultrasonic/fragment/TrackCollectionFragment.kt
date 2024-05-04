@@ -525,6 +525,7 @@ open class TrackCollectionFragment(
         val shareName = navArgs.shareName
         val genreName = navArgs.genreName
         val moodName = navArgs.moodName
+        val yearName = navArgs.yearName
         val year = navArgs.year
         val length = navArgs.length
         val ratingMin = navArgs.ratingMin
@@ -556,7 +557,10 @@ open class TrackCollectionFragment(
                 listModel.getSongsForGenre(genreName, year?.toIntOrNull(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
             } else if (moodName != null) {
                 setTitle(moodName)
-                listModel.getSongsForMood(moodName,year?.toIntOrNull() , if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
+                listModel.getSongsForMood(moodName, year?.toIntOrNull(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
+            } else if (yearName != null) {
+                setTitle(yearName)
+                listModel.getSongsForYear(yearName.toInt(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
             } else if (getStarredTracks) {
                 setTitle(getString(R.string.main_songs_starred))
                 listModel.getStarred()
