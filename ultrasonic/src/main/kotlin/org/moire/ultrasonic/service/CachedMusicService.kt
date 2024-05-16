@@ -396,14 +396,14 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun getGenres(refresh: Boolean): List<Genre> {
+    override fun getGenres(refresh: Boolean, year: Int?): List<Genre> {
         checkSettingsChanged()
         if (refresh) {
             cachedGenres.clear()
         }
         var result = cachedGenres.get()
         if (result == null) {
-            result = musicService.getGenres(refresh)
+            result = musicService.getGenres(refresh, year)
             cachedGenres.set(result)
         }
 
@@ -418,14 +418,14 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun getMoods(refresh: Boolean): List<Mood> {
+    override fun getMoods(refresh: Boolean, year: Int?): List<Mood> {
         checkSettingsChanged()
         if (refresh) {
             cachedMoods.clear()
         }
         var result = cachedMoods.get()
         if (result == null) {
-            result = musicService.getMoods(refresh)
+            result = musicService.getMoods(refresh, year)
             cachedMoods.set(result)
         }
 

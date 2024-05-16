@@ -292,13 +292,13 @@ internal class ApiVersionCheckWrapper(
         return api.updateShare(id, description, expires)
     }
 
-    override fun getGenres(): Call<GenresResponse> {
+    override fun getGenres(year: Int?): Call<GenresResponse> {
         checkVersion(V1_9_0)
-        return api.getGenres()
+        return api.getGenres(year)
     }
-    override fun getMoods(): Call<MoodsResponse> {
+    override fun getMoods(year: Int?): Call<MoodsResponse> {
         checkVersion(V1_9_0)
-        return api.getMoods()
+        return api.getMoods(year)
     }
     override fun getYears(): Call<YearsResponse> {
         checkVersion(V1_9_0)

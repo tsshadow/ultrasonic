@@ -288,10 +288,10 @@ interface SubsonicAPIDefinition {
     ): Call<SubsonicResponse>
 
     @GET("getGenres.view")
-    fun getGenres(): Call<GenresResponse>
+    fun getGenres(@Query("year") year: Int? = null): Call<GenresResponse>
 
     @GET("getMoods.view")
-    fun getMoods(): Call<MoodsResponse>
+    fun getMoods(@Query("year") year: Int? = null): Call<MoodsResponse>
 
     @GET("getYears.view")
     fun getYears(): Call<YearsResponse>

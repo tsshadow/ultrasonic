@@ -119,7 +119,8 @@ class SelectGenreFragment : Fragment(), RefreshableFragment {
         ) {
             val result = withContext(Dispatchers.IO) {
                 val musicService = getMusicService()
-                musicService.getGenres(refresh)
+                val yr =  yearSpinner?.getSelectedItem() as String
+                musicService.getGenres(refresh, yr.toIntOrNull())
             }
             swipeRefresh?.isRefreshing = false
             withContext(Dispatchers.Main) {

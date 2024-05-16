@@ -119,7 +119,8 @@ class SelectMoodFragment : Fragment(), RefreshableFragment {
         ) {
             val result = withContext(Dispatchers.IO) {
                 val musicService = getMusicService()
-                musicService.getMoods(refresh)
+                val yr = yearSpinner?.getSelectedItem() as String;
+                musicService.getMoods(refresh, yr.toIntOrNull())
             }
             swipeRefresh?.isRefreshing = false
             withContext(Dispatchers.Main) {

@@ -1520,7 +1520,7 @@ class MediaLibrarySessionCallback :
         Timber.i("getGenres: year=$year length=$length")
         return mainScope.future {
             val genres = serviceScope.future {
-                callWithErrorHandling { musicService.getGenres(true) }
+                callWithErrorHandling { musicService.getGenres(true, year) }
             }.await()
 
             val mediaIdPrefix = if (year == null) {
@@ -1588,7 +1588,7 @@ class MediaLibrarySessionCallback :
         Timber.i("getMoods: year=$year length=$length")
         return mainScope.future {
             val moods = serviceScope.future {
-                callWithErrorHandling { musicService.getMoods(true) }
+                callWithErrorHandling { musicService.getMoods(true, year) }
             }.await()
 
             val mediaIdPrefix = if (year == null) {
