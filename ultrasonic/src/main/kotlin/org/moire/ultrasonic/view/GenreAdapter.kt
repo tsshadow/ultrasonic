@@ -6,6 +6,7 @@
  */
 package org.moire.ultrasonic.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -39,12 +40,13 @@ class GenreAdapter(context: Context, genres: List<Genre>) :
         positions = positionList.toTypedArray()
     }
 
+    @SuppressLint("SetTextI18n")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var rowView = convertView
         if (rowView == null) {
             rowView = layoutInflater.inflate(R.layout.list_item_generic, parent, false)
         }
-        (rowView as TextView?)!!.text = getItem(position)!!.name
+        (rowView as TextView?)!!.text = getItem(position)!!.name + " " + getItem(position)!!.songCount
         return rowView!!
     }
 

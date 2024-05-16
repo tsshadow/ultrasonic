@@ -46,6 +46,7 @@ import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.RatingUpdate
+import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
@@ -1519,7 +1520,7 @@ class MediaLibrarySessionCallback :
 
         Timber.i("getGenres: year=$year length=$length")
         return mainScope.future {
-            val genres = serviceScope.future {
+            var genres = serviceScope.future {
                 callWithErrorHandling { musicService.getGenres(true, year) }
             }.await()
 
@@ -1538,10 +1539,13 @@ class MediaLibrarySessionCallback :
             }
             Timber.i("getGenres: mediaIdPrefix=$mediaIdPrefix $year")
 
+            if (genres != null) {
+                genres = genres.sortedBy { Genre -> Genre.songCount  }
+            }
 
             genres?.forEach {
                 mediaItems.add(
-                    it.name,
+                    it.name + " " + it.songCount,
                     mediaIdPrefix + "|" + it.name,
                     R.string.main_genres_title,
                     isBrowsable = true,
@@ -1587,7 +1591,7 @@ class MediaLibrarySessionCallback :
 
         Timber.i("getMoods: year=$year length=$length")
         return mainScope.future {
-            val moods = serviceScope.future {
+            var moods = serviceScope.future {
                 callWithErrorHandling { musicService.getMoods(true, year) }
             }.await()
 
@@ -1604,9 +1608,14 @@ class MediaLibrarySessionCallback :
                     MEDIA_MOOD_LIVESETS_LAST_YEAR
                 }
             }
+
+
+            if (moods != null) {
+                moods = moods.sortedBy { mood -> mood.songCount }
+            }
             moods?.forEach {
                 mediaItems.add(
-                    it.name,
+                    it.name + " " + it.songCount,
                     mediaIdPrefix + "|" + it.name,
                     R.string.main_moods_title,
                     isBrowsable = true,

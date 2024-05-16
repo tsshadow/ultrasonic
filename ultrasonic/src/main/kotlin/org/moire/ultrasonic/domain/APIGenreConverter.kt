@@ -7,6 +7,7 @@ import org.moire.ultrasonic.api.subsonic.models.Genre as APIGenre
 
 fun APIGenre.toDomainEntity(): Genre = Genre(
     name = this@toDomainEntity.name,
+    songCount = this@toDomainEntity.songCount,
     index = this@toDomainEntity.name.substring(0, 1)
 )
 

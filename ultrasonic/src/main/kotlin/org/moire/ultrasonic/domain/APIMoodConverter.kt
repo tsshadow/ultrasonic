@@ -7,6 +7,7 @@ import org.moire.ultrasonic.api.subsonic.models.Mood as APIMood
 
 fun APIMood.toDomainEntity(): Mood = Mood(
     name = this@toDomainEntity.name,
+    songCount = this@toDomainEntity.songCount,
     index = this@toDomainEntity.name.substring(0, 1)
 )
 
