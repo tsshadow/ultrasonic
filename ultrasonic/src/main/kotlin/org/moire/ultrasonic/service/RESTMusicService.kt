@@ -509,14 +509,14 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getGenres(refresh: Boolean, year: Int?): List<Genre> {
-        val response = API.getGenres(year).execute().throwOnFailure()
+    override fun getGenres(refresh: Boolean, year: Int?, length: String?): List<Genre> {
+        val response = API.getGenres(year, length).execute().throwOnFailure()
 
         return response.body()!!.genresList.toDomainEntityList()
     }
     @Throws(Exception::class)
-    override fun getMoods(refresh: Boolean, year: Int?): List<Mood> {
-        val response = API.getMoods(year).execute().throwOnFailure()
+    override fun getMoods(refresh: Boolean, year: Int?, length: String?): List<Mood> {
+        val response = API.getMoods(year, length).execute().throwOnFailure()
 
         return response.body()!!.moodsList.toDomainEntityList()
     }

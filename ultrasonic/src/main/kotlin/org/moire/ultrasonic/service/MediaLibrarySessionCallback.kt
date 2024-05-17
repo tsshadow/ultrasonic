@@ -1521,7 +1521,7 @@ class MediaLibrarySessionCallback :
         Timber.i("getGenres: year=$year length=$length")
         return mainScope.future {
             var genres = serviceScope.future {
-                callWithErrorHandling { musicService.getGenres(true, year) }
+                callWithErrorHandling { musicService.getGenres(true, year, length) }
             }.await()
 
             val mediaIdPrefix = if (year == null) {
@@ -1540,7 +1540,7 @@ class MediaLibrarySessionCallback :
             Timber.i("getGenres: mediaIdPrefix=$mediaIdPrefix $year")
 
             if (genres != null) {
-                genres = genres.sortedBy { Genre -> Genre.songCount  }
+                genres = genres.sortedByDescending { Genre -> Genre.songCount  }
             }
 
             genres?.forEach {
@@ -1562,7 +1562,7 @@ class MediaLibrarySessionCallback :
         Timber.i("getGenre: genre=$genre year=$year length=$length")
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongsByGenre(genre, year, length, null, null, 500, 0) }
+                callWithErrorHandling { musicService.getSongsByGenre(genre, year, length, null, null, 100000, 0) }
             }.await()
 
             if (songs != null) {
@@ -1592,7 +1592,7 @@ class MediaLibrarySessionCallback :
         Timber.i("getMoods: year=$year length=$length")
         return mainScope.future {
             var moods = serviceScope.future {
-                callWithErrorHandling { musicService.getMoods(true, year) }
+                callWithErrorHandling { musicService.getMoods(true, year, length) }
             }.await()
 
             val mediaIdPrefix = if (year == null) {
@@ -1611,7 +1611,7 @@ class MediaLibrarySessionCallback :
 
 
             if (moods != null) {
-                moods = moods.sortedBy { mood -> mood.songCount }
+                moods = moods.sortedByDescending { mood -> mood.songCount }
             }
             moods?.forEach {
                 mediaItems.add(
@@ -1632,7 +1632,7 @@ class MediaLibrarySessionCallback :
         Timber.i("getMood:  mood=$mood year=$year length=$length")
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongsByMood(mood, year, length, null, null, 500, 0) }
+                callWithErrorHandling { musicService.getSongsByMood(mood, year, length, null, null, 100000, 0) }
             }.await()
 
             if (songs != null) {

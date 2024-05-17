@@ -37,10 +37,10 @@ interface MusicService {
     fun isLicenseValid(): Boolean
 
     @Throws(Exception::class)
-    fun getGenres(refresh: Boolean, year: Int?): List<Genre>
+    fun getGenres(refresh: Boolean, year: Int?, length: String?): List<Genre>
 
     @Throws(Exception::class)
-    fun getMoods(refresh: Boolean, year: Int?): List<Mood>
+    fun getMoods(refresh: Boolean, year: Int?, length: String?): List<Mood>
 
     @Throws(Exception::class)
     fun getYears(refresh: Boolean): List<Year>
