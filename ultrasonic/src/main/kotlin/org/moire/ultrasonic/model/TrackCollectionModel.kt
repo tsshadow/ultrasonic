@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.moire.ultrasonic.api.subsonic.models.Cluster
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
@@ -20,6 +21,7 @@ import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.DownloadState
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.util.Util
+import org.moire.ultrasonic.util.Util.ifNotNull
 
 /*
 * Model for retrieving different collections of tracks from the API
@@ -76,6 +78,26 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getSongsByMood(mood, year, length, ratingMin, ratingMax, count, newOffset)
+            currentListIsSortable = false
+            updateList(musicDirectory, append)
+
+            // Update current offset
+            loadedUntil = newOffset
+        }
+    }
+    suspend fun getSongs(mood: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, append: Boolean) {
+        // Handle the logic for endless scrolling:
+        // If appending the existing list, set the offset from where to load
+        var newOffset = offset
+        if (append) newOffset += (count + loadedUntil)
+
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            var clusters = emptyArray<Cluster>()
+            clusters += Cluster("MOOD", mood)
+            year.ifNotNull { clusters += Cluster("YEAR", year.toString())}
+            length.ifNotNull { clusters += Cluster("LENGTH", length.orEmpty())}
+            val musicDirectory = service.getSongs(clusters, ratingMin, ratingMax, count, newOffset)
             currentListIsSortable = false
             updateList(musicDirectory, append)
 

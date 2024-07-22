@@ -9,6 +9,7 @@ package org.moire.ultrasonic.api.subsonic
 
 import okhttp3.ResponseBody
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
+import org.moire.ultrasonic.api.subsonic.models.Cluster
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
 import org.moire.ultrasonic.api.subsonic.response.BookmarksResponse
 import org.moire.ultrasonic.api.subsonic.response.ChatMessagesResponse
@@ -28,6 +29,7 @@ import org.moire.ultrasonic.api.subsonic.response.GetRandomSongsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetSongsByGenreResponse
 import org.moire.ultrasonic.api.subsonic.response.GetSongsByMoodResponse
 import org.moire.ultrasonic.api.subsonic.response.GetSongsByYearResponse
+import org.moire.ultrasonic.api.subsonic.response.GetSongsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetStarredResponse
 import org.moire.ultrasonic.api.subsonic.response.GetStarredTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.GetUserResponse
@@ -307,6 +309,17 @@ interface SubsonicAPIDefinition {
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByGenreResponse>
+
+    @GET("getSongs.view")
+    fun getSongs(
+        @Query("clusters") cluster: Array<Cluster>,
+        @Query("ratingMin") ratingMin: Int? = null,
+        @Query("ratingMax") ratingMax: Int? = null,
+        @Query("count") count: Int = 10,
+        @Query("offset") offset: Int = 0,
+        @Query("musicFolderId") musicFolderId: String? = null
+    ): Call<GetSongsResponse>
+
     @GET("getSongsByMood.view")
     fun getSongsByMood(
         @Query("mood") mood: String,

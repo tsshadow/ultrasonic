@@ -14,6 +14,7 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
+import org.moire.ultrasonic.api.subsonic.models.Cluster
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
 import org.moire.ultrasonic.api.subsonic.toStreamResponse
@@ -543,6 +544,22 @@ open class RESTMusicService(
 
         return result
     }
+
+    @Throws(Exception::class)
+    override fun getSongs(
+        clusters: Array<Cluster>,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int): MusicDirectory {
+        val response = API.getSongs(clusters, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
+
+        return result
+    }
+
     @Throws(Exception::class)
     override fun getSongsByMood(
         mood: String,
@@ -559,6 +576,7 @@ open class RESTMusicService(
 
         return result
     }
+
     @Throws(Exception::class)
     override fun getSongsByYear(
         year: Int,
