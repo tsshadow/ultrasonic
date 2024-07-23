@@ -13,7 +13,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.moire.ultrasonic.api.subsonic.models.Filter
 import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.MusicDirectory
@@ -22,7 +21,6 @@ import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.DownloadState
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.util.Util
-import org.moire.ultrasonic.util.Util.ifNotNull
 
 /*
 * Model for retrieving different collections of tracks from the API
@@ -68,33 +66,6 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset)
-            currentListIsSortable = false
-            updateList(musicDirectory, append)
-
-            // Update current offset
-            loadedUntil = newOffset
-        }
-    }
-
-    suspend fun getSongsForYear(
-        year: Int,
-        length: String?,
-        ratingMin: Int?,
-        ratingMax: Int?,
-        count: Int,
-        offset: Int,
-        append: Boolean
-    ) {
-        // Handle the logic for endless scrolling:
-        // If appending the existing list, set the offset from where to load
-        var newOffset = offset
-        if (append) newOffset += (count + loadedUntil)
-
-        withContext(Dispatchers.IO) {
-            val service = MusicServiceFactory.getMusicService()
-            val filters = Filters(Filter("YEAR", year.toString()))
-            length.ifNotNull { filters.add(Filter("LENGTH", length.orEmpty())) }
             val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset)
             currentListIsSortable = false
             updateList(musicDirectory, append)
