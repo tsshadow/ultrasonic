@@ -43,11 +43,11 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.api.subsonic.models.Cluster
+import org.moire.ultrasonic.api.subsonic.models.filter
+import org.moire.ultrasonic.api.subsonic.models.filters
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.RatingUpdate
-import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
@@ -1634,9 +1634,10 @@ class MediaLibrarySessionCallback :
         Timber.i("getMood:  mood=$mood year=$year length=$length")
         return mainScope.future {
             val songs = serviceScope.future {
-                var clusters :Array<Cluster> = arrayOf(Cluster("MOOD", mood))
-                year.ifNotNull { clusters += Cluster("YEAR", year.toString()) }
-                callWithErrorHandling { musicService.getSongs(clusters, null,null, 100000, 0) }
+                val filters = filters()
+                filters.add(filter("MOOD", mood))
+                year.ifNotNull { filters.add(filter("YEAR", year.toString())) }
+                callWithErrorHandling { musicService.getSongs(filters, null,null, 100000, 0) }
             }.await()
 
             if (songs != null) {

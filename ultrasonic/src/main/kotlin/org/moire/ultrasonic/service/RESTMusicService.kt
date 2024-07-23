@@ -6,7 +6,6 @@
  */
 package org.moire.ultrasonic.service
 
-import android.util.Log
 import java.io.IOException
 import java.io.InputStream
 import okhttp3.Protocol
@@ -15,7 +14,7 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.api.subsonic.models.Cluster
+import org.moire.ultrasonic.api.subsonic.models.filters
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
 import org.moire.ultrasonic.api.subsonic.toStreamResponse
@@ -548,18 +547,14 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun getSongs(
-        clusters: Array<Cluster>,
+        filters: filters,
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,
         offset: Int): MusicDirectory {
 
-        var str: String = "[{";
-        clusters.forEach {  str += "\"name\":\""+it.name+"\",\"value\":\""+it.value+"\" }"};
-        str+="]"
-
-        Timber.d(str);
-        val response = API.getSongs(str, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+        Timber.d(filters.toString())
+        val response = API.getSongs(filters.toString(), ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))

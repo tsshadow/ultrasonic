@@ -13,7 +13,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.moire.ultrasonic.api.subsonic.models.Cluster
+import org.moire.ultrasonic.api.subsonic.models.filter
+import org.moire.ultrasonic.api.subsonic.models.filters
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
@@ -52,7 +53,16 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
-    suspend fun getSongsForGenre(genre: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, append: Boolean) {
+    suspend fun getSongsForGenre(
+        genre: String,
+        year: Int?,
+        length: String?,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int,
+        append: Boolean
+    ) {
         // Handle the logic for endless scrolling:
         // If appending the existing list, set the offset from where to load
         var newOffset = offset
@@ -60,7 +70,8 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByGenre(genre, year, length, ratingMin, ratingMax, count, newOffset)
+            val musicDirectory =
+                service.getSongsByGenre(genre, year, length, ratingMin, ratingMax, count, newOffset)
             currentListIsSortable = false
             updateList(musicDirectory, append)
 
@@ -69,7 +80,16 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
-    suspend fun getSongsForMood(mood: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, append: Boolean) {
+    suspend fun getSongsForMood(
+        mood: String,
+        year: Int?,
+        length: String?,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int,
+        append: Boolean
+    ) {
         // Handle the logic for endless scrolling:
         // If appending the existing list, set the offset from where to load
         var newOffset = offset
@@ -77,27 +97,8 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByMood(mood, year, length, ratingMin, ratingMax, count, newOffset)
-            currentListIsSortable = false
-            updateList(musicDirectory, append)
-
-            // Update current offset
-            loadedUntil = newOffset
-        }
-    }
-    suspend fun getSongs(mood: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, append: Boolean) {
-        // Handle the logic for endless scrolling:
-        // If appending the existing list, set the offset from where to load
-        var newOffset = offset
-        if (append) newOffset += (count + loadedUntil)
-
-        withContext(Dispatchers.IO) {
-            val service = MusicServiceFactory.getMusicService()
-            var clusters = emptyArray<Cluster>()
-            clusters += Cluster("MOOD", mood)
-            year.ifNotNull { clusters += Cluster("YEAR", year.toString())}
-            length.ifNotNull { clusters += Cluster("LENGTH", length.orEmpty())}
-            val musicDirectory = service.getSongs(clusters, ratingMin, ratingMax, count, newOffset)
+            val musicDirectory =
+                service.getSongsByMood(mood, year, length, ratingMin, ratingMax, count, newOffset)
             currentListIsSortable = false
             updateList(musicDirectory, append)
 
@@ -106,7 +107,16 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
-    suspend fun getSongsForYear(year: Int, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, append: Boolean) {
+    suspend fun getSongs(
+        mood: String,
+        year: Int?,
+        length: String?,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int,
+        append: Boolean
+    ) {
         // Handle the logic for endless scrolling:
         // If appending the existing list, set the offset from where to load
         var newOffset = offset
@@ -114,7 +124,37 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongsByYear(year, length, ratingMin, ratingMax, count, newOffset)
+            val filters = filters()
+            filters.add(filter("MOOD", mood))
+            year.ifNotNull { filters.add(filter("YEAR", year.toString())) }
+            length.ifNotNull { filters.add(filter("LENGTH", length.orEmpty())) }
+            val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset)
+            currentListIsSortable = false
+            updateList(musicDirectory, append)
+
+            // Update current offset
+            loadedUntil = newOffset
+        }
+    }
+
+    suspend fun getSongsForYear(
+        year: Int,
+        length: String?,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int,
+        append: Boolean
+    ) {
+        // Handle the logic for endless scrolling:
+        // If appending the existing list, set the offset from where to load
+        var newOffset = offset
+        if (append) newOffset += (count + loadedUntil)
+
+        withContext(Dispatchers.IO) {
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory =
+                service.getSongsByYear(year, length, ratingMin, ratingMax, count, newOffset)
             currentListIsSortable = false
             updateList(musicDirectory, append)
 
@@ -233,14 +273,17 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
                     DownloadState.DONE -> {
                         deleteEnabled = true
                     }
+
                     DownloadState.PINNED -> {
                         deleteEnabled = true
                         pinnedCount++
                         unpinEnabled = true
                     }
+
                     DownloadState.IDLE, DownloadState.FAILED -> {
                         downloadEnabled = true
                     }
+
                     else -> {}
                 }
             }

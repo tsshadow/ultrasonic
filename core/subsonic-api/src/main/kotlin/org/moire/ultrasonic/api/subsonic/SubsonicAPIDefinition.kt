@@ -9,7 +9,6 @@ package org.moire.ultrasonic.api.subsonic
 
 import okhttp3.ResponseBody
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.api.subsonic.models.Cluster
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
 import org.moire.ultrasonic.api.subsonic.response.BookmarksResponse
 import org.moire.ultrasonic.api.subsonic.response.ChatMessagesResponse
@@ -312,7 +311,7 @@ interface SubsonicAPIDefinition {
 
     @GET("getSongs.view")
     fun getSongs(
-        @Query("clusters") cluster: String,
+        @Query("clusters") clusters: String,
         @Query("ratingMin") ratingMin: Int? = null,
         @Query("ratingMax") ratingMax: Int? = null,
         @Query("count") count: Int = 10,

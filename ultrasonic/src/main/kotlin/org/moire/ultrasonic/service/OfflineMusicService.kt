@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.api.subsonic.models.Cluster
+import org.moire.ultrasonic.api.subsonic.models.filters
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.MetaDatabase
 import org.moire.ultrasonic.domain.Album
@@ -393,13 +393,13 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Throws(Exception::class)
     override fun getSongs(
-        clusters: Array<Cluster>,
+        filters: filters,
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,
         offset: Int
     ): MusicDirectory {
-        throw OfflineException("Getting Songs By Genre not available in offline mode")
+        throw OfflineException("Getting Songs By filters not available in offline mode")
     }
     @Throws(Exception::class)
     override fun getSongsByMood(

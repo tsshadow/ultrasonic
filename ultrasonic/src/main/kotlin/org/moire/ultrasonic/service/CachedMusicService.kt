@@ -12,7 +12,7 @@ import kotlin.Pair
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.api.subsonic.models.Cluster
+import org.moire.ultrasonic.api.subsonic.models.filters
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.MetaDatabase
 import org.moire.ultrasonic.domain.Album
@@ -477,13 +477,13 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
 
     @Throws(Exception::class)
     override fun getSongs(
-        clusters: Array<Cluster>,
+        filters: filters,
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,
         offset: Int
     ): MusicDirectory {
-        return musicService.getSongs(clusters, ratingMin, ratingMax, count, offset)
+        return musicService.getSongs(filters, ratingMin, ratingMax, count, offset)
     }
 
     @Throws(Exception::class)
