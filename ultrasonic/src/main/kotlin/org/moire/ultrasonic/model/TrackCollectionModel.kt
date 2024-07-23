@@ -13,8 +13,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.moire.ultrasonic.api.subsonic.models.filter
-import org.moire.ultrasonic.api.subsonic.models.filters
+import org.moire.ultrasonic.api.subsonic.models.Filter
+import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
@@ -124,10 +124,9 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val filters = filters()
-            filters.add(filter("MOOD", mood))
-            year.ifNotNull { filters.add(filter("YEAR", year.toString())) }
-            length.ifNotNull { filters.add(filter("LENGTH", length.orEmpty())) }
+            val filters = Filters(Filter("MOOD", mood))
+            year.ifNotNull { filters.add(Filter("YEAR", year.toString())) }
+            length.ifNotNull { filters.add(Filter("LENGTH", length.orEmpty())) }
             val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset)
             currentListIsSortable = false
             updateList(musicDirectory, append)

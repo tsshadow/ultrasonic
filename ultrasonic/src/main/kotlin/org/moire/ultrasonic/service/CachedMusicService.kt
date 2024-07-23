@@ -12,7 +12,7 @@ import kotlin.Pair
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.api.subsonic.models.filters
+import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.MetaDatabase
 import org.moire.ultrasonic.domain.Album
@@ -477,7 +477,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
 
     @Throws(Exception::class)
     override fun getSongs(
-        filters: filters,
+        filters: Filters,
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,

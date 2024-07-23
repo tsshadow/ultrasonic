@@ -14,7 +14,7 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.moire.ultrasonic.api.subsonic.ApiNotSupportedException
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.api.subsonic.models.filters
+import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
 import org.moire.ultrasonic.api.subsonic.toStreamResponse
@@ -547,7 +547,7 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun getSongs(
-        filters: filters,
+        filters: Filters,
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,

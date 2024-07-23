@@ -8,7 +8,7 @@ package org.moire.ultrasonic.service
 
 import java.io.InputStream
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.api.subsonic.models.filters
+import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.Bookmark
@@ -126,7 +126,7 @@ interface MusicService {
     fun getSongsByGenre(genre: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
-    fun getSongs(filters: filters, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory
+    fun getSongs(filters: Filters, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
     fun getSongsByMood(mood: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory
