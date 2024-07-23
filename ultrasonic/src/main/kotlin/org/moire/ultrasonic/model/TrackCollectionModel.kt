@@ -53,64 +53,8 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         }
     }
 
-    suspend fun getSongsForGenre(
-        genre: String,
-        year: Int?,
-        length: String?,
-        ratingMin: Int?,
-        ratingMax: Int?,
-        count: Int,
-        offset: Int,
-        append: Boolean
-    ) {
-        // Handle the logic for endless scrolling:
-        // If appending the existing list, set the offset from where to load
-        var newOffset = offset
-        if (append) newOffset += (count + loadedUntil)
-
-        withContext(Dispatchers.IO) {
-            val service = MusicServiceFactory.getMusicService()
-            val musicDirectory =
-                service.getSongsByGenre(genre, year, length, ratingMin, ratingMax, count, newOffset)
-            currentListIsSortable = false
-            updateList(musicDirectory, append)
-
-            // Update current offset
-            loadedUntil = newOffset
-        }
-    }
-
-    suspend fun getSongsForMood(
-        mood: String,
-        year: Int?,
-        length: String?,
-        ratingMin: Int?,
-        ratingMax: Int?,
-        count: Int,
-        offset: Int,
-        append: Boolean
-    ) {
-        // Handle the logic for endless scrolling:
-        // If appending the existing list, set the offset from where to load
-        var newOffset = offset
-        if (append) newOffset += (count + loadedUntil)
-
-        withContext(Dispatchers.IO) {
-            val service = MusicServiceFactory.getMusicService()
-            val musicDirectory =
-                service.getSongsByMood(mood, year, length, ratingMin, ratingMax, count, newOffset)
-            currentListIsSortable = false
-            updateList(musicDirectory, append)
-
-            // Update current offset
-            loadedUntil = newOffset
-        }
-    }
-
     suspend fun getSongs(
-        mood: String,
-        year: Int?,
-        length: String?,
+        filters: Filters,
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,
@@ -124,9 +68,6 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val filters = Filters(Filter("MOOD", mood))
-            year.ifNotNull { filters.add(Filter("YEAR", year.toString())) }
-            length.ifNotNull { filters.add(Filter("LENGTH", length.orEmpty())) }
             val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset)
             currentListIsSortable = false
             updateList(musicDirectory, append)
@@ -152,8 +93,9 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory =
-                service.getSongsByYear(year, length, ratingMin, ratingMax, count, newOffset)
+            val filters = Filters(Filter("YEAR", year.toString()))
+            length.ifNotNull { filters.add(Filter("LENGTH", length.orEmpty())) }
+            val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset)
             currentListIsSortable = false
             updateList(musicDirectory, append)
 

@@ -36,6 +36,8 @@ import org.moire.ultrasonic.adapters.AlbumHeader
 import org.moire.ultrasonic.adapters.AlbumRowDelegate
 import org.moire.ultrasonic.adapters.HeaderViewBinder
 import org.moire.ultrasonic.adapters.TrackViewBinder
+import org.moire.ultrasonic.api.subsonic.models.Filter
+import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Identifiable
@@ -54,6 +56,7 @@ import org.moire.ultrasonic.util.DownloadAction
 import org.moire.ultrasonic.util.DownloadUtil
 import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
 import org.moire.ultrasonic.util.Settings
+import org.moire.ultrasonic.util.Util.ifNotNull
 import org.moire.ultrasonic.util.Util.navigateToCurrent
 import org.moire.ultrasonic.util.Util.toast
 import org.moire.ultrasonic.util.toastingExceptionHandler
@@ -554,13 +557,21 @@ open class TrackCollectionFragment(
                 listModel.getShare(shareId)
             } else if (genreName != null) {
                 setTitle(genreName)
-                listModel.getSongsForGenre(genreName, year?.toIntOrNull(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
+                val filters = Filters(Filter("GENRE",genreName))
+                year.ifNotNull { if(year !== "All") filters.add(Filter("YEAR", year.toString()))}
+                if (length!== null && length.isNotEmpty()) filters.add(Filter("LENGTH", length.toString()))
+                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append)
             } else if (moodName != null) {
                 setTitle(moodName)
-                listModel.getSongs(moodName, year?.toIntOrNull(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
+                val filters = Filters(Filter("MOOD",moodName))
+                year.ifNotNull { if(year !== "All") filters.add(Filter("YEAR", year.toString()))}
+                if (length!== null && length.isNotEmpty()) filters.add(Filter("LENGTH", length.toString()))
+                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append)
             } else if (yearName != null) {
                 setTitle(yearName)
-                listModel.getSongsForYear(yearName.toInt(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
+                val filters = Filters(Filter("YEAR",year.toString()))
+                year.ifNotNull { filters.add(Filter("LENGTH", length.toString()))}
+                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append)
             } else if (getStarredTracks) {
                 setTitle(getString(R.string.main_songs_starred))
                 listModel.getStarred()
