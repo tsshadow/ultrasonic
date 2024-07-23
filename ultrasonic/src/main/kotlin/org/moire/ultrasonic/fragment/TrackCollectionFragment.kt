@@ -557,7 +557,7 @@ open class TrackCollectionFragment(
                 listModel.getSongsForGenre(genreName, year?.toIntOrNull(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
             } else if (moodName != null) {
                 setTitle(moodName)
-                listModel.getSongsForMood(moodName, year?.toIntOrNull(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
+                listModel.getSongs(moodName, year?.toIntOrNull(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)
             } else if (yearName != null) {
                 setTitle(yearName)
                 listModel.getSongsForYear(yearName.toInt(), if(length?.length!! >0) length else null, ratingMin, ratingMax, size, offset, append)

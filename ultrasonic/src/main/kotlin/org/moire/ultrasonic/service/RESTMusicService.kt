@@ -6,6 +6,7 @@
  */
 package org.moire.ultrasonic.service
 
+import android.util.Log
 import java.io.IOException
 import java.io.InputStream
 import okhttp3.Protocol
@@ -552,7 +553,13 @@ open class RESTMusicService(
         ratingMax: Int?,
         count: Int,
         offset: Int): MusicDirectory {
-        val response = API.getSongs(clusters, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+
+        var str: String = "[{";
+        clusters.forEach {  str += "\"name\":\""+it.name+"\",\"value\":\""+it.value+"\" }"};
+        str+="]"
+
+        Timber.d(str);
+        val response = API.getSongs(str, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
