@@ -69,6 +69,7 @@ private const val MEDIA_ALBUM_FREQUENT_ID = "MEDIA_ALBUM_FREQUENT_ID"
 private const val MEDIA_ALBUM_RANDOM_ID = "MEDIA_ALBUM_RANDOM_ID"
 private const val MEDIA_ALBUM_STARRED_ID = "MEDIA_ALBUM_STARRED_ID"
 private const val MEDIA_SONG_RANDOM_ID = "MEDIA_SONG_RANDOM_ID"
+private const val MEDIA_SONG_RECENT = "MEDIA_SONG_RECENT"
 private const val MEDIA_SONG_STARRED_ID = "MEDIA_SONG_STARRED_ID"
 private const val MEDIA_ARTIST_ID = "MEDIA_ARTIST_ID"
 private const val MEDIA_LIBRARY_ID = "MEDIA_LIBRARY_ID"
@@ -103,15 +104,15 @@ private const val MEDIA_GENRES_LIVESETS_LAST_YEAR = "MEDIA_GENRES_LIVESETS_LAST_
 private const val MEDIA_GENRE_LIVESETS_LAST_YEAR = "MEDIA_GENRE_LIVESETS_LAST_YEAR"
 
 // Moods -> songs
-private const val MEDIA_MOODS_SONGS = "MEDIA_MOODS_SONGS"
-private const val MEDIA_MOOD_SONGS = "MEDIA_MOOD_SONGS"
-private const val MEDIA_MOODS_SONGS_LAST_YEAR = "MEDIA_MOODS_SONGS_LAST_YEAR"
-private const val MEDIA_MOOD_SONGS_LAST_YEAR = "MEDIA_MOOD_SONGS_LAST_YEAR"
-// Moods -> Livesets
-private const val MEDIA_MOODS_LIVESETS = "MEDIA_MOODS_LIVESETS"
-private const val MEDIA_MOOD_LIVESETS = "MEDIA_MOOD_LIVESETS"
-private const val MEDIA_MOODS_LIVESETS_LAST_YEAR = "MEDIA_MOODS_LIVESETS_LAST_YEAR"
-private const val MEDIA_MOOD_LIVESETS_LAST_YEAR = "MEDIA_MOOD_LIVESETS_LAST_YEAR"
+//private const val MEDIA_MOODS_SONGS = "MEDIA_MOODS_SONGS"
+//private const val MEDIA_MOOD_SONGS = "MEDIA_MOOD_SONGS"
+//private const val MEDIA_MOODS_SONGS_LAST_YEAR = "MEDIA_MOODS_SONGS_LAST_YEAR"
+//private const val MEDIA_MOOD_SONGS_LAST_YEAR = "MEDIA_MOOD_SONGS_LAST_YEAR"
+//// Moods -> Livesets
+//private const val MEDIA_MOODS_LIVESETS = "MEDIA_MOODS_LIVESETS"
+//private const val MEDIA_MOOD_LIVESETS = "MEDIA_MOOD_LIVESETS"
+//private const val MEDIA_MOODS_LIVESETS_LAST_YEAR = "MEDIA_MOODS_LIVESETS_LAST_YEAR"
+//private const val MEDIA_MOOD_LIVESETS_LAST_YEAR = "MEDIA_MOOD_LIVESETS_LAST_YEAR"
 
 // Currently the display limit for long lists is 100 items
 private const val DISPLAY_LIMIT = 100
@@ -647,6 +648,8 @@ class MediaLibrarySessionCallback :
             MEDIA_ALBUM_RANDOM_ID -> getAlbums(AlbumListType.RANDOM)
             MEDIA_ALBUM_STARRED_ID -> getAlbums(AlbumListType.STARRED)
             MEDIA_SONG_RANDOM_ID -> getRandomSongs()
+            MEDIA_SONG_RECENT -> getRecentSongs()
+
             // Genre -> songs
             MEDIA_GENRES_SONGS -> getGenres(null, "short")
             MEDIA_GENRE_SONGS -> getGenre(parentIdParts[1], null, "short")
@@ -657,16 +660,17 @@ class MediaLibrarySessionCallback :
             MEDIA_GENRE_LIVESETS -> getGenre(parentIdParts[1], null, "long")
             MEDIA_GENRES_LIVESETS_LAST_YEAR -> getGenres(year, "long")
             MEDIA_GENRE_LIVESETS_LAST_YEAR -> getGenre(parentIdParts[1],year, "long")
-            // Mood -> songs
-            MEDIA_MOODS_SONGS -> getMoods(null, "short")
-            MEDIA_MOOD_SONGS -> getMood(parentIdParts[1],null, "short")
-            MEDIA_MOODS_SONGS_LAST_YEAR -> getMoods(year, "short")
-            MEDIA_MOOD_SONGS_LAST_YEAR -> getMood(parentIdParts[1], year, "short")
-            // Mood -> livesets
-            MEDIA_MOODS_LIVESETS -> getMoods(null, "long")
-            MEDIA_MOOD_LIVESETS -> getMood(parentIdParts[1],null, "long")
-            MEDIA_MOODS_LIVESETS_LAST_YEAR -> getMoods(year, "long")
-            MEDIA_MOOD_LIVESETS_LAST_YEAR -> getMood(parentIdParts[1], year, "long")
+
+//            // Mood -> songs
+//            MEDIA_MOODS_SONGS -> getMoods(null, "short")
+//            MEDIA_MOOD_SONGS -> getMood(parentIdParts[1],null, "short")
+//            MEDIA_MOODS_SONGS_LAST_YEAR -> getMoods(year, "short")
+//            MEDIA_MOOD_SONGS_LAST_YEAR -> getMood(parentIdParts[1], year, "short")
+//            // Mood -> livesets
+//            MEDIA_MOODS_LIVESETS -> getMoods(null, "long")
+//            MEDIA_MOOD_LIVESETS -> getMood(parentIdParts[1],null, "long")
+//            MEDIA_MOODS_LIVESETS_LAST_YEAR -> getMoods(year, "long")
+//            MEDIA_MOOD_LIVESETS_LAST_YEAR -> getMood(parentIdParts[1], year, "long")
 
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
             MEDIA_SHARE_ID -> getShares()
@@ -878,35 +882,35 @@ class MediaLibrarySessionCallback :
             mediaType = MEDIA_TYPE_PLAYLIST
         )
 
-        // Moods
-        mediaItems.add(
-            R.string.main_title_all_songs,
-            MEDIA_MOODS_SONGS,
-            R.string.main_moods_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        mediaItems.add(
-            R.string.main_title_songs_last_year,
-            MEDIA_MOODS_SONGS_LAST_YEAR,
-            R.string.main_moods_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        mediaItems.add(
-            R.string.main_title_all_livesets,
-            MEDIA_MOODS_LIVESETS,
-            R.string.main_moods_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        mediaItems.add(
-            R.string.main_title_livesets_last_year,
-            MEDIA_MOODS_LIVESETS_LAST_YEAR,
-            R.string.main_moods_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
+//        // Moods
+//        mediaItems.add(
+//            R.string.main_title_all_songs,
+//            MEDIA_MOODS_SONGS,
+//            R.string.main_moods_title,
+//            isBrowsable = true,
+//            mediaType = MEDIA_TYPE_PLAYLIST
+//        )
+//        mediaItems.add(
+//            R.string.main_title_songs_last_year,
+//            MEDIA_MOODS_SONGS_LAST_YEAR,
+//            R.string.main_moods_title,
+//            isBrowsable = true,
+//            mediaType = MEDIA_TYPE_PLAYLIST
+//        )
+//        mediaItems.add(
+//            R.string.main_title_all_livesets,
+//            MEDIA_MOODS_LIVESETS,
+//            R.string.main_moods_title,
+//            isBrowsable = true,
+//            mediaType = MEDIA_TYPE_PLAYLIST
+//        )
+//        mediaItems.add(
+//            R.string.main_title_livesets_last_year,
+//            MEDIA_MOODS_LIVESETS_LAST_YEAR,
+//            R.string.main_moods_title,
+//            isBrowsable = true,
+//            mediaType = MEDIA_TYPE_PLAYLIST
+//        )
 
         // Songs
         mediaItems.add(
@@ -1504,6 +1508,34 @@ class MediaLibrarySessionCallback :
         }
     }
 
+    private fun getRecentSongs(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        return mainScope.future {
+            val songs = serviceScope.future {
+                callWithErrorHandling { musicService.getSongs(Filters(), null, null, DISPLAY_LIMIT, 0, "Added") }
+            }.await()
+
+            if (songs != null) {
+                if (songs.size > 1) {
+                    mediaItems.addPlayAllItem(listOf(MEDIA_SONG_RANDOM_ID).joinToString("|"))
+                }
+
+                // TODO: Paging is not implemented for songs, is it necessary at all?
+                val items = songs.getTracks()
+                randomSongsCache = items
+                items.map { song ->
+                    mediaItems.add(
+                        song.toMediaItem(
+                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
+                        )
+                    )
+                }
+            }
+            return@future LibraryResult.ofItemList(mediaItems, null)
+        }
+    }
+
     private fun playRandomSongs(): List<Track>? {
         if (randomSongsCache == null) {
             // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
@@ -1564,79 +1596,10 @@ class MediaLibrarySessionCallback :
         Timber.i("getGenre: genre=$genre year=$year length=$length")
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongsByGenre(genre, year, length, null, null, 100000, 0) }
-            }.await()
-
-            if (songs != null) {
-
-                if (songs.size > 1) {
-                    mediaItems.addPlayAllItem(listOf(MEDIA_SONG_RANDOM_ID).joinToString("|"))
-                }
-
-                // TODO: Paging is not implemented for songs, is it necessary at all?
-                val items = songs.getTracks()
-                randomSongsCache = items
-                items.map { song ->
-                    mediaItems.add(
-                        song.toMediaItem(
-                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
-                        )
-                    )
-                }
-            }
-            return@future LibraryResult.ofItemList(mediaItems, null)
-        }
-    }
-
-    private fun getMoods(year: Int?, length: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        val mediaItems: MutableList<MediaItem> = ArrayList()
-
-        Timber.i("getMoods: year=$year length=$length")
-        return mainScope.future {
-            var moods = serviceScope.future {
-                callWithErrorHandling { musicService.getMoods(true, year, length) }
-            }.await()
-
-            val mediaIdPrefix = if (year == null) {
-                if (length == "short") {
-                    MEDIA_MOOD_SONGS
-                } else {
-                    MEDIA_MOOD_LIVESETS
-                }
-            } else {
-                if (length == "short") {
-                    MEDIA_MOOD_SONGS_LAST_YEAR
-                } else {
-                    MEDIA_MOOD_LIVESETS_LAST_YEAR
-                }
-            }
-
-
-            if (moods != null) {
-                moods = moods.sortedByDescending { mood -> mood.songCount }
-            }
-            moods?.forEach {
-                mediaItems.add(
-                    it.name + " " + it.songCount,
-                    mediaIdPrefix + "|" + it.name,
-                    R.string.main_moods_title,
-                    isBrowsable = true,
-                    mediaType = MEDIA_TYPE_PLAYLIST)
-
-            }
-            return@future LibraryResult.ofItemList(mediaItems, null)
-        }
-    }
-
-    private fun getMood(mood: String, year: Int?, length: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        val mediaItems: MutableList<MediaItem> = ArrayList()
-
-        Timber.i("getMood:  mood=$mood year=$year length=$length")
-        return mainScope.future {
-            val songs = serviceScope.future {
-                val filters = Filters(Filter("MOOD", mood))
-                year.ifNotNull { filters.add(Filter("YEAR", year.toString())) }
-                callWithErrorHandling { musicService.getSongs(filters, null,null, 100000, 0) }
+                val filters = Filters(Filter("GENRE", genre))
+                filters.add(Filter("LENGTH", length))
+                year.ifNotNull { filters.add(Filter("YEAR", year.toString()))}
+                callWithErrorHandling { musicService.getSongs(filters, null, null, 100000, 0, "Added") }
             }.await()
 
             if (songs != null) {

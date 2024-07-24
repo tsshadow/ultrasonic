@@ -66,7 +66,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset)
+            val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset, "Added")
             currentListIsSortable = false
             updateList(musicDirectory, append)
 

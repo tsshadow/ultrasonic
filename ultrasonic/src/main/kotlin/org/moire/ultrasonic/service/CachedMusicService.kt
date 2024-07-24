@@ -481,9 +481,10 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,
-        offset: Int
+        offset: Int,
+        sortMethod: String?
     ): MusicDirectory {
-        return musicService.getSongs(filters, ratingMin, ratingMax, count, offset)
+        return musicService.getSongs(filters, ratingMin, ratingMax, count, offset, sortMethod)
     }
 
     @Throws(Exception::class)

@@ -551,10 +551,11 @@ open class RESTMusicService(
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,
-        offset: Int): MusicDirectory {
+        offset: Int,
+        sortMethod: String?): MusicDirectory {
 
         Timber.d(filters.toString())
-        val response = API.getSongs(filters.toString(), ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+        val response = API.getSongs(filters.toString(), ratingMin, ratingMax, count, offset, null, sortMethod).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))

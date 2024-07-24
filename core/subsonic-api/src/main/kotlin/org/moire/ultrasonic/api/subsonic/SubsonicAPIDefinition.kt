@@ -316,7 +316,8 @@ interface SubsonicAPIDefinition {
         @Query("ratingMax") ratingMax: Int? = null,
         @Query("count") count: Int = 10,
         @Query("offset") offset: Int = 0,
-        @Query("musicFolderId") musicFolderId: String? = null
+        @Query("musicFolderId") musicFolderId: String? = null,
+        @Query("sortMethod") sortMethod: String? = null
     ): Call<GetSongsResponse>
 
     @GET("getSongsByMood.view")
