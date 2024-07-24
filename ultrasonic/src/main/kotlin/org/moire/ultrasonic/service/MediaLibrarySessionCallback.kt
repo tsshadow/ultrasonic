@@ -1513,7 +1513,7 @@ class MediaLibrarySessionCallback :
 
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongs(Filters(), null, null, DISPLAY_LIMIT, 0, "Added") }
+                callWithErrorHandling { musicService.getSongs(Filters(), null, null, DISPLAY_LIMIT, 0, "LastWritten") }
             }.await()
 
             if (songs != null) {
@@ -1599,7 +1599,7 @@ class MediaLibrarySessionCallback :
                 val filters = Filters(Filter("GENRE", genre))
                 filters.add(Filter("LENGTH", length))
                 year.ifNotNull { filters.add(Filter("YEAR", year.toString()))}
-                callWithErrorHandling { musicService.getSongs(filters, null, null, 100000, 0, "Added") }
+                callWithErrorHandling { musicService.getSongs(filters, null, null, 100000, 0, "LastWritten") }
             }.await()
 
             if (songs != null) {
