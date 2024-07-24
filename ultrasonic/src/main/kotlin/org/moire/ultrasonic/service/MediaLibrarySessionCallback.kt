@@ -70,6 +70,8 @@ private const val MEDIA_ALBUM_RANDOM_ID = "MEDIA_ALBUM_RANDOM_ID"
 private const val MEDIA_ALBUM_STARRED_ID = "MEDIA_ALBUM_STARRED_ID"
 private const val MEDIA_SONG_RANDOM_ID = "MEDIA_SONG_RANDOM_ID"
 private const val MEDIA_SONG_RECENT = "MEDIA_SONG_RECENT"
+private const val MEDIA_LIVESET_RANDOM_ID = "MEDIA_LIVESET_RANDOM_ID"
+private const val MEDIA_LIVESET_RECENT = "MEDIA_LIVESET_RECENT"
 private const val MEDIA_SONG_STARRED_ID = "MEDIA_SONG_STARRED_ID"
 private const val MEDIA_ARTIST_ID = "MEDIA_ARTIST_ID"
 private const val MEDIA_LIBRARY_ID = "MEDIA_LIBRARY_ID"
@@ -649,6 +651,8 @@ class MediaLibrarySessionCallback :
             MEDIA_ALBUM_STARRED_ID -> getAlbums(AlbumListType.STARRED)
             MEDIA_SONG_RANDOM_ID -> getRandomSongs()
             MEDIA_SONG_RECENT -> getRecentSongs()
+            MEDIA_LIVESET_RANDOM_ID -> getRandomLivesets()
+            MEDIA_LIVESET_RECENT -> getRecentLivesets()
 
             // Genre -> songs
             MEDIA_GENRES_SONGS -> getGenres(null, "short")
@@ -917,6 +921,28 @@ class MediaLibrarySessionCallback :
             R.string.main_songs_random,
             MEDIA_SONG_RANDOM_ID,
             R.string.main_songs_title,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
+        )
+        mediaItems.add(
+            R.string.main_songs_recent,
+            MEDIA_SONG_RECENT,
+            R.string.main_songs_title,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
+        )
+        // Livesets
+        mediaItems.add(
+            R.string.main_songs_random,
+            MEDIA_LIVESET_RANDOM_ID,
+            R.string.main_livesets_title,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
+        )
+        mediaItems.add(
+            R.string.main_songs_recent,
+            MEDIA_LIVESET_RECENT,
+            R.string.main_livesets_title,
             isBrowsable = true,
             mediaType = MEDIA_TYPE_PLAYLIST
         )
@@ -1513,7 +1539,63 @@ class MediaLibrarySessionCallback :
 
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongs(Filters(), null, null, DISPLAY_LIMIT, 0, "LastWritten") }
+                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "short")), null, null, DISPLAY_LIMIT, 0, "LastWritten") }
+            }.await()
+
+            if (songs != null) {
+                if (songs.size > 1) {
+                    mediaItems.addPlayAllItem(listOf(MEDIA_SONG_RANDOM_ID).joinToString("|"))
+                }
+
+                // TODO: Paging is not implemented for songs, is it necessary at all?
+                val items = songs.getTracks()
+                randomSongsCache = items
+                items.map { song ->
+                    mediaItems.add(
+                        song.toMediaItem(
+                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
+                        )
+                    )
+                }
+            }
+            return@future LibraryResult.ofItemList(mediaItems, null)
+        }
+    }
+
+    private fun getRandomLivesets(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        return mainScope.future {
+            val songs = serviceScope.future {
+                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "long")), null, null, DISPLAY_LIMIT, 0, "Random") }
+            }.await()
+
+            if (songs != null) {
+                if (songs.size > 1) {
+                    mediaItems.addPlayAllItem(listOf(MEDIA_SONG_RANDOM_ID).joinToString("|"))
+                }
+
+                // TODO: Paging is not implemented for songs, is it necessary at all?
+                val items = songs.getTracks()
+                randomSongsCache = items
+                items.map { song ->
+                    mediaItems.add(
+                        song.toMediaItem(
+                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
+                        )
+                    )
+                }
+            }
+            return@future LibraryResult.ofItemList(mediaItems, null)
+        }
+    }
+
+    private fun getRecentLivesets(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        return mainScope.future {
+            val songs = serviceScope.future {
+                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "long")), null, null, DISPLAY_LIMIT, 0, "LastWritten") }
             }.await()
 
             if (songs != null) {
