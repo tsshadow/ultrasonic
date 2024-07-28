@@ -529,8 +529,10 @@ open class TrackCollectionFragment(
         val genreName = navArgs.genreName
         val moodName = navArgs.moodName
         val yearName = navArgs.yearName
+        val getSongsName = navArgs.getSongsName
         val year = navArgs.year
         val length = navArgs.length
+        val sortMethod = navArgs.sortMethod
         val ratingMin = navArgs.ratingMin
         val ratingMax = navArgs.ratingMax
 
@@ -570,7 +572,7 @@ open class TrackCollectionFragment(
             } else if (yearName != null) {
                 setTitle(yearName)
                 val filters = Filters(Filter("YEAR",year.toString()))
-                year.ifNotNull { filters.add(Filter("LENGTH", length.toString()))}
+                if (length!== null && length.isNotEmpty()) filters.add(Filter("LENGTH", length.toString()))
                 listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append)
             } else if (getStarredTracks) {
                 setTitle(getString(R.string.main_songs_starred))
@@ -578,6 +580,41 @@ open class TrackCollectionFragment(
             } else if (getVideos) {
                 setTitle(R.string.main_videos)
                 listModel.getVideos(refresh2)
+            } else if(getSongsName != null) {
+            setTitle(getSongsName)
+            val filters = Filters()
+            if (year !== null && year.isNotEmpty()) filters.add(
+                Filter(
+                    "YEAR",
+                    year.toString()
+                )
+            )
+            if (length !== null && length.isNotEmpty()) filters.add(
+                Filter(
+                    "LENGTH",
+                    length.toString()
+                )
+            )
+            if (sortMethod != null) {
+                listModel.getSongs(
+                    filters,
+                    ratingMin,
+                    ratingMax,
+                    size,
+                    offset,
+                    append,
+                    sortMethod
+                )
+            } else {
+                listModel.getSongs(
+                    filters,
+                    ratingMin,
+                    ratingMax,
+                    size,
+                    offset,
+                    append
+                )
+            }
             } else if (id == null || getRandomTracks) {
                 // There seems to be a bug in ViewPager when resuming the Activity that sub-fragments
                 // arguments are empty. If we have no id, just show some random tracks

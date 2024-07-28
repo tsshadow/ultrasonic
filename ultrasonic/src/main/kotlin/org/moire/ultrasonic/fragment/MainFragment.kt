@@ -30,7 +30,6 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.fragment.legacy.SelectGenreFragment
-import org.moire.ultrasonic.fragment.tsshadow.LandingPageFragment
 import org.moire.ultrasonic.fragment.tsshadow.SelectMoodFragment
 import org.moire.ultrasonic.fragment.tsshadow.SelectYearFragment
 import org.moire.ultrasonic.util.LayoutType

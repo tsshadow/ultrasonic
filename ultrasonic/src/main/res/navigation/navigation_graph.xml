@@ -131,6 +131,11 @@
             app:argType="string"
             app:nullable="true" />
         <argument
+            android:name="getSongsName"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
             android:name="year"
             android:defaultValue=""
             app:argType="string"
@@ -186,6 +191,11 @@
             android:name="offset"
             android:defaultValue="0"
             app:argType="integer" />
+        <argument
+            android:name="sortMethod"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/albumListFragment"
@@ -209,7 +219,12 @@
         <argument
             android:name="offset"
             android:defaultValue="0"
-            app:argType="integer" />
+            app:argType="integer"/>
+        <argument
+            android:name="sortMethod"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
         <argument
             android:name="append"
             android:defaultValue="false"

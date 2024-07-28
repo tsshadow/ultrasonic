@@ -57,7 +57,8 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         ratingMax: Int?,
         count: Int,
         offset: Int,
-        append: Boolean
+        append: Boolean,
+        sortMethod: String = "LastWritten"
     ) {
         // Handle the logic for endless scrolling:
         // If appending the existing list, set the offset from where to load
@@ -66,7 +67,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset, "LastWritten")
+            val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset, sortMethod)
             currentListIsSortable = false
             updateList(musicDirectory, append)
 
