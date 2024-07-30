@@ -11,9 +11,7 @@ import androidx.navigation.fragment.findNavController
 import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
-import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util
 
@@ -93,29 +91,29 @@ class LandingPageFragment : Fragment(), KoinComponent {
 
     private fun setupButtons() {
         // Songs
-        songsTitle = binding!!.findViewById(R.id.main_songs);
-        randomSongsButton = binding!!.findViewById(R.id.main_songs_button);
-        recentSongsButton = binding!!.findViewById(R.id.main_songs_recent);
+        songsTitle = binding!!.findViewById(R.id.main_songs)
+        randomSongsButton = binding!!.findViewById(R.id.main_songs_button)
+        recentSongsButton = binding!!.findViewById(R.id.main_songs_recent)
         // Livesets
-        livesetsTitle = binding!!.findViewById(R.id.main_livesets);
-        randomLivesetsButton = binding!!.findViewById(R.id.main_livesets_button);
-        recentLivesetsButton = binding!!.findViewById(R.id.main_livesets_recent);
+        livesetsTitle = binding!!.findViewById(R.id.main_livesets)
+        randomLivesetsButton = binding!!.findViewById(R.id.main_livesets_button)
+        recentLivesetsButton = binding!!.findViewById(R.id.main_livesets_recent)
 
         // Albums
-        albumsTitle = binding!!.findViewById(R.id.main_albums);
-        albumsNewestButton = binding!!.findViewById(R.id.main_albums_newest);
-        albumsRandomButton = binding!!.findViewById(R.id.main_albums_random);
-        albumsHighestButton = binding!!.findViewById(R.id.main_albums_highest);
-        albumsStarredButton = binding!!.findViewById(R.id.main_albums_starred);
-        albumsRecentButton = binding!!.findViewById(R.id.main_albums_recent);
-        albumsFrequentButton = binding!!.findViewById(R.id.main_albums_frequent);
-        albumsAlphaByNameButton = binding!!.findViewById(R.id.main_albums_alphaByName);
-        albumsAlphaByArtistButton = binding!!.findViewById(R.id.main_albums_alphaByArtist);
+        albumsTitle = binding!!.findViewById(R.id.main_albums)
+        albumsNewestButton = binding!!.findViewById(R.id.main_albums_newest)
+        albumsRandomButton = binding!!.findViewById(R.id.main_albums_random)
+        albumsHighestButton = binding!!.findViewById(R.id.main_albums_highest)
+        albumsStarredButton = binding!!.findViewById(R.id.main_albums_starred)
+        albumsRecentButton = binding!!.findViewById(R.id.main_albums_recent)
+        albumsFrequentButton = binding!!.findViewById(R.id.main_albums_frequent)
+        albumsAlphaByNameButton = binding!!.findViewById(R.id.main_albums_alphaByName)
+        albumsAlphaByArtistButton = binding!!.findViewById(R.id.main_albums_alphaByArtist)
 
 
         // Videos
-        videosTitle = binding!!.findViewById(R.id.main_videos_title);
-        videosButton = binding!!.findViewById(R.id.main_videos);
+        videosTitle = binding!!.findViewById(R.id.main_videos_title)
+        videosButton = binding!!.findViewById(R.id.main_videos)
     }
 
     private fun setupItemVisibility() {
@@ -197,35 +195,6 @@ class LandingPageFragment : Fragment(), KoinComponent {
             findNavController().navigate(action)
         }
 
-    }
-
-    private fun showStarredSongs() {
-//        val action = MainFragmentDirections.mainToTrackCollection(
-//            getStarred = true,
-//        )
-//        findNavController().navigate(action)
-    }
-
-    private fun showRandomSongs() {
-
-    }
-
-    private fun showArtists() {
-//        val action = MainFragmentDirections.mainToArtistList(
-//            title = requireContext().resources.getString(R.string.main_artists_title)
-//        )
-//        findNavController().navigate(action)
-    }
-
-    private fun showAlbumList(type: AlbumListType, titleIndex: Int) {
-//        val title = requireContext().resources.getString(titleIndex, "")
-//        val action = MainFragmentDirections.mainToAlbumList(
-//            type = type,
-//            title = title,
-//            size = Settings.maxAlbums,
-//            offset = 0
-//        )
-//        findNavController().navigate(action)
     }
 
     companion object {
