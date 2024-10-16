@@ -40,6 +40,16 @@
                 android:text="@string/main.songs_recent"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
             <TextView
+                android:id="@+id/main_songs_this_year_button"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="40dip"
+                android:paddingStart="6dip"
+                android:paddingEnd="6dip"
+                android:text="@string/main.songs_random_this_year"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
                 android:id="@+id/main_livesets"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -68,6 +78,16 @@
                 android:paddingStart="6dip"
                 android:paddingEnd="6dip"
                 android:text="@string/main.songs_recent"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:id="@+id/main_livesets_this_year_button"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="40dip"
+                android:paddingStart="6dip"
+                android:paddingEnd="6dip"
+                android:text="@string/main.songs_random_this_year"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
