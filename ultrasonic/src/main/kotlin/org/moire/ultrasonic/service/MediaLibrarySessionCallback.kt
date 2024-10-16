@@ -52,6 +52,7 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
+import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.ifNotNull
 import org.moire.ultrasonic.util.buildMediaItem
@@ -886,36 +887,6 @@ class MediaLibrarySessionCallback :
             mediaType = MEDIA_TYPE_PLAYLIST
         )
 
-//        // Moods
-//        mediaItems.add(
-//            R.string.main_title_all_songs,
-//            MEDIA_MOODS_SONGS,
-//            R.string.main_moods_title,
-//            isBrowsable = true,
-//            mediaType = MEDIA_TYPE_PLAYLIST
-//        )
-//        mediaItems.add(
-//            R.string.main_title_songs_last_year,
-//            MEDIA_MOODS_SONGS_LAST_YEAR,
-//            R.string.main_moods_title,
-//            isBrowsable = true,
-//            mediaType = MEDIA_TYPE_PLAYLIST
-//        )
-//        mediaItems.add(
-//            R.string.main_title_all_livesets,
-//            MEDIA_MOODS_LIVESETS,
-//            R.string.main_moods_title,
-//            isBrowsable = true,
-//            mediaType = MEDIA_TYPE_PLAYLIST
-//        )
-//        mediaItems.add(
-//            R.string.main_title_livesets_last_year,
-//            MEDIA_MOODS_LIVESETS_LAST_YEAR,
-//            R.string.main_moods_title,
-//            isBrowsable = true,
-//            mediaType = MEDIA_TYPE_PLAYLIST
-//        )
-
         // Songs
         mediaItems.add(
             R.string.main_songs_random,
@@ -1539,7 +1510,7 @@ class MediaLibrarySessionCallback :
 
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "short")), null, null, DISPLAY_LIMIT, 0, "LastWritten") }
+                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "short")), null, null, maxSongs, 0, "LastWritten") }
             }.await()
 
             if (songs != null) {
@@ -1567,7 +1538,7 @@ class MediaLibrarySessionCallback :
 
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "long")), null, null, DISPLAY_LIMIT, 0, "Random") }
+                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "long")), null, null, maxSongs, 0, "Random") }
             }.await()
 
             if (songs != null) {
@@ -1595,7 +1566,7 @@ class MediaLibrarySessionCallback :
 
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "long")), null, null, DISPLAY_LIMIT, 0, "LastWritten") }
+                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "long")), null, null, maxSongs, 0, "LastWritten") }
             }.await()
 
             if (songs != null) {
@@ -1623,7 +1594,7 @@ class MediaLibrarySessionCallback :
             // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
             // In this case we request a new set of random songs
             val content = serviceScope.future {
-                callWithErrorHandling { musicService.getRandomSongs(DISPLAY_LIMIT) }
+                callWithErrorHandling { musicService.getRandomSongs(maxSongs) }
             }.get()
             randomSongsCache = content?.getTracks()
         }
@@ -1681,7 +1652,7 @@ class MediaLibrarySessionCallback :
                 val filters = Filters(Filter("GENRE", genre))
                 filters.add(Filter("LENGTH", length))
                 year.ifNotNull { filters.add(Filter("YEAR", year.toString()))}
-                callWithErrorHandling { musicService.getSongs(filters, null, null, 100000, 0, "LastWritten") }
+                callWithErrorHandling { musicService.getSongs(filters, null, null, maxSongs, 0, "LastWritten") }
             }.await()
 
             if (songs != null) {
