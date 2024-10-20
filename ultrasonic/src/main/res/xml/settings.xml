@@ -161,14 +161,14 @@
         a:title="@string/settings.network_title"
         app:iconSpaceReserved="false">
         <ListPreference
-            a:defaultValue="@string/settings.max_bitrate_unlimited"
+            a:defaultValue="0"
             a:entries="@array/maxBitrateNames"
             a:entryValues="@array/maxBitrateValues"
             a:key="@string/setting_key.max_bitrate_mobile"
             a:title="@string/settings.max_bitrate_mobile"
             app:iconSpaceReserved="false"/>
         <ListPreference
-            a:defaultValue="@string/settings.max_bitrate_unlimited"
+            a:defaultValue="0"
             a:entries="@array/maxBitrateNames"
             a:entryValues="@array/maxBitrateValues"
             a:key="@string/setting_key.max_bitrate_wifi"
@@ -221,7 +221,7 @@
             a:title="@string/settings.cache_location"
             app:iconSpaceReserved="false"/>
         <ListPreference
-            a:defaultValue="@string/settings.preload_100"
+            a:defaultValue="100"
             a:entries="@array/preloadCountNames"
             a:entryValues="@array/preloadCountValues"
             a:key="@string/setting_key.preload_count"
