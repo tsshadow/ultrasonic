@@ -20,14 +20,8 @@
         android:id="@+id/toArtistList"
         app:destination="@id/artistListFragment" />
     <action
-        android:id="@+id/toGenreList"
-        app:destination="@id/selectGenreFragment" />
-    <action
-        android:id="@+id/toMoodList"
-        app:destination="@id/selectMoodFragment" />
-    <action
-        android:id="@+id/toYearList"
-        app:destination="@id/selectYearFragment" />
+        android:id="@+id/toSongList"
+        app:destination="@id/selectSongFragment" />
     <action
         android:id="@+id/toLandingPage"
         app:destination="@id/landingPageFragment" />
@@ -296,16 +290,8 @@
         android:id="@+id/aboutFragment"
         android:name="org.moire.ultrasonic.fragment.AboutFragment" />
     <fragment
-        android:id="@+id/selectGenreFragment"
-        android:name="org.moire.ultrasonic.fragment.legacy.SelectGenreFragment">
-    </fragment>
-    <fragment
-        android:id="@+id/selectMoodFragment"
-        android:name="org.moire.ultrasonic.fragment.tsshadow.selectMoodFragment">
-    </fragment>
-    <fragment
-        android:id="@+id/selectYearFragment"
-        android:name="org.moire.ultrasonic.fragment.tsshadow.selectYearFragment">
+        android:id="@+id/selectSongFragment"
+        android:name="org.moire.ultrasonic.fragment.tsshadow.SelectSongFragment">
     </fragment>
     <fragment
         android:id="@+id/landingPageFragment"

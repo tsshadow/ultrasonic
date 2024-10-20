@@ -1,4 +1,4 @@
-package org.moire.ultrasonic.fragment
+package org.moire.ultrasonic.fragment.tsshadow
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +14,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util
+import java.util.Calendar
 
 /**
  * Displays the Main screen of Ultrasonic, where the music library can be browsed
@@ -93,15 +94,15 @@ class LandingPageFragment : Fragment(), KoinComponent {
 
     private fun setupButtons() {
         // Songs
-        songsTitle = binding!!.findViewById(R.id.main_songs);
-        randomSongsButton = binding!!.findViewById(R.id.main_songs_button);
-        randomSongsThisYearButton = binding!!.findViewById(R.id.main_songs_this_year_button);
-        recentSongsButton = binding!!.findViewById(R.id.main_songs_recent);
+        songsTitle = binding!!.findViewById(R.id.main_songs)
+        randomSongsButton = binding!!.findViewById(R.id.main_songs_button)
+        randomSongsThisYearButton = binding!!.findViewById(R.id.main_songs_this_year_button)
+        recentSongsButton = binding!!.findViewById(R.id.main_songs_recent)
         // Livesets
-        livesetsTitle = binding!!.findViewById(R.id.main_livesets);
-        randomLivesetsButton = binding!!.findViewById(R.id.main_livesets_button);
-        randomLivesetsThisYearButton = binding!!.findViewById(R.id.main_livesets_this_year_button);
-        recentLivesetsButton = binding!!.findViewById(R.id.main_livesets_recent);
+        livesetsTitle = binding!!.findViewById(R.id.main_livesets)
+        randomLivesetsButton = binding!!.findViewById(R.id.main_livesets_button)
+        randomLivesetsThisYearButton = binding!!.findViewById(R.id.main_livesets_this_year_button)
+        recentLivesetsButton = binding!!.findViewById(R.id.main_livesets_recent)
 
         // Albums
         albumsTitle = binding!!.findViewById(R.id.main_albums)
@@ -158,6 +159,7 @@ class LandingPageFragment : Fragment(), KoinComponent {
     }
 
     private fun setupClickListener() {
+        val y = Calendar.getInstance().get(Calendar.YEAR).toString()
         randomSongsButton.setOnClickListener {
             val action = NavigationGraphDirections.toTrackCollection(
                 size = maxSongs,
@@ -174,7 +176,7 @@ class LandingPageFragment : Fragment(), KoinComponent {
                 offset = 0,
                 sortMethod = "Random",
                 length = "short",
-                year = "2024",
+                year = y,
                 getSongsName = "Random Songs (This Year)"
             )
             findNavController().navigate(action)
@@ -218,7 +220,7 @@ class LandingPageFragment : Fragment(), KoinComponent {
                 offset = 0,
                 sortMethod = "Random",
                 length = "long",
-                year = "2024",
+                year = y,
                 getSongsName = "Random Livesets (This Year)"
             )
             findNavController().navigate(action)

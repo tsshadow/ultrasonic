@@ -122,6 +122,7 @@
     <string name="main.title_songs_last_year">This year (songs)</string>
     <string name="main.title_livesets_last_year">This Year (livesets)</string>
     <string name="main.landing_page_title">Home</string>
+    <string name="main.advanced_search_title">Search</string>
     <string name="main.offline">Offline</string>
     <string name="main.setup_server">%s - Set up Server</string>
     <string name="main.songs_random">Random</string>

@@ -29,9 +29,8 @@ import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.fragment.legacy.SelectGenreFragment
-import org.moire.ultrasonic.fragment.tsshadow.SelectMoodFragment
-import org.moire.ultrasonic.fragment.tsshadow.SelectYearFragment
+import org.moire.ultrasonic.fragment.tsshadow.LandingPageFragment
+import org.moire.ultrasonic.fragment.tsshadow.SelectSongFragment
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.view.EMPTY_CAPABILITIES
@@ -174,11 +173,9 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
         val action = when (position) {
             0 -> NavigationGraphDirections.toLandingPage()
-            1 -> NavigationGraphDirections.toGenreList()
-            2 -> NavigationGraphDirections.toMoodList()
-            3 -> NavigationGraphDirections.toYearList()
-            4 -> NavigationGraphDirections.toTrackCollection()
-            5 -> NavigationGraphDirections.toAlbumList(
+            1 -> NavigationGraphDirections.toSongList()
+            2 -> NavigationGraphDirections.toTrackCollection()
+            3 -> NavigationGraphDirections.toAlbumList(
                 AlbumListType.NEWEST,
                 size = Settings.maxAlbums
             )
@@ -187,11 +184,9 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
         val fragment = when (position) {
             0 -> LandingPageFragment()
-            1 -> SelectGenreFragment()
-            2 -> SelectMoodFragment()
-            3 -> SelectYearFragment()
-            4 -> TrackCollectionFragment(SortOrder.RANDOM)
-            5 -> AlbumListFragment(layoutType)
+            1 -> SelectSongFragment()
+            2 -> TrackCollectionFragment(SortOrder.RANDOM)
+            3 -> AlbumListFragment(layoutType)
             else -> ArtistListFragment()
         }
 
@@ -211,12 +206,10 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
     fun getTitleForFragment(pos: Int, context: Context): String {
         return when (pos) {
             0 -> context.getString(R.string.main_landing_page_title)
-            1 -> context.getString(R.string.main_genres_title)
-            2 -> context.getString(R.string.main_moods_title)
-            3 -> context.getString(R.string.main_years_title)
-            4 -> context.getString(R.string.main_songs_title)
-            5 -> context.getString(R.string.main_albums_title)
-            6 -> context.getString(R.string.main_artists_title)
+            1 -> context.getString(R.string.main_advanced_search_title)
+            2 -> context.getString(R.string.main_songs_title)
+            3 -> context.getString(R.string.main_albums_title)
+            4 -> context.getString(R.string.main_artists_title)
             else -> "Unknown"
         }
     }
