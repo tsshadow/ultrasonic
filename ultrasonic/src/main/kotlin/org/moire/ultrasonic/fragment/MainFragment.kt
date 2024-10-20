@@ -165,7 +165,7 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
     override fun getItemCount(): Int {
         // Hide Genre tab when offline
-        return if (ActiveServerProvider.isOffline()) 3 else 7
+        return if (ActiveServerProvider.isOffline()) 3 else 5
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -179,7 +179,8 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
                 AlbumListType.NEWEST,
                 size = Settings.maxAlbums
             )
-            else -> NavigationGraphDirections.toArtistList()
+            4 -> NavigationGraphDirections.toArtistList()
+            else -> NavigationGraphDirections.toLandingPage()
         }
 
         val fragment = when (position) {
@@ -187,7 +188,8 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
             1 -> SelectSongFragment()
             2 -> TrackCollectionFragment(SortOrder.RANDOM)
             3 -> AlbumListFragment(layoutType)
-            else -> ArtistListFragment()
+            4 -> ArtistListFragment()
+            else -> LandingPageFragment()
         }
 
         fragmentMap[position] = SoftReference(fragment)
