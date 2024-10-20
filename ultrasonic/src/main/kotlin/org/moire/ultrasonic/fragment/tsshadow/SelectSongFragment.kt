@@ -29,20 +29,25 @@ import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.toastingExceptionHandler
-import timber.log.Timber
-
 
 /**
  * Advanced search fragment, enables searching for songs with multiple parameters
  */
 class SelectSongFragment : Fragment(), RefreshableFragment {
     override var swipeRefresh: SwipeRefreshLayout? = null
-    private var lengthSpinner: Spinner? = null
-    private var genreSpinner: Spinner? = null
-    private var genreList = ArrayList<String>()
+
     private var yearSpinner: Spinner? = null
+
     private var ratingMin: Spinner? = null
     private var ratingMax: Spinner? = null
+
+    private var lengthSpinner: Spinner? = null
+
+    private var genreSpinner: Spinner? = null
+    private var genreList = ArrayList<String>()
+
+    private var sortMethodSpinner: Spinner? = null
+
     private var searchButton: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,16 +67,18 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         super.onViewCreated(view, savedInstanceState)
         swipeRefresh = view.findViewById(R.id.select_genre_refresh)
         yearSpinner = view.findViewById(R.id.select_year)
-        genreSpinner = view.findViewById(R.id.select_genre)
         ratingMin = view.findViewById(R.id.select_rating_min)
         ratingMax = view.findViewById(R.id.select_rating_max)
         lengthSpinner = view.findViewById(R.id.select_length)
+        genreSpinner = view.findViewById(R.id.select_genre)
+        sortMethodSpinner = view.findViewById(R.id.select_sort_method)
         searchButton = view.findViewById(R.id.search)
         swipeRefresh?.setOnRefreshListener { load(true) }
 
         searchButton?.setOnClickListener {
             val genre = genreSpinner?.selectedItem as String
             val action = NavigationGraphDirections.toTrackCollection(
+                getSongsName = "getSongs",
                 genreName = if (genre != "") genre else null,
                 size = maxSongs,
                 offset = 0,
@@ -79,6 +86,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
                 length = lengthSpinner?.selectedItem as String?,
                 ratingMin = ratingMin?.selectedItem as Int,
                 ratingMax = ratingMax?.selectedItem as Int,
+                sortMethod = sortMethodSpinner?.selectedItem as String
             )
             findNavController().navigate(action)
         }
@@ -91,7 +99,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
             )
         ratingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        var years = arrayOf(
+        val years = arrayOf(
             "All",
             "2024",
             "2023",
@@ -126,14 +134,17 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
             "1994",
             "1993",
             "1992"
-        );
+        )
         val yearAdapter =
             ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, years)
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        var lengths = arrayOf("", "short", "long");
         val lengthAdapter =
-            ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, lengths)
+            ArrayAdapter<String>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                arrayOf("", "short", "long")
+            )
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         // Initialize empty genres list
@@ -142,13 +153,30 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
             ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, genreList)
         genreAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
+        val sortMethodAdapter =
+            ArrayAdapter<String>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                arrayListOf(
+                    "None",
+                    "Id",
+                    "Random",
+                    "LastWritten",
+                    "StarredDateDesc",
+                    "Name",
+                    "DateDescAndRelease",
+                    "Release",
+                    "TrackList"
+                )
+            )
         // Set Adapters
-        genreSpinner?.setAdapter(genreAdapter)
         yearSpinner?.setAdapter(yearAdapter)
-        lengthSpinner?.setAdapter(lengthAdapter)
         ratingMin?.setAdapter(ratingAdapter)
         ratingMax?.setAdapter(ratingAdapter)
         ratingMax?.setSelection(5)
+        lengthSpinner?.setAdapter(lengthAdapter)
+        genreSpinner?.setAdapter(genreAdapter)
+        sortMethodSpinner?.setAdapter(sortMethodAdapter)
 
         setTitle(this, R.string.main_advanced_search_title)
         load(false)
@@ -165,9 +193,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
 
                 musicService.getGenres(refresh, null, null)
             }
-
             for (genre in genres) {
-                Timber.e(genre.name, null)
                 genreList.add(genre.name)
             }
         }
