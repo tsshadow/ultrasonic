@@ -98,6 +98,7 @@ class LandingPageFragment : Fragment(), KoinComponent {
         randomSongsButton = binding!!.findViewById(R.id.main_songs_button)
         randomSongsThisYearButton = binding!!.findViewById(R.id.main_songs_this_year_button)
         recentSongsButton = binding!!.findViewById(R.id.main_songs_recent)
+
         // Livesets
         livesetsTitle = binding!!.findViewById(R.id.main_livesets)
         randomLivesetsButton = binding!!.findViewById(R.id.main_livesets_button)

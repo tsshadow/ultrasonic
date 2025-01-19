@@ -98,12 +98,16 @@ private const val MEDIA_SEARCH_SONG_ITEM = "MEDIA_SEARCH_SONG_ITEM"
 // Genres -> songs
 private const val MEDIA_GENRES_SONGS = "MEDIA_GENRES_SONGS"
 private const val MEDIA_GENRE_SONGS = "MEDIA_GENRE_SONGS"
+private const val MEDIA_GENRES_SONGS_THIS_YEAR = "MEDIA_GENRES_SONGS_THIS_YEAR"
 private const val MEDIA_GENRES_SONGS_LAST_YEAR = "MEDIA_GENRES_SONGS_LAST_YEAR"
+private const val MEDIA_GENRE_SONGS_THIS_YEAR = "MEDIA_GENRE_SONGS_THIS_YEAR"
 private const val MEDIA_GENRE_SONGS_LAST_YEAR = "MEDIA_GENRE_SONGS_LAST_YEAR"
 // Genres -> Livesets
 private const val MEDIA_GENRES_LIVESETS = "MEDIA_GENRES_LIVESETS"
 private const val MEDIA_GENRE_LIVESETS = "MEDIA_GENRE_LIVESETS"
+private const val MEDIA_GENRES_LIVESETS_THIS_YEAR = "MEDIA_GENRES_LIVESETS_THIS_YEAR"
 private const val MEDIA_GENRES_LIVESETS_LAST_YEAR = "MEDIA_GENRES_LIVESETS_LAST_YEAR"
+private const val MEDIA_GENRE_LIVESETS_THIS_YEAR = "MEDIA_GENRE_LIVESETS_THIS_YEAR"
 private const val MEDIA_GENRE_LIVESETS_LAST_YEAR = "MEDIA_GENRE_LIVESETS_LAST_YEAR"
 
 // Moods -> songs
@@ -658,13 +662,18 @@ class MediaLibrarySessionCallback :
             // Genre -> songs
             MEDIA_GENRES_SONGS -> getGenres(null, "short")
             MEDIA_GENRE_SONGS -> getGenre(parentIdParts[1], null, "short")
-            MEDIA_GENRES_SONGS_LAST_YEAR -> getGenres(year, "short")
-            MEDIA_GENRE_SONGS_LAST_YEAR -> getGenre(parentIdParts[1],year, "short")
+            MEDIA_GENRES_SONGS_THIS_YEAR -> getGenres(year, "short")
+            MEDIA_GENRES_SONGS_LAST_YEAR -> getGenres(year-1, "short")
+            MEDIA_GENRE_SONGS_THIS_YEAR -> getGenre(parentIdParts[1],year, "short")
+            MEDIA_GENRE_SONGS_LAST_YEAR -> getGenre(parentIdParts[1],year-1, "short")
+
             // Genre -> livesets
             MEDIA_GENRES_LIVESETS -> getGenres(null, "long")
             MEDIA_GENRE_LIVESETS -> getGenre(parentIdParts[1], null, "long")
-            MEDIA_GENRES_LIVESETS_LAST_YEAR -> getGenres(year, "long")
-            MEDIA_GENRE_LIVESETS_LAST_YEAR -> getGenre(parentIdParts[1],year, "long")
+            MEDIA_GENRES_LIVESETS_THIS_YEAR -> getGenres(year, "long")
+            MEDIA_GENRES_LIVESETS_LAST_YEAR -> getGenres(year-1, "long")
+            MEDIA_GENRE_LIVESETS_THIS_YEAR -> getGenre(parentIdParts[1],year, "long")
+            MEDIA_GENRE_LIVESETS_LAST_YEAR -> getGenre(parentIdParts[1],year-1, "long")
 
 //            // Mood -> songs
 //            MEDIA_MOODS_SONGS -> getMoods(null, "short")
@@ -866,6 +875,13 @@ class MediaLibrarySessionCallback :
             mediaType = MEDIA_TYPE_PLAYLIST
         )
         mediaItems.add(
+            R.string.main_title_songs_this_year,
+            MEDIA_GENRES_SONGS_THIS_YEAR,
+            R.string.main_genres_title,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
+        )
+        mediaItems.add(
             R.string.main_title_songs_last_year,
             MEDIA_GENRES_SONGS_LAST_YEAR,
             R.string.main_genres_title,
@@ -875,6 +891,13 @@ class MediaLibrarySessionCallback :
         mediaItems.add(
             R.string.main_title_all_livesets,
             MEDIA_GENRES_LIVESETS,
+            R.string.main_genres_title,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST
+        )
+        mediaItems.add(
+            R.string.main_title_livesets_this_year,
+            MEDIA_GENRES_LIVESETS_THIS_YEAR,
             R.string.main_genres_title,
             isBrowsable = true,
             mediaType = MEDIA_TYPE_PLAYLIST

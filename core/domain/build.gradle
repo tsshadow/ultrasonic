@@ -10,7 +10,19 @@ dependencies {
     implementation libs.roomKtx
     ksp libs.room
 }
-
 android {
     namespace 'org.moire.ultrasonic.subsonic.domain'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
+    kotlinOptions {
+        jvmTarget = "21"
+    }
+
+    ksp {
+        arg("ksp.jvmTarget", "21") // Ensure KSP targets JVM 21
+    }
 }
+

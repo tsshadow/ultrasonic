@@ -101,6 +101,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
 
         val years = arrayOf(
             "All",
+            "2025",
             "2024",
             "2023",
             "2022",
