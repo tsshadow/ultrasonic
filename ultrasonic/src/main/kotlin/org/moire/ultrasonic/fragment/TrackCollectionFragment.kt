@@ -562,18 +562,21 @@ open class TrackCollectionFragment(
                 val filters = Filters(Filter("GENRE",genreName))
                 year.ifNotNull { if(year !== "All") filters.add(Filter("YEAR", year.toString()))}
                 if (length!== null && length.isNotEmpty()) filters.add(Filter("LENGTH", length.toString()))
-                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append)
+                val effectiveSortMethod = if (sortMethod.isNullOrEmpty()) "LastWritten" else sortMethod
+                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append, effectiveSortMethod)
             } else if (moodName != null) {
                 setTitle(moodName)
                 val filters = Filters(Filter("MOOD",moodName))
                 year.ifNotNull { if(year !== "All") filters.add(Filter("YEAR", year.toString()))}
                 if (length!== null && length.isNotEmpty()) filters.add(Filter("LENGTH", length.toString()))
-                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append)
+                val effectiveSortMethod = if (sortMethod.isNullOrEmpty()) "LastWritten" else sortMethod
+                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append, effectiveSortMethod)
             } else if (yearName != null) {
                 setTitle(yearName)
                 val filters = Filters(Filter("YEAR",year.toString()))
                 if (length!== null && length.isNotEmpty()) filters.add(Filter("LENGTH", length.toString()))
-                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append)
+                val effectiveSortMethod = if (sortMethod.isNullOrEmpty()) "LastWritten" else sortMethod
+                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append, effectiveSortMethod)
             } else if (getStarredTracks) {
                 setTitle(getString(R.string.main_songs_starred))
                 listModel.getStarred()
@@ -595,26 +598,8 @@ open class TrackCollectionFragment(
                     length.toString()
                 )
             )
-            if (sortMethod != null) {
-                listModel.getSongs(
-                    filters,
-                    ratingMin,
-                    ratingMax,
-                    size,
-                    offset,
-                    append,
-                    sortMethod
-                )
-            } else {
-                listModel.getSongs(
-                    filters,
-                    ratingMin,
-                    ratingMax,
-                    size,
-                    offset,
-                    append
-                )
-            }
+            val effectiveSortMethod = if (sortMethod.isNullOrEmpty()) "LastWritten" else sortMethod
+            listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append, effectiveSortMethod)
             } else if (id == null || getRandomTracks) {
                 // There seems to be a bug in ViewPager when resuming the Activity that sub-fragments
                 // arguments are empty. If we have no id, just show some random tracks

@@ -58,7 +58,7 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         count: Int,
         offset: Int,
         append: Boolean,
-        sortMethod: String = "LastWritten"
+        sortMethod: String,
     ) {
         // Handle the logic for endless scrolling:
         // If appending the existing list, set the offset from where to load
