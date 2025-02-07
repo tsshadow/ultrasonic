@@ -193,7 +193,7 @@ class LandingPageFragment : Fragment(), KoinComponent {
             val action = NavigationGraphDirections.toTrackCollection(
                 size = maxSongs,
                 offset = 0,
-                sortMethod = "LastWrittenDesc",
+                sortMethod = "AddedDesc",
                 length = "short",
                 getSongsName = "Recent added Songs"
             )
