@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/main_list">
@@ -37,8 +37,20 @@
                 android:minHeight="40dip"
                 android:paddingStart="6dip"
                 android:paddingEnd="6dip"
-                android:text="@string/main.songs_recent"
+                android:text="@string/main.songs_recent_added"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/main_songs_recent_modified"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="40dip"
+                android:paddingStart="6dip"
+                android:paddingEnd="6dip"
+                android:text="@string/main.songs_recent_modified"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
             <TextView
                 android:id="@+id/main_songs_this_year_button"
                 android:layout_width="fill_parent"
@@ -77,8 +89,19 @@
                 android:minHeight="40dip"
                 android:paddingStart="6dip"
                 android:paddingEnd="6dip"
-                android:text="@string/main.songs_recent"
+                android:text="@string/main.songs_recent_added"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:id="@+id/main_livesets_recent_modified"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="40dip"
+                android:paddingStart="6dip"
+                android:paddingEnd="6dip"
+                android:text="@string/main.songs_recent_modified"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
             <TextView
                 android:id="@+id/main_livesets_this_year_button"
                 android:layout_width="fill_parent"

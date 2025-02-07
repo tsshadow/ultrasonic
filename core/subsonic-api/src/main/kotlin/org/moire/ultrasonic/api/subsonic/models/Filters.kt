@@ -23,10 +23,13 @@ class Filters {
     }
 
     override fun toString(): String {
-        var str = "["
-        filters.forEach { str += "$it," }
-        str = str.substring(0, str.length - 1)
-        str += "]"
+        var str = "";
+        if (this.filters.isNotEmpty()) {
+            str = "["
+            filters.forEach { str += "$it," }
+            str = str.substring(0, str.length - 1)
+            str += "]"
+        }
         return str
     }
 

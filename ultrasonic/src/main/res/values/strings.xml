@@ -130,6 +130,8 @@
     <string name="main.songs_random">Random</string>
     <string name="main.songs_random_this_year">Random (2025)</string>
     <string name="main.songs_recent">Recent</string>
+    <string name="main.songs_recent_added">Recent Added</string>
+    <string name="main.songs_recent_modified">Recent Modified</string>
     <string name="main.songs_starred">Starred</string>
     <string name="main.songs_title">Songs</string>
     <string name="main.livesets_title">Livesets</string>

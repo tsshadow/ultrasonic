@@ -311,7 +311,7 @@ interface SubsonicAPIDefinition {
 
     @GET("getSongs.view")
     fun getSongs(
-        @Query("clusters") clusters: String,
+        @Query("clusters") clusters: String?,
         @Query("ratingMin") ratingMin: Int? = null,
         @Query("ratingMax") ratingMax: Int? = null,
         @Query("count") count: Int = 10,

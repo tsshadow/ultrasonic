@@ -27,12 +27,14 @@ class LandingPageFragment : Fragment(), KoinComponent {
     private lateinit var songsTitle: TextView
     private lateinit var randomSongsButton: TextView
     private lateinit var recentSongsButton: TextView
+    private lateinit var recentModifiedSongsButton: TextView
     private lateinit var randomSongsThisYearButton: TextView
 
     // Livesets
     private lateinit var livesetsTitle: TextView
     private lateinit var randomLivesetsButton: TextView
     private lateinit var recentLivesetsButton: TextView
+    private lateinit var recentModifiedLivesetsButton: TextView
     private lateinit var randomLivesetsThisYearButton: TextView
 
     private lateinit var albumsTitle: TextView
@@ -98,12 +100,14 @@ class LandingPageFragment : Fragment(), KoinComponent {
         randomSongsButton = binding!!.findViewById(R.id.main_songs_button)
         randomSongsThisYearButton = binding!!.findViewById(R.id.main_songs_this_year_button)
         recentSongsButton = binding!!.findViewById(R.id.main_songs_recent)
+        recentModifiedSongsButton = binding!!.findViewById(R.id.main_songs_recent_modified)
 
         // Livesets
         livesetsTitle = binding!!.findViewById(R.id.main_livesets)
         randomLivesetsButton = binding!!.findViewById(R.id.main_livesets_button)
         randomLivesetsThisYearButton = binding!!.findViewById(R.id.main_livesets_this_year_button)
         recentLivesetsButton = binding!!.findViewById(R.id.main_livesets_recent)
+        recentModifiedLivesetsButton = binding!!.findViewById(R.id.main_livesets_recent_modified)
 
         // Albums
         albumsTitle = binding!!.findViewById(R.id.main_albums)
@@ -134,6 +138,7 @@ class LandingPageFragment : Fragment(), KoinComponent {
         songsTitle.isVisible = true
         randomSongsButton.isVisible = true
         recentSongsButton.isVisible = true
+        recentModifiedSongsButton.isVisible = true
         randomSongsThisYearButton.isVisible = true
 
 
@@ -141,6 +146,7 @@ class LandingPageFragment : Fragment(), KoinComponent {
         livesetsTitle.isVisible = true
         randomLivesetsButton.isVisible = true
         recentLivesetsButton.isVisible = true
+        recentModifiedLivesetsButton.isVisible = true
         randomLivesetsThisYearButton.isVisible = true
 
         // Albums
@@ -187,9 +193,19 @@ class LandingPageFragment : Fragment(), KoinComponent {
             val action = NavigationGraphDirections.toTrackCollection(
                 size = maxSongs,
                 offset = 0,
-                sortMethod = "LastWritten",
+                sortMethod = "LastWrittenDesc",
                 length = "short",
-                getSongsName = "Recent Songs"
+                getSongsName = "Recent added Songs"
+            )
+            findNavController().navigate(action)
+        }
+        recentModifiedSongsButton.setOnClickListener {
+            val action = NavigationGraphDirections.toTrackCollection(
+                size = maxSongs,
+                offset = 0,
+                sortMethod = "LastWrittenDesc",
+                length = "short",
+                getSongsName = "Recent modified Songs"
             )
             findNavController().navigate(action)
         }
@@ -204,17 +220,27 @@ class LandingPageFragment : Fragment(), KoinComponent {
             findNavController().navigate(action)
         }
 
+
         recentLivesetsButton.setOnClickListener {
             val action = NavigationGraphDirections.toTrackCollection(
                 size = maxSongs,
                 offset = 0,
-                sortMethod = "LastWritten",
+                sortMethod = "AddedDesc",
                 length = "long",
-                getSongsName = "Recent Livesets"
+                getSongsName = "Recent added Livesets"
             )
             findNavController().navigate(action)
         }
-
+        recentModifiedLivesetsButton.setOnClickListener {
+            val action = NavigationGraphDirections.toTrackCollection(
+                size = maxSongs,
+                offset = 0,
+                sortMethod = "LastWrittenDesc",
+                length = "long",
+                getSongsName = "Recent modified Livesets"
+            )
+            findNavController().navigate(action)
+        }
         randomLivesetsThisYearButton.setOnClickListener {
             val action = NavigationGraphDirections.toTrackCollection(
                 size = maxSongs,

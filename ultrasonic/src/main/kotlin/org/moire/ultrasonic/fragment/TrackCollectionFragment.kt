@@ -586,12 +586,7 @@ open class TrackCollectionFragment(
             } else if(getSongsName != null) {
             setTitle(getSongsName)
             val filters = Filters()
-            if (year !== null && year.isNotEmpty()) filters.add(
-                Filter(
-                    "YEAR",
-                    year.toString()
-                )
-            )
+            year.ifNotNull { if(year !== "All" && year!== "") filters.add(Filter("YEAR", year.toString()))}
             if (length !== null && length.isNotEmpty()) filters.add(
                 Filter(
                     "LENGTH",
