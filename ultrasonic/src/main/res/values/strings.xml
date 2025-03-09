@@ -197,6 +197,8 @@
     <string name="settings.cache_size_25000">25 GB</string>
     <string name="settings.cache_size_3000">3 GB</string>
     <string name="settings.cache_size_30000">30 GB</string>
+    <string name="settings.cache_size_100000">100 GB</string>
+    <string name="settings.cache_size_250000">250 GB</string>
     <string name="settings.cache_size_4000">4 GB</string>
     <string name="settings.cache_size_500">500 MB</string>
     <string name="settings.cache_size_5000">5 GB</string>
