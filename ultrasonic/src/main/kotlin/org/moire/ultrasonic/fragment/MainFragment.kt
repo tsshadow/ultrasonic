@@ -30,6 +30,8 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.fragment.tsshadow.LandingPageFragment
+import org.moire.ultrasonic.fragment.tsshadow.SelectLivesetFragment
+import org.moire.ultrasonic.fragment.tsshadow.SelectPresetFragment
 import org.moire.ultrasonic.fragment.tsshadow.SelectSongFragment
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
@@ -172,24 +174,24 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
         Timber.i("Creating new fragment at position: $position")
 
         val action = when (position) {
-            0 -> NavigationGraphDirections.toLandingPage()
+            0 -> NavigationGraphDirections.toPresetPage()
             1 -> NavigationGraphDirections.toSongList()
-            2 -> NavigationGraphDirections.toTrackCollection()
+            2 -> NavigationGraphDirections.toLivestList()
             3 -> NavigationGraphDirections.toAlbumList(
                 AlbumListType.NEWEST,
                 size = Settings.maxAlbums
             )
             4 -> NavigationGraphDirections.toArtistList()
-            else -> NavigationGraphDirections.toLandingPage()
+            else -> NavigationGraphDirections.toPresetPage()
         }
 
         val fragment = when (position) {
-            0 -> LandingPageFragment()
+            0 -> SelectPresetFragment()
             1 -> SelectSongFragment()
-            2 -> TrackCollectionFragment(SortOrder.RANDOM)
+            2 -> SelectLivesetFragment()
             3 -> AlbumListFragment(layoutType)
             4 -> ArtistListFragment()
-            else -> LandingPageFragment()
+            else -> SelectPresetFragment()
         }
 
         fragmentMap[position] = SoftReference(fragment)
@@ -208,8 +210,8 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
     fun getTitleForFragment(pos: Int, context: Context): String {
         return when (pos) {
             0 -> context.getString(R.string.main_landing_page_title)
-            1 -> context.getString(R.string.main_advanced_search_title)
-            2 -> context.getString(R.string.main_songs_title)
+            1 -> context.getString(R.string.main_songs_title)
+            2 -> context.getString(R.string.main_livesets_title)
             3 -> context.getString(R.string.main_albums_title)
             4 -> context.getString(R.string.main_artists_title)
             else -> "Unknown"

@@ -134,6 +134,7 @@ dependencies {
     implementation libs.rxJava
     implementation libs.rxAndroid
     implementation libs.multiType
+    implementation libs.gridlayout
 
     ksp libs.room
 

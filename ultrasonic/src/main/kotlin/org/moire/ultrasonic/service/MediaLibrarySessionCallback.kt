@@ -102,6 +102,7 @@ private const val MEDIA_GENRES_SONGS_THIS_YEAR = "MEDIA_GENRES_SONGS_THIS_YEAR"
 private const val MEDIA_GENRES_SONGS_LAST_YEAR = "MEDIA_GENRES_SONGS_LAST_YEAR"
 private const val MEDIA_GENRE_SONGS_THIS_YEAR = "MEDIA_GENRE_SONGS_THIS_YEAR"
 private const val MEDIA_GENRE_SONGS_LAST_YEAR = "MEDIA_GENRE_SONGS_LAST_YEAR"
+
 // Genres -> Livesets
 private const val MEDIA_GENRES_LIVESETS = "MEDIA_GENRES_LIVESETS"
 private const val MEDIA_GENRE_LIVESETS = "MEDIA_GENRE_LIVESETS"
@@ -109,17 +110,6 @@ private const val MEDIA_GENRES_LIVESETS_THIS_YEAR = "MEDIA_GENRES_LIVESETS_THIS_
 private const val MEDIA_GENRES_LIVESETS_LAST_YEAR = "MEDIA_GENRES_LIVESETS_LAST_YEAR"
 private const val MEDIA_GENRE_LIVESETS_THIS_YEAR = "MEDIA_GENRE_LIVESETS_THIS_YEAR"
 private const val MEDIA_GENRE_LIVESETS_LAST_YEAR = "MEDIA_GENRE_LIVESETS_LAST_YEAR"
-
-// Moods -> songs
-//private const val MEDIA_MOODS_SONGS = "MEDIA_MOODS_SONGS"
-//private const val MEDIA_MOOD_SONGS = "MEDIA_MOOD_SONGS"
-//private const val MEDIA_MOODS_SONGS_LAST_YEAR = "MEDIA_MOODS_SONGS_LAST_YEAR"
-//private const val MEDIA_MOOD_SONGS_LAST_YEAR = "MEDIA_MOOD_SONGS_LAST_YEAR"
-//// Moods -> Livesets
-//private const val MEDIA_MOODS_LIVESETS = "MEDIA_MOODS_LIVESETS"
-//private const val MEDIA_MOOD_LIVESETS = "MEDIA_MOOD_LIVESETS"
-//private const val MEDIA_MOODS_LIVESETS_LAST_YEAR = "MEDIA_MOODS_LIVESETS_LAST_YEAR"
-//private const val MEDIA_MOOD_LIVESETS_LAST_YEAR = "MEDIA_MOOD_LIVESETS_LAST_YEAR"
 
 // Currently the display limit for long lists is 100 items
 private const val DISPLAY_LIMIT = 100
@@ -437,7 +427,7 @@ class MediaLibrarySessionCallback :
         pageSize: Int,
         params: MediaLibraryService.LibraryParams?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.i("onLoadChildren")
+        Timber.i("onGetChildren")
         return onLoadChildren(parentId)
     }
 
@@ -497,6 +487,7 @@ class MediaLibrarySessionCallback :
         controller: MediaSession.ControllerInfo,
         rating: Rating
     ): ListenableFuture<SessionResult> {
+        Timber.d("onSetRating")
         val mediaItem = session.player.currentMediaItem
 
         if (mediaItem != null) {
@@ -522,6 +513,7 @@ class MediaLibrarySessionCallback :
         mediaId: String,
         rating: Rating
     ): ListenableFuture<SessionResult> {
+        Timber.d("onSetRating")
         // TODO: Through this methods it is possible to set a rating on an arbitrary MediaItem.
         // Right now the ratings are submitted, yet the underlying track is only updated when
         // coming from the other onSetRating(session, controller, rating)
@@ -551,7 +543,7 @@ class MediaLibrarySessionCallback :
         controller: MediaSession.ControllerInfo,
         mediaItems: MutableList<MediaItem>
     ): ListenableFuture<List<MediaItem>> {
-        Timber.i("onAddMediaItems")
+        Timber.d("onAddMediaItems")
 
         if (mediaItems.isEmpty()) return Futures.immediateFuture(mediaItems)
         // Return early if its a search
@@ -633,8 +625,10 @@ class MediaLibrarySessionCallback :
     private fun onLoadChildren(
         parentId: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("onLoadChildren")
         Timber.d("AutoMediaBrowserService onLoadChildren called. ParentId: %s", parentId)
         val year = Calendar.getInstance().get(Calendar.YEAR)
+        val lastYear = Calendar.getInstance().get(Calendar.YEAR) - 1
         val parentIdParts = parentId.split('|')
 
         return when (parentIdParts.first()) {
@@ -663,28 +657,17 @@ class MediaLibrarySessionCallback :
             MEDIA_GENRES_SONGS -> getGenres(null, "short")
             MEDIA_GENRE_SONGS -> getGenre(parentIdParts[1], null, "short")
             MEDIA_GENRES_SONGS_THIS_YEAR -> getGenres(year, "short")
-            MEDIA_GENRES_SONGS_LAST_YEAR -> getGenres(year-1, "short")
-            MEDIA_GENRE_SONGS_THIS_YEAR -> getGenre(parentIdParts[1],year, "short")
-            MEDIA_GENRE_SONGS_LAST_YEAR -> getGenre(parentIdParts[1],year-1, "short")
+            MEDIA_GENRES_SONGS_LAST_YEAR -> getGenres(lastYear, "short")
+            MEDIA_GENRE_SONGS_THIS_YEAR -> getGenre(parentIdParts[1], year, "short")
+            MEDIA_GENRE_SONGS_LAST_YEAR -> getGenre(parentIdParts[1], lastYear , "short")
 
             // Genre -> livesets
             MEDIA_GENRES_LIVESETS -> getGenres(null, "long")
             MEDIA_GENRE_LIVESETS -> getGenre(parentIdParts[1], null, "long")
             MEDIA_GENRES_LIVESETS_THIS_YEAR -> getGenres(year, "long")
-            MEDIA_GENRES_LIVESETS_LAST_YEAR -> getGenres(year-1, "long")
-            MEDIA_GENRE_LIVESETS_THIS_YEAR -> getGenre(parentIdParts[1],year, "long")
-            MEDIA_GENRE_LIVESETS_LAST_YEAR -> getGenre(parentIdParts[1],year-1, "long")
-
-//            // Mood -> songs
-//            MEDIA_MOODS_SONGS -> getMoods(null, "short")
-//            MEDIA_MOOD_SONGS -> getMood(parentIdParts[1],null, "short")
-//            MEDIA_MOODS_SONGS_LAST_YEAR -> getMoods(year, "short")
-//            MEDIA_MOOD_SONGS_LAST_YEAR -> getMood(parentIdParts[1], year, "short")
-//            // Mood -> livesets
-//            MEDIA_MOODS_LIVESETS -> getMoods(null, "long")
-//            MEDIA_MOOD_LIVESETS -> getMood(parentIdParts[1],null, "long")
-//            MEDIA_MOODS_LIVESETS_LAST_YEAR -> getMoods(year, "long")
-//            MEDIA_MOOD_LIVESETS_LAST_YEAR -> getMood(parentIdParts[1], year, "long")
+            MEDIA_GENRES_LIVESETS_LAST_YEAR -> getGenres(lastYear, "long")
+            MEDIA_GENRE_LIVESETS_THIS_YEAR -> getGenre(parentIdParts[1], year, "long")
+            MEDIA_GENRE_LIVESETS_LAST_YEAR -> getGenre(parentIdParts[1], lastYear, "long")
 
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
             MEDIA_SHARE_ID -> getShares()
@@ -864,6 +847,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun getLibrary(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("GetLibrary")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         // Genres
@@ -1052,6 +1036,7 @@ class MediaLibrarySessionCallback :
         id: String,
         name: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getAlbumsForArtist")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
@@ -1080,6 +1065,7 @@ class MediaLibrarySessionCallback :
         id: String,
         name: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getSongsForAlbum")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
@@ -1134,6 +1120,7 @@ class MediaLibrarySessionCallback :
         type: AlbumListType,
         page: Int? = null
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getAlbums")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
@@ -1182,6 +1169,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun getPlaylists(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getPlaylists")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
@@ -1205,6 +1193,7 @@ class MediaLibrarySessionCallback :
         id: String,
         name: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getPlaylist")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
@@ -1239,6 +1228,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun playPlaylist(id: String, name: String): List<Track>? {
+        Timber.d("playPlaylist")
         if (playlistCache == null) {
             // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
             val content =
@@ -1252,6 +1242,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun playPlaylistSong(id: String, name: String, songId: String): List<Track>? {
+        Timber.d("playPlaylistSong")
         if (playlistCache == null) {
             // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
             val content = serviceScope.future {
@@ -1265,12 +1256,14 @@ class MediaLibrarySessionCallback :
     }
 
     private fun playAlbum(id: String, name: String?): List<Track>? {
+        Timber.d("playAlbum")
         val songs = listSongsInMusicService(id, name)
         if (songs != null) return songs.getTracks()
         return null
     }
 
     private fun playAlbumSong(id: String, name: String?, songId: String): List<Track>? {
+        Timber.d("playAlbumSong")
         val songs = listSongsInMusicService(id, name)
         val song = songs?.getTracks()?.firstOrNull { x -> x.id == songId }
         if (song != null) return listOf(song)
@@ -1278,6 +1271,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun getPodcasts(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getPodcasts")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
@@ -1299,6 +1293,7 @@ class MediaLibrarySessionCallback :
     private fun getPodcastEpisodes(
         id: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getPodcastEpisodes")
         val mediaItems: MutableList<MediaItem> = ArrayList()
         return mainScope.future {
             val episodes = serviceScope.future {
@@ -1324,6 +1319,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun playPodcast(id: String): List<Track>? {
+        Timber.d("playPodcast")
         val episodes = serviceScope.future {
             callWithErrorHandling { musicService.getPodcastEpisodes(id) }
         }.get()
@@ -1334,6 +1330,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun playPodcastEpisode(id: String, episodeId: String): List<Track>? {
+        Timber.d("playPodcastEpisode")
         val episodes = serviceScope.future {
             callWithErrorHandling { musicService.getPodcastEpisodes(id) }
         }.get()
@@ -1347,6 +1344,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun getBookmarks(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getBookmarks")
         val mediaItems: MutableList<MediaItem> = ArrayList()
         return mainScope.future {
             val bookmarks = serviceScope.future {
@@ -1369,6 +1367,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun playBookmark(id: String): List<Track>? {
+        Timber.d("playBookmark")
         val bookmarks = serviceScope.future {
             callWithErrorHandling { musicService.getBookmarks() }
         }.get()
@@ -1381,6 +1380,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun getShares(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getShares")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
@@ -1403,6 +1403,7 @@ class MediaLibrarySessionCallback :
     private fun getSongsForShare(
         id: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getSongsForShare")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
@@ -1429,6 +1430,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun playShare(id: String): List<Track>? {
+        Timber.d("playShare")
         val shares = serviceScope.future {
             callWithErrorHandling { musicService.getShares(false) }
         }.get()
@@ -1440,6 +1442,7 @@ class MediaLibrarySessionCallback :
     }
 
     private fun playShareSong(id: String, songId: String): List<Track>? {
+        Timber.d("playShareSong")
         val shares = serviceScope.future {
             callWithErrorHandling { musicService.getShares(false) }
         }.get()
@@ -1533,7 +1536,16 @@ class MediaLibrarySessionCallback :
 
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "short")), null, null, maxSongs, 0, "AddedDesc") }
+                callWithErrorHandling {
+                    musicService.getSongs(
+                        Filters(Filter("LENGTH", "short")),
+                        null,
+                        null,
+                        maxSongs,
+                        0,
+                        "AddedDesc"
+                    )
+                }
             }.await()
 
             if (songs != null) {
@@ -1561,7 +1573,16 @@ class MediaLibrarySessionCallback :
 
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "long")), null, null, maxSongs, 0, "Random") }
+                callWithErrorHandling {
+                    musicService.getSongs(
+                        Filters(Filter("LENGTH", "long")),
+                        null,
+                        null,
+                        maxSongs,
+                        0,
+                        "Random"
+                    )
+                }
             }.await()
 
             if (songs != null) {
@@ -1589,7 +1610,16 @@ class MediaLibrarySessionCallback :
 
         return mainScope.future {
             val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getSongs(Filters(Filter("LENGTH", "long")), null, null, maxSongs, 0, "AddedDesc") }
+                callWithErrorHandling {
+                    musicService.getSongs(
+                        Filters(Filter("LENGTH", "long")),
+                        null,
+                        null,
+                        maxSongs,
+                        0,
+                        "AddedDesc"
+                    )
+                }
             }.await()
 
             if (songs != null) {
@@ -1625,7 +1655,10 @@ class MediaLibrarySessionCallback :
         return null
     }
 
-    private fun getGenres(year: Int?, length: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+    private fun getGenres(
+        year: Int?,
+        length: String
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         Timber.i("getGenres: year=$year length=$length")
@@ -1642,15 +1675,23 @@ class MediaLibrarySessionCallback :
                 }
             } else {
                 if (length == "short") {
-                    MEDIA_GENRE_SONGS_LAST_YEAR
+                    if (year == Calendar.getInstance().get(Calendar.YEAR)) {
+                        MEDIA_GENRE_SONGS_THIS_YEAR
+                    } else {
+                        MEDIA_GENRE_SONGS_LAST_YEAR
+                    }
                 } else {
-                    MEDIA_GENRE_LIVESETS_LAST_YEAR
+                    if (year == Calendar.getInstance().get(Calendar.YEAR)) {
+                        MEDIA_GENRE_LIVESETS_THIS_YEAR
+                    } else {
+                        MEDIA_GENRE_LIVESETS_LAST_YEAR
+                    }
                 }
             }
             Timber.i("getGenres: mediaIdPrefix=$mediaIdPrefix $year")
 
             if (genres != null) {
-                genres = genres.sortedByDescending { Genre -> Genre.songCount  }
+                genres = genres.sortedByDescending { Genre -> Genre.songCount }
             }
 
             genres?.forEach {
@@ -1659,14 +1700,19 @@ class MediaLibrarySessionCallback :
                     mediaIdPrefix + "|" + it.name,
                     R.string.main_genres_title,
                     isBrowsable = true,
-                    mediaType = MEDIA_TYPE_PLAYLIST)
+                    mediaType = MEDIA_TYPE_PLAYLIST
+                )
 
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
     }
 
-    private fun getGenre(genre: String, year: Int?, length: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+    private fun getGenre(
+        genre: String,
+        year: Int?,
+        length: String
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         Timber.i("getGenre: genre=$genre year=$year length=$length")
@@ -1674,10 +1720,19 @@ class MediaLibrarySessionCallback :
             val songs = serviceScope.future {
                 val filters = Filters(Filter("GENRE", genre))
                 filters.add(Filter("LENGTH", length))
-                year.ifNotNull { filters.add(Filter("YEAR", year.toString()))}
-                val sortMethod = if (year !== null)  "AddedDesc"  else  "Random"
+                year.ifNotNull { filters.add(Filter("YEAR", year.toString())) }
+                val sortMethod = if (year !== null) "AddedDesc" else "Random"
 
-                callWithErrorHandling { musicService.getSongs(filters, null, null, maxSongs, 0, sortMethod) }
+                callWithErrorHandling {
+                    musicService.getSongs(
+                        filters,
+                        null,
+                        null,
+                        maxSongs,
+                        0,
+                        sortMethod
+                    )
+                }
             }.await()
 
             if (songs != null) {
@@ -1778,6 +1833,7 @@ class MediaLibrarySessionCallback :
 
         this.add(mediaItem)
     }
+
     @Suppress("LongParameterList")
     private fun MutableList<MediaItem>.add(
         resId: String,
@@ -1786,7 +1842,7 @@ class MediaLibrarySessionCallback :
         isBrowsable: Boolean = true,
         mediaType: Int = MEDIA_TYPE_FOLDER_MIXED,
         icon: Int? = null
-    ){
+    ) {
         val applicationContext = UApp.applicationContext()
 
         val mediaItem = buildMediaItem(

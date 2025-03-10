@@ -33,15 +33,13 @@ import org.moire.ultrasonic.util.toastingExceptionHandler
 /**
  * Advanced search fragment, enables searching for songs with multiple parameters
  */
-class SelectSongFragment : Fragment(), RefreshableFragment {
+class SelectLivesetFragment : Fragment(), RefreshableFragment {
     override var swipeRefresh: SwipeRefreshLayout? = null
 
     private var yearSpinner: Spinner? = null
 
     private var ratingMin: Spinner? = null
     private var ratingMax: Spinner? = null
-
-
 
     private var genreSpinner: Spinner? = null
     private var genreList = ArrayList<String>()
@@ -82,7 +80,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
                 size = maxSongs,
                 offset = 0,
                 year = yearSpinner?.selectedItem as String,
-                length = "short",
+                length = "long",
                 ratingMin = ratingMin?.selectedItem as Int,
                 ratingMax = ratingMax?.selectedItem as Int,
                 sortMethod = sortMethodSpinner?.selectedItem as String
@@ -170,7 +168,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         genreSpinner?.setAdapter(genreAdapter)
         sortMethodSpinner?.setAdapter(sortMethodAdapter)
 
-        setTitle(this, R.string.main_songs_title)
+        setTitle(this, R.string.main_livesets_title)
         load(false)
     }
 

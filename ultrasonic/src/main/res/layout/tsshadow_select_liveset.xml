@@ -121,7 +121,7 @@
             a:id="@+id/search"
             a:layout_width="match_parent"
             a:layout_height="wrap_content"
-            a:text="Search Songs" />
+            a:text="Search Livesets" />
     </LinearLayout>
 
 
