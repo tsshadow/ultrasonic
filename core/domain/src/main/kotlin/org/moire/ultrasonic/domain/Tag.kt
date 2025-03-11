@@ -11,6 +11,6 @@ data class Tag(
     val songCount: Int
 ) : Serializable {
     companion object {
-        private const val serialVersionUID = -3943025175219134028L
+        private const val serialVersionUID = -3943025175219134029L
     }
 }

@@ -423,9 +423,9 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     @Throws(Exception::class)
     override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> {
         checkSettingsChanged()
-        if (refresh) {
-            cachedTags.clear()
-        }
+//        if (refresh) {
+        cachedTags.clear()
+//        }
         var result = cachedTags.get()
         if (result == null) {
             result = musicService.getTags(refresh, name, year, length)
