@@ -37,6 +37,7 @@ import org.moire.ultrasonic.domain.PodcastsChannel
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Share
+import org.moire.ultrasonic.domain.Tag
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
 import org.moire.ultrasonic.domain.toArtistList
@@ -515,6 +516,14 @@ open class RESTMusicService(
 
         return response.body()!!.genresList.toDomainEntityList()
     }
+
+    @Throws(Exception::class)
+    override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> {
+        val response = API.getTags(name, year, length).execute().throwOnFailure()
+
+        return response.body()!!.tagsList.toDomainEntityList()
+    }
+
     @Throws(Exception::class)
     override fun getMoods(refresh: Boolean, year: Int?, length: String?): List<Mood> {
         val response = API.getMoods(year, length).execute().throwOnFailure()

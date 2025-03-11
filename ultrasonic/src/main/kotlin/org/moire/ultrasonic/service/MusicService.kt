@@ -26,6 +26,7 @@ import org.moire.ultrasonic.domain.PodcastsChannel
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Share
+import org.moire.ultrasonic.domain.Tag
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
 
@@ -39,6 +40,9 @@ interface MusicService {
 
     @Throws(Exception::class)
     fun getGenres(refresh: Boolean, year: Int?, length: String?): List<Genre>
+
+    @Throws(Exception::class)
+    fun getTags(refresh: Boolean, name:String, year: Int?, length: String?): List<Tag>
 
     @Throws(Exception::class)
     fun getMoods(refresh: Boolean, year: Int?, length: String?): List<Mood>

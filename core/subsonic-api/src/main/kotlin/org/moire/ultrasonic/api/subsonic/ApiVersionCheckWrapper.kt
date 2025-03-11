@@ -43,6 +43,7 @@ import org.moire.ultrasonic.api.subsonic.response.SearchThreeResponse
 import org.moire.ultrasonic.api.subsonic.response.SearchTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.SharesResponse
 import org.moire.ultrasonic.api.subsonic.response.SubsonicResponse
+import org.moire.ultrasonic.api.subsonic.response.TagsResponse
 import org.moire.ultrasonic.api.subsonic.response.VideosResponse
 import org.moire.ultrasonic.api.subsonic.response.YearsResponse
 import retrofit2.Call
@@ -295,6 +296,10 @@ internal class ApiVersionCheckWrapper(
     override fun getGenres(year: Int?, length: String?): Call<GenresResponse> {
         checkVersion(V1_9_0)
         return api.getGenres(year, length)
+    }
+    override fun getTags(name: String, year: Int?, length: String?): Call<TagsResponse> {
+        checkVersion(V1_9_0)
+        return api.getTags(name, year, length)
     }
     override fun getMoods(year: Int?, length: String?): Call<MoodsResponse> {
         checkVersion(V1_9_0)

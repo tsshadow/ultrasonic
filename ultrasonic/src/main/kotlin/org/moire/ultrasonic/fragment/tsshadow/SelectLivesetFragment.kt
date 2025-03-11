@@ -43,6 +43,8 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
 
     private var genreSpinner: Spinner? = null
     private var genreList = ArrayList<String>()
+    private var festivalSpinner: Spinner? = null
+    private var festivalList = ArrayList<String>()
 
     private var sortMethodSpinner: Spinner? = null
 
@@ -58,7 +60,7 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.tsshadow_select_song, container, false)
+        return inflater.inflate(R.layout.tsshadow_select_liveset, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,15 +70,18 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
         ratingMin = view.findViewById(R.id.select_rating_min)
         ratingMax = view.findViewById(R.id.select_rating_max)
         genreSpinner = view.findViewById(R.id.select_genre)
+        festivalSpinner = view.findViewById(R.id.select_festival)
         sortMethodSpinner = view.findViewById(R.id.select_sort_method)
         searchButton = view.findViewById(R.id.search)
         swipeRefresh?.setOnRefreshListener { load(true) }
 
         searchButton?.setOnClickListener {
             val genre = genreSpinner?.selectedItem as String
+            val festival = festivalSpinner?.selectedItem as String
             val action = NavigationGraphDirections.toTrackCollection(
                 getSongsName = "getSongs",
                 genreName = if (genre != "") genre else null,
+       //         festival = festival,
                 size = maxSongs,
                 offset = 0,
                 year = yearSpinner?.selectedItem as String,
@@ -143,6 +148,13 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
             ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, genreList)
         genreAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
+
+        // Initialize empty festivals list
+        festivalList = arrayListOf("")
+        val festivalAdapter =
+            ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, festivalList)
+        festivalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
         val sortMethodAdapter =
             ArrayAdapter<String>(
                 requireContext(),
@@ -166,6 +178,7 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
         ratingMax?.setAdapter(ratingAdapter)
         ratingMax?.setSelection(5)
         genreSpinner?.setAdapter(genreAdapter)
+        festivalSpinner?.setAdapter(festivalAdapter)
         sortMethodSpinner?.setAdapter(sortMethodAdapter)
 
         setTitle(this, R.string.main_livesets_title)
@@ -184,6 +197,16 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
             }
             for (genre in genres) {
                 genreList.add(genre.name)
+            }
+
+            val festivals = withContext(Dispatchers.IO) {
+                val musicService = getMusicService()
+//                val yr = yearSpinner?.getSelectedItem() as String;
+
+                musicService.getTags(refresh, "festival", null, null)
+            }
+            for (festival in festivals) {
+                festivalList.add(festival.name)
             }
         }
     }

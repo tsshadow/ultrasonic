@@ -31,6 +31,7 @@ import org.moire.ultrasonic.domain.PodcastsChannel
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Share
+import org.moire.ultrasonic.domain.Tag
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
 import org.moire.ultrasonic.domain.Year
@@ -53,6 +54,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     private val cachedPodcastsChannels =
         TimeLimitedCache<List<PodcastsChannel>?>(3600, TimeUnit.SECONDS)
     private val cachedGenres = TimeLimitedCache<List<Genre>>(10 * 3600, TimeUnit.SECONDS)
+    private val cachedTags = TimeLimitedCache<List<Tag>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedMoods = TimeLimitedCache<List<Mood>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedYears = TimeLimitedCache<List<Year>>(10 * 3600, TimeUnit.SECONDS)
 
@@ -419,6 +421,28 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
+    override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedTags.clear()
+        }
+        var result = cachedTags.get()
+        if (result == null) {
+            result = musicService.getTags(refresh, name, year, length)
+            cachedTags.set(result)
+        }
+
+        val sorted = result.toMutableList()
+        sorted.sortWith { tag, tag2 ->
+            tag.name.compareTo(
+                tag2.name,
+                ignoreCase = true
+            )
+        }
+        return sorted
+    }
+
+    @Throws(Exception::class)
     override fun getMoods(refresh: Boolean, year: Int?, length: String?): List<Mood> {
         checkSettingsChanged()
         if (refresh) {
@@ -439,6 +463,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         }
         return sorted
     }
+
     @Throws(Exception::class)
     override fun getYears(refresh: Boolean): List<Year> {
         checkSettingsChanged()
@@ -471,7 +496,15 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         count: Int,
         offset: Int
     ): MusicDirectory {
-        return musicService.getSongsByGenre(genre, year, length, ratingMin, ratingMax, count, offset)
+        return musicService.getSongsByGenre(
+            genre,
+            year,
+            length,
+            ratingMin,
+            ratingMax,
+            count,
+            offset
+        )
     }
 
 

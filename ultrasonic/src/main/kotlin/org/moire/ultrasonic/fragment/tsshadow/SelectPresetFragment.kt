@@ -8,15 +8,17 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -32,6 +34,7 @@ import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.toastingExceptionHandler
+import java.time.Year
 
 class SelectPresetFragment : Fragment(), RefreshableFragment {
     override var swipeRefresh: SwipeRefreshLayout? = null
@@ -73,6 +76,7 @@ class SelectPresetFragment : Fragment(), RefreshableFragment {
         return inflater.inflate(R.layout.tsshadow_preset_page, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -81,21 +85,25 @@ class SelectPresetFragment : Fragment(), RefreshableFragment {
 
         gridLayout = view.findViewById(R.id.gridLayoutContainer)
 
-        // List of tile data
+        val currentYear = Year.now().value
+
         val genreTiles = listOf(
             TileInfo("Recent Songs"),
             TileInfo("Random Songs", sortMethod = "Random"),
             TileInfo("Recent Livesets", length = "long"),
             TileInfo("Random Livesets", sortMethod = "Random", length = "long"),
-            TileInfo("Hardstyle", genre = "Hardstyle", year = "2025"),
-            TileInfo("Mainstream Hardstyle", genre = "Mainstream Hardstyle", year = "2025"),
-            TileInfo("Raw Hardstyle", genre = "Raw Hardstyle", year = "2025"),
-            TileInfo("Hardcore", genre = "Hardcore", year = "2025"),
-            TileInfo("Mainstream Hardcore", genre = "Mainstream Hardcore", year = "2025"),
-            TileInfo("Industrial Hardcore", genre = "Raw Hardstyle", year = "2025"),
-            TileInfo("Uptempo Hardcore", genre = "Uptempo Hardcore", year = "2025"),
-            TileInfo("Bouncy Uptempo", genre = "Bouncy Uptempo", year = "2025"),
-            TileInfo("Terror", genre = "Terror", year = "2025")
+            TileInfo("Euphoric Hardstyle", genre = "Euphoric Hardstyle", year = "$currentYear"),
+            TileInfo("Hardstyle", genre = "Hardstyle", year = "$currentYear"),
+            TileInfo("Hardstyle Classics", genre = "Hardstyle Classics", year = "$currentYear"),
+            TileInfo("Mainstream Hardstyle", genre = "Mainstream Hardstyle", year = "$currentYear"),
+            TileInfo("Raw Hardstyle", genre = "Raw Hardstyle", year = "$currentYear"),
+            TileInfo("Hardcore", genre = "Hardcore", year = "$currentYear"),
+            TileInfo("Mainstream Hardcore", genre = "Mainstream Hardcore", year = "$currentYear"),
+            TileInfo("Millennium Hardcore", genre = "Millennium Hardcore", year = "$currentYear"),
+            TileInfo("Industrial Hardcore", genre = "Industrial Hardcore"),
+            TileInfo("Uptempo Hardcore", genre = "Uptempo Hardcore", year = "$currentYear"),
+            TileInfo("Bouncy Uptempo", genre = "Bouncy Uptempo", year = "$currentYear"),
+            TileInfo("Zaagtempo", genre = "Zaagtempo", year = "$currentYear"),
         )
 
 
@@ -110,25 +118,78 @@ class SelectPresetFragment : Fragment(), RefreshableFragment {
     }
 
     private fun createTileView(tile: TileInfo, index: Int): View {
-        // You can use an existing layout file or create a new one
         val tileView = LayoutInflater.from(context).inflate(R.layout.tile_layout, gridLayout, false)
 
-        val tileCard = tileView.findViewById<ConstraintLayout>(R.id.tile_card)
-        tileCard.setBackgroundColor(
-            colors[index % colors.size]
+        val tileBackground = tileView.findViewById<View>(R.id.tile_card)
+        val tileIcon = tileView.findViewById<ImageView>(R.id.tile_icon)
+        val tileTextView = tileView.findViewById<TextView>(R.id.tile_text)
+
+        // Assign gradient backgrounds (cycling through a predefined list)
+        val backgroundList = listOf(
+            R.drawable.tile_background_gradient,  // Default gradient
+        )
+        val chosenBackground = backgroundList[index % backgroundList.size]
+        tileBackground.setBackgroundResource(chosenBackground)
+
+        // Assign icons based on genre
+        val iconMap = mapOf(
+            // Random and Recent Songs
+            "Recent Songs" to R.drawable.baseline_music_note_24,
+            "Random Songs" to R.drawable.baseline_music_note_24,
+            "Recent Livesets" to R.drawable.baseline_music_note_24,
+            "Random Livesets" to R.drawable.baseline_music_note_24,
+
+            // Softer Genres
+            "Euphoric Hardstyle" to R.drawable.baseline_emoji_emotions_24,  // Softer, emotional
+            "Hardstyle" to R.drawable.baseline_mood_24,  // Regular Hardstyle is softer
+            "Mainstream Hardstyle" to R.drawable.baseline_mood_24,  // Mainstream is softer
+            "Hardstyle Classics" to R.drawable.baseline_headset_24,  // Classic hardstyle is more chill
+
+            // Harder Genres
+            "Raw Hardstyle" to R.drawable.baseline_local_fire_department_24,  // Raw = harder
+            "Mainstream Hardcore" to R.drawable.baseline_thunderstorm_24,  // Hardcore but mainstream
+            "Hardcore" to R.drawable.baseline_bolt_24,  // Standard Hardcore
+            "Millennium Hardcore" to R.drawable.baseline_headset_24,  // Old-school hardcore = more chill
+            "Industrial Hardcore" to R.drawable.baseline_local_fire_department_24,  // Harder, industrial vibes
+            "Uptempo Hardcore" to R.drawable.baseline_thunderstorm_24,  // Fast, aggressive, stormy
+            "Bouncy Uptempo" to R.drawable.baseline_emoji_emotions_24,  // Still hard, but fun
+            "Zaagtempo" to R.drawable.baseline_bolt_24  // Extreme hardcore, lightning fast
         )
 
-        // Set the properties for the tile (you could use a TextView, ImageView, etc.)
-        val tileTextView = tileView.findViewById<TextView>(R.id.tile_text)
+        tileIcon.setImageResource(iconMap[tile.genre] ?: R.drawable.baseline_music_note_24)
+
+        // Set tile text
         tileTextView.text = tile.title
 
-        // Set click listener
+        // Dynamic Gradient Colors
+        val colorStart = colors[index % colors.size]  // Pick a dark color from the list
+        val colorEnd = Color.BLACK  // Fade into black
+
+        // Create GradientDrawable
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,  // Top-left to Bottom-right
+            intArrayOf(colorStart, colorEnd)  // Gradient colors
+        )
+        gradientDrawable.cornerRadius = 24f  // Smooth corners
+
+        // Apply Gradient Background to Tile
+        tileBackground.background = gradientDrawable
+
+        // Set icon from icon map
+        val iconRes = iconMap[tile.title] ?: R.drawable.baseline_music_note_24
+        tileIcon.setImageResource(iconRes)
+
+        // Set text
+        tileTextView.text = tile.title
+
+        // Click event
         tileView.setOnClickListener {
             navigateToGenre(tile)
         }
 
         return tileView
     }
+
 
     private fun navigateToGenre(tile: TileInfo) {
         val action = NavigationGraphDirections.toTrackCollection(
@@ -169,4 +230,6 @@ class SelectPresetFragment : Fragment(), RefreshableFragment {
         val ratingMax: Int = 5,
         val sortMethod: String = "AddedDesc"
     )
+
+
 }

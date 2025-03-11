@@ -43,6 +43,7 @@ import org.moire.ultrasonic.domain.PodcastsChannel
 import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Share
+import org.moire.ultrasonic.domain.Tag
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
 import org.moire.ultrasonic.domain.Year
@@ -430,6 +431,11 @@ class OfflineMusicService : MusicService, KoinComponent {
     @Throws(Exception::class)
     override fun getGenres(refresh: Boolean, year: Int?, length: String?): List<Genre> {
         throw OfflineException("Getting Genres not available in offline mode")
+    }
+
+    @Throws(Exception::class)
+    override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> {
+        throw OfflineException("Getting Tags not available in offline mode")
     }
 
     @Throws(Exception::class)

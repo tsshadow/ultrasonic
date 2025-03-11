@@ -10,13 +10,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.widget.GridLayout
-            android:id="@+id/gridLayoutContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:columnCount="3"
-            android:orientation="horizontal"
-            />
+        <!-- NestedScrollView to allow scrolling inside SwipeRefreshLayout -->
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">  <!-- Ensures full expansion -->
+
+            <android.widget.GridLayout
+                android:id="@+id/gridLayoutContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:columnCount="3"
+                android:orientation="horizontal"
+                android:padding="8dp" />
+
+        </androidx.core.widget.NestedScrollView>
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

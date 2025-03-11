@@ -92,6 +92,28 @@
             a:inputType="text"
             a:spinnerMode="dropdown" />
     </LinearLayout>
+
+    <!--    Festival   -->
+    <LinearLayout
+        a:layout_width="match_parent"
+        a:layout_height="40dp">
+
+        <TextView
+            a:id="@+id/textView8"
+            a:layout_width="0dp"
+            a:layout_height="wrap_content"
+            a:layout_weight=".10"
+            a:text="Festival" />
+
+        <Spinner
+            a:id="@+id/select_festival"
+            a:layout_width="0dp"
+            a:layout_height="match_parent"
+            a:layout_weight=".30"
+            a:inputType="text"
+            a:spinnerMode="dropdown" />
+    </LinearLayout>
+
     <!--Sort Method -->
     <LinearLayout
         a:layout_width="match_parent"

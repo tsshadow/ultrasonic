@@ -41,6 +41,7 @@ import org.moire.ultrasonic.api.subsonic.response.SearchThreeResponse
 import org.moire.ultrasonic.api.subsonic.response.SearchTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.SharesResponse
 import org.moire.ultrasonic.api.subsonic.response.SubsonicResponse
+import org.moire.ultrasonic.api.subsonic.response.TagsResponse
 import org.moire.ultrasonic.api.subsonic.response.VideosResponse
 import org.moire.ultrasonic.api.subsonic.response.YearsResponse
 import retrofit2.Call
@@ -290,6 +291,9 @@ interface SubsonicAPIDefinition {
 
     @GET("getGenres.view")
     fun getGenres(@Query("year") year: Int? = null, @Query("length") length: String? = null): Call<GenresResponse>
+
+    @GET("getTags.view")
+    fun getTags(@Query("name") name: String, @Query("year") year: Int? = null, @Query("length") length: String? = null): Call<TagsResponse>
 
     @GET("getMoods.view")
     fun getMoods(@Query("year") year: Int? = null, @Query("length") length: String? = null): Call<MoodsResponse>
