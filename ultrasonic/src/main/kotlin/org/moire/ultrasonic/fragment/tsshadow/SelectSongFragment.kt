@@ -37,6 +37,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
     override var swipeRefresh: SwipeRefreshLayout? = null
 
     private var yearSpinner: Spinner? = null
+    private var yearList = ArrayList<String>()
 
     private var ratingMin: Spinner? = null
     private var ratingMax: Spinner? = null
@@ -98,45 +99,9 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
             )
         ratingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        val years = arrayOf(
-            "All",
-            "2025",
-            "2024",
-            "2023",
-            "2022",
-            "2021",
-            "2020",
-            "2019",
-            "2018",
-            "2017",
-            "2016",
-            "2015",
-            "2014",
-            "2013",
-            "2012",
-            "2011",
-            "2010",
-            "2009",
-            "2008",
-            "2007",
-            "2006",
-            "2005",
-            "2004",
-            "2003",
-            "2002",
-            "2001",
-            "2000",
-            "1999",
-            "1998",
-            "1997",
-            "1996",
-            "1995",
-            "1994",
-            "1993",
-            "1992"
-        )
+        yearList = arrayListOf("All")
         val yearAdapter =
-            ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, years)
+            ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, yearList)
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         // Initialize empty genres list
@@ -186,6 +151,18 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
             }
             for (genre in genres) {
                 genreList.add(genre.name)
+            }
+
+
+            var years = withContext(Dispatchers.IO) {
+                val musicService = getMusicService()
+
+                musicService.getTags(refresh, "YEAR", null, null)
+            }
+            years = years.sortedByDescending { it.name }
+
+            for (year in years) {
+                yearList.add(year.name)
             }
         }
     }

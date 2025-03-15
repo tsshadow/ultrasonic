@@ -104,7 +104,7 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
             )
         ratingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        yearList = arrayListOf("")
+        yearList = arrayListOf("All")
         val yearAdapter =
             ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, yearList)
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -172,22 +172,19 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
 
             val festivals = withContext(Dispatchers.IO) {
                 val musicService = getMusicService()
-//                val yr = yearSpinner?.getSelectedItem() as String;
 
                 musicService.getTags(refresh, "FESTIVAL", null, null)
             }
-            Timber.i("Festivals:", festivals.toString())
             for (festival in festivals) {
                 festivalList.add(festival.name)
             }
 
-            val years = withContext(Dispatchers.IO) {
+            var years = withContext(Dispatchers.IO) {
                 val musicService = getMusicService()
-//                val yr = yearSpinner?.getSelectedItem() as String;
 
                 musicService.getTags(refresh, "YEAR", null, null)
             }
-            Timber.i("years:", years.toString())
+            years = years.sortedByDescending { it.name }
 
             for (year in years) {
                 yearList.add(year.name)
