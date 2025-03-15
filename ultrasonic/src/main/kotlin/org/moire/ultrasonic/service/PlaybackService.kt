@@ -47,6 +47,7 @@ import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.imageloader.ArtworkBitmapLoader
 import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.service.ultrasonic.androidauto.MediaLibrarySessionCallback
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
@@ -148,7 +149,7 @@ class PlaybackService :
             .build()
 
         // Send custom layout to legacy session.
-        mediaLibrarySession.setCustomLayout(librarySessionCallback.defaultCustomCommands)
+        mediaLibrarySession.setCustomLayout(librarySessionCallback.getCommandHelper().defaultCustomCommands)
 
         // Set a listener to update the API client when the active server has changed
         rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
@@ -312,7 +313,7 @@ class PlaybackService :
     }
 
     private fun updateCustomHeartButton(isHeart: Boolean) {
-        librarySessionCallback.updateCustomHeartButton(mediaLibrarySession, isHeart)
+        librarySessionCallback.getCommandHelper().updateCustomHeartButton(mediaLibrarySession, isHeart)
     }
 
     private fun cacheNextSongs() {
