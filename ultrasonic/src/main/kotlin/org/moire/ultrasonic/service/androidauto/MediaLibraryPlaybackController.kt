@@ -1,4 +1,11 @@
-package org.moire.ultrasonic.service.ultrasonic.androidauto
+/*
+ * MediaLibraryPlaybackController.kt
+ * Copyright (C) 2009-2025 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
+package org.moire.ultrasonic.service.androidauto
 
 import androidx.media3.common.MediaItem
 import com.google.common.util.concurrent.Futures
@@ -50,7 +57,7 @@ class MediaLibraryPlaybackController(
         return null
     }
 
-    public fun playRandomSong(songId: String): List<Track>? {
+    fun playRandomSong(songId: String): List<Track>? {
         // If there is no cache, we can't play the selected song.
         if (dataProvider.randomSongsCache != null) {
             val song = dataProvider.randomSongsCache!!.firstOrNull { x -> x.id == songId }
@@ -59,7 +66,7 @@ class MediaLibraryPlaybackController(
         return null
     }
 
-    public fun playStarredSongs(): List<Track>? {
+    fun playStarredSongs(): List<Track>? {
         if (dataProvider.starredSongsCache == null) {
             // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
             val content = dataProvider.listStarredSongsInMusicService()
@@ -69,7 +76,7 @@ class MediaLibraryPlaybackController(
         return null
     }
 
-    public fun playStarredSong(songId: String): List<Track>? {
+    fun playStarredSong(songId: String): List<Track>? {
         if (dataProvider.starredSongsCache == null) {
             // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
             val content = dataProvider.listStarredSongsInMusicService()
@@ -81,7 +88,7 @@ class MediaLibraryPlaybackController(
     }
 
 
-    public fun playSearch(id: String): List<Track>? {
+    fun playSearch(id: String): List<Track>? {
         // If there is no cache, we can't play the selected song.
         if (dataProvider.searchSongsCache != null) {
             val song = dataProvider.searchSongsCache!!.firstOrNull { x -> x.id == id }
@@ -119,14 +126,14 @@ class MediaLibraryPlaybackController(
         return null
     }
 
-    public fun playAlbum(id: String, name: String?): List<Track>? {
+    fun playAlbum(id: String, name: String?): List<Track>? {
         Timber.d("playAlbum")
         val songs = dataProvider.listSongsInMusicService(id, name)
         if (songs != null) return songs.getTracks()
         return null
     }
 
-    public fun playAlbumSong(id: String, name: String?, songId: String): List<Track>? {
+    fun playAlbumSong(id: String, name: String?, songId: String): List<Track>? {
         Timber.d("playAlbumSong")
         val songs = dataProvider.listSongsInMusicService(id, name)
         val song = songs?.getTracks()?.firstOrNull { x -> x.id == songId }
@@ -135,7 +142,6 @@ class MediaLibraryPlaybackController(
     }
 
 
-    @Suppress("MagicNumber", "ComplexMethod")
     fun onAddLegacyAutoItems(
         mediaItems: MutableList<MediaItem>
     ): ListenableFuture<List<MediaItem>> {

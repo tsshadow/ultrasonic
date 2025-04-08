@@ -5,13 +5,12 @@
  * Distributed under terms of the GNU GPLv3 license.
  */
 
-package org.moire.ultrasonic.service.ultrasonic.androidauto
+package org.moire.ultrasonic.service.androidauto
 
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MIXED
 import androidx.media3.common.Player
-import androidx.media3.session.MediaSession
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.util.Util
@@ -58,7 +57,6 @@ abstract class MediaLibraryBase {
         }
 
 
-        @Suppress("LongParameterList")
         fun MutableList<MediaItem>.add(
             resId: String,
             mediaId: String,
@@ -107,7 +105,6 @@ abstract class MediaLibraryBase {
             this.add(mediaItem)
         }
 
-        @Suppress("LongParameterList")
         fun MutableList<MediaItem>.add(
             resId: Int,
             mediaId: String,
@@ -159,11 +156,11 @@ abstract class MediaLibraryBase {
         internal const val MEDIA_ALBUM_STARRED_ID = "MEDIA_ALBUM_STARRED_ID"
         internal const val MEDIA_SONG_RANDOM_ID = "MEDIA_SONG_RANDOM_ID"
         internal const val MEDIA_SONG_RECENT = "MEDIA_SONG_RECENT"
-        internal const val MEDIA_LIVESET_RANDOM_ID = "MEDIA_LIVESET_RANDOM_ID"
-        internal const val MEDIA_LIVESET_RECENT = "MEDIA_LIVESET_RECENT"
         internal const val MEDIA_SONG_STARRED_ID = "MEDIA_SONG_STARRED_ID"
         internal const val MEDIA_ARTIST_ID = "MEDIA_ARTIST_ID"
         internal const val MEDIA_LIBRARY_ID = "MEDIA_LIBRARY_ID"
+        internal const val MEDIA_SONGS_ID = "MEDIA_SONGS_ID"
+        internal const val MEDIA_LIVESETS_ID = "MEDIA_LIVESETS_ID"
         internal const val MEDIA_PLAYLIST_ID = "MEDIA_PLAYLIST_ID"
         internal const val MEDIA_SHARE_ID = "MEDIA_SHARE_ID"
         internal const val MEDIA_BOOKMARK_ID = "MEDIA_BOOKMARK_ID"
@@ -184,8 +181,9 @@ abstract class MediaLibraryBase {
         internal const val MEDIA_SEARCH_SONG_ITEM = "MEDIA_SEARCH_SONG_ITEM"
 
         // Genres -> songs
-        internal const val MEDIA_GENRES_SONGS = "MEDIA_GENRES_SONGS"
-        internal const val MEDIA_GENRE_SONGS = "MEDIA_GENRE_SONGS"
+        internal const val MEDIA_GET_GENRES = "MEDIA_GET_GENRES"
+        internal const val MEDIA_GET_YEARS = "MEDIA_GET_YEARS"
+        internal const val MEDIA_GET_SONGS_BY_GENRE = "MEDIA_GENRE_SONGS"
         internal const val MEDIA_GENRES_SONGS_THIS_YEAR = "MEDIA_GENRES_SONGS_THIS_YEAR"
         internal const val MEDIA_GENRES_SONGS_LAST_YEAR = "MEDIA_GENRES_SONGS_LAST_YEAR"
         internal const val MEDIA_GENRE_SONGS_THIS_YEAR = "MEDIA_GENRE_SONGS_THIS_YEAR"

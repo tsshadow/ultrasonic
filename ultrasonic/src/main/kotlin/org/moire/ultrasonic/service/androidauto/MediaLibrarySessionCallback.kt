@@ -5,7 +5,7 @@
  * Distributed under terms of the GNU GPLv3 license.
  */
 
-package org.moire.ultrasonic.service.ultrasonic.androidauto
+package org.moire.ultrasonic.service.androidauto
 
 import android.os.Bundle
 import androidx.annotation.OptIn
@@ -20,6 +20,7 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import androidx.media3.session.SessionResult.RESULT_SUCCESS
+import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
@@ -37,6 +38,7 @@ import org.moire.ultrasonic.service.PlaybackService
 import org.moire.ultrasonic.service.PlaybackStateSerializer
 import org.moire.ultrasonic.service.RatingManager
 import org.moire.ultrasonic.service.toMediaItemsWithStartPosition
+import org.moire.ultrasonic.util.toMediaItem
 import org.moire.ultrasonic.util.toTrack
 import timber.log.Timber
 
@@ -58,7 +60,6 @@ import timber.log.Timber
  * and `MediaLibraryBrowser` to provide a seamless media experience.
  *
  */
-@Suppress("TooManyFunctions", "LargeClass", "UnusedPrivateMember")
 class MediaLibrarySessionCallback :
     MediaLibraryBase(),
     MediaLibraryService.MediaLibrarySession.Callback,
@@ -67,7 +68,6 @@ class MediaLibrarySessionCallback :
     private val commandHandler: MediaLibraryCommandHandler = MediaLibraryCommandHandler()
 
     private val playbackStateSerializer: PlaybackStateSerializer by inject()
-
     private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val mainScope = CoroutineScope(Dispatchers.Main)
@@ -78,7 +78,7 @@ class MediaLibrarySessionCallback :
         MediaLibraryDataProvider(serviceScope = serviceScope, musicService = musicService)
     private var playbackController: MediaLibraryPlaybackController =
         MediaLibraryPlaybackController(serviceScope = serviceScope, musicService = musicService)
-    private var browser: MediaLibraryBrowser = MediaLibraryBrowser(
+    private var mediaLibrarBrowser: MediaLibraryBrowser = MediaLibraryBrowser(
         mainScope = mainScope,
         serviceScope = serviceScope,
         musicService = musicService
@@ -88,7 +88,7 @@ class MediaLibrarySessionCallback :
 
         playbackController.dataProvider = dataProvider
         dataProvider.playbackController = playbackController
-        browser.dataProvider = dataProvider
+        mediaLibrarBrowser.dataProvider = dataProvider
         commandHandler.initialize()
     }
 
@@ -117,7 +117,12 @@ class MediaLibrarySessionCallback :
             // Let Media3 controller (for instance the MediaNotificationProvider)
             // know about the custom layout right after it connected.
             with(session) {
-//                setCustomLayout(session.buildCustomCommands(canShuffle = canShuffle()))
+                setCustomLayout(
+                    commandHandler.buildCustomCommands(
+                        session,
+                        commandHandler.canShuffleWrapper(session)
+                    )
+                )
             }
         }
     }
@@ -153,7 +158,7 @@ class MediaLibrarySessionCallback :
                 commandHandler.customRepeatModeSet = true
 
                 session.player.setNextRepeatMode()
-//                session.updateCustomCommands()
+                commandHandler.updateCustomCommandsWrapper(session)
             }
 
             else -> {
@@ -268,9 +273,28 @@ class MediaLibrarySessionCallback :
         browser: MediaSession.ControllerInfo,
         params: MediaLibraryService.LibraryParams?
     ): ListenableFuture<LibraryResult<MediaItem>> {
-        return this.browser.getLibraryRoot(
+        return this.mediaLibrarBrowser.getLibraryRoot(
             session, browser, params
-        );
+        )
+    }
+
+    override fun onGetChildren(
+        session: MediaLibraryService.MediaLibrarySession,
+        browser: MediaSession.ControllerInfo,
+        parentId: String,
+        page: Int,
+        pageSize: Int,
+        params: MediaLibraryService.LibraryParams?
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        return mediaLibrarBrowser.getChildren(session, browser, parentId, page, pageSize, params)
+    }
+
+    override fun onGetItem(
+        session: MediaLibraryService.MediaLibrarySession,
+        browser: MediaSession.ControllerInfo,
+        mediaId: String
+    ): ListenableFuture<LibraryResult<MediaItem>> {
+        return mediaLibrarBrowser.getItem(mediaId)
     }
 
     fun getCommandHelper(): MediaLibraryCommandHandler {

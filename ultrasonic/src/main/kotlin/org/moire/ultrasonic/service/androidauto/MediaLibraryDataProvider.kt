@@ -5,7 +5,7 @@
  * Distributed under terms of the GNU GPLv3 license.
  */
 
-package org.moire.ultrasonic.service.ultrasonic.androidauto
+package org.moire.ultrasonic.service.androidauto
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.future
@@ -41,7 +41,6 @@ class MediaLibraryDataProvider(
     var searchSongsCache: List<Track>? = null
 
 
-    @Suppress("MagicNumber", "ComplexMethod")
     fun tracksFromMediaId(mediaId: String?): List<Track>? {
         Timber.d(
             "AutoMediaBrowserService onPlayFromMediaIdRequested called. mediaId: %s",

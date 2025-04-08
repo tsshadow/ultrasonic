@@ -1,19 +1,21 @@
-package org.moire.ultrasonic.service.ultrasonic.androidauto
+/*
+ * MediaLibraryCommandHandler.kt
+ * Copyright (C) 2009-2025 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
+package org.moire.ultrasonic.service.androidauto
 
 import android.os.Build
 import android.os.Bundle
 import androidx.car.app.connection.CarConnection
-import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
-import androidx.media3.session.SessionResult
-import androidx.media3.session.SessionResult.RESULT_SUCCESS
 import com.google.common.collect.ImmutableList
-import com.google.common.util.concurrent.Futures
-import com.google.common.util.concurrent.ListenableFuture
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.service.PlaybackService
@@ -39,8 +41,8 @@ import timber.log.Timber
 class MediaLibraryCommandHandler {
     private val placeholderButton = getPlaceholderButton()
 
-    var heartIsCurrentlyOn = false
-    public var customRepeatModeSet = false
+    private var heartIsCurrentlyOn = false
+    var customRepeatModeSet = false
 
     lateinit var allCustomCommands: List<CommandButton>
 
@@ -151,7 +153,7 @@ class MediaLibraryCommandHandler {
             repeatAllButton
         )
 
-        defaultCustomCommands = listOf(heartButtonToggleOn, shuffleButton, repeatOffButton)
+        defaultCustomCommands = listOf(shuffleButton, repeatOffButton)
     }
 
 
@@ -258,7 +260,6 @@ class MediaLibraryCommandHandler {
         Timber.d("shuffleCurrentPlaylist")
 
         // 3 was chosen because that leaves at least two other songs to be shuffled around
-        @Suppress("MagicNumber")
         if (player.mediaItemCount < 3) {
             return
         }
@@ -279,12 +280,23 @@ class MediaLibraryCommandHandler {
         player.addMediaItems(mediaItemsToShuffle.shuffled())
     }
 
-    public fun MediaSession.updateCustomCommands() {
+    fun updateCustomCommandsWrapper(session: MediaSession) {
+        session.updateCustomCommands()
+    }
+    private fun MediaSession.updateCustomCommands() {
         setCustomLayout(
             buildCustomCommands(
                 heartIsCurrentlyOn,
                 canShuffle()
             )
         )
+    }
+
+    fun buildCustomCommands(session: MediaSession,  canShuffle: Boolean): ImmutableList<CommandButton> {
+        return session.buildCustomCommands(canShuffle)
+    }
+
+    fun canShuffleWrapper(session: MediaSession): Boolean {
+        return session.canShuffle()
     }
 }

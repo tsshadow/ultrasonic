@@ -1,11 +1,16 @@
-package org.moire.ultrasonic.service.ultrasonic.androidauto
+/*
+ * MediaLibraryBrowser.kt
+ * Copyright (C) 2009-2025 Ultrasonic developers
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
 
+package org.moire.ultrasonic.service.androidauto
+
+import TileInfo
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
-import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ARTISTS
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS
-import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MIXED
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_PLAYLIST
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
@@ -17,7 +22,6 @@ import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.guava.future
-import org.koin.core.component.inject
 import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
@@ -27,7 +31,6 @@ import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MusicService
-import org.moire.ultrasonic.service.ultrasonic.androidauto.MediaLibraryBase.Companion.add
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.ifNotNull
@@ -134,6 +137,7 @@ class MediaLibraryBrowser(
             )
         }
     }
+
     private fun getBookmarks(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("getBookmarks")
         val mediaItems: MutableList<MediaItem> = ArrayList()
@@ -185,6 +189,7 @@ class MediaLibraryBrowser(
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
     }
+
     fun getChildren(
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,
@@ -193,23 +198,21 @@ class MediaLibraryBrowser(
         pageSize: Int,
         params: MediaLibraryService.LibraryParams?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.i("onGetChildren")
+        Timber.i("getChildren")
         return loadChildren(parentId)
     }
 
-    @Suppress("ReturnCount", "ComplexMethod")
-    fun loadChildren(
+    private fun loadChildren(
         parentId: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.d("onLoadChildren")
         Timber.d("AutoMediaBrowserService onLoadChildren called. ParentId: %s", parentId)
-        val year = Calendar.getInstance().get(Calendar.YEAR)
-        val lastYear = Calendar.getInstance().get(Calendar.YEAR) - 1
         val parentIdParts = parentId.split('|')
 
         return when (parentIdParts.first()) {
             MEDIA_ROOT_ID -> getRootItems()
             MEDIA_LIBRARY_ID -> getLibrary()
+            MEDIA_SONGS_ID -> getSongsLibrary()
+            MEDIA_LIVESETS_ID -> getLivesetsLibrary()
             MEDIA_ARTIST_ID -> getArtists()
             MEDIA_ARTIST_SECTION -> getArtists(parentIdParts[1])
             MEDIA_ALBUM_ID -> getAlbums(AlbumListType.SORTED_BY_NAME)
@@ -224,28 +227,13 @@ class MediaLibraryBrowser(
             MEDIA_ALBUM_RECENT_ID -> getAlbums(AlbumListType.RECENT)
             MEDIA_ALBUM_RANDOM_ID -> getAlbums(AlbumListType.RANDOM)
             MEDIA_ALBUM_STARRED_ID -> getAlbums(AlbumListType.STARRED)
-            MEDIA_SONG_RANDOM_ID -> getRandomSongs()
-            MEDIA_SONG_RECENT -> getRecentSongs()
-            MEDIA_LIVESET_RANDOM_ID -> getRandomLivesets()
-            MEDIA_LIVESET_RECENT -> getRecentLivesets()
-
-            // Genre -> songs
-            MEDIA_GENRES_SONGS -> getGenres(null, "short")
-            MEDIA_GENRE_SONGS -> getGenre(parentIdParts[1], null, "short")
-            MEDIA_GENRES_SONGS_THIS_YEAR -> getGenres(year, "short")
-            MEDIA_GENRES_SONGS_LAST_YEAR -> getGenres(lastYear, "short")
-            MEDIA_GENRE_SONGS_THIS_YEAR -> getGenre(parentIdParts[1], year, "short")
-            MEDIA_GENRE_SONGS_LAST_YEAR -> getGenre(parentIdParts[1], lastYear , "short")
-
-            // Genre -> livesets
-            MEDIA_GENRES_LIVESETS -> getGenres(null, "long")
-            MEDIA_GENRE_LIVESETS -> getGenre(parentIdParts[1], null, "long")
-            MEDIA_GENRES_LIVESETS_THIS_YEAR -> getGenres(year, "long")
-            MEDIA_GENRES_LIVESETS_LAST_YEAR -> getGenres(lastYear, "long")
-            MEDIA_GENRE_LIVESETS_THIS_YEAR -> getGenre(parentIdParts[1], year, "long")
-            MEDIA_GENRE_LIVESETS_LAST_YEAR -> getGenre(parentIdParts[1], lastYear, "long")
-
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
+
+            MEDIA_SONG_RANDOM_ID -> getSongs(parentIdParts[1], "Random")
+            MEDIA_SONG_RECENT -> getSongs(parentIdParts[1], "Recent")
+            MEDIA_GET_GENRES -> getGenres(parentIdParts[1])
+            MEDIA_GET_YEARS -> getYears(parentIdParts[1], parentIdParts[2])
+            MEDIA_GET_SONGS_BY_GENRE -> getGenre(parentIdParts[1], parentIdParts[3].toIntOrNull(), parentIdParts[2])
             MEDIA_SHARE_ID -> getShares()
             MEDIA_BOOKMARK_ID -> getBookmarks()
             MEDIA_PODCAST_ID -> getPodcasts()
@@ -265,36 +253,32 @@ class MediaLibraryBrowser(
     private fun getRootItems(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        if (!isOffline) {
-            mediaItems.add(
-                R.string.music_library_label,
-                MEDIA_LIBRARY_ID,
-                null,
-                isBrowsable = true,
-                mediaType = MEDIA_TYPE_FOLDER_MIXED,
-                icon = R.drawable.ic_library
-            )
-        }
-
         mediaItems.add(
-            R.string.main_artists_title,
-            MEDIA_ARTIST_ID,
+            R.string.music_library_label,
+            MEDIA_LIBRARY_ID,
             null,
             isBrowsable = true,
-            mediaType = MEDIA_TYPE_FOLDER_ARTISTS,
-            icon = R.drawable.ic_artist
+            mediaType = MEDIA_TYPE_FOLDER_MIXED,
+            icon = R.drawable.ic_library
         )
 
-        if (!isOffline) {
-            mediaItems.add(
-                R.string.main_albums_title,
-                MEDIA_ALBUM_ID,
-                null,
-                isBrowsable = true,
-                mediaType = MEDIA_TYPE_FOLDER_ALBUMS,
-                icon = R.drawable.ic_menu_browse
-            )
-        }
+        mediaItems.add(
+            "Songs",
+            MEDIA_SONGS_ID,
+            null,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_FOLDER_PLAYLISTS,
+            icon = R.drawable.ic_stat_play
+        )
+
+        mediaItems.add(
+            "Livesets",
+            MEDIA_LIVESETS_ID,
+            null,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_FOLDER_PLAYLISTS,
+            icon = R.drawable.ic_menu_browse
+        )
 
         mediaItems.add(
             R.string.playlist_label,
@@ -311,129 +295,73 @@ class MediaLibraryBrowser(
     private fun getLibrary(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("GetLibrary")
         val mediaItems: MutableList<MediaItem> = ArrayList()
-
-        // Genres
-        mediaItems.add(
-            R.string.main_title_all_songs,
-            MEDIA_GENRES_SONGS,
-            R.string.main_genres_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        mediaItems.add(
-            R.string.main_title_songs_this_year,
-            MEDIA_GENRES_SONGS_THIS_YEAR,
-            R.string.main_genres_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        mediaItems.add(
-            R.string.main_title_songs_last_year,
-            MEDIA_GENRES_SONGS_LAST_YEAR,
-            R.string.main_genres_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        mediaItems.add(
-            R.string.main_title_all_livesets,
-            MEDIA_GENRES_LIVESETS,
-            R.string.main_genres_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        mediaItems.add(
-            R.string.main_title_livesets_this_year,
-            MEDIA_GENRES_LIVESETS_THIS_YEAR,
-            R.string.main_genres_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        mediaItems.add(
-            R.string.main_title_livesets_last_year,
-            MEDIA_GENRES_LIVESETS_LAST_YEAR,
-            R.string.main_genres_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
+        val presets = listOf(
+            TileInfo("Recent Songs"),
+            TileInfo("Random Songs", sortMethod = "Random"),
+            TileInfo("Recent Livesets", length = "long"),
+            TileInfo("Random Livesets", sortMethod = "Random", length = "long"),
+            TileInfo("Starred Songs", ratingMin = 5)
         )
 
-        // Songs
-        mediaItems.add(
-            R.string.main_songs_random,
-            MEDIA_SONG_RANDOM_ID,
-            R.string.main_songs_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        mediaItems.add(
-            R.string.main_songs_recent,
-            MEDIA_SONG_RECENT,
-            R.string.main_songs_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        // Livesets
-        mediaItems.add(
-            R.string.main_songs_random,
-            MEDIA_LIVESET_RANDOM_ID,
-            R.string.main_livesets_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
-        )
-        mediaItems.add(
-            R.string.main_songs_recent,
-            MEDIA_LIVESET_RECENT,
-            R.string.main_livesets_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
+        presets.mapNotNullTo(mediaItems) { it.toMediaItem() }
+
+        return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems, null))
+    }
+
+    private fun getSongsLibrary(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getSongsLibrary")
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val presets = listOf(
+            TileInfo("Search"),
+            TileInfo("Recent"),
+            TileInfo("Random", sortMethod = "Random"),
+            TileInfo("Starred", ratingMin = 5),
+            TileInfo("Bouncy Uptempo ($currentYear)", genre = "Bouncy Uptempo", year = "$currentYear"),
+            TileInfo("Euphoric Hardstyle ($currentYear)", genre = "Euphoric Hardstyle", year = "$currentYear"),
+            TileInfo("Hardcore ($currentYear)", genre = "Hardcore", year = "$currentYear"),
+            TileInfo("Hardstyle ($currentYear)", genre = "Hardstyle", year = "$currentYear"),
+            TileInfo("Hardstyle Classics", genre = "Hardstyle Classics"),
+            TileInfo("Industrial Hardcore", genre = "Industrial Hardcore"),
+            TileInfo("Mainstream Hardcore ($currentYear)", genre = "Mainstream Hardcore", year = "$currentYear"),
+            TileInfo("Mainstream Hardcore", genre = "Millennium Hardcore"),
+            TileInfo("Mainstream Hardstyle ($currentYear)", genre = "Mainstream Hardstyle", year = "$currentYear"),
+            TileInfo("Raw Hardstyle ($currentYear)", genre = "Raw Hardstyle", year = "$currentYear"),
+            TileInfo("Uptempo Hardcore ($currentYear)", genre = "Uptempo Hardcore", year = "$currentYear"),
+            TileInfo("Zaagtempo", genre = "Zaagtempo"),
         )
 
-        mediaItems.add(
-            R.string.main_songs_starred,
-            MEDIA_SONG_STARRED_ID,
-            R.string.main_songs_title,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_PLAYLIST
+        presets.mapNotNullTo(mediaItems) { it.toMediaItem() }
+
+        return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems, null))
+    }
+
+    private fun getLivesetsLibrary(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getLivesetsLibrary")
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val presets = listOf(
+            TileInfo("Search", length = "long"),
+            TileInfo("Recent", length = "long"),
+            TileInfo("Random", sortMethod = "Random", length = "long"),
+            TileInfo("Starred", ratingMin = 5, length = "long"),
+            TileInfo("Bouncy Uptempo", genre = "Bouncy Uptempo", length = "long"),
+            TileInfo("Euphoric Hardstyle ($currentYear)", genre = "Euphoric Hardstyle", year = "$currentYear", length = "long"),
+            TileInfo("Hardcore ($currentYear)", genre = "Hardcore", year = "$currentYear", length = "long"),
+            TileInfo("Hardstyle ($currentYear)", genre = "Hardstyle", year = "$currentYear", length = "long"),
+            TileInfo("Hardstyle Classics", genre = "Hardstyle Classics", length = "long"),
+            TileInfo("Industrial Hardcore", genre = "Industrial Hardcore", length = "long"),
+            TileInfo("Mainstream Hardcore ($currentYear)", genre = "Mainstream Hardcore", year = "$currentYear", length = "long"),
+            TileInfo("Mainstream Hardcore", genre = "Millennium Hardcore", length = "long"),
+            TileInfo("Mainstream Hardstyle ($currentYear)", genre = "Mainstream Hardstyle", year = "$currentYear", length = "long"),
+            TileInfo("Raw Hardstyle ($currentYear)", genre = "Raw Hardstyle", year = "$currentYear", length = "long"),
+            TileInfo("Uptempo Hardcore ($currentYear)", genre = "Uptempo Hardcore", year = "$currentYear", length = "long"),
+            TileInfo("Zaagtempo", genre = "Zaagtempo", length = "long"),
         )
 
-        // Albums
-        mediaItems.add(
-            R.string.main_albums_newest,
-            MEDIA_ALBUM_NEWEST_ID,
-            R.string.main_albums_title
-        )
-
-        mediaItems.add(
-            R.string.main_albums_recent,
-            MEDIA_ALBUM_RECENT_ID,
-            R.string.main_albums_title,
-            mediaType = MEDIA_TYPE_FOLDER_ALBUMS
-        )
-
-        mediaItems.add(
-            R.string.main_albums_frequent,
-            MEDIA_ALBUM_FREQUENT_ID,
-            R.string.main_albums_title,
-            mediaType = MEDIA_TYPE_FOLDER_ALBUMS
-        )
-
-        mediaItems.add(
-            R.string.main_albums_random,
-            MEDIA_ALBUM_RANDOM_ID,
-            R.string.main_albums_title,
-            mediaType = MEDIA_TYPE_FOLDER_ALBUMS
-        )
-
-        mediaItems.add(
-            R.string.main_albums_starred,
-            MEDIA_ALBUM_STARRED_ID,
-            R.string.main_albums_title,
-            mediaType = MEDIA_TYPE_FOLDER_ALBUMS
-        )
-
-        // Other
-        mediaItems.add(R.string.button_bar_shares, MEDIA_SHARE_ID, null)
-        mediaItems.add(R.string.button_bar_bookmarks, MEDIA_BOOKMARK_ID, null)
-        mediaItems.add(R.string.button_bar_podcasts, MEDIA_PODCAST_ID, null)
+        presets.mapNotNullTo(mediaItems) { it.toMediaItem() }
 
         return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems, null))
     }
@@ -689,122 +617,24 @@ class MediaLibraryBrowser(
         }
     }
 
-
-    private fun getRandomSongs(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+    private fun getSongs(length: String?, searchMethod: String?): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        return mainScope.future {
-            val songs = serviceScope.future {
-                callWithErrorHandling { musicService.getRandomSongs(DISPLAY_LIMIT) }
-            }.await()
-
-            if (songs != null) {
-                if (songs.size > 1) {
-                    mediaItems.addPlayAllItem(listOf(MEDIA_SONG_RANDOM_ID).joinToString("|"))
-                }
-
-                // TODO: Paging is not implemented for songs, is it necessary at all?
-                val items = songs.getTracks()
-                dataProvider.randomSongsCache = items
-                items.map { song ->
-                    mediaItems.add(
-                        song.toMediaItem(
-                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
-                        )
-                    )
-                }
-            }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+        val filters = Filters()
+        if (length != null) {
+            filters.add(Filter("LENGTH", length))
         }
-    }
-
-    private fun getRecentSongs(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
             val songs = serviceScope.future {
                 callWithErrorHandling {
                     musicService.getSongs(
-                        Filters(Filter("LENGTH", "short")),
+                        filters,
                         null,
                         null,
                         maxSongs,
                         0,
-                        "AddedDesc"
-                    )
-                }
-            }.await()
-
-            if (songs != null) {
-                if (songs.size > 1) {
-                    mediaItems.addPlayAllItem(listOf(MEDIA_SONG_RANDOM_ID).joinToString("|"))
-                }
-
-                // TODO: Paging is not implemented for songs, is it necessary at all?
-                val items = songs.getTracks()
-                dataProvider.randomSongsCache = items
-                items.map { song ->
-                    mediaItems.add(
-                        song.toMediaItem(
-                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
-                        )
-                    )
-                }
-            }
-            return@future LibraryResult.ofItemList(mediaItems, null)
-        }
-    }
-
-    private fun getRandomLivesets(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        val mediaItems: MutableList<MediaItem> = ArrayList()
-
-        return mainScope.future {
-            val songs = serviceScope.future {
-                callWithErrorHandling {
-                    musicService.getSongs(
-                        Filters(Filter("LENGTH", "long")),
-                        null,
-                        null,
-                        maxSongs,
-                        0,
-                        "Random"
-                    )
-                }
-            }.await()
-
-            if (songs != null) {
-                if (songs.size > 1) {
-                    mediaItems.addPlayAllItem(listOf(MEDIA_SONG_RANDOM_ID).joinToString("|"))
-                }
-
-                // TODO: Paging is not implemented for songs, is it necessary at all?
-                val items = songs.getTracks()
-                dataProvider.randomSongsCache = items
-                items.map { song ->
-                    mediaItems.add(
-                        song.toMediaItem(
-                            listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
-                        )
-                    )
-                }
-            }
-            return@future LibraryResult.ofItemList(mediaItems, null)
-        }
-    }
-
-    private fun getRecentLivesets(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        val mediaItems: MutableList<MediaItem> = ArrayList()
-
-        return mainScope.future {
-            val songs = serviceScope.future {
-                callWithErrorHandling {
-                    musicService.getSongs(
-                        Filters(Filter("LENGTH", "long")),
-                        null,
-                        null,
-                        maxSongs,
-                        0,
-                        "AddedDesc"
+                        searchMethod ?: "AddedDesc"
                     )
                 }
             }.await()
@@ -830,48 +660,64 @@ class MediaLibraryBrowser(
     }
 
     private fun getGenres(
-        year: Int?,
         length: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        Timber.i("getGenres: year=$year length=$length")
+        Timber.i("getGenres:length=$length")
         return mainScope.future {
             var genres = serviceScope.future {
-                callWithErrorHandling { musicService.getGenres(true, year, length) }
+                callWithErrorHandling { musicService.getGenres(true, null, length) }
             }.await()
 
-            val mediaIdPrefix = if (year == null) {
-                if (length == "short") {
-                    MEDIA_GENRE_SONGS
-                } else {
-                    MEDIA_GENRE_LIVESETS
-                }
-            } else {
-                if (length == "short") {
-                    if (year == Calendar.getInstance().get(Calendar.YEAR)) {
-                        MEDIA_GENRE_SONGS_THIS_YEAR
-                    } else {
-                        MEDIA_GENRE_SONGS_LAST_YEAR
-                    }
-                } else {
-                    if (year == Calendar.getInstance().get(Calendar.YEAR)) {
-                        MEDIA_GENRE_LIVESETS_THIS_YEAR
-                    } else {
-                        MEDIA_GENRE_LIVESETS_LAST_YEAR
-                    }
-                }
-            }
-            Timber.i("getGenres: mediaIdPrefix=$mediaIdPrefix $year")
 
             if (genres != null) {
-                genres = genres.sortedByDescending { Genre -> Genre.songCount }
+                genres = genres.sortedByDescending { genre -> genre.songCount }
             }
 
             genres?.forEach {
                 mediaItems.add(
-                    it.name + " " + it.songCount,
-                    mediaIdPrefix + "|" + it.name,
+                    it.name ,
+                    "$MEDIA_GET_YEARS|${it.name}|$length",
+                    R.string.main_genres_title,
+                    isBrowsable = true,
+                    mediaType = MEDIA_TYPE_PLAYLIST
+                )
+            }
+            return@future LibraryResult.ofItemList(mediaItems, null)
+        }
+    }
+
+    private fun getYears(
+        genre: String?,
+        length: String
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        Timber.i("getYears: genre=$genre length=$length")
+        return mainScope.future {
+            var years = serviceScope.future {
+                callWithErrorHandling { musicService.getTags(
+                    true, "YEAR",
+                    year = null,
+                    length = length
+                ) }
+            }.await()
+
+            if (years != null) {
+                years = years.sortedByDescending { y -> y.name }
+            }
+            mediaItems.add(
+                "All" ,
+                "$MEDIA_GET_SONGS_BY_GENRE|$genre|$length|",
+                R.string.main_genres_title,
+                isBrowsable = true,
+                mediaType = MEDIA_TYPE_PLAYLIST
+            )
+            years?.forEach {
+                mediaItems.add(
+                    it.name ,
+                    "$MEDIA_GET_SONGS_BY_GENRE|$genre|$length|${it.name}",
                     R.string.main_genres_title,
                     isBrowsable = true,
                     mediaType = MEDIA_TYPE_PLAYLIST
@@ -1031,5 +877,32 @@ class MediaLibraryBrowser(
             }
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
+    }
+    private fun TileInfo.toMediaItem(): MediaItem? {
+        val context = UApp.applicationContext()
+
+        val mediaId = when {
+            title.contains("Random", ignoreCase = true) -> "$MEDIA_SONG_RANDOM_ID|$length"
+            title.contains("Recent", ignoreCase = true) -> "$MEDIA_SONG_RECENT|$length"
+            title.contains("Starred", ignoreCase = true) -> "$MEDIA_SONG_STARRED_ID|$length"
+            title.contains("Search", ignoreCase = true) -> "$MEDIA_GET_GENRES|$length"
+            else -> "$MEDIA_GET_SONGS_BY_GENRE|$genre|$length"+(if (year != null) "|$year" else "|")
+        }
+
+        val groupName = context.getString(
+            when {
+                length == "long" -> R.string.main_livesets_title
+                else -> R.string.main_songs_title
+            }
+        )
+
+        return buildMediaItem(
+            title = this.title,
+            mediaId = mediaId,
+            isPlayable = false,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_PLAYLIST,
+            group = groupName
+        )
     }
 }
