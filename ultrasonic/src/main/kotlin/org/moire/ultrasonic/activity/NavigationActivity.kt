@@ -498,7 +498,7 @@ class NavigationActivity : ScopeActivity() {
         mediaPlayerManager.addToPlaylist(
             songs = musicDirectory.getTracks(),
             autoPlay = true,
-            shuffle = true,
+            shuffle = false,
             insertionMode = MediaPlayerManager.InsertionMode.CLEAR
         )
 

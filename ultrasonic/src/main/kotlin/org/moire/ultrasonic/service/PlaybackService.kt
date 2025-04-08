@@ -47,7 +47,7 @@ import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.imageloader.ArtworkBitmapLoader
 import org.moire.ultrasonic.provider.UltrasonicAppWidgetProvider
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.service.ultrasonic.androidauto.MediaLibrarySessionCallback
+import org.moire.ultrasonic.service.androidauto.MediaLibrarySessionCallback
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util

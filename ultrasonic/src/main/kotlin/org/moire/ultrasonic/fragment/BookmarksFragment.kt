@@ -71,7 +71,7 @@ class BookmarksFragment : TrackCollectionFragment() {
             mediaPlayerManager.addToPlaylist(
                 songs = songs,
                 autoPlay = false,
-                shuffle = true,
+                shuffle = false,
                 insertionMode = MediaPlayerManager.InsertionMode.CLEAR
             )
 
