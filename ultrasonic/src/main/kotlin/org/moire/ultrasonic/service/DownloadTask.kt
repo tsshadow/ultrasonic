@@ -275,12 +275,12 @@ class DownloadTask(
 
         // If we are downloading a new album, and the user has not visited the Artists list
         // recently, then the artist won't be in the database.
-        if (artist == null) {
-            val artists: List<Artist> = musicService.getArtists(true)
-            artist = artists.find {
-                it.id == artistId
-            }
-        }
+//        if (artist == null) {
+//            val artists: List<Artist> = musicService.getArtists(true)
+//            artist = artists.find {
+//                it.id == artistId
+//            }
+//        }
 
         // If we have found an artist, cache it.
         if (artist != null) {
