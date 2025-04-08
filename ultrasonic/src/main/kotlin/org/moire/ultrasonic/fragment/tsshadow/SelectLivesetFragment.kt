@@ -7,17 +7,27 @@
 
 package org.moire.ultrasonic.fragment.tsshadow
 
+import TileInfo
+import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.GridLayout
+import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import createTileView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,11 +40,13 @@ import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.toastingExceptionHandler
 import timber.log.Timber
+import java.time.Year
 
 /**
  * Advanced search fragment, enables searching for songs with multiple parameters
  */
 class SelectLivesetFragment : Fragment(), RefreshableFragment {
+    private lateinit var gridLayout: GridLayout
     override var swipeRefresh: SwipeRefreshLayout? = null
 
     private var yearSpinner: Spinner? = null
@@ -66,6 +78,7 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
         return inflater.inflate(R.layout.tsshadow_select_liveset, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         swipeRefresh = view.findViewById(R.id.select_genre_refresh)
@@ -151,6 +164,39 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
         genreSpinner?.setAdapter(genreAdapter)
         festivalSpinner?.setAdapter(festivalAdapter)
         sortMethodSpinner?.setAdapter(sortMethodAdapter)
+
+        // TILES
+        gridLayout = view.findViewById(R.id.gridLayoutContainer)
+
+        val currentYear = Year.now().value
+
+        val genreTiles = listOf(
+            TileInfo("Euphoric Hardstyle", genre = "Euphoric Hardstyle", length = "long"),
+            TileInfo("Hardstyle", genre = "Hardstyle", length = "long"),
+            TileInfo(
+                "Hardstyle Classics",
+                genre = "Hardstyle Classics",
+                length = "long",
+                sortMethod = "Random"
+            ),
+            TileInfo("Mainstream Hardstyle", genre = "Mainstream Hardstyle", length = "long"),
+            TileInfo("Raw Hardstyle", genre = "Raw Hardstyle", length = "long"),
+            TileInfo("Hardcore", genre = "Hardcore", length = "long"),
+            TileInfo("Mainstream Hardcore", genre = "Mainstream Hardcore", length = "long"),
+            TileInfo("Uptempo Hardcore", genre = "Uptempo Hardcore", length = "long"),
+            TileInfo("Bouncy Uptempo", genre = "Bouncy Uptempo", length = "long"),
+            TileInfo("Zaagtempo", genre = "Zaagtempo", length = "long"),
+        )
+
+        // Dynamically create and add tiles to GridLayout
+        genreTiles.forEachIndexed { index, tile ->
+            val tileView =
+                createTileView(tile, index, requireContext(), gridLayout, findNavController())
+            gridLayout.addView(tileView)
+        }
+
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        gridLayout.columnCount = if (isLandscape) 5 else 3
 
         setTitle(this, R.string.main_livesets_title)
         load(false)

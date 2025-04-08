@@ -124,5 +124,21 @@
             a:text="Search Songs" />
     </LinearLayout>
 
+    <!-- NestedScrollView to allow scrolling inside SwipeRefreshLayout -->
+    <androidx.core.widget.NestedScrollView
+        a:layout_width="match_parent"
+        a:layout_height="match_parent"
+        a:fillViewport="true">  <!-- Ensures full expansion -->
+
+        <android.widget.GridLayout
+            a:id="@+id/gridLayoutContainer"
+            a:layout_width="match_parent"
+            a:layout_height="wrap_content"
+            a:clipToPadding="false"
+            a:columnCount="3"
+            a:orientation="horizontal"
+            a:padding="8dp" />
+
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

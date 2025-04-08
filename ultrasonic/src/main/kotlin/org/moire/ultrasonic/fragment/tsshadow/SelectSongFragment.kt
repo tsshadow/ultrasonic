@@ -7,17 +7,23 @@
 
 package org.moire.ultrasonic.fragment.tsshadow
 
+import TileInfo
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.GridLayout
 import android.widget.Spinner
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import createTileView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,11 +35,13 @@ import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.toastingExceptionHandler
+import java.time.Year
 
 /**
  * Advanced search fragment, enables searching for songs with multiple parameters
  */
 class SelectSongFragment : Fragment(), RefreshableFragment {
+    private lateinit var gridLayout: GridLayout
     override var swipeRefresh: SwipeRefreshLayout? = null
 
     private var yearSpinner: Spinner? = null
@@ -41,7 +49,6 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
 
     private var ratingMin: Spinner? = null
     private var ratingMax: Spinner? = null
-
 
 
     private var genreSpinner: Spinner? = null
@@ -64,6 +71,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         return inflater.inflate(R.layout.tsshadow_select_song, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         swipeRefresh = view.findViewById(R.id.select_genre_refresh)
@@ -134,6 +142,77 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         ratingMax?.setSelection(5)
         genreSpinner?.setAdapter(genreAdapter)
         sortMethodSpinner?.setAdapter(sortMethodAdapter)
+
+
+        // TILES
+        gridLayout = view.findViewById(R.id.gridLayoutContainer)
+
+        val currentYear = Year.now().value
+
+        val genreTiles = listOf(
+            TileInfo(
+                "Euphoric Hardstyle",
+                genre = "Euphoric Hardstyle",
+                length = "short",
+                year = "$currentYear"
+            ),
+            TileInfo("Hardstyle", genre = "Hardstyle", length = "short", sortMethod = "Random"),
+            TileInfo("Hardstyle", genre = "Hardstyle", length = "short", year = "$currentYear"),
+            TileInfo(
+                "Hardstyle Classics",
+                genre = "Hardstyle Classics",
+                length = "short",
+            ),
+            TileInfo(
+                "Mainstream Hardstyle",
+                genre = "Mainstream Hardstyle",
+                length = "short",
+                year = "$currentYear"
+            ),
+            TileInfo(
+                "Raw Hardstyle",
+                genre = "Raw Hardstyle",
+                length = "short",
+                year = "$currentYear"
+            ),
+            TileInfo("Hardcore", genre = "Hardcore", length = "short", sortMethod = "Random"),
+            TileInfo("Hardcore", genre = "Hardcore", length = "short", year = "$currentYear"),
+            TileInfo(
+                "Mainstream Hardcore",
+                genre = "Mainstream Hardcore",
+                length = "short",
+                year = "$currentYear"
+            ),
+            TileInfo(
+                "Industrial Hardcore",
+                genre = "Industrial Hardcore",
+                length = "short",
+            ),
+            TileInfo(
+                "Uptempo Hardcore",
+                genre = "Uptempo Hardcore",
+                length = "short",
+                year = "$currentYear"
+            ),
+            TileInfo(
+                "Bouncy Uptempo",
+                genre = "Bouncy Uptempo",
+                length = "short",
+                year = "$currentYear"
+            ),
+            TileInfo("Zaagtempo", genre = "Zaagtempo", length = "short", year = "$currentYear"),
+        )
+
+
+        // Dynamically create and add tiles to GridLayout
+        genreTiles.forEachIndexed { index, tile ->
+            val tileView =
+                createTileView(tile, index, requireContext(), gridLayout, findNavController())
+            gridLayout.addView(tileView)
+        }
+
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        gridLayout.columnCount = if (isLandscape) 5 else 3
 
         setTitle(this, R.string.main_songs_title)
         load(false)
