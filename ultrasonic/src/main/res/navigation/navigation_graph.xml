@@ -141,6 +141,11 @@
             app:argType="string"
             app:nullable="true" />
         <argument
+            android:name="festival"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
             android:name="length"
             android:defaultValue="@null"
             app:argType="string"

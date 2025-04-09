@@ -527,6 +527,7 @@ open class TrackCollectionFragment(
         val shareId = navArgs.shareId
         val shareName = navArgs.shareName
         val genreName = navArgs.genreName
+        val festival = navArgs.festival
         val moodName = navArgs.moodName
         val yearName = navArgs.yearName
         val getSongsName = navArgs.getSongsName
@@ -557,36 +558,36 @@ open class TrackCollectionFragment(
             } else if (shareId != null) {
                 setTitle(shareName)
                 listModel.getShare(shareId)
-            } else if (genreName != null) {
-                setTitle(genreName)
-                val filters = Filters(Filter("GENRE",genreName))
-                year.ifNotNull { if(year !== "All") filters.add(Filter("YEAR", year.toString()))}
-                if (length!== null && length.isNotEmpty()) filters.add(Filter("LENGTH", length.toString()))
-                val effectiveSortMethod = if (sortMethod.isNullOrEmpty()) "LastWritten" else sortMethod
-                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append, effectiveSortMethod)
-            } else if (moodName != null) {
-                setTitle(moodName)
-                val filters = Filters(Filter("MOOD",moodName))
-                year.ifNotNull { if(year !== "All") filters.add(Filter("YEAR", year.toString()))}
-                if (length!== null && length.isNotEmpty()) filters.add(Filter("LENGTH", length.toString()))
-                val effectiveSortMethod = if (sortMethod.isNullOrEmpty()) "LastWritten" else sortMethod
-                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append, effectiveSortMethod)
-            } else if (yearName != null) {
-                setTitle(yearName)
-                val filters = Filters(Filter("YEAR",year.toString()))
-                if (length!== null && length.isNotEmpty()) filters.add(Filter("LENGTH", length.toString()))
-                val effectiveSortMethod = if (sortMethod.isNullOrEmpty()) "LastWritten" else sortMethod
-                listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append, effectiveSortMethod)
             } else if (getStarredTracks) {
                 setTitle(getString(R.string.main_songs_starred))
                 listModel.getStarred()
             } else if (getVideos) {
                 setTitle(R.string.main_videos)
                 listModel.getVideos(refresh2)
+
+            // getSongsName
+            // Get songs based on filters, for example songs from
+            // [Hardstyle, 2025]
+            // [Uptempo Hardcore, 2021, short]
+
             } else if(getSongsName != null) {
-            setTitle(getSongsName)
-            val filters = Filters()
+                val title = buildString {
+                    if (length == "short") append("Songs") else append("Livesets")
+                    if (!festival.isNullOrBlank()) append(festival)
+                    if (!genreName.isNullOrBlank()) {
+                        if (isNotEmpty()) append(" ")
+                        append(genreName)
+                    }
+                    if (year != null) {
+                        append(" ($year)")
+                    }
+                }
+
+                setTitle(title)
+
+                val filters = Filters()
             year.ifNotNull { if(year !== "All" && year!== "") filters.add(Filter("YEAR", year.toString()))}
+            festival.ifNotNull { if(festival !== "All" && festival!== "") filters.add(Filter("FESTIVAL", festival.toString()))}
             if (length !== null && length.isNotEmpty()) filters.add(
                 Filter(
                     "LENGTH",

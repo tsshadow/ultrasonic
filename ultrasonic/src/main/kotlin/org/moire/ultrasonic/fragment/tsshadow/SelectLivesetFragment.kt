@@ -97,14 +97,14 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
             val action = NavigationGraphDirections.toTrackCollection(
                 getSongsName = "getSongs",
                 genreName = if (genre != "") genre else null,
-                //         festival = festival,
+                festival = if (festival != "") festival else null,
                 size = maxSongs,
                 offset = 0,
                 year = yearSpinner?.selectedItem as String,
                 length = "long",
                 ratingMin = ratingMin?.selectedItem as Int,
                 ratingMax = ratingMax?.selectedItem as Int,
-                sortMethod = sortMethodSpinner?.selectedItem as String
+                sortMethod = sortMethodSpinner?.selectedItem as String,
             )
             findNavController().navigate(action)
         }
