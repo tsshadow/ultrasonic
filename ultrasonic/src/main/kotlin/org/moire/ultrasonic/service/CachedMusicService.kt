@@ -125,7 +125,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun getArtists(refresh: Boolean): List<Artist> {
+    override fun getArtists(refresh: Boolean, offset: Int?, count: Int?): List<Artist> {
         checkSettingsChanged()
 
         if (refresh) {
@@ -135,7 +135,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         var result = cachedArtists.get()
 
         if (result.isEmpty()) {
-            result = musicService.getArtists(refresh)
+            result = musicService.getArtists(refresh, offset, count)
             cachedArtists.set(result)
         }
         return result

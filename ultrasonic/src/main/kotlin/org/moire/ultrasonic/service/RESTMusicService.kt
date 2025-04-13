@@ -96,8 +96,8 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getArtists(refresh: Boolean): List<Artist> {
-        val response = API.getArtists(null).execute().throwOnFailure()
+    override fun getArtists(refresh: Boolean, offset: Int?, count: Int?): List<Artist> {
+        val response = API.getArtists(null, offset, count).execute().throwOnFailure()
 
         return response.body()!!.indexes.toArtistList(activeServerId)
     }

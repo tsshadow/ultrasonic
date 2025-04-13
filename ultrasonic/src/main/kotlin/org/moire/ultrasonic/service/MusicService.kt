@@ -66,7 +66,7 @@ interface MusicService {
     fun getIndexes(musicFolderId: String?, refresh: Boolean): List<Index>
 
     @Throws(Exception::class)
-    fun getArtists(refresh: Boolean): List<Artist>
+    fun getArtists(refresh: Boolean, offset: Int? = null, count: Int? = null): List<Artist>
 
     @Throws(Exception::class)
     fun getMusicDirectory(id: String, name: String?, refresh: Boolean): MusicDirectory

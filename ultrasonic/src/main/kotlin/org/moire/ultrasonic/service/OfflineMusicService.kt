@@ -112,7 +112,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(OfflineException::class)
-    override fun getArtists(refresh: Boolean): List<Artist> {
+    override fun getArtists(refresh: Boolean, offset: Int?, count: Int?): List<Artist> {
         return cachedArtists.get()
     }
 

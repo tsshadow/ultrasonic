@@ -95,8 +95,8 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
             val genre = genreSpinner?.selectedItem as String
             val festival = festivalSpinner?.selectedItem as String
             val action = NavigationGraphDirections.toTrackCollection(
-                getSongsName = "getSongs",
-                genreName = if (genre != "") genre else null,
+                songs = "?",
+                genre = if (genre != "") genre else null,
                 festival = if (festival != "") festival else null,
                 size = maxSongs,
                 offset = 0,
@@ -168,7 +168,7 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
         // TILES
         gridLayout = view.findViewById(R.id.gridLayoutContainer)
 
-        val currentYear = Year.now().value
+//        val currentYear = Year.now().value
 
         val genreTiles = listOf(
             TileInfo("Euphoric Hardstyle", genre = "Euphoric Hardstyle", length = "long"),

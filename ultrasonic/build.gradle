@@ -117,6 +117,7 @@ dependencies {
     implementation libs.media3datasource
     implementation libs.media3okhttp
     implementation libs.swipeRefresh
+    implementation libs.lifecycleLivedataKtx
 
     implementation libs.navigationFragment
     implementation libs.navigationUi

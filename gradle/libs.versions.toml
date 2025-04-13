@@ -2,6 +2,7 @@
 # You need to run ./gradlew wrapper after updating the version
 gradle                 = "8.1.1"
 
+lifecycleLivedataKtx = "2.7.0"
 navigation             = "2.7.5"
 gradlePlugin           = "8.8.0"
 androidxcar            = "1.2.0"
@@ -56,6 +57,7 @@ car                     = { module = "androidx.car.app:app", version.ref = "andr
 core                    = { module = "androidx.core:core-ktx", version.ref = "androidxcore" }
 design                  = { module = "com.google.android.material:material", version.ref = "materialDesign" }
 annotations             = { module = "androidx.annotation:annotation", version.ref = "androidSupport" }
+lifecycleLivedataKtx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 multidex                = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 constraintLayout        = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintLayout" }
 room                    = { module = "androidx.room:room-compiler", version.ref = "room" }

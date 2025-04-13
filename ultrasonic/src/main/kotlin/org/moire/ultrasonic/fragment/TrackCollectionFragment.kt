@@ -191,7 +191,7 @@ open class TrackCollectionFragment(
     }
 
     private fun loadMoreTracks() {
-        if (displayRandom() || navArgs.genreName != null) {
+        if (displayRandom() || navArgs.genre != null) {
             getLiveData(append = true)
         }
     }
@@ -527,11 +527,9 @@ open class TrackCollectionFragment(
         val playlistName = navArgs.playlistName
         val shareId = navArgs.shareId
         val shareName = navArgs.shareName
-        val genreName = navArgs.genreName
+        val genre = navArgs.genre
         val festival = navArgs.festival
-        val moodName = navArgs.moodName
-        val yearName = navArgs.yearName
-        val getSongsName = navArgs.getSongsName
+        val songs = navArgs.songs
         val year = navArgs.year
         val length = navArgs.length
         val sortMethod = navArgs.sortMethod
@@ -570,20 +568,35 @@ open class TrackCollectionFragment(
                 // Get songs based on filters, for example songs from
                 // [Hardstyle, 2025]
                 // [Uptempo Hardcore, 2021, short]
-            } else if (getSongsName != null) {
-                val title = buildString {
-                    if (length == "short") append("Songs") else append("Livesets")
-                    if (!festival.isNullOrBlank()) append(festival)
-                    if (!genreName.isNullOrBlank()) {
-                        if (isNotEmpty()) append(" ")
-                        append(genreName)
+            } else if (songs != null) {
+                // No preset title
+                if (songs != "?") {
+                    setTitle(songs)
+                } else {
+                    val title = buildString {
+                        when (sortMethod) {
+                            "AddedDesc" -> {
+                                append("Recent ")
+                            }
+                            "Random" -> {
+                                append("Random ")
+                            }
+                            "LastWrittenDesc" -> {
+                                append("Recent Modified ")
+                            }
+                        }
+//                        if (length == "short") append("Songs:") else append("Livesets:")
+                        if (!festival.isNullOrBlank()) append(festival)
+                        if (!genre.isNullOrBlank() && genre != "All") {
+                            if (isNotEmpty()) append(" ")
+                            append(genre)
+                        }
+                        if (year != null) {
+                            append(" ($year)")
+                        }
                     }
-                    if (year != null) {
-                        append(" ($year)")
-                    }
+                    setTitle(title)
                 }
-
-                setTitle(title)
 
                 val filters = Filters()
                 year.ifNotNull {

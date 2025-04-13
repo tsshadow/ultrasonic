@@ -29,9 +29,6 @@
         android:id="@+id/toPresetPage"
         app:destination="@id/selectPresetPage" />
     <action
-        android:id="@+id/toLandingPage"
-        app:destination="@id/landingPageFragment" />
-    <action
         android:id="@+id/toSearchFragment"
         app:destination="@id/searchFragment" />
     <action
@@ -116,28 +113,18 @@
             app:argType="string"
             app:nullable="true" />
         <argument
-            android:name="genreName"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="moodName"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="yearName"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="getSongsName"
+            android:name="songs"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <argument
             android:name="year"
             android:defaultValue=""
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="genre"
+            android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <argument
@@ -309,10 +296,6 @@
     <fragment
         android:id="@+id/selectLivesetFragment"
         android:name="org.moire.ultrasonic.fragment.tsshadow.SelectLivesetFragment"/>
-    <fragment
-        android:id="@+id/landingPageFragment"
-        android:name="org.moire.ultrasonic.fragment.tsshadow.LandingPageFragment">
-    </fragment>
     <fragment
         android:id="@+id/playerFragment"
         android:name="org.moire.ultrasonic.fragment.PlayerFragment">

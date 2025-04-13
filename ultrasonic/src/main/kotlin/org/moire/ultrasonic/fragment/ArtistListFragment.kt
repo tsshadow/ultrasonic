@@ -21,15 +21,17 @@ import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.domain.ArtistOrIndex
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.model.ArtistListModel
+import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import timber.log.Timber
 
 /**
  * Displays the list of Artists or Indexes (folders) from the media library
  */
 class ArtistListFragment : EntryListFragment<ArtistOrIndex>() {
-
-    /**
-     * The ViewModel to use to get the data
-     */
+    private var allDataLoaded: Boolean = false
+    private var isLoading: Boolean = false
+    private var offset = 0
+    private val pageSize = 1000
     override val listModel: ArtistListModel by viewModels()
 
     /**
@@ -56,15 +58,57 @@ class ArtistListFragment : EntryListFragment<ArtistOrIndex>() {
                 { menuItem, entry -> onContextMenuItemSelected(menuItem, entry) }
             )
         )
+
+        listView?.addOnScrollListener(object :
+            androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            override fun onScrolled(
+                recyclerView: androidx.recyclerview.widget.RecyclerView,
+                dx: Int,
+                dy: Int
+            ) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (dy <= 0 || isLoading || allDataLoaded) return
+
+                val layoutManager =
+                    recyclerView.layoutManager as? androidx.recyclerview.widget.LinearLayoutManager
+                        ?: return
+
+                val visibleItemCount = layoutManager.childCount
+                val totalItemCount = layoutManager.itemCount
+                val firstVisibleItem = layoutManager.findFirstVisibleItemPosition()
+
+                val reachedBottom = (visibleItemCount + firstVisibleItem) >= totalItemCount - 3
+                if (reachedBottom) {
+                    loadMoreItems()
+                }
+            }
+        })
     }
 
-    /**
-     * There are different targets depending on what list we show.
-     * If we are showing indexes, we need to go to TrackCollection
-     * If we are showing artists, we need to go to AlbumList
-     */
+    private fun loadMoreItems() {
+        isLoading = true
+        offset += pageSize
+        listModel.loadMore(
+            isOffline = false,
+            useId3Tags = true, // or use a flag from somewhere like `ActiveServerProvider`
+            musicService = getMusicService(),
+            refresh = false,
+            offset = offset,
+            count = pageSize
+        )
+
+        // You can observe `artists` in your ViewModel or use a LiveData callback for better control
+        // Here's a basic delay-based placeholder to stop loading
+        listView?.postDelayed({
+            isLoading = false
+            if ((viewAdapter.items.size ?: 0) < offset + pageSize) {
+                allDataLoaded = true
+            }
+        }, 1000)
+    }
+
     override fun onItemClick(item: ArtistOrIndex) {
-        // Check type
         val action = if (item is Index) {
             NavigationGraphDirections.toTrackCollection(
                 id = item.id,

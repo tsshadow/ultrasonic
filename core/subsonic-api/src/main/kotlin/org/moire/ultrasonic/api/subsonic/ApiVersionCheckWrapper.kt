@@ -58,9 +58,9 @@ internal class ApiVersionCheckWrapper(
     var currentApiVersion: SubsonicAPIVersions,
     var isRealProtocolVersion: Boolean = false
 ) : SubsonicAPIDefinition by api {
-    override fun getArtists(musicFolderId: String?): Call<GetArtistsResponse> {
+    override fun getArtists(musicFolderId: String?, offset: Int?, count: Int?): Call<GetArtistsResponse> {
         checkVersion(V1_8_0)
-        return api.getArtists(musicFolderId)
+        return api.getArtists(musicFolderId, offset, count)
     }
 
     override fun star(id: String?, albumId: String?, artistId: String?): Call<SubsonicResponse> {

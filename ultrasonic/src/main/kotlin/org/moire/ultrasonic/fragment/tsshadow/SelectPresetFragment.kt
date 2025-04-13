@@ -61,17 +61,18 @@ class SelectPresetFragment : Fragment(), RefreshableFragment {
         super.onViewCreated(view, savedInstanceState)
 
         swipeRefresh = view.findViewById(R.id.select_genre_refresh)
-        swipeRefresh?.setOnRefreshListener { load(true) }
 
         gridLayout = view.findViewById(R.id.gridLayoutContainer)
 
-        val currentYear = Year.now().value
+//        val currentYear = Year.now().value
 
         val genreTiles = listOf(
             TileInfo("Recent Songs"),
             TileInfo("Random Songs", sortMethod = "Random"),
+            TileInfo("Recent Modified Songs", sortMethod = "LastWrittenDesc", length = "long"),
             TileInfo("Recent Livesets", length = "long"),
             TileInfo("Random Livesets", sortMethod = "Random", length = "long"),
+            TileInfo("Recent Modified Livesets", sortMethod = "LastWrittenDesc", length = "long"),
         )
 
 
@@ -86,21 +87,5 @@ class SelectPresetFragment : Fragment(), RefreshableFragment {
         gridLayout.columnCount = if (isLandscape) 5 else 3
 
         setTitle(this, "Presets")
-        load(false)
     }
-
-
-    private fun load(refresh: Boolean) {
-        viewLifecycleOwner.lifecycleScope.launch(
-            toastingExceptionHandler()
-        ) {
-            val genres = withContext(Dispatchers.IO) {
-                val musicService = getMusicService()
-                musicService.getGenres(refresh, null, null)
-            }
-            // Additional logic if needed for fetching genres dynamically
-        }
-    }
-
-
 }

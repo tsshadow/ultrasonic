@@ -55,7 +55,7 @@ private val genreIconMap: Map<String, Int> = mapOf(
  * Describes the configuration for a tile that represents a genre or song preset.
  */
 data class TileInfo(
-    val title: String,
+    var title: String,
     val genre: String? = null,
     val year: String? = null,
     val size: Int = maxSongs,
@@ -71,8 +71,8 @@ data class TileInfo(
  */
 fun navigateToGenre(tile: TileInfo): NavDirections {
     return NavigationGraphDirections.toTrackCollection(
-        getSongsName = tile.title,
-        genreName = tile.genre,
+        songs = tile.title,
+        genre = tile.genre,
         size = tile.size,
         offset = tile.offset,
         year = tile.year,
@@ -118,8 +118,8 @@ fun createTileView(
     tileIcon.setImageResource(iconRes)
     tileIcon.contentDescription = tile.genre ?: tile.title
 
-    // Format tile text
-    tileText.text = tile.year?.let { "${tile.title} ($it)" } ?: tile.title
+    tile.title = tile.year?.let { "${tile.title} ($it)" } ?: tile.title
+    tileText.text = tile.title
 
     // Click handler
     tileView.setOnClickListener {

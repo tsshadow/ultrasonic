@@ -79,7 +79,7 @@ interface SubsonicAPIDefinition {
     fun getMusicDirectory(@Query("id") id: String): Call<GetMusicDirectoryResponse>
 
     @GET("getArtists.view")
-    fun getArtists(@Query("musicFolderId") musicFolderId: String?): Call<GetArtistsResponse>
+    fun getArtists(@Query("musicFolderId") musicFolderId: String? = null, @Query("offset") offset: Int? = null, @Query("count") count: Int? = null): Call<GetArtistsResponse>
 
     @GET("star.view")
     fun star(

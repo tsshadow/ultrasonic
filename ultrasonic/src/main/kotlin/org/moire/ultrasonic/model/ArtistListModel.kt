@@ -10,10 +10,15 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.Collator
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.ArtistOrIndex
 import org.moire.ultrasonic.service.MusicService
+import timber.log.Timber
 
 /**
  * Provides ViewModel which contains the list of available Artists
@@ -37,20 +42,55 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
         isOffline: Boolean,
         useId3Tags: Boolean,
         musicService: MusicService,
-        refresh: Boolean
+        refresh: Boolean,
     ) {
         super.load(isOffline, useId3Tags, musicService, refresh)
 
         val musicFolderId = activeServer.musicFolderId
 
         val result = if (ActiveServerProvider.shouldUseId3Tags()) {
-            musicService.getArtists(refresh)
+            musicService.getArtists(refresh, 0, 100)
         } else {
             musicService.getIndexes(musicFolderId, refresh)
         }
 
         artists.postValue(result.toMutableList().sortedWith(comparator))
     }
+
+    fun loadMore(
+        isOffline: Boolean,
+        useId3Tags: Boolean,
+        musicService: MusicService,
+        refresh: Boolean,
+        offset: Int,
+        count: Int
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val musicFolderId = activeServer.musicFolderId
+
+            Timber.d(" $offset, $count")
+            val result = if (useId3Tags) {
+                musicService.getArtists(true, offset, count)
+            } else {
+                // fallback if not using ID3 tags
+                musicService.getIndexes(musicFolderId, refresh).drop(offset).take(count)
+            }
+
+
+            val sorted = result.sortedWith(comparator)
+
+            val current = artists.value ?: emptyList()
+            val combined = current + sorted
+
+            Timber.d(combined.first().name)
+            Timber.d(combined.size.toString())
+            withContext(Dispatchers.Main) {
+                artists.postValue(combined)
+            }
+        }
+    }
+
+
 
     override fun showSelectFolderHeader(): Boolean {
         return true

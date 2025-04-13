@@ -86,8 +86,8 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         searchButton?.setOnClickListener {
             val genre = genreSpinner?.selectedItem as String
             val action = NavigationGraphDirections.toTrackCollection(
-                getSongsName = "getSongs",
-                genreName = if (genre != "") genre else null,
+                songs = "?",
+                genre = if (genre != "") genre else null,
                 size = maxSongs,
                 offset = 0,
                 year = yearSpinner?.selectedItem as String,
