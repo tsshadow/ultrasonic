@@ -183,6 +183,7 @@ abstract class MediaLibraryBase {
         // Genres -> songs
         internal const val MEDIA_GET_GENRES = "MEDIA_GET_GENRES"
         internal const val MEDIA_GET_YEARS = "MEDIA_GET_YEARS"
+        internal const val MEDIA_GET_SORT_METHOD = "MEDIA_GET_SORT_METHOD"
         internal const val MEDIA_GET_SONGS_BY_GENRE = "MEDIA_GENRE_SONGS"
         internal const val MEDIA_GENRES_SONGS_THIS_YEAR = "MEDIA_GENRES_SONGS_THIS_YEAR"
         internal const val MEDIA_GENRES_SONGS_LAST_YEAR = "MEDIA_GENRES_SONGS_LAST_YEAR"

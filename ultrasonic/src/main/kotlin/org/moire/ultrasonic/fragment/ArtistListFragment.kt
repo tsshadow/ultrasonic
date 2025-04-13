@@ -30,7 +30,6 @@ import timber.log.Timber
  * Displays the list of Artists or Indexes (folders) from the media library
  */
 class ArtistListFragment : EntryListFragment<ArtistOrIndex>() {
-    private var allDataLoaded: Boolean = false
     private var isLoading: Boolean = false
     private var offset = 0
     private val pageSize = 100

@@ -207,8 +207,9 @@ class MediaLibraryBrowser(
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("AutoMediaBrowserService onLoadChildren called. ParentId: %s", parentId)
         val parentIdParts = parentId.split('|')
+        val action = parentIdParts.first()
 
-        return when (parentIdParts.first()) {
+        return when (action) {
             MEDIA_ROOT_ID -> getRootItems()
             MEDIA_LIBRARY_ID -> getLibrary()
             MEDIA_SONGS_ID -> getSongsLibrary()
@@ -228,12 +229,13 @@ class MediaLibraryBrowser(
             MEDIA_ALBUM_RANDOM_ID -> getAlbums(AlbumListType.RANDOM)
             MEDIA_ALBUM_STARRED_ID -> getAlbums(AlbumListType.STARRED)
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
-
             MEDIA_SONG_RANDOM_ID -> getSongs(parentIdParts[1], "Random")
             MEDIA_SONG_RECENT -> getSongs(parentIdParts[1], "Recent")
+
             MEDIA_GET_GENRES -> getGenres(parentIdParts[1])
             MEDIA_GET_YEARS -> getYears(parentIdParts[1], parentIdParts[2])
-            MEDIA_GET_SONGS_BY_GENRE -> getGenre(parentIdParts[1], parentIdParts[3].toIntOrNull(), parentIdParts[2])
+            MEDIA_GET_SORT_METHOD -> getSortMethod(parentIdParts[1], parentIdParts[2], parentIdParts[3])
+            MEDIA_GET_SONGS_BY_GENRE -> getGenre(parentIdParts[1], parentIdParts[3].toIntOrNull(), parentIdParts[2], parentIdParts[4])
             MEDIA_SHARE_ID -> getShares()
             MEDIA_BOOKMARK_ID -> getBookmarks()
             MEDIA_PODCAST_ID -> getPodcasts()
@@ -709,7 +711,7 @@ class MediaLibraryBrowser(
             }
             mediaItems.add(
                 "All" ,
-                "$MEDIA_GET_SONGS_BY_GENRE|$genre|$length|",
+                "$MEDIA_GET_SORT_METHOD|$genre|$length|",
                 R.string.main_genres_title,
                 isBrowsable = true,
                 mediaType = MEDIA_TYPE_PLAYLIST
@@ -717,7 +719,7 @@ class MediaLibraryBrowser(
             years?.forEach {
                 mediaItems.add(
                     it.name ,
-                    "$MEDIA_GET_SONGS_BY_GENRE|$genre|$length|${it.name}",
+                    "$MEDIA_GET_SORT_METHOD|$genre|$length|${it.name}",
                     R.string.main_genres_title,
                     isBrowsable = true,
                     mediaType = MEDIA_TYPE_PLAYLIST
@@ -727,11 +729,41 @@ class MediaLibraryBrowser(
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
     }
+private fun getSortMethod(
+        genre: String?,
+        length: String?,
+        year: String?,
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+
+        Timber.i("getSortMethod: genre=$genre length=$length year=$year")
+        return mainScope.future {
+
+            val sortMethods = mapOf(
+                "Recent toegevoegd" to "AddedDesc",
+                "Recent aangepast" to "LastWrittenDesc",
+                "Willekeurig" to "Random"
+            )
+
+            sortMethods.forEach { (name, value) ->
+                mediaItems.add(
+                    name,
+                    "$MEDIA_GET_SONGS_BY_GENRE|$genre|$length|$year|$value",
+                    R.string.main_genres_title,
+                    isBrowsable = true,
+                    mediaType = MEDIA_TYPE_PLAYLIST
+                )
+            }
+
+            return@future LibraryResult.ofItemList(mediaItems, null)
+        }
+    }
 
     private fun getGenre(
         genre: String,
         year: Int?,
-        length: String
+        length: String,
+        sortMethod: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
@@ -741,7 +773,6 @@ class MediaLibraryBrowser(
                 val filters = Filters(Filter("GENRE", genre))
                 filters.add(Filter("LENGTH", length))
                 year.ifNotNull { filters.add(Filter("YEAR", year.toString())) }
-                val sortMethod = if (year !== null) "AddedDesc" else "Random"
 
                 callWithErrorHandling {
                     musicService.getSongs(
