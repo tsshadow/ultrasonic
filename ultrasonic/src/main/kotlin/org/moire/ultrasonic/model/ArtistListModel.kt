@@ -68,7 +68,7 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
         CoroutineScope(Dispatchers.IO).launch {
             val musicFolderId = activeServer.musicFolderId
 
-            Timber.d(" $offset, $count")
+            Timber.d("loadMore offset=$offset, count=$count")
             val result = if (useId3Tags) {
                 musicService.getArtists(true, offset, count)
             } else {
@@ -82,8 +82,6 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
             val current = artists.value ?: emptyList()
             val combined = current + sorted
 
-            Timber.d(combined.first().name)
-            Timber.d(combined.size.toString())
             withContext(Dispatchers.Main) {
                 artists.postValue(combined)
             }
