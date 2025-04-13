@@ -188,6 +188,7 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
                 title = createTitle(genre, year, sortMethod, festival),
                 genre = genre,
                 year = year,
+                festival = festival,
                 sortMethod = sortMethod,
                 length = DEFAULT_LENGTH,
                 ratingMin = ratingMinSpinner.selectedItem as Int,
