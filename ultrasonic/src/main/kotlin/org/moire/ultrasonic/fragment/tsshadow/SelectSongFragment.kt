@@ -50,7 +50,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
     private lateinit var searchButton: Button
     private lateinit var saveButton: Button
 
-    private val genreList = arrayListOf("")
+    private val genreList = arrayListOf("All")
     private val yearList = arrayListOf("All")
     private var tiles = mutableListOf<TileInfo>()
 
@@ -157,10 +157,10 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         searchButton.setOnClickListener {
             val action = NavigationGraphDirections.toTrackCollection(
                 songs = "?",
-                genre = genreSpinner.selectedItem as String,
+                genre = if(genreSpinner.selectedItem as String == "All") null else genreSpinner.selectedItem as String,
                 size = maxSongs,
                 offset = 0,
-                year = yearSpinner.selectedItem as String,
+                year = if(yearSpinner.selectedItem as String == "All") null else yearSpinner.selectedItem as String,
                 length = DEFAULT_LENGTH,
                 ratingMin = ratingMinSpinner.selectedItem as Int,
                 ratingMax = ratingMaxSpinner.selectedItem as Int,
@@ -179,8 +179,8 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
 
             val newTile = TileInfo(
                 title = createTitle(genre, year, sortMethod),
-                genre = genre,
-                year = year,
+                genre = if (genre == "All") null else genre,
+                year = if (year == "All") null else year,
                 sortMethod = sortMethod,
                 length = DEFAULT_LENGTH,
                 ratingMin = ratingMinSpinner.selectedItem as Int,
@@ -207,16 +207,19 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         viewLifecycleOwner.lifecycleScope.launch(toastingExceptionHandler()) {
             val musicService = getMusicService()
 
-            val genres = withContext(Dispatchers.IO) {
-                musicService.getGenres(refresh, null, null)
+            if (genreList.size == 1 && genreList[0] == "All") {
+                val genres = withContext(Dispatchers.IO) {
+                    musicService.getGenres(refresh, null, null)
+                }
+                genreList.addAll(genres.map { it.name })
             }
-            genreList.addAll(genres.map { it.name })
 
-            val years = withContext(Dispatchers.IO) {
-                musicService.getTags(refresh, "YEAR", null, null)
-            }.sortedByDescending { it.name }
-
-            yearList.addAll(years.map { it.name })
+            if (yearList.size == 1 && yearList[0] == "All") {
+                val years = withContext(Dispatchers.IO) {
+                    musicService.getTags(refresh, "YEAR", null, null)
+                }.sortedByDescending { it.name }
+                yearList.addAll(years.map { it.name })
+            }
         }
     }
 

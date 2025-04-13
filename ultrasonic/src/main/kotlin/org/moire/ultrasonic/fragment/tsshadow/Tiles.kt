@@ -93,7 +93,18 @@ data class TileInfo(
  * Returns a navigation action for a given tile.
  */
 fun navigateToGenre(tile: TileInfo): NavDirections {
-    Timber.d("Navigating to genre: ${tile.title} with parameters: ${tile.genre}, ${tile.year}, ${tile.size}, ${tile.offset}, ${tile.length}, ${tile.ratingMin}, ${tile.ratingMax}, ${tile.sortMethod}")
+    Timber.d(
+        "Navigating to track collection for: '${tile.title}' with parameters: " +
+                "genre=${tile.genre}, " +
+                "festival=${tile.festival}, " +
+                "year=${tile.year}, " +
+                "size=${tile.size}, " +
+                "offset=${tile.offset}, " +
+                "length=${tile.length}, " +
+                "ratingMin=${tile.ratingMin}, " +
+                "ratingMax=${tile.ratingMax}, " +
+                "sortMethod=${tile.sortMethod}"
+    )
     return NavigationGraphDirections.toTrackCollection(
         songs = tile.title,
         genre = tile.genre,

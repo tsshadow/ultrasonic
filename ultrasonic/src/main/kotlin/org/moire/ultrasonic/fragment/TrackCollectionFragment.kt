@@ -578,9 +578,11 @@ open class TrackCollectionFragment(
                             "AddedDesc" -> {
                                 append("Recent ")
                             }
+
                             "Random" -> {
                                 append("Random ")
                             }
+
                             "LastWrittenDesc" -> {
                                 append("Recent Modified ")
                             }

@@ -46,9 +46,9 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
     private lateinit var searchButton: Button
     private lateinit var saveButton: Button
 
-    private val genreList = arrayListOf("")
+    private val genreList = arrayListOf("All")
     private val yearList = arrayListOf("All")
-    private val festivalList = arrayListOf("")
+    private val festivalList = arrayListOf("All")
 
     private var tiles = mutableListOf<TileInfo>()
 
@@ -62,7 +62,11 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
         applyTheme(requireContext())
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         return inflater.inflate(R.layout.tsshadow_select_liveset, container, false)
     }
 
@@ -101,7 +105,11 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
 
     private fun initializeSpinners() {
         fun <T> createAdapter(items: List<T>): ArrayAdapter<T> {
-            return ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, items).apply {
+            return ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                items
+            ).apply {
                 setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             }
         }
@@ -126,12 +134,42 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
 
         if (tiles.isEmpty()) {
             tiles = mutableListOf(
-                TileInfo("Hardstyle", genre = "Hardstyle", length = DEFAULT_LENGTH, sortMethod = "LastWrittenDesc"),
-                TileInfo("Raw Hardstyle", genre = "Raw Hardstyle", length = DEFAULT_LENGTH, sortMethod = "LastWrittenDesc"),
-                TileInfo("Hardcore", genre = "Hardcore", length = DEFAULT_LENGTH, sortMethod = "LastWrittenDesc"),
-                TileInfo("Mainstream Hardcore", genre = "Mainstream Hardcore", length = DEFAULT_LENGTH, sortMethod = "LastWrittenDesc"),
-                TileInfo("Uptempo Hardcore", genre = "Uptempo Hardcore", length = DEFAULT_LENGTH, sortMethod = "LastWrittenDesc"),
-                TileInfo("Bouncy Uptempo", genre = "Bouncy Uptempo", length = DEFAULT_LENGTH, sortMethod = "LastWrittenDesc")
+                TileInfo(
+                    "Hardstyle",
+                    genre = "Hardstyle",
+                    length = DEFAULT_LENGTH,
+                    sortMethod = "LastWrittenDesc"
+                ),
+                TileInfo(
+                    "Raw Hardstyle",
+                    genre = "Raw Hardstyle",
+                    length = DEFAULT_LENGTH,
+                    sortMethod = "LastWrittenDesc"
+                ),
+                TileInfo(
+                    "Hardcore",
+                    genre = "Hardcore",
+                    length = DEFAULT_LENGTH,
+                    sortMethod = "LastWrittenDesc"
+                ),
+                TileInfo(
+                    "Mainstream Hardcore",
+                    genre = "Mainstream Hardcore",
+                    length = DEFAULT_LENGTH,
+                    sortMethod = "LastWrittenDesc"
+                ),
+                TileInfo(
+                    "Uptempo Hardcore",
+                    genre = "Uptempo Hardcore",
+                    length = DEFAULT_LENGTH,
+                    sortMethod = "LastWrittenDesc"
+                ),
+                TileInfo(
+                    "Bouncy Uptempo",
+                    genre = "Bouncy Uptempo",
+                    length = DEFAULT_LENGTH,
+                    sortMethod = "LastWrittenDesc"
+                )
             )
             saveTiles(requireContext(), tiles, PAGE_KEY)
         }
@@ -163,11 +201,11 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
             val festival = festivalSpinner.selectedItem as String
             val action = NavigationGraphDirections.toTrackCollection(
                 songs = "?",
-                genre = genre.takeIf { it.isNotBlank() },
-                festival = festival.takeIf { it.isNotBlank() },
+                genre = if (genreSpinner.selectedItem as String == "All") null else genreSpinner.selectedItem as String,
+                festival = if (festivalSpinner.selectedItem as String == "All") null else festivalSpinner.selectedItem as String,
                 size = maxSongs,
                 offset = 0,
-                year = yearSpinner.selectedItem as String,
+                year = if (yearSpinner.selectedItem as String == "All") null else yearSpinner.selectedItem as String,
                 length = DEFAULT_LENGTH,
                 ratingMin = ratingMinSpinner.selectedItem as Int,
                 ratingMax = ratingMaxSpinner.selectedItem as Int,
@@ -186,9 +224,9 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
 
             val newTile = TileInfo(
                 title = createTitle(genre, year, sortMethod, festival),
-                genre = genre,
-                year = year,
-                festival = festival,
+                genre = if (genre == "All") null else genre,
+                year = if (year == "All") null else year,
+                festival = if (festival == "All") null else festival,
                 sortMethod = sortMethod,
                 length = DEFAULT_LENGTH,
                 ratingMin = ratingMinSpinner.selectedItem as Int,
@@ -217,21 +255,26 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
         viewLifecycleOwner.lifecycleScope.launch(toastingExceptionHandler()) {
             val musicService = getMusicService()
 
-            val genres = withContext(Dispatchers.IO) {
-                musicService.getGenres(refresh, null, null)
+            if (genreList.size == 1 && genreList[0] == "All") {
+                val genres = withContext(Dispatchers.IO) {
+                    musicService.getGenres(refresh, null, null)
+                }
+                genreList.addAll(genres.map { it.name })
             }
-            genreList.addAll(genres.map { it.name })
 
-            val festivals = withContext(Dispatchers.IO) {
-                musicService.getTags(refresh, "FESTIVAL", null, null)
+            if (festivalList.size == 1 && festivalList[0] == "All") {
+                val festivals = withContext(Dispatchers.IO) {
+                    musicService.getTags(refresh, "FESTIVAL", null, null)
+                }
+                festivalList.addAll(festivals.map { it.name })
             }
-            festivalList.addAll(festivals.map { it.name })
 
-            val years = withContext(Dispatchers.IO) {
-                musicService.getTags(refresh, "YEAR", null, null)
-            }.sortedByDescending { it.name }
-
-            yearList.addAll(years.map { it.name })
+            if (yearList.size == 1 && yearList[0] == "All") {
+                val years = withContext(Dispatchers.IO) {
+                    musicService.getTags(refresh, "YEAR", null, null)
+                }.sortedByDescending { it.name }
+                yearList.addAll(years.map { it.name })
+            }
         }
     }
 
