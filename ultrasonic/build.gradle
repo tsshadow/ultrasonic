@@ -149,6 +149,7 @@ dependencies {
     testImplementation libs.robolectric
 
     implementation libs.timber
-    implementation("androidx.media:media:1.6.0")
+    implementation(libs.media)
+    implementation libs.gson
 }
 

@@ -1,3 +1,5 @@
+import TileStorage.saveTiles
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -13,6 +15,10 @@ import androidx.navigation.NavDirections
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.util.Settings.maxSongs
+
+/**
+ * TileInfo.kt
+ */
 
 /**
  * Defines the default gradient color pool used for tiles.
@@ -92,7 +98,9 @@ fun createTileView(
     index: Int,
     context: Context,
     gridLayout: GridLayout,
-    navigationController: NavController
+    navigationController: NavController,
+    tileList: MutableList<TileInfo>,
+    page: String
 ): View {
     val inflater = LayoutInflater.from(context)
     val tileView = inflater.inflate(R.layout.tsshadow_tile_layout, gridLayout, false)
@@ -117,8 +125,6 @@ fun createTileView(
     @DrawableRes val iconRes = genreIconMap[tile.genre] ?: R.drawable.baseline_music_note_24
     tileIcon.setImageResource(iconRes)
     tileIcon.contentDescription = tile.genre ?: tile.title
-
-    tile.title = tile.year?.let { "${tile.title} ($it)" } ?: tile.title
     tileText.text = tile.title
 
     // Click handler
@@ -126,5 +132,20 @@ fun createTileView(
         navigationController.navigate(navigateToGenre(tile))
     }
 
+    tileView.setOnLongClickListener {
+        AlertDialog.Builder(context)
+            .setTitle("Tile verwijderen?")
+            .setMessage("Weet je zeker dat je '${tile.title}' wilt verwijderen?")
+            .setPositiveButton("Ja") { _, _ ->
+                gridLayout.removeView(tileView)
+                tileList.remove(tile)
+                saveTiles(context, tileList, page)
+            }
+            .setNegativeButton("Annuleren", null)
+            .show()
+        true
+    }
+
     return tileView
 }
+

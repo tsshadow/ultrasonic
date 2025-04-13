@@ -8,6 +8,8 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
 import TileInfo
+import TileStorage.loadTiles
+import TileStorage.saveTiles
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
@@ -57,6 +59,8 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
     private var sortMethodSpinner: Spinner? = null
 
     private var searchButton: Button? = null
+    private var saveButton: Button? = null
+    private var tiles: MutableList<TileInfo> = mutableListOf<TileInfo>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +85,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         genreSpinner = view.findViewById(R.id.select_genre)
         sortMethodSpinner = view.findViewById(R.id.select_sort_method)
         searchButton = view.findViewById(R.id.search)
+        saveButton = view.findViewById(R.id.save)
         swipeRefresh?.setOnRefreshListener { load(true) }
 
         searchButton?.setOnClickListener {
@@ -149,71 +154,118 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
 
         val currentYear = Year.now().value
 
-        val genreTiles = listOf(
-            TileInfo(
-                "Euphoric Hardstyle",
-                genre = "Euphoric Hardstyle",
-                length = "short",
-                year = "$currentYear"
-            ),
-            TileInfo("Hardstyle", genre = "Hardstyle", length = "short", sortMethod = "Random"),
-            TileInfo("Hardstyle", genre = "Hardstyle", length = "short", year = "$currentYear"),
-            TileInfo(
-                "Hardstyle Classics",
-                genre = "Hardstyle Classics",
-                length = "short",
-            ),
-            TileInfo(
-                "Mainstream Hardstyle",
-                genre = "Mainstream Hardstyle",
-                length = "short",
-                year = "$currentYear"
-            ),
-            TileInfo(
-                "Raw Hardstyle",
-                genre = "Raw Hardstyle",
-                length = "short",
-                year = "$currentYear"
-            ),
-            TileInfo("Hardcore", genre = "Hardcore", length = "short", sortMethod = "Random"),
-            TileInfo("Hardcore", genre = "Hardcore", length = "short", year = "$currentYear"),
-            TileInfo(
-                "Mainstream Hardcore",
-                genre = "Mainstream Hardcore",
-                length = "short",
-                year = "$currentYear"
-            ),
-            TileInfo(
-                "Industrial Hardcore",
-                genre = "Industrial Hardcore",
-                length = "short",
-            ),
-            TileInfo(
-                "Uptempo Hardcore",
-                genre = "Uptempo Hardcore",
-                length = "short",
-                year = "$currentYear"
-            ),
-            TileInfo(
-                "Bouncy Uptempo",
-                genre = "Bouncy Uptempo",
-                length = "short",
-                year = "$currentYear"
-            ),
-            TileInfo("Zaagtempo", genre = "Zaagtempo", length = "short", year = "$currentYear"),
-        )
-
+        saveTiles(requireContext(), tiles, "song")
+        tiles = loadTiles(requireContext(), "song");
+        if (tiles.size == 0) {
+            tiles = mutableListOf(
+                TileInfo(
+                    "Euphoric Hardstyle ($currentYear)",
+                    genre = "Euphoric Hardstyle",
+                    length = "short",
+                    year = "$currentYear"
+                ),
+                TileInfo("Hardstyle ($currentYear)", genre = "Hardstyle", length = "short", year = "$currentYear"),
+                TileInfo(
+                    "Mainstream Hardstyle ($currentYear)",
+                    genre = "Mainstream Hardstyle",
+                    length = "short",
+                    year = "$currentYear"
+                ),
+                TileInfo(
+                    "Raw Hardstyle ($currentYear)",
+                    genre = "Raw Hardstyle",
+                    length = "short",
+                    year = "$currentYear"
+                ),
+                TileInfo("Hardcore", genre = "Hardcore", length = "short", year = "$currentYear"),
+                TileInfo(
+                    "Uptempo Hardcore ($currentYear)",
+                    genre = "Uptempo Hardcore",
+                    length = "short",
+                    year = "$currentYear"
+                ),
+                TileInfo(
+                    "Bouncy Uptempo ($currentYear)",
+                    genre = "Bouncy Uptempo",
+                    length = "short",
+                    year = "$currentYear"
+                ),
+            )
+            saveTiles(requireContext(), tiles, "song")
+        }
 
         // Dynamically create and add tiles to GridLayout
-        genreTiles.forEachIndexed { index, tile ->
+        tiles.forEachIndexed { index, tile ->
             val tileView =
-                createTileView(tile, index, requireContext(), gridLayout, findNavController())
+                createTileView(
+                    tile,
+                    index,
+                    requireContext(),
+                    gridLayout,
+                    findNavController(),
+                    tiles,
+                    "song"
+                )
             gridLayout.addView(tileView)
         }
 
         val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         gridLayout.columnCount = if (isLandscape) 5 else 3
+        // Save Button
+        saveButton?.setOnClickListener {
+            val genre = genreSpinner?.selectedItem as? String
+            val year = yearSpinner?.selectedItem as? String
+            val sortMethod = sortMethodSpinner?.selectedItem as? String
 
+            val title = buildString {
+                when (sortMethod) {
+                    "AddedDesc" -> {
+                        append("Recent ")
+                    }
+
+                    "Random" -> {
+                        append("Random ")
+                    }
+
+                    "LastWrittenDesc" -> {
+                        append("Recent Modified ")
+                    }
+                }
+                if (!genre.isNullOrBlank() && genre != "All") {
+                    if (isNotEmpty()) append(" ")
+                    append(genre)
+                }
+                if (year != null) {
+                    append(" ($year)")
+                }
+            }
+
+            val newTile = TileInfo(
+                title = title,
+                genre = genre,
+                year = year,
+                sortMethod = sortMethod!!,
+                length = "long",
+                ratingMin = ratingMin?.selectedItem as? Int ?: 0,
+                ratingMax = ratingMax?.selectedItem as? Int ?: 5
+            )
+
+            // Add and persist
+            tiles.add(newTile)
+            saveTiles(requireContext(), tiles, "song")
+
+            // Add to UI
+            val tileView = createTileView(
+                newTile,
+                tiles.size - 1,
+                requireContext(),
+                gridLayout,
+                findNavController(),
+                tiles,
+                "song"
+            )
+            gridLayout.addView(tileView)
+        }
         setTitle(this, R.string.main_songs_title)
         load(false)
     }

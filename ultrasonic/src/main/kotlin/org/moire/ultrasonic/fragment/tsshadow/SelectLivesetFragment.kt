@@ -8,9 +8,9 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
 import TileInfo
+import TileStorage.loadTiles
+import TileStorage.saveTiles
 import android.content.res.Configuration
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,9 +19,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.GridLayout
-import android.widget.ImageView
 import android.widget.Spinner
-import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -33,14 +32,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.fragment.FragmentTitle.getTitle
 import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util.applyTheme
+import org.moire.ultrasonic.util.Util.ifNotNull
 import org.moire.ultrasonic.util.toastingExceptionHandler
-import timber.log.Timber
-import java.time.Year
 
 /**
  * Advanced search fragment, enables searching for songs with multiple parameters
@@ -64,6 +63,8 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
     private var sortMethodSpinner: Spinner? = null
 
     private var searchButton: Button? = null
+    private var saveButton: Button? = null
+    private var tiles: MutableList<TileInfo> = mutableListOf<TileInfo>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,6 +90,7 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
         festivalSpinner = view.findViewById(R.id.select_festival)
         sortMethodSpinner = view.findViewById(R.id.select_sort_method)
         searchButton = view.findViewById(R.id.search)
+        saveButton = view.findViewById(R.id.save)
         swipeRefresh?.setOnRefreshListener { load(true) }
 
         searchButton?.setOnClickListener {
@@ -170,34 +172,95 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
 
 //        val currentYear = Year.now().value
 
-        val genreTiles = listOf(
-            TileInfo("Euphoric Hardstyle", genre = "Euphoric Hardstyle", length = "long"),
-            TileInfo("Hardstyle", genre = "Hardstyle", length = "long"),
-            TileInfo(
-                "Hardstyle Classics",
-                genre = "Hardstyle Classics",
-                length = "long",
-                sortMethod = "Random"
-            ),
-            TileInfo("Mainstream Hardstyle", genre = "Mainstream Hardstyle", length = "long"),
-            TileInfo("Raw Hardstyle", genre = "Raw Hardstyle", length = "long"),
-            TileInfo("Hardcore", genre = "Hardcore", length = "long"),
-            TileInfo("Mainstream Hardcore", genre = "Mainstream Hardcore", length = "long"),
-            TileInfo("Uptempo Hardcore", genre = "Uptempo Hardcore", length = "long"),
-            TileInfo("Bouncy Uptempo", genre = "Bouncy Uptempo", length = "long"),
-            TileInfo("Zaagtempo", genre = "Zaagtempo", length = "long"),
-        )
+
+        tiles = loadTiles(requireContext(), "liveset");
+        if (tiles.size == 0) {
+            tiles = mutableListOf(
+                TileInfo("Hardstyle", genre = "Hardstyle", length = "long", sortMethod = "LastWrittenDesc"),
+                TileInfo("Raw Hardstyle", genre = "Raw Hardstyle", length = "long",  sortMethod = "LastWrittenDesc"),
+                TileInfo("Hardcore", genre = "Hardcore", length = "long",  sortMethod = "LastWrittenDesc"),
+                TileInfo("Mainstream Hardcore", genre = "Mainstream Hardcore", length = "long",  sortMethod = "LastWrittenDesc"),
+                TileInfo("Uptempo Hardcore", genre = "Uptempo Hardcore", length = "long",  sortMethod = "LastWrittenDesc"),
+                TileInfo("Bouncy Uptempo", genre = "Bouncy Uptempo", length = "long",  sortMethod = "LastWrittenDesc"),
+            )
+            saveTiles(requireContext(), tiles, "liveset")
+        }
 
         // Dynamically create and add tiles to GridLayout
-        genreTiles.forEachIndexed { index, tile ->
+        tiles.forEachIndexed { index, tile ->
             val tileView =
-                createTileView(tile, index, requireContext(), gridLayout, findNavController())
+                createTileView(
+                    tile,
+                    index,
+                    requireContext(),
+                    gridLayout,
+                    findNavController(),
+                    tiles,
+                    "liveset"
+                )
             gridLayout.addView(tileView)
         }
 
         val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         gridLayout.columnCount = if (isLandscape) 5 else 3
 
+
+        // Save Button
+        saveButton?.setOnClickListener {
+            val genre = genreSpinner?.selectedItem as? String
+            val year = yearSpinner?.selectedItem as? String
+            val sortMethod = sortMethodSpinner?.selectedItem as? String
+            val festival = festivalSpinner?.selectedItem as? String
+
+            val title = buildString {
+                when (sortMethod) {
+                    "AddedDesc" -> {
+                        append("Recent ")
+                    }
+
+                    "Random" -> {
+                        append("Random ")
+                    }
+
+                    "LastWrittenDesc" -> {
+                        append("Recent Modified ")
+                    }
+                }
+                if (!festival.isNullOrBlank()) append(festival)
+                if (!genre.isNullOrBlank() && genre != "All") {
+                    if (isNotEmpty()) append(" ")
+                    append(genre)
+                }
+                if (year != null && year != "All") {
+                    append(" ($year)")
+                }
+            }
+            val newTile = TileInfo(
+                title = title,
+                genre = genre,
+                year = year,
+                sortMethod = sortMethod!!,
+                length = "long",
+                ratingMin = ratingMin?.selectedItem as? Int ?: 0,
+                ratingMax = ratingMax?.selectedItem as? Int ?: 5
+            )
+
+            // Add and persist
+            tiles.add(newTile)
+            saveTiles(requireContext(), tiles, "liveset")
+
+            // Add to UI
+            val tileView = createTileView(
+                newTile,
+                tiles.size - 1,
+                requireContext(),
+                gridLayout,
+                findNavController(),
+                tiles,
+                "liveset"
+            )
+            gridLayout.addView(tileView)
+        }
         setTitle(this, R.string.main_livesets_title)
         load(false)
     }
