@@ -352,6 +352,7 @@ open class TrackCollectionFragment(
             }
         }
     }
+
     private fun unpinSelectedTracks() {
         DownloadUtil.justDownload(
             action = DownloadAction.UNPIN,
@@ -565,12 +566,11 @@ open class TrackCollectionFragment(
                 setTitle(R.string.main_videos)
                 listModel.getVideos(refresh2)
 
-            // getSongsName
-            // Get songs based on filters, for example songs from
-            // [Hardstyle, 2025]
-            // [Uptempo Hardcore, 2021, short]
-
-            } else if(getSongsName != null) {
+                // getSongsName
+                // Get songs based on filters, for example songs from
+                // [Hardstyle, 2025]
+                // [Uptempo Hardcore, 2021, short]
+            } else if (getSongsName != null) {
                 val title = buildString {
                     if (length == "short") append("Songs") else append("Livesets")
                     if (!festival.isNullOrBlank()) append(festival)
@@ -586,16 +586,39 @@ open class TrackCollectionFragment(
                 setTitle(title)
 
                 val filters = Filters()
-            year.ifNotNull { if(year !== "All" && year!== "") filters.add(Filter("YEAR", year.toString()))}
-            festival.ifNotNull { if(festival !== "All" && festival!== "") filters.add(Filter("FESTIVAL", festival.toString()))}
-            if (length !== null && length.isNotEmpty()) filters.add(
-                Filter(
-                    "LENGTH",
-                    length.toString()
+                year.ifNotNull {
+                    if (year !== "All" && year !== "") filters.add(
+                        Filter(
+                            "YEAR",
+                            year.toString()
+                        )
+                    )
+                }
+                festival.ifNotNull {
+                    if (festival !== "All" && festival !== "") filters.add(
+                        Filter(
+                            "FESTIVAL",
+                            festival.toString()
+                        )
+                    )
+                }
+                if (length !== null && length.isNotEmpty()) filters.add(
+                    Filter(
+                        "LENGTH",
+                        length.toString()
+                    )
                 )
-            )
-            val effectiveSortMethod = if (sortMethod.isNullOrEmpty()) "LastWritten" else sortMethod
-            listModel.getSongs(filters, ratingMin, ratingMax, size, offset, append, effectiveSortMethod)
+                val effectiveSortMethod =
+                    if (sortMethod.isNullOrEmpty()) "AddedDesc" else sortMethod
+                listModel.getSongs(
+                    filters,
+                    ratingMin,
+                    ratingMax,
+                    size,
+                    offset,
+                    append,
+                    effectiveSortMethod
+                )
             } else if (id == null || getRandomTracks) {
                 // There seems to be a bug in ViewPager when resuming the Activity that sub-fragments
                 // arguments are empty. If we have no id, just show some random tracks
@@ -656,9 +679,11 @@ open class TrackCollectionFragment(
                 )
                 findNavController().navigate(action)
             }
+
             item is Track && item.isVideo -> {
                 VideoPlayer.playVideo(requireContext(), item)
             }
+
             else -> {
                 triggerButtonUpdate()
             }
