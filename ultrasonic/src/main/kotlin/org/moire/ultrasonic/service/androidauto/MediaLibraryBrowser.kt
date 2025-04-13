@@ -229,13 +229,25 @@ class MediaLibraryBrowser(
             MEDIA_ALBUM_RANDOM_ID -> getAlbums(AlbumListType.RANDOM)
             MEDIA_ALBUM_STARRED_ID -> getAlbums(AlbumListType.STARRED)
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
-            MEDIA_SONG_RANDOM_ID -> getSongs(parentIdParts[1], "Random")
-            MEDIA_SONG_RECENT -> getSongs(parentIdParts[1], "Recent")
+            MEDIA_SONG_RANDOM_ID -> getSongs(length = parentIdParts[1], "Random")
+            MEDIA_SONG_RECENT -> getSongs(length = parentIdParts[1], "Recent")
 
-            MEDIA_GET_GENRES -> getGenres(parentIdParts[1])
-            MEDIA_GET_YEARS -> getYears(parentIdParts[1], parentIdParts[2])
-            MEDIA_GET_SORT_METHOD -> getSortMethod(parentIdParts[1], parentIdParts[2], parentIdParts[3])
-            MEDIA_GET_SONGS_BY_GENRE -> getGenre(parentIdParts[1], parentIdParts[3].toIntOrNull(), parentIdParts[2], parentIdParts[4])
+            // Custom search: Length, genre, year, sortMethod
+            MEDIA_GET_GENRES -> getGenres(length = parentIdParts[1])
+            MEDIA_GET_YEARS -> getYears(length = parentIdParts[1], genre = parentIdParts[2])
+            MEDIA_GET_SORT_METHOD -> getSortMethod(
+                length = parentIdParts[1],
+                genre = parentIdParts[2],
+                year = parentIdParts[3]
+            )
+
+            MEDIA_GET_SONGS_BY_GENRE -> getGenre(
+                length = parentIdParts[1],
+                genre = parentIdParts[2],
+                year = parentIdParts[3].toIntOrNull(),
+                sortMethod = parentIdParts[4]
+            )
+
             MEDIA_SHARE_ID -> getShares()
             MEDIA_BOOKMARK_ID -> getBookmarks()
             MEDIA_PODCAST_ID -> getPodcasts()
@@ -320,17 +332,41 @@ class MediaLibraryBrowser(
             TileInfo("Recent"),
             TileInfo("Random", sortMethod = "Random"),
             TileInfo("Starred", ratingMin = 5),
-            TileInfo("Bouncy Uptempo ($currentYear)", genre = "Bouncy Uptempo", year = "$currentYear"),
-            TileInfo("Euphoric Hardstyle ($currentYear)", genre = "Euphoric Hardstyle", year = "$currentYear"),
+            TileInfo(
+                "Bouncy Uptempo ($currentYear)",
+                genre = "Bouncy Uptempo",
+                year = "$currentYear"
+            ),
+            TileInfo(
+                "Euphoric Hardstyle ($currentYear)",
+                genre = "Euphoric Hardstyle",
+                year = "$currentYear"
+            ),
             TileInfo("Hardcore ($currentYear)", genre = "Hardcore", year = "$currentYear"),
             TileInfo("Hardstyle ($currentYear)", genre = "Hardstyle", year = "$currentYear"),
             TileInfo("Hardstyle Classics", genre = "Hardstyle Classics"),
             TileInfo("Industrial Hardcore", genre = "Industrial Hardcore"),
-            TileInfo("Mainstream Hardcore ($currentYear)", genre = "Mainstream Hardcore", year = "$currentYear"),
+            TileInfo(
+                "Mainstream Hardcore ($currentYear)",
+                genre = "Mainstream Hardcore",
+                year = "$currentYear"
+            ),
             TileInfo("Mainstream Hardcore", genre = "Millennium Hardcore"),
-            TileInfo("Mainstream Hardstyle ($currentYear)", genre = "Mainstream Hardstyle", year = "$currentYear"),
-            TileInfo("Raw Hardstyle ($currentYear)", genre = "Raw Hardstyle", year = "$currentYear"),
-            TileInfo("Uptempo Hardcore ($currentYear)", genre = "Uptempo Hardcore", year = "$currentYear"),
+            TileInfo(
+                "Mainstream Hardstyle ($currentYear)",
+                genre = "Mainstream Hardstyle",
+                year = "$currentYear"
+            ),
+            TileInfo(
+                "Raw Hardstyle ($currentYear)",
+                genre = "Raw Hardstyle",
+                year = "$currentYear"
+            ),
+            TileInfo(
+                "Uptempo Hardcore ($currentYear)",
+                genre = "Uptempo Hardcore",
+                year = "$currentYear"
+            ),
             TileInfo("Zaagtempo", genre = "Zaagtempo"),
         )
 
@@ -350,16 +386,51 @@ class MediaLibraryBrowser(
             TileInfo("Random", sortMethod = "Random", length = "long"),
             TileInfo("Starred", ratingMin = 5, length = "long"),
             TileInfo("Bouncy Uptempo", genre = "Bouncy Uptempo", length = "long"),
-            TileInfo("Euphoric Hardstyle ($currentYear)", genre = "Euphoric Hardstyle", year = "$currentYear", length = "long"),
-            TileInfo("Hardcore ($currentYear)", genre = "Hardcore", year = "$currentYear", length = "long"),
-            TileInfo("Hardstyle ($currentYear)", genre = "Hardstyle", year = "$currentYear", length = "long"),
+            TileInfo(
+                "Euphoric Hardstyle ($currentYear)",
+                genre = "Euphoric Hardstyle",
+                year = "$currentYear",
+                length = "long"
+            ),
+            TileInfo(
+                "Hardcore ($currentYear)",
+                genre = "Hardcore",
+                year = "$currentYear",
+                length = "long"
+            ),
+            TileInfo(
+                "Hardstyle ($currentYear)",
+                genre = "Hardstyle",
+                year = "$currentYear",
+                length = "long"
+            ),
             TileInfo("Hardstyle Classics", genre = "Hardstyle Classics", length = "long"),
             TileInfo("Industrial Hardcore", genre = "Industrial Hardcore", length = "long"),
-            TileInfo("Mainstream Hardcore ($currentYear)", genre = "Mainstream Hardcore", year = "$currentYear", length = "long"),
+            TileInfo(
+                "Mainstream Hardcore ($currentYear)",
+                genre = "Mainstream Hardcore",
+                year = "$currentYear",
+                length = "long"
+            ),
             TileInfo("Mainstream Hardcore", genre = "Millennium Hardcore", length = "long"),
-            TileInfo("Mainstream Hardstyle ($currentYear)", genre = "Mainstream Hardstyle", year = "$currentYear", length = "long"),
-            TileInfo("Raw Hardstyle ($currentYear)", genre = "Raw Hardstyle", year = "$currentYear", length = "long"),
-            TileInfo("Uptempo Hardcore ($currentYear)", genre = "Uptempo Hardcore", year = "$currentYear", length = "long"),
+            TileInfo(
+                "Mainstream Hardstyle ($currentYear)",
+                genre = "Mainstream Hardstyle",
+                year = "$currentYear",
+                length = "long"
+            ),
+            TileInfo(
+                "Raw Hardstyle ($currentYear)",
+                genre = "Raw Hardstyle",
+                year = "$currentYear",
+                length = "long"
+            ),
+            TileInfo(
+                "Uptempo Hardcore ($currentYear)",
+                genre = "Uptempo Hardcore",
+                year = "$currentYear",
+                length = "long"
+            ),
             TileInfo("Zaagtempo", genre = "Zaagtempo", length = "long"),
         )
 
@@ -461,7 +532,8 @@ class MediaLibraryBrowser(
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
-            val songs = serviceScope.future { dataProvider.listSongsInMusicService(id, name) }.await()
+            val songs =
+                serviceScope.future { dataProvider.listSongsInMusicService(id, name) }.await()
 
             if (songs != null) {
                 if (songs.getChildren(includeDirs = true, includeFiles = false).isEmpty() &&
@@ -619,7 +691,10 @@ class MediaLibraryBrowser(
         }
     }
 
-    private fun getSongs(length: String?, searchMethod: String?): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+    private fun getSongs(
+        length: String?,
+        searchMethod: String?
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         val filters = Filters()
@@ -679,8 +754,8 @@ class MediaLibraryBrowser(
 
             genres?.forEach {
                 mediaItems.add(
-                    it.name ,
-                    "$MEDIA_GET_YEARS|${it.name}|$length",
+                    it.name,
+                    "$MEDIA_GET_YEARS|$length|${it.name}",
                     R.string.main_genres_title,
                     isBrowsable = true,
                     mediaType = MEDIA_TYPE_PLAYLIST
@@ -691,35 +766,37 @@ class MediaLibraryBrowser(
     }
 
     private fun getYears(
-        genre: String?,
-        length: String
+        length: String,
+        genre: String?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         Timber.i("getYears: genre=$genre length=$length")
         return mainScope.future {
             var years = serviceScope.future {
-                callWithErrorHandling { musicService.getTags(
-                    true, "YEAR",
-                    year = null,
-                    length = length
-                ) }
+                callWithErrorHandling {
+                    musicService.getTags(
+                        true, "YEAR",
+                        year = null,
+                        length = length
+                    )
+                }
             }.await()
 
             if (years != null) {
                 years = years.sortedByDescending { y -> y.name }
             }
             mediaItems.add(
-                "All" ,
-                "$MEDIA_GET_SORT_METHOD|$genre|$length|",
+                "All",
+                "$MEDIA_GET_SORT_METHOD|$length|$genre|",
                 R.string.main_genres_title,
                 isBrowsable = true,
                 mediaType = MEDIA_TYPE_PLAYLIST
             )
             years?.forEach {
                 mediaItems.add(
-                    it.name ,
-                    "$MEDIA_GET_SORT_METHOD|$genre|$length|${it.name}",
+                    it.name,
+                    "$MEDIA_GET_SORT_METHOD|$length|$genre|${it.name}",
                     R.string.main_genres_title,
                     isBrowsable = true,
                     mediaType = MEDIA_TYPE_PLAYLIST
@@ -729,9 +806,10 @@ class MediaLibraryBrowser(
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
     }
-private fun getSortMethod(
-        genre: String?,
+
+    private fun getSortMethod(
         length: String?,
+        genre: String?,
         year: String?,
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
@@ -748,7 +826,7 @@ private fun getSortMethod(
             sortMethods.forEach { (name, value) ->
                 mediaItems.add(
                     name,
-                    "$MEDIA_GET_SONGS_BY_GENRE|$genre|$length|$year|$value",
+                    "$MEDIA_GET_SONGS_BY_GENRE|$length|$genre|$year|$value",
                     R.string.main_genres_title,
                     isBrowsable = true,
                     mediaType = MEDIA_TYPE_PLAYLIST
@@ -760,9 +838,9 @@ private fun getSortMethod(
     }
 
     private fun getGenre(
+        length: String,
         genre: String,
         year: Int?,
-        length: String,
         sortMethod: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
@@ -835,6 +913,7 @@ private fun getSortMethod(
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
     }
+
     private fun getPodcastEpisodes(
         id: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
@@ -882,6 +961,7 @@ private fun getSortMethod(
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
     }
+
     private fun getSectionFromName(name: String): String {
         var section = name.first().uppercaseChar()
         if (!section.isLetter()) section = '#'
@@ -909,6 +989,7 @@ private fun getSortMethod(
             return@future LibraryResult.ofItemList(mediaItems, null)
         }
     }
+
     private fun TileInfo.toMediaItem(): MediaItem? {
         val context = UApp.applicationContext()
 
@@ -917,7 +998,7 @@ private fun getSortMethod(
             title.contains("Recent", ignoreCase = true) -> "$MEDIA_SONG_RECENT|$length"
             title.contains("Starred", ignoreCase = true) -> "$MEDIA_SONG_STARRED_ID|$length"
             title.contains("Search", ignoreCase = true) -> "$MEDIA_GET_GENRES|$length"
-            else -> "$MEDIA_GET_SONGS_BY_GENRE|$genre|$length"+(if (year != null) "|$year" else "|")
+            else -> "$MEDIA_GET_SONGS_BY_GENRE|$genre|$length" + (if (year != null) "|$year" else "|")
         }
 
         val groupName = context.getString(
