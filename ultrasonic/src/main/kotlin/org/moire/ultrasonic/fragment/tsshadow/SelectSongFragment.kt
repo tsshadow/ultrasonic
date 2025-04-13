@@ -1,10 +1,3 @@
-/*
- * SelectSongFragment.kt
- * Copyright (C) 2009-2024 Teun.Schriks
- *
- * Distributed under terms of the GNU GPLv3 license.
- */
-
 package org.moire.ultrasonic.fragment.tsshadow
 
 import TileInfo
@@ -13,13 +6,8 @@ import TileStorage.saveTiles
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.GridLayout
-import android.widget.Spinner
+import android.view.*
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -40,221 +28,168 @@ import org.moire.ultrasonic.util.toastingExceptionHandler
 import java.time.Year
 
 /**
- * Advanced search fragment, enables searching for songs with multiple parameters
+ * Fragment for selecting or saving tile presets for regular songs.
+ * Allows filtering by genre, year, rating, and sort method.
+ * Search results or saved tiles navigate to a TrackCollection.
  */
 class SelectSongFragment : Fragment(), RefreshableFragment {
-    private lateinit var gridLayout: GridLayout
+
+    companion object {
+        private const val DEFAULT_LENGTH = "short"
+        private const val PAGE_KEY = "song"
+    }
+
     override var swipeRefresh: SwipeRefreshLayout? = null
 
-    private var yearSpinner: Spinner? = null
-    private var yearList = ArrayList<String>()
+    private lateinit var gridLayout: GridLayout
+    private lateinit var yearSpinner: Spinner
+    private lateinit var ratingMinSpinner: Spinner
+    private lateinit var ratingMaxSpinner: Spinner
+    private lateinit var genreSpinner: Spinner
+    private lateinit var sortMethodSpinner: Spinner
+    private lateinit var searchButton: Button
+    private lateinit var saveButton: Button
 
-    private var ratingMin: Spinner? = null
-    private var ratingMax: Spinner? = null
-
-
-    private var genreSpinner: Spinner? = null
-    private var genreList = ArrayList<String>()
-
-    private var sortMethodSpinner: Spinner? = null
-
-    private var searchButton: Button? = null
-    private var saveButton: Button? = null
-    private var tiles: MutableList<TileInfo> = mutableListOf<TileInfo>()
+    private val genreList = arrayListOf("")
+    private val yearList = arrayListOf("All")
+    private var tiles = mutableListOf<TileInfo>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme(requireContext())
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.tsshadow_select_song, container, false)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initializeViews(view)
+        initializeSpinners()
+        swipeRefresh?.setOnRefreshListener { load(true) }
+
+        loadTilesOrDefaults()
+        populateTiles()
+        adjustGridColumnCount()
+
+        setupSearchButton()
+        setupSaveButton()
+
+        setTitle(this, R.string.main_songs_title)
+        load(false)
+    }
+
+    private fun initializeViews(view: View) {
         swipeRefresh = view.findViewById(R.id.select_genre_refresh)
         yearSpinner = view.findViewById(R.id.select_year)
-        ratingMin = view.findViewById(R.id.select_rating_min)
-        ratingMax = view.findViewById(R.id.select_rating_max)
+        ratingMinSpinner = view.findViewById(R.id.select_rating_min)
+        ratingMaxSpinner = view.findViewById(R.id.select_rating_max)
         genreSpinner = view.findViewById(R.id.select_genre)
         sortMethodSpinner = view.findViewById(R.id.select_sort_method)
         searchButton = view.findViewById(R.id.search)
         saveButton = view.findViewById(R.id.save)
-        swipeRefresh?.setOnRefreshListener { load(true) }
+        gridLayout = view.findViewById(R.id.gridLayoutContainer)
+    }
 
-        searchButton?.setOnClickListener {
-            val genre = genreSpinner?.selectedItem as String
+    private fun initializeSpinners() {
+        fun <T> createAdapter(items: List<T>): ArrayAdapter<T> {
+            return ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, items).apply {
+                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            }
+        }
+
+        yearSpinner.adapter = createAdapter(yearList)
+        genreSpinner.adapter = createAdapter(genreList)
+        ratingMinSpinner.adapter = createAdapter((0..5).toList())
+        ratingMaxSpinner.adapter = createAdapter((0..5).toList())
+        ratingMaxSpinner.setSelection(5)
+
+        val sortMethods = listOf(
+            "None", "Id", "Random", "AddedDesc", "LastWrittenDesc",
+            "StarredDateDesc", "Name", "DateDescAndRelease", "Release", "TrackList"
+        )
+        sortMethodSpinner.adapter = createAdapter(sortMethods)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun loadTilesOrDefaults() {
+        tiles = loadTiles(requireContext(), PAGE_KEY).toMutableList()
+        val currentYear = Year.now().value.toString()
+
+        if (tiles.isEmpty()) {
+            tiles = mutableListOf(
+                TileInfo("Euphoric Hardstyle ($currentYear)", genre = "Euphoric Hardstyle", length = DEFAULT_LENGTH, year = currentYear),
+                TileInfo("Hardstyle ($currentYear)", genre = "Hardstyle", length = DEFAULT_LENGTH, year = currentYear),
+                TileInfo("Mainstream Hardstyle ($currentYear)", genre = "Mainstream Hardstyle", length = DEFAULT_LENGTH, year = currentYear),
+                TileInfo("Raw Hardstyle ($currentYear)", genre = "Raw Hardstyle", length = DEFAULT_LENGTH, year = currentYear),
+                TileInfo("Hardcore ($currentYear)", genre = "Hardcore", length = DEFAULT_LENGTH, year = currentYear),
+                TileInfo("Uptempo Hardcore ($currentYear)", genre = "Uptempo Hardcore", length = DEFAULT_LENGTH, year = currentYear),
+                TileInfo("Bouncy Uptempo ($currentYear)", genre = "Bouncy Uptempo", length = DEFAULT_LENGTH, year = currentYear)
+            )
+            saveTiles(requireContext(), tiles, PAGE_KEY)
+        }
+    }
+
+    private fun populateTiles() {
+        tiles.forEachIndexed { index, tile ->
+            val tileView = createTileView(
+                tile,
+                index,
+                requireContext(),
+                gridLayout,
+                findNavController(),
+                tiles,
+                PAGE_KEY
+            )
+            gridLayout.addView(tileView)
+        }
+    }
+
+    private fun adjustGridColumnCount() {
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        gridLayout.columnCount = if (isLandscape) 5 else 3
+    }
+
+    private fun setupSearchButton() {
+        searchButton.setOnClickListener {
             val action = NavigationGraphDirections.toTrackCollection(
                 songs = "?",
-                genre = if (genre != "") genre else null,
+                genre = genreSpinner.selectedItem as String,
                 size = maxSongs,
                 offset = 0,
-                year = yearSpinner?.selectedItem as String,
-                length = "short",
-                ratingMin = ratingMin?.selectedItem as Int,
-                ratingMax = ratingMax?.selectedItem as Int,
-                sortMethod = sortMethodSpinner?.selectedItem as String
+                year = yearSpinner.selectedItem as String,
+                length = DEFAULT_LENGTH,
+                ratingMin = ratingMinSpinner.selectedItem as Int,
+                ratingMax = ratingMaxSpinner.selectedItem as Int,
+                sortMethod = sortMethodSpinner.selectedItem as String
             )
             findNavController().navigate(action)
         }
+    }
 
-        val ratingAdapter =
-            ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_item,
-                arrayOf(0, 1, 2, 3, 4, 5)
-            )
-        ratingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+    private fun setupSaveButton() {
+        saveButton.setOnClickListener {
+            val genre = genreSpinner.selectedItem as? String ?: return@setOnClickListener
+            val year = yearSpinner.selectedItem as? String ?: return@setOnClickListener
+            val sortMethod = sortMethodSpinner.selectedItem as? String ?: return@setOnClickListener
 
-        yearList = arrayListOf("All")
-        val yearAdapter =
-            ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, yearList)
-        yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        // Initialize empty genres list
-        genreList = arrayListOf("")
-        val genreAdapter =
-            ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, genreList)
-        genreAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        val sortMethodAdapter =
-            ArrayAdapter<String>(
-                requireContext(),
-                android.R.layout.simple_spinner_item,
-                arrayListOf(
-                    "None",
-                    "Id",
-                    "Random",
-                    "AddedDesc",
-                    "LastWrittenDesc",
-                    "StarredDateDesc",
-                    "Name",
-                    "DateDescAndRelease",
-                    "Release",
-                    "TrackList"
-                )
-            )
-        // Set Adapters
-        yearSpinner?.setAdapter(yearAdapter)
-        ratingMin?.setAdapter(ratingAdapter)
-        ratingMax?.setAdapter(ratingAdapter)
-        ratingMax?.setSelection(5)
-        genreSpinner?.setAdapter(genreAdapter)
-        sortMethodSpinner?.setAdapter(sortMethodAdapter)
-
-
-        // TILES
-        gridLayout = view.findViewById(R.id.gridLayoutContainer)
-
-        val currentYear = Year.now().value
-
-        saveTiles(requireContext(), tiles, "song")
-        tiles = loadTiles(requireContext(), "song");
-        if (tiles.size == 0) {
-            tiles = mutableListOf(
-                TileInfo(
-                    "Euphoric Hardstyle ($currentYear)",
-                    genre = "Euphoric Hardstyle",
-                    length = "short",
-                    year = "$currentYear"
-                ),
-                TileInfo("Hardstyle ($currentYear)", genre = "Hardstyle", length = "short", year = "$currentYear"),
-                TileInfo(
-                    "Mainstream Hardstyle ($currentYear)",
-                    genre = "Mainstream Hardstyle",
-                    length = "short",
-                    year = "$currentYear"
-                ),
-                TileInfo(
-                    "Raw Hardstyle ($currentYear)",
-                    genre = "Raw Hardstyle",
-                    length = "short",
-                    year = "$currentYear"
-                ),
-                TileInfo("Hardcore", genre = "Hardcore", length = "short", year = "$currentYear"),
-                TileInfo(
-                    "Uptempo Hardcore ($currentYear)",
-                    genre = "Uptempo Hardcore",
-                    length = "short",
-                    year = "$currentYear"
-                ),
-                TileInfo(
-                    "Bouncy Uptempo ($currentYear)",
-                    genre = "Bouncy Uptempo",
-                    length = "short",
-                    year = "$currentYear"
-                ),
-            )
-            saveTiles(requireContext(), tiles, "song")
-        }
-
-        // Dynamically create and add tiles to GridLayout
-        tiles.forEachIndexed { index, tile ->
-            val tileView =
-                createTileView(
-                    tile,
-                    index,
-                    requireContext(),
-                    gridLayout,
-                    findNavController(),
-                    tiles,
-                    "song"
-                )
-            gridLayout.addView(tileView)
-        }
-
-        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        gridLayout.columnCount = if (isLandscape) 5 else 3
-        // Save Button
-        saveButton?.setOnClickListener {
-            val genre = genreSpinner?.selectedItem as? String
-            val year = yearSpinner?.selectedItem as? String
-            val sortMethod = sortMethodSpinner?.selectedItem as? String
-
-            val title = buildString {
-                when (sortMethod) {
-                    "AddedDesc" -> {
-                        append("Recent ")
-                    }
-
-                    "Random" -> {
-                        append("Random ")
-                    }
-
-                    "LastWrittenDesc" -> {
-                        append("Recent Modified ")
-                    }
-                }
-                if (!genre.isNullOrBlank() && genre != "All") {
-                    if (isNotEmpty()) append(" ")
-                    append(genre)
-                }
-                if (year != null) {
-                    append(" ($year)")
-                }
-            }
 
             val newTile = TileInfo(
-                title = title,
+                title = createTitle(genre, year, sortMethod),
                 genre = genre,
                 year = year,
-                sortMethod = sortMethod!!,
-                length = "long",
-                ratingMin = ratingMin?.selectedItem as? Int ?: 0,
-                ratingMax = ratingMax?.selectedItem as? Int ?: 5
+                sortMethod = sortMethod,
+                length = DEFAULT_LENGTH,
+                ratingMin = ratingMinSpinner.selectedItem as Int,
+                ratingMax = ratingMaxSpinner.selectedItem as Int
             )
 
-            // Add and persist
             tiles.add(newTile)
-            saveTiles(requireContext(), tiles, "song")
+            saveTiles(requireContext(), tiles, PAGE_KEY)
 
-            // Add to UI
             val tileView = createTileView(
                 newTile,
                 tiles.size - 1,
@@ -262,39 +197,41 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
                 gridLayout,
                 findNavController(),
                 tiles,
-                "song"
+                PAGE_KEY
             )
             gridLayout.addView(tileView)
         }
-        setTitle(this, R.string.main_songs_title)
-        load(false)
     }
 
     private fun load(refresh: Boolean) {
-        viewLifecycleOwner.lifecycleScope.launch(
-            toastingExceptionHandler()
-        ) {
-            val genres = withContext(Dispatchers.IO) {
-                val musicService = getMusicService()
-//                val yr = yearSpinner?.getSelectedItem() as String;
+        viewLifecycleOwner.lifecycleScope.launch(toastingExceptionHandler()) {
+            val musicService = getMusicService()
 
+            val genres = withContext(Dispatchers.IO) {
                 musicService.getGenres(refresh, null, null)
             }
-            for (genre in genres) {
-                genreList.add(genre.name)
-            }
+            genreList.addAll(genres.map { it.name })
 
-
-            var years = withContext(Dispatchers.IO) {
-                val musicService = getMusicService()
-
+            val years = withContext(Dispatchers.IO) {
                 musicService.getTags(refresh, "YEAR", null, null)
-            }
-            years = years.sortedByDescending { it.name }
+            }.sortedByDescending { it.name }
 
-            for (year in years) {
-                yearList.add(year.name)
+            yearList.addAll(years.map { it.name })
+        }
+    }
+
+    private fun createTitle(genre: String, year: String, sortMethod: String): String {
+        return buildString {
+            when (sortMethod) {
+                "AddedDesc" -> append("Recent ")
+                "Random" -> append("Random ")
+                "LastWrittenDesc" -> append("Recent Modified ")
             }
+            if (genre.isNotBlank() && genre != "All") {
+                if (isNotEmpty()) append(" ")
+                append(genre)
+            }
+            if (year != "All") append(" ($year)")
         }
     }
 }

@@ -15,10 +15,26 @@ import androidx.navigation.NavDirections
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.util.Settings.maxSongs
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
+import androidx.core.content.edit
+import timber.log.Timber
 
-/**
- * TileInfo.kt
- */
+object TileStorage {
+    private val KEY = "user_tiles"
+
+    fun saveTiles(context: Context, tiles: MutableList<TileInfo>, page: String) {
+        val prefs = context.getSharedPreferences(page + "_tiles", Context.MODE_PRIVATE)
+        val json = Gson().toJson(tiles)
+        prefs.edit() { putString(KEY, json) }
+    }
+
+    fun loadTiles(context: Context, page: String): MutableList<TileInfo> {
+        val prefs = context.getSharedPreferences(page + "_tiles", Context.MODE_PRIVATE)
+        val json = prefs.getString(KEY, "[]")
+        return Gson().fromJson(json, object : TypeToken<MutableList<TileInfo>>() {}.type)
+    }
+}
 
 /**
  * Defines the default gradient color pool used for tiles.
@@ -76,6 +92,7 @@ data class TileInfo(
  * Returns a navigation action for a given tile.
  */
 fun navigateToGenre(tile: TileInfo): NavDirections {
+    Timber.d("Navigating to genre: ${tile.title} with parameters: ${tile.genre}, ${tile.year}, ${tile.size}, ${tile.offset}, ${tile.length}, ${tile.ratingMin}, ${tile.ratingMax}, ${tile.sortMethod}")
     return NavigationGraphDirections.toTrackCollection(
         songs = tile.title,
         genre = tile.genre,

@@ -607,6 +607,14 @@ open class TrackCollectionFragment(
                         )
                     )
                 }
+                genre.ifNotNull {
+                    if (genre !== "All" && genre !== "") filters.add(
+                        Filter(
+                            "GENRE",
+                            genre.toString()
+                        )
+                    )
+                }
                 festival.ifNotNull {
                     if (festival !== "All" && festival !== "") filters.add(
                         Filter(
