@@ -206,8 +206,8 @@ class MediaLibraryBrowser(
         parentId: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("AutoMediaBrowserService onLoadChildren called. ParentId: %s", parentId)
-        val parentIdParts = parentId.split('|')
-        val action = parentIdParts.first()
+        val parts = parentId.split('|')
+        val action = parts.firstOrNull() ?: return emptyResult("Missing action in parentId: $parentId")
 
         return when (action) {
             MEDIA_ROOT_ID -> getRootItems()
@@ -215,13 +215,17 @@ class MediaLibraryBrowser(
             MEDIA_SONGS_ID -> getSongsLibrary()
             MEDIA_LIVESETS_ID -> getLivesetsLibrary()
             MEDIA_ARTIST_ID -> getArtists()
-            MEDIA_ARTIST_SECTION -> getArtists(parentIdParts[1])
+            MEDIA_ARTIST_SECTION -> {
+                val section = parts.getOrNull(1)
+                if (section != null) getArtists(section) else emptyResult("Missing section in $parentId")
+            }
             MEDIA_ALBUM_ID -> getAlbums(AlbumListType.SORTED_BY_NAME)
-            MEDIA_ALBUM_PAGE_ID -> getAlbums(
-                AlbumListType.fromName(parentIdParts[1]),
-                parentIdParts[2].toInt()
-            )
-
+            MEDIA_ALBUM_PAGE_ID -> {
+                val listType = parts.getOrNull(1)?.let { AlbumListType.fromName(it) }
+                val page = parts.getOrNull(2)?.toIntOrNull()
+                if (listType != null && page != null) getAlbums(listType, page)
+                else emptyResult("Invalid album page params in $parentId")
+            }
             MEDIA_PLAYLIST_ID -> getPlaylists()
             MEDIA_ALBUM_FREQUENT_ID -> getAlbums(AlbumListType.FREQUENT)
             MEDIA_ALBUM_NEWEST_ID -> getAlbums(AlbumListType.NEWEST)
@@ -229,40 +233,84 @@ class MediaLibraryBrowser(
             MEDIA_ALBUM_RANDOM_ID -> getAlbums(AlbumListType.RANDOM)
             MEDIA_ALBUM_STARRED_ID -> getAlbums(AlbumListType.STARRED)
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
-            MEDIA_SONG_RANDOM_ID -> getSongs(length = parentIdParts[1], "Random")
-            MEDIA_SONG_RECENT -> getSongs(length = parentIdParts[1], "Recent")
-
-            // Custom search: Length, genre, year, sortMethod
-            MEDIA_GET_GENRES -> getGenres(length = parentIdParts[1])
-            MEDIA_GET_YEARS -> getYears(length = parentIdParts[1], genre = parentIdParts[2])
-            MEDIA_GET_SORT_METHOD -> getSortMethod(
-                length = parentIdParts[1],
-                genre = parentIdParts[2],
-                year = parentIdParts[3]
-            )
-
-            MEDIA_GET_SONGS_BY_GENRE -> getGenre(
-                length = parentIdParts[1],
-                genre = parentIdParts[2],
-                year = parentIdParts[3].toIntOrNull(),
-                sortMethod = parentIdParts[4]
-            )
-
+            MEDIA_SONG_RANDOM_ID -> {
+                val length = parts.getOrNull(1)
+                if (length != null) getSongs(length = length, sortMethod = "Random")
+                else emptyResult("Missing length in $parentId")
+            }
+            MEDIA_SONG_RECENT -> {
+                val length = parts.getOrNull(1)
+                if (length != null) getSongs(length = length, sortMethod = "Recent")
+                else emptyResult("Missing length in $parentId")
+            }
+            MEDIA_GET_GENRES -> {
+                val length = parts.getOrNull(1)
+                if (length != null) getGenres(length) else emptyResult("Missing length in $parentId")
+            }
+            MEDIA_GET_YEARS -> {
+                val length = parts.getOrNull(1)
+                val genre = parts.getOrNull(2)
+                if (length != null && genre != null) getYears(length, genre)
+                else emptyResult("Missing length or genre in $parentId")
+            }
+            MEDIA_GET_SORT_METHOD -> {
+                val length = parts.getOrNull(1)
+                val genre = parts.getOrNull(2)
+                val year = parts.getOrNull(3)
+                if (length != null && genre != null && year != null) getSortMethod(length, genre, year)
+                else emptyResult("Missing sort params in $parentId")
+            }
+            MEDIA_GET_SONGS_BY_GENRE -> {
+                val length = parts.getOrNull(1)
+                val genre = parts.getOrNull(2)
+                val year = parts.getOrNull(3)?.toIntOrNull()
+                val sortMethod = parts.getOrNull(4)
+                if (length != null && genre != null && sortMethod != null) {
+                    getGenre(length, genre, year, sortMethod)
+                } else {
+                    emptyResult("Invalid genre/song filter in $parentId")
+                }
+            }
             MEDIA_SHARE_ID -> getShares()
             MEDIA_BOOKMARK_ID -> getBookmarks()
             MEDIA_PODCAST_ID -> getPodcasts()
-            MEDIA_PLAYLIST_ITEM -> getPlaylist(parentIdParts[1], parentIdParts[2])
-            MEDIA_ARTIST_ITEM -> getAlbumsForArtist(
-                parentIdParts[1],
-                parentIdParts[2]
-            )
-
-            MEDIA_ALBUM_ITEM -> getSongsForAlbum(parentIdParts[1], parentIdParts[2])
-            MEDIA_SHARE_ITEM -> getSongsForShare(parentIdParts[1])
-            MEDIA_PODCAST_ITEM -> getPodcastEpisodes(parentIdParts[1])
-            else -> Futures.immediateFuture(LibraryResult.ofItemList(listOf(), null))
+            MEDIA_PLAYLIST_ITEM -> {
+                val playlistId = parts.getOrNull(1)
+                val name = parts.getOrNull(2)
+                if (playlistId != null && name != null) getPlaylist(playlistId, name)
+                else emptyResult("Invalid playlist item in $parentId")
+            }
+            MEDIA_ARTIST_ITEM -> {
+                val artistId = parts.getOrNull(1)
+                val artistName = parts.getOrNull(2)
+                if (artistId != null && artistName != null) getAlbumsForArtist(artistId, artistName)
+                else emptyResult("Invalid artist item in $parentId")
+            }
+            MEDIA_ALBUM_ITEM -> {
+                val albumId = parts.getOrNull(1)
+                val albumName = parts.getOrNull(2)
+                if (albumId != null && albumName != null) getSongsForAlbum(albumId, albumName)
+                else emptyResult("Invalid album item in $parentId")
+            }
+            MEDIA_SHARE_ITEM -> {
+                val shareId = parts.getOrNull(1)
+                if (shareId != null) getSongsForShare(shareId)
+                else emptyResult("Missing shareId in $parentId")
+            }
+            MEDIA_PODCAST_ITEM -> {
+                val podcastId = parts.getOrNull(1)
+                if (podcastId != null) getPodcastEpisodes(podcastId)
+                else emptyResult("Missing podcastId in $parentId")
+            }
+            else -> emptyResult("Unknown action in $parentId")
         }
     }
+
+    private fun emptyResult(reason: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.w("loadChildren(): %s", reason)
+        return Futures.immediateFuture(LibraryResult.ofItemList(listOf(), null))
+    }
+
 
     private fun getRootItems(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
@@ -693,7 +741,7 @@ class MediaLibraryBrowser(
 
     private fun getSongs(
         length: String?,
-        searchMethod: String?
+        sortMethod: String?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
@@ -711,7 +759,7 @@ class MediaLibraryBrowser(
                         null,
                         maxSongs,
                         0,
-                        searchMethod ?: "AddedDesc"
+                        sortMethod ?: "AddedDesc"
                     )
                 }
             }.await()
