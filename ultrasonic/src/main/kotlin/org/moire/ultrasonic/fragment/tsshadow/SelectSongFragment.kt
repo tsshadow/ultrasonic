@@ -25,6 +25,8 @@ import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.toastingExceptionHandler
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import java.time.Year
 
 /**
@@ -46,12 +48,18 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
     private lateinit var ratingMinSpinner: Spinner
     private lateinit var ratingMaxSpinner: Spinner
     private lateinit var genreSpinner: Spinner
+    private lateinit var labelSpinner: Spinner
     private lateinit var sortMethodSpinner: Spinner
     private lateinit var searchButton: Button
     private lateinit var saveButton: Button
 
+    private lateinit var filterContainer: View
+    private lateinit var toggleFiltersButton: Button
+    private var filtersVisible = false
+
     private val genreList = arrayListOf("All")
     private val yearList = arrayListOf("All")
+    private val labelList = arrayListOf("All")
     private var tiles = mutableListOf<TileInfo>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +79,17 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         initializeSpinners()
         swipeRefresh?.setOnRefreshListener { load(true) }
 
+        // Toggle filter visibility
+        toggleFiltersButton.setOnClickListener {
+            filtersVisible = !filtersVisible
+
+            // Animate the transition
+            TransitionManager.beginDelayedTransition(view as ViewGroup, AutoTransition())
+
+            filterContainer.visibility = if (filtersVisible) View.VISIBLE else View.GONE
+            toggleFiltersButton.text = if (filtersVisible) "Hide Filters ▲" else "Show Filters ▼"
+        }
+
         loadTilesOrDefaults()
         populateTiles()
         adjustGridColumnCount()
@@ -88,10 +107,13 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         ratingMinSpinner = view.findViewById(R.id.select_rating_min)
         ratingMaxSpinner = view.findViewById(R.id.select_rating_max)
         genreSpinner = view.findViewById(R.id.select_genre)
+        labelSpinner = view.findViewById(R.id.select_label)
         sortMethodSpinner = view.findViewById(R.id.select_sort_method)
         searchButton = view.findViewById(R.id.search)
         saveButton = view.findViewById(R.id.save)
         gridLayout = view.findViewById(R.id.gridLayoutContainer)
+        filterContainer = view.findViewById(R.id.filter_container)
+        toggleFiltersButton = view.findViewById(R.id.toggle_filters)
     }
 
     private fun initializeSpinners() {
@@ -103,6 +125,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
 
         yearSpinner.adapter = createAdapter(yearList)
         genreSpinner.adapter = createAdapter(genreList)
+        labelSpinner.adapter = createAdapter(labelList)
         ratingMinSpinner.adapter = createAdapter((0..5).toList())
         ratingMaxSpinner.adapter = createAdapter((0..5).toList())
         ratingMaxSpinner.setSelection(5)
@@ -158,6 +181,7 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
             val action = NavigationGraphDirections.toTrackCollection(
                 songs = "?",
                 genre = if(genreSpinner.selectedItem as String == "All") null else genreSpinner.selectedItem as String,
+                label = if (labelSpinner.selectedItem as String == "All") null else labelSpinner.selectedItem as String,
                 size = maxSongs,
                 offset = 0,
                 year = if(yearSpinner.selectedItem as String == "All") null else yearSpinner.selectedItem as String,
@@ -175,12 +199,14 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
             val genre = genreSpinner.selectedItem as? String ?: return@setOnClickListener
             val year = yearSpinner.selectedItem as? String ?: return@setOnClickListener
             val sortMethod = sortMethodSpinner.selectedItem as? String ?: return@setOnClickListener
+            val label = labelSpinner.selectedItem as? String
 
 
             val newTile = TileInfo(
-                title = createTitle(genre, year, sortMethod),
-                genre = if (genre == "All") null else genre,
+                title = createTitle(genre, year, sortMethod, label),
+                genre = if (genreSpinner.selectedItem as String == "All") null else genreSpinner.selectedItem as String,
                 year = if (year == "All") null else year,
+                label = if (label == "All") null else label,
                 sortMethod = sortMethod,
                 length = DEFAULT_LENGTH,
                 ratingMin = ratingMinSpinner.selectedItem as Int,
@@ -214,6 +240,13 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
                 genreList.addAll(genres.map { it.name })
             }
 
+            if (labelList.size == 1 && labelList[0] == "All") {
+                val labels = withContext(Dispatchers.IO) {
+                    musicService.getTags(refresh, "PUBLISHER", null, null)
+                }
+                labelList.addAll(labels.map { it.name })
+            }
+
             if (yearList.size == 1 && yearList[0] == "All") {
                 val years = withContext(Dispatchers.IO) {
                     musicService.getTags(refresh, "YEAR", null, null)
@@ -223,13 +256,15 @@ class SelectSongFragment : Fragment(), RefreshableFragment {
         }
     }
 
-    private fun createTitle(genre: String, year: String, sortMethod: String): String {
+    private fun createTitle(genre: String, year: String, sortMethod: String,
+                            label: String?): String {
         return buildString {
             when (sortMethod) {
                 "AddedDesc" -> append("Recent ")
                 "Random" -> append("Random ")
                 "LastWrittenDesc" -> append("Recent Modified ")
             }
+            if (!label.isNullOrBlank()) append(label)
             if (genre.isNotBlank() && genre != "All") {
                 if (isNotEmpty()) append(" ")
                 append(genre)

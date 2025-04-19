@@ -133,6 +133,11 @@
             app:argType="string"
             app:nullable="true" />
         <argument
+            android:name="label"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
             android:name="length"
             android:defaultValue="@null"
             app:argType="string"

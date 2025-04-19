@@ -82,6 +82,7 @@ data class TileInfo(
     val year: String? = null,
     val size: Int = maxSongs,
     val festival: String? = null,
+    val label: String? = null,
     val offset: Int = 0,
     val length: String = "short",
     val ratingMin: Int = 0,
@@ -97,6 +98,7 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
         "Navigating to track collection for: '${tile.title}' with parameters: " +
                 "genre=${tile.genre}, " +
                 "festival=${tile.festival}, " +
+                "label=${tile.label}, " +
                 "year=${tile.year}, " +
                 "size=${tile.size}, " +
                 "offset=${tile.offset}, " +
@@ -112,6 +114,7 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
         offset = tile.offset,
         year = tile.year,
         festival = tile.festival,
+        label = tile.label,
         length = tile.length,
         ratingMin = tile.ratingMin,
         ratingMax = tile.ratingMax,

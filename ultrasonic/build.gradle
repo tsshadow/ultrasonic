@@ -101,7 +101,7 @@ dependencies {
     api(libs.picasso) {
         exclude group: "com.android.support"
     }
-
+    implementation libs.transition
     implementation libs.car
     implementation libs.core
     implementation libs.design

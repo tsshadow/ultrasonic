@@ -529,6 +529,7 @@ open class TrackCollectionFragment(
         val shareName = navArgs.shareName
         val genre = navArgs.genre
         val festival = navArgs.festival
+        val label = navArgs.label
         val songs = navArgs.songs
         val year = navArgs.year
         val length = navArgs.length
@@ -589,6 +590,7 @@ open class TrackCollectionFragment(
                         }
 //                        if (length == "short") append("Songs:") else append("Livesets:")
                         if (!festival.isNullOrBlank()) append(festival)
+                        if (!label.isNullOrBlank()) append(label)
                         if (!genre.isNullOrBlank() && genre != "All") {
                             if (isNotEmpty()) append(" ")
                             append(genre)
@@ -622,6 +624,14 @@ open class TrackCollectionFragment(
                         Filter(
                             "FESTIVAL",
                             festival.toString()
+                        )
+                    )
+                }
+                label.ifNotNull {
+                    if (label !== "All" && label !== "") filters.add(
+                        Filter(
+                            "PUBLISHER",
+                            label.toString()
                         )
                     )
                 }

@@ -24,6 +24,7 @@ room                   = "2.6.1"
 kotlin                 = "1.9.21"
 ksp                    = "1.9.21-1.0.15"
 kotlinxCoroutines      = "1.7.3"
+transition = "1.4.1"
 viewModelKtx           = "2.6.2"
 swipeRefresh           = "1.1.0"
 
@@ -67,6 +68,7 @@ constraintLayout        = { module = "androidx.constraintlayout:constraintlayout
 room                    = { module = "androidx.room:room-compiler", version.ref = "room" }
 roomRuntime             = { module = "androidx.room:room-runtime", version.ref = "room" }
 roomKtx                 = { module = "androidx.room:room-ktx", version.ref = "room" }
+transition = { module = "androidx.transition:transition", version.ref = "transition" }
 viewModelKtx            = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "viewModelKtx" }
 navigationFragment      = { module = "androidx.navigation:navigation-fragment", version.ref = "navigation" }
 navigationUi            = { module = "androidx.navigation:navigation-ui", version.ref = "navigation" }

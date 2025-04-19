@@ -25,6 +25,8 @@ import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.toastingExceptionHandler
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 
 /**
  * Fragment for composing and saving advanced filters to explore long-form music content,
@@ -45,6 +47,10 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
     private lateinit var sortMethodSpinner: Spinner
     private lateinit var searchButton: Button
     private lateinit var saveButton: Button
+
+    private lateinit var filterContainer: View
+    private lateinit var toggleFiltersButton: Button
+    private var filtersVisible = false
 
     private val genreList = arrayListOf("All")
     private val yearList = arrayListOf("All")
@@ -79,6 +85,16 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
 
         swipeRefresh?.setOnRefreshListener { load(true) }
 
+        // Toggle filter visibility
+        toggleFiltersButton.setOnClickListener {
+            filtersVisible = !filtersVisible
+
+            // Animate the transition
+            TransitionManager.beginDelayedTransition(view as ViewGroup, AutoTransition())
+
+            filterContainer.visibility = if (filtersVisible) View.VISIBLE else View.GONE
+            toggleFiltersButton.text = if (filtersVisible) "Hide Filters ▲" else "Show Filters ▼"
+        }
         loadTilesOrDefaults()
         populateTiles()
         adjustGridColumnCount()
@@ -101,6 +117,8 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
         searchButton = view.findViewById(R.id.search)
         saveButton = view.findViewById(R.id.save)
         gridLayout = view.findViewById(R.id.gridLayoutContainer)
+        filterContainer = view.findViewById(R.id.filter_container)
+        toggleFiltersButton = view.findViewById(R.id.toggle_filters)
     }
 
     private fun initializeSpinners() {
@@ -197,8 +215,6 @@ class SelectLivesetFragment : Fragment(), RefreshableFragment {
 
     private fun setupSearchButton() {
         searchButton.setOnClickListener {
-            val genre = genreSpinner.selectedItem as String
-            val festival = festivalSpinner.selectedItem as String
             val action = NavigationGraphDirections.toTrackCollection(
                 songs = "?",
                 genre = if (genreSpinner.selectedItem as String == "All") null else genreSpinner.selectedItem as String,
