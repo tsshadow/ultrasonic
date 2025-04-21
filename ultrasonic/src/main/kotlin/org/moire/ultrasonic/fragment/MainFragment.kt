@@ -165,7 +165,7 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
     override fun getItemCount(): Int {
         // Hide Genre tab when offline
-        return if (ActiveServerProvider.isOffline()) 3 else 5
+        return if (ActiveServerProvider.isOffline()) 3 else 4
     }
 
     override fun createFragment(position: Int): Fragment {
