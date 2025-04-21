@@ -436,7 +436,18 @@
     <!-- TSShadow -->
     <string name="tile_icon_description">Tegel icoon</string>
     <string name="genre_name">Genre Name</string>
-
+    <string name="show_filters">Show Filters ▼</string>
+    <string name="hide_filters">Hide Filters ▲</string>
+    <string name="year">Jaar</string>
+    <string name="rating">Rating</string>
+    <string name="from">Van</string>
+    <string name="to">Tot</string>
+    <string name="genre">Genre</string>
+    <string name="festival">Festival</string>
+    <string name="label">Label</string>
+    <string name="save_preset">Sla op</string>
+    <string name="search_button">Zoek</string>
+    <string name="sort_method">Sortering</string>
     <string name="sort_none">Geen</string>
     <string name="sort_random">Willekeurig</string>
     <string name="sort_added_desc">Laatst toegevoegd</string>

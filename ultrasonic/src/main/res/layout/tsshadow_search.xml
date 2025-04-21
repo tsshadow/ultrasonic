@@ -1,34 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:a="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
+<!--
+  ~ tsshadow_search.xml
+  ~ Layout for the main fragment (SelectFragment)
+  ~ Contains RecyclerView with grid tiles, filter popup overlay and FAB
+  ~ Copyright (C) 2009-2025 Ultrasonic developers
+  ~ Distributed under terms of the GNU GPLv3 license.
+-->
 
-    <Button
-        android:id="@+id/toggle_filters"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:text="@string/show_filters" />
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/filter_overlay_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <include layout="@layout/tsshadow_filters" />
-
-    <!-- NestedScrollView to allow scrolling inside SwipeRefreshLayout -->
-    <androidx.core.widget.NestedScrollView
+    <!-- RecyclerView for grid tiles -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tileRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">  <!-- Ensures full expansion -->
+        android:padding="12dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/tsshadow_tile_layout" />
 
-        <android.widget.GridLayout
-            android:id="@+id/gridLayoutContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:columnCount="3"
-            android:orientation="horizontal"
-            android:padding="8dp" />
+    <!-- Popup overlay with filter options -->
+    <include layout="@layout/tsshadow_filters" />
 
-    </androidx.core.widget.NestedScrollView>
-
-</LinearLayout>
+    <!-- Floating action button to open filters -->
+    <ImageButton
+        android:id="@+id/show_filters"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="32dp"
+        android:backgroundTint="@color/design_default_color_primary_dark"
+        android:background="@drawable/rounded_button"
+        android:contentDescription="@string/show_filters"
+        android:src="@android:drawable/ic_menu_search"
+        android:elevation="8dp" />
+</FrameLayout>
