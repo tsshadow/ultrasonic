@@ -433,5 +433,13 @@
     <string name="list_view">Lijst</string>
     <string name="grid_view">Hoes</string>
 
+    <!-- TSShadow -->
+    <string name="tile_icon_description">Tegel icoon</string>
+    <string name="genre_name">Genre Name</string>
+
+    <string name="sort_none">Geen</string>
+    <string name="sort_random">Willekeurig</string>
+    <string name="sort_added_desc">Laatst toegevoegd</string>
+    <string name="sort_written_desc">Laatst bijgewerkt</string>
 
 </resources>

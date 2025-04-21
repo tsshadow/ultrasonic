@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ bg_spinner.xml
+  ~ Copyright (C) 2009-2025 Ultrasonic developers
+  ~
+  ~ Distributed under terms of the GNU GPLv3 license.
+  -->
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+</selector>

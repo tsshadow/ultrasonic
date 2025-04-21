@@ -26,9 +26,6 @@
         android:id="@+id/toLivestList"
         app:destination="@id/selectLivesetFragment" />
     <action
-        android:id="@+id/toPresetPage"
-        app:destination="@id/selectPresetPage" />
-    <action
         android:id="@+id/toSearchFragment"
         app:destination="@id/searchFragment" />
     <action
@@ -295,9 +292,6 @@
     <fragment
         android:id="@+id/selectSongFragment"
         android:name="org.moire.ultrasonic.fragment.tsshadow.SelectSongFragment"/>
-    <fragment
-        android:id="@+id/selectPresetPage"
-        android:name="org.moire.ultrasonic.fragment.tsshadow.SelectPresetFragment"/>
     <fragment
         android:id="@+id/selectLivesetFragment"
         android:name="org.moire.ultrasonic.fragment.tsshadow.SelectLivesetFragment"/>

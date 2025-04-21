@@ -1,3 +1,10 @@
+/*
+ * Tiles.kt
+ * Copyright (C) 2009-2025 Teun.Schriks
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
 import TileStorage.saveTiles
 import android.app.AlertDialog
 import android.content.Context
@@ -76,8 +83,8 @@ private val genreIconMap: Map<String, Int> = mapOf(
 /**
  * Describes the configuration for a tile that represents a genre or song preset.
  */
-data class TileInfo(
-    var title: String,
+class TileInfo(
+    var title: String = "",
     val genre: String? = null,
     val year: String? = null,
     val size: Int = maxSongs,
@@ -88,7 +95,32 @@ data class TileInfo(
     val ratingMin: Int = 0,
     val ratingMax: Int = 5,
     val sortMethod: String = "AddedDesc"
-)
+) {
+    init {
+        if (title == "") title = createDefaultTitle()
+    }
+
+    private fun createDefaultTitle(): String {
+        return buildString {
+            when (sortMethod) {
+                "AddedDesc" -> append("Recent ")
+                "Random" -> append("Random ")
+                "LastWrittenDesc" -> append("Recent Modified ")
+            }
+
+            // Append optional label/festival/genre
+            listOf(festival, label, genre)
+                .filter { !it.isNullOrBlank() && it != "All" }
+                .joinToString(" ")
+                .let { if (it.isNotBlank()) append(it) }
+
+            // Append year
+            if (!year.isNullOrBlank() && year != "All") {
+                append(" ($year)")
+            }
+        }
+    }
+}
 
 /**
  * Returns a navigation action for a given tile.
