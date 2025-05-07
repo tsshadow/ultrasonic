@@ -4,18 +4,34 @@ package org.moire.ultrasonic.api.subsonic.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class Filter(@JsonProperty("name") val name: String, @JsonProperty("value") val value: String) {
+/**
+ * A flexible filter model supporting both single and multi-value entries,
+ * for use in Ultrasonic's REST API requests.
+ */
+class Filter(
+    @JsonProperty("name") val name: String,
+    @JsonProperty("value") val value: Any
+) {
     override fun toString(): String {
-        return "{\"name\":\"$name\",\"value\":\"$value\" }"
+        val valueStr = when (value) {
+            is String -> "\"$value\""
+            is List<*> -> value.joinToString(prefix = "[", postfix = "]") { "\"$it\"" }
+            else -> value.toString()
+        }
+        return "{\"name\":\"$name\",\"value\":$valueStr}"
     }
 }
 
+/**
+ * Holds a collection of filters. Used to construct query parameters
+ * for filtered song/liveset lookups.
+ */
 class Filters {
 
-    constructor() {}
+    constructor()
 
     constructor(filters: Array<Filter>) {
-        this.filters = filters
+        this.filters = filters.toMutableList()
     }
 
     constructor(filter: Filter) {
@@ -23,19 +39,20 @@ class Filters {
     }
 
     override fun toString(): String {
-        var str = "";
-        if (this.filters.isNotEmpty()) {
-            str = "["
-            filters.forEach { str += "$it," }
-            str = str.substring(0, str.length - 1)
-            str += "]"
+        return if (filters.isNotEmpty()) {
+            filters.joinToString(prefix = "[", postfix = "]") { it.toString() }
+        } else {
+            ""
         }
-        return str
     }
 
     fun add(filter: Filter) {
-        filters += filter
+        filters.add(filter)
     }
 
-    private var filters: Array<Filter> = emptyArray()
+    fun isEmpty(): Boolean = filters.isEmpty()
+
+    private var filters: MutableList<Filter> = mutableListOf()
+
+    fun getAll(): List<Filter> = filters.toList()
 }

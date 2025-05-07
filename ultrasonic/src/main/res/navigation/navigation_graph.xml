@@ -115,6 +115,11 @@
             app:argType="string"
             app:nullable="true" />
         <argument
+            android:name="filters"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true" />
+        <argument
             android:name="year"
             android:defaultValue=""
             app:argType="string"

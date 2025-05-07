@@ -374,48 +374,24 @@ class MediaLibraryBrowser(
         Timber.d("getSongsLibrary")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val currentYear = listOf(Calendar.getInstance().get(Calendar.YEAR).toString())
         val presets = listOf(
             TileInfo("Search"),
             TileInfo("Recent"),
             TileInfo("Random", sortMethod = "Random"),
             TileInfo("Starred", ratingMin = 5),
-            TileInfo(
-                "Bouncy Uptempo ($currentYear)",
-                genre = "Bouncy Uptempo",
-                year = "$currentYear"
-            ),
-            TileInfo(
-                "Euphoric Hardstyle ($currentYear)",
-                genre = "Euphoric Hardstyle",
-                year = "$currentYear"
-            ),
-            TileInfo("Hardcore ($currentYear)", genre = "Hardcore", year = "$currentYear"),
-            TileInfo("Hardstyle ($currentYear)", genre = "Hardstyle", year = "$currentYear"),
-            TileInfo("Hardstyle Classics", genre = "Hardstyle Classics"),
-            TileInfo("Industrial Hardcore", genre = "Industrial Hardcore"),
-            TileInfo(
-                "Mainstream Hardcore ($currentYear)",
-                genre = "Mainstream Hardcore",
-                year = "$currentYear"
-            ),
-            TileInfo("Mainstream Hardcore", genre = "Millennium Hardcore"),
-            TileInfo(
-                "Mainstream Hardstyle ($currentYear)",
-                genre = "Mainstream Hardstyle",
-                year = "$currentYear"
-            ),
-            TileInfo(
-                "Raw Hardstyle ($currentYear)",
-                genre = "Raw Hardstyle",
-                year = "$currentYear"
-            ),
-            TileInfo(
-                "Uptempo Hardcore ($currentYear)",
-                genre = "Uptempo Hardcore",
-                year = "$currentYear"
-            ),
-            TileInfo("Zaagtempo", genre = "Zaagtempo"),
+            TileInfo("Bouncy Uptempo (${currentYear[0]})", genre = listOf("Bouncy Uptempo"), year = currentYear),
+            TileInfo("Euphoric Hardstyle (${currentYear[0]})", genre = listOf("Euphoric Hardstyle"), year = currentYear),
+            TileInfo("Hardcore (${currentYear[0]})", genre = listOf("Hardcore"), year = currentYear),
+            TileInfo("Hardstyle (${currentYear[0]})", genre = listOf("Hardstyle"), year = currentYear),
+            TileInfo("Hardstyle Classics", genre = listOf("Hardstyle Classics")),
+            TileInfo("Industrial Hardcore", genre = listOf("Industrial Hardcore")),
+            TileInfo("Mainstream Hardcore (${currentYear[0]})", genre = listOf("Mainstream Hardcore"), year = currentYear),
+            TileInfo("Millennium Hardcore", genre = listOf("Millennium Hardcore")),
+            TileInfo("Mainstream Hardstyle (${currentYear[0]})", genre = listOf("Mainstream Hardstyle"), year = currentYear),
+            TileInfo("Raw Hardstyle (${currentYear[0]})", genre = listOf("Raw Hardstyle"), year = currentYear),
+            TileInfo("Uptempo Hardcore (${currentYear[0]})", genre = listOf("Uptempo Hardcore"), year = currentYear),
+            TileInfo("Zaagtempo", genre = listOf("Zaagtempo"))
         )
 
         presets.mapNotNullTo(mediaItems) { it.toMediaItem() }
@@ -427,59 +403,24 @@ class MediaLibraryBrowser(
         Timber.d("getLivesetsLibrary")
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val currentYear = listOf(Calendar.getInstance().get(Calendar.YEAR).toString())
         val presets = listOf(
             TileInfo("Search", length = "long"),
             TileInfo("Recent", length = "long"),
             TileInfo("Random", sortMethod = "Random", length = "long"),
             TileInfo("Starred", ratingMin = 5, length = "long"),
-            TileInfo("Bouncy Uptempo", genre = "Bouncy Uptempo", length = "long"),
-            TileInfo(
-                "Euphoric Hardstyle ($currentYear)",
-                genre = "Euphoric Hardstyle",
-                year = "$currentYear",
-                length = "long"
-            ),
-            TileInfo(
-                "Hardcore ($currentYear)",
-                genre = "Hardcore",
-                year = "$currentYear",
-                length = "long"
-            ),
-            TileInfo(
-                "Hardstyle ($currentYear)",
-                genre = "Hardstyle",
-                year = "$currentYear",
-                length = "long"
-            ),
-            TileInfo("Hardstyle Classics", genre = "Hardstyle Classics", length = "long"),
-            TileInfo("Industrial Hardcore", genre = "Industrial Hardcore", length = "long"),
-            TileInfo(
-                "Mainstream Hardcore ($currentYear)",
-                genre = "Mainstream Hardcore",
-                year = "$currentYear",
-                length = "long"
-            ),
-            TileInfo("Mainstream Hardcore", genre = "Millennium Hardcore", length = "long"),
-            TileInfo(
-                "Mainstream Hardstyle ($currentYear)",
-                genre = "Mainstream Hardstyle",
-                year = "$currentYear",
-                length = "long"
-            ),
-            TileInfo(
-                "Raw Hardstyle ($currentYear)",
-                genre = "Raw Hardstyle",
-                year = "$currentYear",
-                length = "long"
-            ),
-            TileInfo(
-                "Uptempo Hardcore ($currentYear)",
-                genre = "Uptempo Hardcore",
-                year = "$currentYear",
-                length = "long"
-            ),
-            TileInfo("Zaagtempo", genre = "Zaagtempo", length = "long"),
+            TileInfo("Bouncy Uptempo", genre = listOf("Bouncy Uptempo"), length = "long"),
+            TileInfo("Euphoric Hardstyle (${currentYear[0]})", genre = listOf("Euphoric Hardstyle"), year = currentYear, length = "long"),
+            TileInfo("Hardcore (${currentYear[0]})", genre = listOf("Hardcore"), year = currentYear, length = "long"),
+            TileInfo("Hardstyle (${currentYear[0]})", genre = listOf("Hardstyle"), year = currentYear, length = "long"),
+            TileInfo("Hardstyle Classics", genre = listOf("Hardstyle Classics"), length = "long"),
+            TileInfo("Industrial Hardcore", genre = listOf("Industrial Hardcore"), length = "long"),
+            TileInfo("Mainstream Hardcore (${currentYear[0]})", genre = listOf("Mainstream Hardcore"), year = currentYear, length = "long"),
+            TileInfo("Millennium Hardcore", genre = listOf("Millennium Hardcore"), length = "long"),
+            TileInfo("Mainstream Hardstyle (${currentYear[0]})", genre = listOf("Mainstream Hardstyle"), year = currentYear, length = "long"),
+            TileInfo("Raw Hardstyle (${currentYear[0]})", genre = listOf("Raw Hardstyle"), year = currentYear, length = "long"),
+            TileInfo("Uptempo Hardcore (${currentYear[0]})", genre = listOf("Uptempo Hardcore"), year = currentYear, length = "long"),
+            TileInfo("Zaagtempo", genre = listOf("Zaagtempo"), length = "long")
         )
 
         presets.mapNotNullTo(mediaItems) { it.toMediaItem() }

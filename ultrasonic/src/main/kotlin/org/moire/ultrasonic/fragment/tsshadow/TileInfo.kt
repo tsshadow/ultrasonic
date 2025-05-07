@@ -1,18 +1,14 @@
-/*
- * TileInfo.kt
- * Copyright (C) 2009-2025 Teun.Schriks
- *
- * Distributed under terms of the GNU GPLv3 license.
- */
-
 import android.content.Context
 import androidx.core.content.edit
 import androidx.core.graphics.toColorInt
-import org.moire.ultrasonic.NavigationGraphDirections
-import org.moire.ultrasonic.R
-import org.moire.ultrasonic.util.Settings.maxSongs
+import androidx.navigation.NavDirections
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
+import org.moire.ultrasonic.NavigationGraphDirections
+import org.moire.ultrasonic.R
+import org.moire.ultrasonic.api.subsonic.models.Filter
+import org.moire.ultrasonic.api.subsonic.models.Filters
+import org.moire.ultrasonic.util.Settings.maxSongs
 
 object TileStorage {
     private val KEY = "user_tiles"
@@ -30,14 +26,14 @@ object TileStorage {
     }
 }
 
-public val tileInfoColors = listOf(
+val tileInfoColors = listOf(
     "#000000", "#00008B", "#8B0000", "#006400", "#4B0082",
     "#808080", "#2F4F4F", "#A9A9A9", "#800000", "#2C3E50",
     "#8B4513", "#3B3B3B", "#556B2F", "#2F4F4F", "#D2691E",
     "#B22222", "#4C4C4C", "#3A3A3A", "#4E4E4E", "#6A5ACD"
 ).map { it.toColorInt() }
 
-public val genreIconMap: Map<String, Int> = mapOf(
+val genreIconMap: Map<String, Int> = mapOf(
     "Recent Songs" to R.drawable.baseline_music_note_24,
     "Random Songs" to R.drawable.baseline_music_note_24,
     "Recent Livesets" to R.drawable.baseline_music_note_24,
@@ -58,8 +54,8 @@ public val genreIconMap: Map<String, Int> = mapOf(
 
 class TileInfo(
     var title: String = "",
-    val genre: String? = null,
-    val year: String? = null,
+    val genre: List<String>? = null,
+    val year: List<String>? = null,
     val size: Int = maxSongs,
     val festival: String? = null,
     val label: String? = null,
@@ -80,27 +76,44 @@ class TileInfo(
                 "Random" -> append("Random ")
                 "LastWrittenDesc" -> append("Recent Modified ")
             }
-            listOf(festival, label, genre)
-                .filter { !it.isNullOrBlank() && it != "All" }
+            listOfNotNull(festival, label, genre?.firstOrNull())
+                .filter { it.isNotBlank() && it != "All" }
                 .joinToString(" ")
                 .let { if (it.isNotBlank()) append(it) }
-            if (!year.isNullOrBlank() && year != "All") {
-                append(" ($year)")
+            if (!year.isNullOrEmpty() && year.firstOrNull()?.isNotBlank() == true && year.first() != "All") {
+                append(" (${year.first()})")
             }
         }
     }
 }
 
-fun navigateToGenre(tile: TileInfo) = NavigationGraphDirections.toTrackCollection(
-    songs = tile.title,
-    genre = tile.genre,
-    size = tile.size,
-    offset = tile.offset,
-    year = tile.year,
-    festival = tile.festival,
-    label = tile.label,
-    length = tile.length,
-    ratingMin = tile.ratingMin,
-    ratingMax = tile.ratingMax,
-    sortMethod = tile.sortMethod
-)
+fun navigateToGenre(tile: TileInfo): NavDirections {
+    val filters = Filters()
+
+    tile.genre?.filter { it.isNotBlank() && it != "All" }?.let {
+        filters.add(if (it.size == 1) Filter("GENRE", it[0]) else Filter("GENRE", it))
+    }
+    tile.year?.filter { it.isNotBlank() && it != "All" }?.let {
+        filters.add(if (it.size == 1) Filter("YEAR", it[0]) else Filter("YEAR", it))
+    }
+    tile.label?.takeIf { it.isNotBlank() && it != "All" }?.let {
+        filters.add(Filter("PUBLISHER", it))
+    }
+    tile.festival?.takeIf { it.isNotBlank() && it != "All" }?.let {
+        filters.add(Filter("FESTIVAL", it))
+    }
+    filters.add(Filter("LENGTH", tile.length))
+
+    val filtersJson = Gson().toJson(filters)
+
+    return NavigationGraphDirections.toTrackCollection(
+        songs = tile.title,
+        filters = filtersJson,
+        size = tile.size,
+        offset = tile.offset,
+        length = tile.length,
+        ratingMin = tile.ratingMin,
+        ratingMax = tile.ratingMax,
+        sortMethod = tile.sortMethod
+    )
+}

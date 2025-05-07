@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ ids.xml
+  ~ Copyright (C) 2009-2025 Ultrasonic developers
+  ~
+  ~ Distributed under terms of the GNU GPLv3 license.
+  -->
+
+<resources>
+    <item name="dialog_layout" type="id" />
+    <item name="multi_select_list" type="id" />
+    <item name="btn_ok" type="id" />
+</resources>

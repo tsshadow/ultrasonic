@@ -13,11 +13,13 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.NavigationGraphDirections
 import TileStorage.saveTiles
 import genreIconMap
 import tileInfoColors
+import navigateToGenre
 import timber.log.Timber
 
 class TileAdapter(
@@ -42,27 +44,13 @@ class TileAdapter(
             ).apply { cornerRadius = 24f }
             tileCard.background = gradient
 
-            @DrawableRes val iconRes = genreIconMap[tile.genre] ?: R.drawable.baseline_music_note_24
+            @DrawableRes val iconRes = genreIconMap[tile.genre?.firstOrNull()] ?: R.drawable.baseline_music_note_24
             tileIcon.setImageResource(iconRes)
-            tileIcon.contentDescription = tile.genre ?: tile.title
+            tileIcon.contentDescription = tile.genre?.firstOrNull() ?: tile.title
             tileText.text = tile.title
 
             itemView.setOnClickListener {
-                navController.navigate(
-                    NavigationGraphDirections.toTrackCollection(
-                        songs = tile.title,
-                        genre = tile.genre,
-                        label = tile.label,
-                        festival = tile.festival,
-                        year = tile.year,
-                        length = tile.length,
-                        offset = tile.offset,
-                        size = tile.size,
-                        ratingMin = tile.ratingMin,
-                        ratingMax = tile.ratingMax,
-                        sortMethod = tile.sortMethod
-                    )
-                )
+                navController.navigate(navigateToGenre(tile))
             }
 
             itemView.setOnLongClickListener {

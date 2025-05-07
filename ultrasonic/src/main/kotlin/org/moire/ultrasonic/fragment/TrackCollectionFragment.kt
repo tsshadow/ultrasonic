@@ -25,6 +25,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.gson.Gson
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.Collections
 import kotlinx.coroutines.Dispatchers
@@ -576,73 +577,47 @@ open class TrackCollectionFragment(
                 } else {
                     val title = buildString {
                         when (sortMethod) {
-                            "AddedDesc" -> {
-                                append("Recent ")
-                            }
-
-                            "Random" -> {
-                                append("Random ")
-                            }
-
-                            "LastWrittenDesc" -> {
-                                append("Recent Modified ")
-                            }
+                            "AddedDesc" -> append("Recent ")
+                            "Random" -> append("Random ")
+                            "LastWrittenDesc" -> append("Recent Modified ")
                         }
-//                        if (length == "short") append("Songs:") else append("Livesets:")
                         if (!festival.isNullOrBlank()) append(festival)
                         if (!label.isNullOrBlank()) append(label)
                         if (!genre.isNullOrBlank() && genre != "All") {
                             if (isNotEmpty()) append(" ")
                             append(genre)
                         }
-                        if (year != null) {
+                        if (!year.isNullOrBlank() && year != "All") {
                             append(" ($year)")
                         }
                     }
                     setTitle(title)
                 }
 
-                val filters = Filters()
-                year.ifNotNull {
-                    if (year !== "All" && year !== "") filters.add(
-                        Filter(
-                            "YEAR",
-                            year.toString()
-                        )
-                    )
-                }
-                genre.ifNotNull {
-                    if (genre !== "All" && genre !== "") filters.add(
-                        Filter(
-                            "GENRE",
-                            genre.toString()
-                        )
-                    )
-                }
-                festival.ifNotNull {
-                    if (festival !== "All" && festival !== "") filters.add(
-                        Filter(
-                            "FESTIVAL",
-                            festival.toString()
-                        )
-                    )
-                }
-                label.ifNotNull {
-                    if (label !== "All" && label !== "") filters.add(
-                        Filter(
-                            "PUBLISHER",
-                            label.toString()
-                        )
-                    )
-                }
-                if (length !== null && length.isNotEmpty()) filters.add(
-                    Filter(
-                        "LENGTH",
-                        length.toString()
-                    )
-                )
-                val effectiveSortMethod =
-                    if (sortMethod.isNullOrEmpty()) "AddedDesc" else sortMethod
+                // Gebruik filtersJson als het er is, anders stel Filters handmatig samen
+                val filters: Filters =
+                    arguments?.getString("filters")?.takeIf { it.isNotEmpty() }?.let {
+                        Gson().fromJson(it, Filters::class.java)
+                    } ?: Filters().apply {
+                        year?.takeIf { it != "All" && it.isNotBlank() }?.let {
+                            add(Filter("YEAR", it))
+                        }
+                        genre?.takeIf { it != "All" && it.isNotBlank() }?.let {
+                            add(Filter("GENRE", it))
+                        }
+                        festival?.takeIf { it != "All" && it.isNotBlank() }?.let {
+                            add(Filter("FESTIVAL", it))
+                        }
+                        label?.takeIf { it != "All" && it.isNotBlank() }?.let {
+                            add(Filter("PUBLISHER", it))
+                        }
+                        length?.takeIf { it.isNotEmpty() }?.let {
+                            add(Filter("LENGTH", it))
+                        }
+                    }
+
+                val effectiveSortMethod = sortMethod?.takeIf { it.isNotEmpty() } ?: "AddedDesc"
+                Timber.d(filters.toString())
                 listModel.getSongs(
                     filters,
                     ratingMin,
@@ -652,6 +627,7 @@ open class TrackCollectionFragment(
                     append,
                     effectiveSortMethod
                 )
+
             } else if (id == null || getRandomTracks) {
                 // There seems to be a bug in ViewPager when resuming the Activity that sub-fragments
                 // arguments are empty. If we have no id, just show some random tracks
