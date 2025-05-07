@@ -240,7 +240,7 @@ class MediaLibraryBrowser(
             }
             MEDIA_SONG_RECENT -> {
                 val length = parts.getOrNull(1)
-                if (length != null) getSongs(length = length, sortMethod = "Recent")
+                if (length != null) getSongs(length = length, sortMethod = "AddedDesc")
                 else emptyResult("Missing length in $parentId")
             }
             MEDIA_GET_GENRES -> {
@@ -1046,7 +1046,7 @@ class MediaLibraryBrowser(
             title.contains("Recent", ignoreCase = true) -> "$MEDIA_SONG_RECENT|$length"
             title.contains("Starred", ignoreCase = true) -> "$MEDIA_SONG_STARRED_ID|$length"
             title.contains("Search", ignoreCase = true) -> "$MEDIA_GET_GENRES|$length"
-            else -> "$MEDIA_GET_SONGS_BY_GENRE|$genre|$length" + (if (year != null) "|$year" else "|")
+            else -> "$MEDIA_GET_SONGS_BY_GENRE|$length|$genre|${year ?: ""}|$sortMethod"
         }
 
         val groupName = context.getString(

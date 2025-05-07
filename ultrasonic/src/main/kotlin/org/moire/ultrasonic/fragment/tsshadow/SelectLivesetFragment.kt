@@ -35,31 +35,26 @@ class SelectLivesetFragment : SelectFragment(){
             TileInfo(
                 genre = "Hardstyle",
                 length = defaultLength,
-                sortMethod = "LastWrittenDesc"
             ),
             TileInfo(
                 genre = "Raw Hardstyle",
                 length = defaultLength,
-                sortMethod = "LastWrittenDesc"
             ),
             TileInfo(
+                genre = "Hardcore",
                 length = defaultLength,
-                sortMethod = "LastWrittenDesc"
             ),
             TileInfo(
                 genre = "Mainstream Hardcore",
                 length = defaultLength,
-                sortMethod = "LastWrittenDesc"
             ),
             TileInfo(
                 genre = "Uptempo Hardcore",
                 length = defaultLength,
-                sortMethod = "LastWrittenDesc"
             ),
             TileInfo(
                 genre = "Bouncy Uptempo",
                 length = defaultLength,
-                sortMethod = "LastWrittenDesc"
             )
         )
     }
