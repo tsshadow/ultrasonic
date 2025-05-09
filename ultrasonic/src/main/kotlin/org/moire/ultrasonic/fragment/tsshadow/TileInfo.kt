@@ -90,18 +90,28 @@ class TileInfo(
 fun navigateToGenre(tile: TileInfo): NavDirections {
     val filters = Filters()
 
-    tile.genre?.filter { it.isNotBlank() && it != "All" }?.let {
-        filters.add(if (it.size == 1) Filter("GENRE", it[0]) else Filter("GENRE", it))
-    }
-    tile.year?.filter { it.isNotBlank() && it != "All" }?.let {
-        filters.add(if (it.size == 1) Filter("YEAR", it[0]) else Filter("YEAR", it))
-    }
-    tile.label?.takeIf { it.isNotBlank() && it != "All" }?.let {
-        filters.add(Filter("PUBLISHER", it))
-    }
-    tile.festival?.takeIf { it.isNotBlank() && it != "All" }?.let {
-        filters.add(Filter("FESTIVAL", it))
-    }
+    tile.genre
+        ?.filter { it.isNotBlank() && it != "All" }
+        ?.takeIf { it.isNotEmpty() }
+        ?.let {
+            filters.add(if (it.size == 1) Filter("GENRE", it[0]) else Filter("GENRE", it))
+        }
+
+    tile.year
+        ?.filter { it.isNotBlank() && it != "All" }
+        ?.takeIf { it.isNotEmpty() }
+        ?.let {
+            filters.add(if (it.size == 1) Filter("YEAR", it[0]) else Filter("YEAR", it))
+        }
+
+    tile.label
+        ?.takeIf { it.isNotBlank() && it != "All" }
+        ?.let { filters.add(Filter("PUBLISHER", it)) }
+
+    tile.festival
+        ?.takeIf { it.isNotBlank() && it != "All" }
+        ?.let { filters.add(Filter("FESTIVAL", it)) }
+
     filters.add(Filter("LENGTH", tile.length))
 
     val filtersJson = Gson().toJson(filters)
@@ -117,3 +127,4 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
         sortMethod = tile.sortMethod
     )
 }
+

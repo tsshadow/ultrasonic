@@ -33,14 +33,13 @@ class SelectSongFragment : SelectFragment() {
     }
 
     override fun getAdditionalFilterParams(): FilterParams {
-        val selectedLabels = if (labelSpinner.hasSelection()) {
-            labelSpinner.getSelectedItems().filter { it.isNotBlank() }
-        } else {
-            emptyList()
-        }
+        val selectedLabels = labelSpinner.getSelectedItems().filter { it.isNotBlank() }
 
-        return FilterParams(label = selectedLabels)
+        return FilterParams(
+            label = selectedLabels,
+        )
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun defaultTileSet(): MutableList<TileInfo> {

@@ -109,21 +109,15 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
     protected open fun createFilters(): Filters {
         val filters = Filters()
 
-        if (genreSpinner.hasSelection()) {
-            val selectedGenres = genreSpinner.getSelectedItems()
-                .filter { it.isNotBlank() }
-            if (selectedGenres.isNotEmpty()) {
-                filters.add(Filter("GENRE", selectedGenres))
-            }
-        }
+        genreSpinner.getSelectedItems()
+            .filter { it.isNotBlank() }
+            .takeIf { it.isNotEmpty() }
+            ?.let { filters.add(Filter("GENRE", it)) }
 
-        if (yearSpinner.hasSelection()) {
-            val selectedYears = yearSpinner.getSelectedItems()
-                .filter { it.isNotBlank() }
-            if (selectedYears.isNotEmpty()) {
-                filters.add(Filter("YEAR", selectedYears))
-            }
-        }
+        yearSpinner.getSelectedItems()
+            .filter { it.isNotBlank() }
+            .takeIf { it.isNotEmpty() }
+            ?.let { filters.add(Filter("YEAR", it)) }
 
         val extras = getAdditionalFilterParams()
 
@@ -133,11 +127,11 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
         extras.festival.takeIf { it.isNotEmpty() }
             ?.let { filters.add(Filter("FESTIVAL", it)) }
 
-
         filters.add(Filter("LENGTH", defaultLength))
 
         return filters
     }
+
 
 
     protected open fun setupSearchButton() {
@@ -274,6 +268,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
     private fun setupFilterToggle(root: View) {
         toggleFiltersButton.setOnClickListener {
             showFilters(root)
+            showCreateMode()
         }
 
         closeButton.setOnClickListener {

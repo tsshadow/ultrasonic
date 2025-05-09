@@ -81,8 +81,4 @@ class MultiSpinnerView @JvmOverloads constructor(
     fun getSelectedItems(): List<String> {
         return selectedItems.map { items[it] }
     }
-
-    fun hasSelection(): Boolean {
-        return selectedItems.isNotEmpty()
-    }
 }
