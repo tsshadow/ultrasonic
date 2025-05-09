@@ -30,7 +30,6 @@ import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.toastingExceptionHandler
 import org.moire.ultrasonic.view.MultiSpinnerView
-import org.moire.ultrasonic.view.StarRatingRangeView
 import timber.log.Timber
 
 abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCallback {
