@@ -33,8 +33,13 @@ class SelectSongFragment : SelectFragment() {
     }
 
     override fun getAdditionalFilterParams(): FilterParams {
-        val selectedLabel = labelSpinner.getSelectedItems().firstOrNull()
-        return FilterParams(label = selectedLabel)
+        val selectedLabels = if (labelSpinner.hasSelection()) {
+            labelSpinner.getSelectedItems().filter { it.isNotBlank() }
+        } else {
+            emptyList()
+        }
+
+        return FilterParams(label = selectedLabels)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

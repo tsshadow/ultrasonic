@@ -31,17 +31,14 @@ class MultiSpinnerView @JvmOverloads constructor(
         updateLabel()
     }
 
-    fun getSelectedItems(): List<String> {
-        return selectedItems.map { items[it] }
-    }
-
     private fun showSelectionDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.tsshadow_multispinner, null)
         val listView = dialogView.findViewById<ListView>(R.id.multi_select_list)
         val okButton = dialogView.findViewById<Button>(R.id.btn_ok)
 
         val checked = BooleanArray(items.size) { selectedItems.contains(it) }
-        val adapter = ArrayAdapter(context, android.R.layout.simple_list_item_multiple_choice, items)
+        val adapter =
+            ArrayAdapter(context, android.R.layout.simple_list_item_multiple_choice, items)
         listView.adapter = adapter
         listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
         for (i in items.indices) listView.setItemChecked(i, checked[i])
@@ -68,5 +65,24 @@ class MultiSpinnerView @JvmOverloads constructor(
         } else {
             selectedItems.joinToString(", ") { items[it] }
         }
+    }
+
+    fun setSelectedItems(selected: List<String>) {
+        selectedItems.clear()
+        selected.forEach { label ->
+            val index = items.indexOf(label)
+            if (index != -1) {
+                selectedItems.add(index)
+            }
+        }
+        updateLabel()
+    }
+
+    fun getSelectedItems(): List<String> {
+        return selectedItems.map { items[it] }
+    }
+
+    fun hasSelection(): Boolean {
+        return selectedItems.isNotEmpty()
     }
 }

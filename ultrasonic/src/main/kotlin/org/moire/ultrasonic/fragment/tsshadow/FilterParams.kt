@@ -8,8 +8,8 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
 class FilterParams(
-    val label: String? = null,
-    val festival: String? = null,
+    val label: List<String> = emptyList(),
+    val festival: List<String> = emptyList(),
     val bpmMin: Int? = null,
     val mood: String? = null,
 )

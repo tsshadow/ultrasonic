@@ -216,8 +216,10 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="16dp"
-            android:gravity="center">
+            android:gravity="center"
+            android:weightSum="2">
 
+            <!-- Save (default) -->
             <Button
                 android:id="@+id/save"
                 android:layout_width="0dp"
@@ -227,10 +229,21 @@
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/save_preset" />
 
+            <Button
+                android:id="@+id/update"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="@color/design_default_color_primary_dark"
+                android:text="@string/update" />
+
             <View
                 android:layout_width="12dp"
                 android:layout_height="match_parent" />
 
+            <!-- Search (default) -->
             <Button
                 android:id="@+id/search"
                 android:layout_width="0dp"
@@ -239,6 +252,17 @@
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/search_button" />
+
+            <Button
+                android:id="@+id/delete"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="@color/design_default_color_primary_dark"
+                android:text="@string/delete" />
         </LinearLayout>
+
     </LinearLayout>
 </FrameLayout>

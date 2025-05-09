@@ -49,10 +49,14 @@ class SelectLivesetFragment : SelectFragment() {
     }
 
     override fun getAdditionalFilterParams(): FilterParams {
-        val selectedFestival = festivalSpinner.getSelectedItems().firstOrNull()
-        return FilterParams(festival = selectedFestival)
-    }
+        val selectedLabels = if (festivalSpinner.hasSelection()) {
+            festivalSpinner.getSelectedItems().filter { it.isNotBlank() }
+        } else {
+            emptyList()
+        }
 
+        return FilterParams(label = selectedLabels)
+    }
     override fun load(refresh: Boolean) {
         super.load(refresh)
 

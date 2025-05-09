@@ -452,5 +452,7 @@
     <string name="sort_random">Willekeurig</string>
     <string name="sort_added_desc">Laatst toegevoegd</string>
     <string name="sort_written_desc">Laatst bijgewerkt</string>
+    <string name="update">Werk bij</string>
+    <string name="delete">Verwijder</string>
 
 </resources>
