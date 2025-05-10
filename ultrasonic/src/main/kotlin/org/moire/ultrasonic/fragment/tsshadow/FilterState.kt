@@ -6,6 +6,7 @@ data class FilterState(
     val title: String = "",
     val genres: List<String> = emptyList(),
     val years: List<String> = emptyList(),
+    val count: Int = 25,
     val ratingMin: Int = 0,
     val ratingMax: Int = 5,
     val sortMethod: String = "None",

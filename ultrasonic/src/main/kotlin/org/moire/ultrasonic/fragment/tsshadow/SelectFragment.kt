@@ -1,5 +1,6 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
+import FilterOptionsViewModel
 import FilterState
 import TileInfo
 import android.content.res.Configuration
@@ -9,6 +10,7 @@ import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,13 +26,13 @@ import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.api.subsonic.models.Filter
 import org.moire.ultrasonic.api.subsonic.models.Filters
+import org.moire.ultrasonic.api.subsonic.models.Genre
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.toastingExceptionHandler
 import timber.log.Timber
 
 abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCallback {
-
+    private val filterOptionsViewModel: FilterOptionsViewModel by activityViewModels()
     private lateinit var recyclerView: RecyclerView
     private lateinit var tileAdapter: TileAdapter
 
@@ -56,6 +58,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             getString(R.string.sort_written_desc) to "LastWrittenDesc"
         )
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,7 +120,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
                     val navAction = NavigationGraphDirections.toTrackCollection(
                         songs = "?",
                         filters = Gson().toJson(filters),
-                        size = maxSongs,
+                        size = filterState.count,
                         offset = 0,
                         length = defaultLength,
                         ratingMin = filterState.ratingMin,
@@ -165,7 +168,8 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             sortMethod = state.sortMethod,
             length = defaultLength,
             ratingMin = state.ratingMin,
-            ratingMax = state.ratingMax
+            ratingMax = state.ratingMax,
+            size = state.count
         )
     }
 
@@ -180,7 +184,8 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             festival = tile.festival ?: emptyList(),
             sortMethod = tile.sortMethod ?: "None",
             ratingMin = tile.ratingMin,
-            ratingMax = tile.ratingMax
+            ratingMax = tile.ratingMax,
+            count = tile.size
         )
         val modal = FilterModalFragment.newInstance(filterState, true, filterModalType)
         modal.show(childFragmentManager, "FilterModal")
@@ -230,13 +235,25 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
 
             val genres = withContext(Dispatchers.IO) {
                 musicService.getGenres(refresh, null, null)
-            }
-            // De modal haalt deze nu uit shared ViewModel of vooraf geladen waardes.
+            }.filter { it.songCount > 10 }.map { it.name }
 
             val years = withContext(Dispatchers.IO) {
                 musicService.getTags(refresh, "YEAR", null, null)
-            }.sortedByDescending { it.name }
-            // Idem
+            }.map { it.name }.sortedDescending()
+
+            val labels = withContext(Dispatchers.IO) {
+                musicService.getTags(refresh, "PUBLISHER", null, null)
+            }.map { it.name }.sorted()
+
+            val festivals = withContext(Dispatchers.IO) {
+                musicService.getTags(refresh, "FESTIVAL", null, null)
+            }.map { it.name }.sorted()
+
+            filterOptionsViewModel.genres.postValue(genres)
+            filterOptionsViewModel.years.postValue(years)
+            filterOptionsViewModel.labels.postValue(labels)
+            filterOptionsViewModel.festivals.postValue(festivals)
+            Timber.d("Filter data loaded: genres=${genres.size}, years=${years.size}, labels=${labels.size}, festivals=${festivals.size}")
         }
     }
 

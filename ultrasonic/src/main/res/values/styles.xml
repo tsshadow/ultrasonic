@@ -67,5 +67,13 @@
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
         <item name="android:padding">16dp</item>
     </style>
+
+    <style name="UltrasonicFilterDialogTheme" parent="Theme.MaterialComponents.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowElevation">0dp</item>
+    </style>
 </resources>
 

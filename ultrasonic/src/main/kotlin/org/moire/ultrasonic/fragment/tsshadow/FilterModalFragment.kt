@@ -1,5 +1,6 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
+import FilterOptionsViewModel
 import FilterState
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,14 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import androidx.lifecycle.Observer
+import com.google.android.material.slider.Slider
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.util.toastingExceptionHandler
 import org.moire.ultrasonic.view.MultiSpinnerView
 
 enum class FilterModalType {
@@ -22,6 +20,8 @@ enum class FilterModalType {
 }
 
 class FilterModalFragment : DialogFragment() {
+
+    private val filterOptionsViewModel: FilterOptionsViewModel by activityViewModels()
 
     private lateinit var genreSpinner: MultiSpinnerView
     private lateinit var yearSpinner: MultiSpinnerView
@@ -33,6 +33,10 @@ class FilterModalFragment : DialogFragment() {
     private lateinit var saveButton: Button
     private lateinit var updateButton: Button
     private lateinit var deleteButton: Button
+    private lateinit var resultCountSlider: Slider
+    private lateinit var resultCountLabel: TextView
+    private val resultCountSteps = listOf(10, 25, 50, 100, 500, 2500)
+    private var selectedResultCount = 25
 
     private lateinit var labelContainer: View
     private lateinit var labelSpinner: MultiSpinnerView
@@ -67,6 +71,11 @@ class FilterModalFragment : DialogFragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NO_FRAME, R.style.UltrasonicFilterDialogTheme)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -87,6 +96,8 @@ class FilterModalFragment : DialogFragment() {
         labelSpinner = view.findViewById(R.id.select_label)
         festivalContainer = view.findViewById(R.id.select_festival_container)
         festivalSpinner = view.findViewById(R.id.select_festival)
+        resultCountSlider = view.findViewById(R.id.select_result_count_slider)
+        resultCountLabel = view.findViewById(R.id.select_result_count_label)
 
         searchButton = view.findViewById(R.id.search)
         saveButton = view.findViewById(R.id.save)
@@ -99,26 +110,25 @@ class FilterModalFragment : DialogFragment() {
         val editMode = arguments?.getBoolean("editMode") ?: false
         modalType = arguments?.getSerializable("type") as? FilterModalType ?: FilterModalType.SONG
 
+        val modalTitle = if (editMode) getString(R.string.edit_filter_title) else getString(R.string.new_filter_title)
+        view.findViewById<TextView>(R.id.filter_title).text = modalTitle
+
         labelContainer.visibility = if (modalType == FilterModalType.SONG) View.VISIBLE else View.GONE
         festivalContainer.visibility = if (modalType == FilterModalType.LIVESET) View.VISIBLE else View.GONE
 
-        initialFilters?.let { applyFilterState(it) }
-
         showCorrectButtons(editMode)
         setupListeners()
-        loadFilterOptions()
+        observeFilterOptions(initialFilters)
+        initialFilters?.let { applyFilterState(it) }
 
-        // sluitknop (kruisje)
         view.findViewById<ImageButton>(R.id.close_button).setOnClickListener {
             dismiss()
         }
     }
 
     private fun setupAdapters() {
-        ratingMinSpinner.adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, (0..5).toList())
-        ratingMaxSpinner.adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, (0..5).toList())
+        ratingMinSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, (0..5).toList())
+        ratingMaxSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, (0..5).toList())
         ratingMaxSpinner.setSelection(5)
 
         val translatedSortMethods = sortMethodMap.keys.toList()
@@ -165,6 +175,7 @@ class FilterModalFragment : DialogFragment() {
             title = titleInput.text.toString(),
             genres = genreSpinner.getSelectedItems(),
             years = yearSpinner.getSelectedItems(),
+            count = selectedResultCount,
             ratingMin = ratingMinSpinner.selectedItem as Int,
             ratingMax = ratingMaxSpinner.selectedItem as Int,
             sortMethod = sortMethodMap[sortMethodSpinner.selectedItem as? String ?: ""] ?: "None",
@@ -175,47 +186,41 @@ class FilterModalFragment : DialogFragment() {
 
     private fun applyFilterState(state: FilterState) {
         titleInput.setText(state.title)
-        genreSpinner.setSelectedItems(state.genres)
-        yearSpinner.setSelectedItems(state.years)
         ratingMinSpinner.setSelection(state.ratingMin)
         ratingMaxSpinner.setSelection(state.ratingMax)
+
+        val resultIndex = resultCountSteps.indexOf(state.count).takeIf { it >= 0 } ?: 1
+        resultCountSlider.value = resultIndex.toFloat()
+        selectedResultCount = resultCountSteps[resultIndex]
+        resultCountLabel.text = getString(R.string.result_count_format, selectedResultCount)
 
         val index = sortMethodMap.values.indexOf(state.sortMethod)
         if (index >= 0) {
             sortMethodSpinner.setSelection(index)
         }
-
-        labelSpinner.setSelectedItems(state.label)
-        festivalSpinner.setSelectedItems(state.festival)
     }
 
-    private fun loadFilterOptions() {
-        viewLifecycleOwner.lifecycleScope.launch(toastingExceptionHandler()) {
-            val musicService = getMusicService()
+    private fun observeFilterOptions(initialFilters: FilterState?) {
+        filterOptionsViewModel.genres.observe(viewLifecycleOwner, Observer { genres ->
+            genreSpinner.setItems(genres)
+            initialFilters?.let { genreSpinner.setSelectedItems(it.genres) }
+        })
+        filterOptionsViewModel.years.observe(viewLifecycleOwner, Observer { years ->
+            yearSpinner.setItems(years)
+            initialFilters?.let { yearSpinner.setSelectedItems(it.years) }
+        })
+        filterOptionsViewModel.labels.observe(viewLifecycleOwner, Observer { labels ->
+            labelSpinner.setItems(labels)
+            initialFilters?.let { labelSpinner.setSelectedItems(it.label) }
+        })
+        filterOptionsViewModel.festivals.observe(viewLifecycleOwner, Observer { festivals ->
+            festivalSpinner.setItems(festivals)
+            initialFilters?.let { festivalSpinner.setSelectedItems(it.festival) }
+        })
 
-            val genres = withContext(Dispatchers.IO) {
-                musicService.getGenres(false, null, null)
-            }
-            genreSpinner.setItems(genres.map { it.name })
-
-            val years = withContext(Dispatchers.IO) {
-                musicService.getTags(false, "YEAR", null, null)
-            }.sortedByDescending { it.name }
-            yearSpinner.setItems(years.map { it.name })
-
-            if (modalType == FilterModalType.SONG) {
-                val labels = withContext(Dispatchers.IO) {
-                    musicService.getTags(false, "PUBLISHER", null, null)
-                }
-                labelSpinner.setItems(labels.map { it.name })
-            }
-
-            if (modalType == FilterModalType.LIVESET) {
-                val festivals = withContext(Dispatchers.IO) {
-                    musicService.getTags(false, "FESTIVAL", null, null)
-                }
-                festivalSpinner.setItems(festivals.map { it.name })
-            }
+        resultCountSlider.addOnChangeListener { _, value, _ ->
+            selectedResultCount = resultCountSteps[value.toInt()]
+            resultCountLabel.text = getString(R.string.result_count_format, selectedResultCount)
         }
     }
 }

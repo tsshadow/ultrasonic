@@ -434,25 +434,36 @@
     <string name="grid_view">Hoes</string>
 
     <!-- TSShadow -->
-    <string name="tile_icon_description">Tegel icoon</string>
-    <string name="genre_name">Genre Name</string>
-    <string name="show_filters">Show Filters ▼</string>
-    <string name="hide_filters">Hide Filters ▲</string>
+    <string name="tile_icon_description">Tegelicoon</string>
+    <string name="genre_name">Genrenaam</string>
+    <string name="show_filters">Filters tonen ▼</string>
+    <string name="hide_filters">Filters verbergen ▲</string>
     <string name="year">Jaar</string>
-    <string name="rating">Rating</string>
+    <string name="rating">Beoordeling</string>
     <string name="from">Van</string>
     <string name="to">Tot</string>
     <string name="genre">Genre</string>
     <string name="festival">Festival</string>
     <string name="label">Label</string>
-    <string name="save_preset">Sla op</string>
-    <string name="search_button">Zoek</string>
-    <string name="sort_method">Sortering</string>
+    <string name="sort_method">Sorteermethode</string>
+    <string name="search_livesets">Livesets zoeken</string>
+    <string name="save_preset">Opslaan</string>
+    <string name="search_button">Zoeken</string>
+
     <string name="sort_none">Geen</string>
     <string name="sort_random">Willekeurig</string>
     <string name="sort_added_desc">Laatst toegevoegd</string>
-    <string name="sort_written_desc">Laatst bijgewerkt</string>
-    <string name="update">Werk bij</string>
-    <string name="delete">Verwijder</string>
+    <string name="sort_written_desc">Laatst bewerkt</string>
+    <string name="close">sluiten</string>
+    <string name="select_items_placeholder">Alles</string>
+    <string name="tile_title">Titel</string>
+    <string name="tile_title_hint">Hardstyle by Teun</string>
+    <string name="delete">Verwijderen</string>
+    <string name="update">Bijwerken</string>
+    <string name="edit_filter_title">Filter bewerken</string>
+    <string name="new_filter_title">Nieuwe filter</string>
+    <string name="result_count_format">Aantal nummers: %1$d</string>
+    <string name="filters_title">Filters</string>
+    <string name="result_count">Aantal resultaten</string>
 
 </resources>

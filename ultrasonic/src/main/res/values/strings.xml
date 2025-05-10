@@ -503,12 +503,15 @@
     <string name="sort_random">Random</string>
     <string name="sort_added_desc">Last Added</string>
     <string name="sort_written_desc">Last Edited</string>
-    <string name="filters_title">Filters</string>
     <string name="close">close</string>
-    <string name="custom_ok">OK</string>
     <string name="select_items_placeholder">All</string>
     <string name="tile_title">title</string>
-    <string name="tile_title_hint">Hardstyle by Teun-Dance</string>
+    <string name="tile_title_hint">Hardstyle by Teun</string>
     <string name="delete">Delete</string>
     <string name="update">Update</string>
+    <string name="edit_filter_title">Edit filter</string>
+    <string name="new_filter_title">New filter</string>
+    <string name="result_count_format">Number of tracks: %1$d</string>
+    <string name="filters_title">Filters</string>
+    <string name="result_count">Result count</string>
 </resources>
