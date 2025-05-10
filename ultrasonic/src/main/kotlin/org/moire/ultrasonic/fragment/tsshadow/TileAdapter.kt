@@ -22,7 +22,7 @@ interface TileAdapterCallback {
 }
 
 class TileAdapter(
-    private val tiles: MutableList<TileInfo>,
+    val tiles: MutableList<TileInfo>,
     private val context: Context,
     private val navController: NavController,
     private val pageKey: String,

@@ -11,7 +11,7 @@ import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.util.Settings.maxSongs
 
 object TileStorage {
-    private val KEY = "user_tiles"
+    private const val KEY = "user_tiles"
 
     fun saveTiles(context: Context, tiles: MutableList<TileInfo>, page: String) {
         val prefs = context.getSharedPreferences("${page}_tiles", Context.MODE_PRIVATE)
@@ -57,8 +57,8 @@ class TileInfo(
     val genre: List<String>? = null,
     val year: List<String>? = null,
     val size: Int = maxSongs,
-    val festival: String? = null,
-    val label: String? = null,
+    val festival: List<String>? = null,
+    val label: List<String>? = null,
     val offset: Int = 0,
     val length: String = "short",
     val ratingMin: Int = 0,
@@ -76,13 +76,17 @@ class TileInfo(
                 "Random" -> append("Random ")
                 "LastWrittenDesc" -> append("Recent Modified ")
             }
-            listOfNotNull(festival, label, genre?.firstOrNull())
-                .filter { it.isNotBlank() && it != "All" }
+
+            fun pick(value: List<String>?): String? =
+                value?.filter { it.isNotBlank() && it != "All" }
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { if (it.size == 1) it.first() else "Multiple" }
+
+            listOfNotNull(pick(festival), pick(label), pick(genre))
                 .joinToString(" ")
                 .let { if (it.isNotBlank()) append(it) }
-            if (!year.isNullOrEmpty() && year.firstOrNull()?.isNotBlank() == true && year.first() != "All") {
-                append(" (${year.first()})")
-            }
+
+            pick(year)?.let { append(" ($it)") }
         }
     }
 }
@@ -105,12 +109,18 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
         }
 
     tile.label
-        ?.takeIf { it.isNotBlank() && it != "All" }
-        ?.let { filters.add(Filter("PUBLISHER", it)) }
+        ?.filter { it.isNotBlank() && it != "All" }
+        ?.takeIf { it.isNotEmpty() }
+        ?.let {
+            filters.add(if (it.size == 1) Filter("PUBLISHER", it[0]) else Filter("PUBLISHER", it))
+        }
 
     tile.festival
-        ?.takeIf { it.isNotBlank() && it != "All" }
-        ?.let { filters.add(Filter("FESTIVAL", it)) }
+        ?.filter { it.isNotBlank() && it != "All" }
+        ?.takeIf { it.isNotEmpty() }
+        ?.let {
+            filters.add(if (it.size == 1) Filter("FESTIVAL", it[0]) else Filter("FESTIVAL", it))
+        }
 
     filters.add(Filter("LENGTH", tile.length))
 
@@ -127,4 +137,3 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
         sortMethod = tile.sortMethod
     )
 }
-

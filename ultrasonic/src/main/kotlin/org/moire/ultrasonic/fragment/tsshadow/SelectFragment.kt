@@ -1,5 +1,6 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
+import FilterState
 import TileInfo
 import android.content.res.Configuration
 import android.os.Build
@@ -7,7 +8,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -17,8 +17,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Util.applyTheme
-import androidx.transition.AutoTransition
-import androidx.transition.TransitionManager
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,37 +27,26 @@ import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.toastingExceptionHandler
-import org.moire.ultrasonic.view.MultiSpinnerView
 import timber.log.Timber
 
 abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCallback {
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var tileAdapter: TileAdapter
+
     protected abstract val pageKey: String
     protected abstract val defaultLength: String
+    protected abstract val filterModalType: FilterModalType
 
     override var swipeRefresh: SwipeRefreshLayout? = null
 
-    private lateinit var titleInput: EditText
-    private lateinit var yearSpinner: MultiSpinnerView
-    private lateinit var ratingMinSpinner: Spinner
-    private lateinit var ratingMaxSpinner: Spinner
-    private lateinit var genreSpinner: MultiSpinnerView
-    private lateinit var sortMethodSpinner: Spinner
-    private lateinit var searchButton: Button
-    private lateinit var saveButton: Button
-    private lateinit var updateButton: Button
-    private lateinit var deleteButton: Button
-    private lateinit var toggleFiltersButton: AppCompatImageButton
-    private lateinit var filterContainer: View
-    private lateinit var closeButton: View
+    private lateinit var toggleFiltersButton: ImageButton
 
     private var tiles = mutableListOf<TileInfo>()
+    private var lastEditedTilePosition: Int? = null
 
     protected open val additionalSpinnerIds: List<Int> = emptyList()
     protected open val additionalFilterLists: MutableList<MutableList<String>> = mutableListOf()
-
-    private var filtersVisible = false
 
     private val sortMethodMap by lazy {
         mapOf(
@@ -87,211 +74,121 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initializeViews(view)
-        initializeFilters()
-        setupFilterToggle(view)
+        setupFilterModalListener()
+
+        toggleFiltersButton.setOnClickListener {
+            val modal = FilterModalFragment.newInstance(null, false, filterModalType)
+            modal.show(childFragmentManager, "FilterModal")
+        }
+
         swipeRefresh?.setOnRefreshListener { load(true) }
 
         loadTilesOrDefaults()
         populateTiles()
         setTitle()
-        setupSearchButton()
-        setupSaveButton()
-
         load(false)
     }
 
     protected abstract fun setTitle()
 
-    protected open fun getAdditionalFilterParams(): FilterParams {
-        return FilterParams()
-    }
+    private fun setupFilterModalListener() {
+        childFragmentManager.setFragmentResultListener(
+            "filters_result",
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val filterState =
+                bundle.getParcelable<FilterState>("filters") ?: return@setFragmentResultListener
+            val action = bundle.getString("action") ?: return@setFragmentResultListener
 
-    protected open fun createFilters(): Filters {
-        val filters = Filters()
+            when (action) {
+                "search" -> {
+                    val filters = Filters().apply {
+                        if (filterState.genres.isNotEmpty())
+                            add(Filter("GENRE", filterState.genres))
+                        if (filterState.years.isNotEmpty())
+                            add(Filter("YEAR", filterState.years))
+                        if (filterState.label.isNotEmpty())
+                            add(Filter("PUBLISHER", filterState.label))
+                        if (filterState.festival.isNotEmpty())
+                            add(Filter("FESTIVAL", filterState.festival))
+                        add(Filter("LENGTH", defaultLength))
+                    }
 
-        genreSpinner.getSelectedItems()
-            .filter { it.isNotBlank() }
-            .takeIf { it.isNotEmpty() }
-            ?.let { filters.add(Filter("GENRE", it)) }
+                    val navAction = NavigationGraphDirections.toTrackCollection(
+                        songs = "?",
+                        filters = Gson().toJson(filters),
+                        size = maxSongs,
+                        offset = 0,
+                        length = defaultLength,
+                        ratingMin = filterState.ratingMin,
+                        ratingMax = filterState.ratingMax,
+                        sortMethod = filterState.sortMethod
+                    )
 
-        yearSpinner.getSelectedItems()
-            .filter { it.isNotBlank() }
-            .takeIf { it.isNotEmpty() }
-            ?.let { filters.add(Filter("YEAR", it)) }
+                    findNavController().navigate(navAction)
+                }
 
-        val extras = getAdditionalFilterParams()
+                "save" -> {
+                    val tile = tileInfoFromFilterState(filterState)
+                    tileAdapter.addTile(tile)
+                    TileStorage.saveTiles(requireContext(), tileAdapter.tiles, pageKey)
+                }
 
-        extras.label.takeIf { it.isNotEmpty() }
-            ?.let { filters.add(Filter("PUBLISHER", it)) }
+                "update" -> {
+                    lastEditedTilePosition?.let {
+                        tiles[it] = tileInfoFromFilterState(filterState)
+                        tileAdapter.notifyItemChanged(it)
+                        TileStorage.saveTiles(requireContext(), tiles, pageKey)
+                        lastEditedTilePosition = null
+                    }
+                }
 
-        extras.festival.takeIf { it.isNotEmpty() }
-            ?.let { filters.add(Filter("FESTIVAL", it)) }
-
-        filters.add(Filter("LENGTH", defaultLength))
-
-        return filters
-    }
-
-
-
-    protected open fun setupSearchButton() {
-        searchButton.setOnClickListener {
-            val filters = createFilters()
-            val action = NavigationGraphDirections.toTrackCollection(
-                songs = "?",
-                filters = Gson().toJson(filters),
-                size = maxSongs,
-                offset = 0,
-                length = defaultLength,
-                ratingMin = ratingMinSpinner.selectedItem as Int,
-                ratingMax = ratingMaxSpinner.selectedItem as Int,
-                sortMethod = sortMethodMap[sortMethodSpinner.selectedItem as? String ?: ""] ?: "None"
-            )
-
-            findNavController().navigate(action)
-        }
-    }
-
-    protected open fun createTileInfoFromFilters(): TileInfo {
-        var label: String? = null
-        var festival: String? = null
-
-        additionalSpinnerIds.forEach { id ->
-            val value = requireView().findViewById<Spinner>(id).selectedItem as? String
-            when (id) {
-                R.id.select_label -> label = value
-                R.id.select_festival -> festival = value
+                "delete" -> {
+                    lastEditedTilePosition?.let {
+                        tiles.removeAt(it)
+                        tileAdapter.notifyItemRemoved(it)
+                        TileStorage.saveTiles(requireContext(), tiles, pageKey)
+                        lastEditedTilePosition = null
+                    }
+                }
             }
         }
-        var customTitle = titleInput.text.toString().takeIf { it.isNotBlank() }
-        if (customTitle == null)
-            customTitle =""
+    }
 
+    private fun tileInfoFromFilterState(state: FilterState): TileInfo {
         return TileInfo(
-            title = customTitle,
-            genre = genreSpinner.getSelectedItems(),
-            year = yearSpinner.getSelectedItems(),
-            label = label,
-            festival = festival,
-            sortMethod = sortMethodMap[sortMethodSpinner.selectedItem as? String ?: ""] ?: "None",
+            title = state.title,
+            genre = state.genres,
+            year = state.years,
+            label = state.label,
+            festival = state.festival,
+            sortMethod = state.sortMethod,
             length = defaultLength,
-            ratingMin = ratingMinSpinner.selectedItem as Int,
-            ratingMax = ratingMaxSpinner.selectedItem as Int
+            ratingMin = state.ratingMin,
+            ratingMax = state.ratingMax
         )
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun setupSaveButton() {
-        saveButton.setOnClickListener {
-            val newTile = createTileInfoFromFilters()
-            tileAdapter.addTile(newTile)
-            hideFilters(requireView())
-            showCreateMode()
-        }
+    override fun onEditTile(tile: TileInfo, position: Int) {
+        lastEditedTilePosition = position
+        val filterState = FilterState(
+            title = tile.title ?: "",
+            genres = tile.genre ?: emptyList(),
+            years = tile.year ?: emptyList(),
+            label = tile.label ?: emptyList(),
+            festival = tile.festival ?: emptyList(),
+            sortMethod = tile.sortMethod ?: "None",
+            ratingMin = tile.ratingMin,
+            ratingMax = tile.ratingMax
+        )
+        val modal = FilterModalFragment.newInstance(filterState, true, filterModalType)
+        modal.show(childFragmentManager, "FilterModal")
     }
 
-    private fun showCreateMode() {
-        saveButton.visibility = View.VISIBLE
-        searchButton.visibility = View.VISIBLE
-        updateButton.visibility = View.GONE
-        deleteButton.visibility = View.GONE
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun showEditMode(position: Int) {
-        saveButton.visibility = View.GONE
-        searchButton.visibility = View.GONE
-        updateButton.visibility = View.VISIBLE
-        deleteButton.visibility = View.VISIBLE
-
-        updateButton.setOnClickListener {
-            val updatedTile = createTileInfoFromFilters()
-            updateTile(updatedTile, position)
-            hideFilters(requireView())
-            showCreateMode()
-            setupSaveButton()
-        }
-
-        deleteButton.setOnClickListener {
-            tiles.removeAt(position)
-            tileAdapter.notifyItemRemoved(position)
-            TileStorage.saveTiles(requireContext(), tiles, pageKey)
-            hideFilters(requireView())
-            showCreateMode()
-            setupSaveButton()
-        }
-    }
-
-    protected open fun initializeViews(view: View) {
+    open fun initializeViews(view: View) {
         recyclerView = view.findViewById(R.id.tileRecyclerView)
-        titleInput = view.findViewById(R.id.select_title)
-        yearSpinner = view.findViewById(R.id.select_year)
-        ratingMinSpinner = view.findViewById(R.id.select_rating_min)
-        ratingMaxSpinner = view.findViewById(R.id.select_rating_max)
-        genreSpinner = view.findViewById(R.id.select_genre)
-        sortMethodSpinner = view.findViewById(R.id.select_sort_method)
-        searchButton = view.findViewById(R.id.search)
-        saveButton = view.findViewById(R.id.save)
-        updateButton = view.findViewById(R.id.update)
-        deleteButton = view.findViewById(R.id.delete)
         toggleFiltersButton = view.findViewById(R.id.show_filters)
-        filterContainer = view.findViewById(R.id.filter_container)
-        closeButton = view.findViewById(R.id.close_button)
-    }
-
-    protected fun initializeFilters() {
-        fun <T> createAdapter(items: List<T>): ArrayAdapter<T> {
-            return ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_item,
-                items
-            ).apply {
-                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            }
-        }
-
-        ratingMinSpinner.adapter = createAdapter((0..5).toList())
-        ratingMaxSpinner.adapter = createAdapter((0..5).toList())
-        ratingMaxSpinner.setSelection(5)
-
-        additionalSpinnerIds.forEachIndexed { index, id ->
-            val spinner = requireView().findViewById<Spinner>(id)
-            val values = additionalFilterLists.getOrNull(index) ?: mutableListOf()
-            spinner.adapter = createAdapter(values)
-        }
-
-        val translatedList = sortMethodMap.keys.toList()
-        sortMethodSpinner.adapter = createAdapter(translatedList)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun setupFilterToggle(root: View) {
-        toggleFiltersButton.setOnClickListener {
-            showFilters(root)
-            showCreateMode()
-        }
-
-        closeButton.setOnClickListener {
-            hideFilters(root)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun showFilters(root: View) {
-        filtersVisible = true
-        TransitionManager.beginDelayedTransition(root as ViewGroup, AutoTransition())
-        filterContainer.visibility = View.VISIBLE
-        toggleFiltersButton.tooltipText = getString(R.string.hide_filters)
-        toggleFiltersButton.visibility = View.GONE
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun hideFilters(root: View) {
-        filtersVisible = false
-        TransitionManager.beginDelayedTransition(root as ViewGroup, AutoTransition())
-        filterContainer.visibility = View.GONE
-        toggleFiltersButton.tooltipText = getString(R.string.show_filters)
-        toggleFiltersButton.visibility = View.VISIBLE
     }
 
     private fun populateTiles() {
@@ -307,47 +204,6 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
         )
         recyclerView.adapter = tileAdapter
     }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun onEditTile(tile: TileInfo, position: Int) {
-        populateFiltersWithTile(tile)
-        showFilters(requireView())
-        showEditMode(position)
-    }
-
-    private fun updateTile(updatedTile: TileInfo, position: Int) {
-        tiles[position] = updatedTile
-        TileStorage.saveTiles(requireContext(), tiles, pageKey)
-        tileAdapter.notifyItemChanged(position)
-    }
-
-    private fun populateFiltersWithTile(tile: TileInfo) {
-        titleInput.setText(tile.title)
-
-        genreSpinner.setSelectedItems(tile.genre ?: emptyList())
-        yearSpinner.setSelectedItems(tile.year ?: emptyList())
-
-        ratingMaxSpinner.setSelection(tile.ratingMax)
-        ratingMinSpinner.setSelection(tile.ratingMin)
-
-        sortMethodSpinner.setSelection(
-            sortMethodMap.values.indexOf(tile.sortMethod).coerceAtLeast(0)
-        )
-
-        additionalSpinnerIds.forEach { id ->
-            val spinner = requireView().findViewById<Spinner>(id)
-            when (id) {
-                R.id.select_label -> spinner.setSelection(getSpinnerIndex(spinner, tile.label))
-                R.id.select_festival -> spinner.setSelection(getSpinnerIndex(spinner, tile.festival))
-            }
-        }
-    }
-
-    private fun getSpinnerIndex(spinner: Spinner, value: String?): Int {
-        val adapter = spinner.adapter as ArrayAdapter<String>
-        return adapter.getPosition(value ?: "All").coerceAtLeast(0)
-    }
-
 
     protected open fun loadTilesOrDefaults() {
         try {
@@ -375,19 +231,19 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             val genres = withContext(Dispatchers.IO) {
                 musicService.getGenres(refresh, null, null)
             }
-            genreSpinner.setItems(genres.map { it.name })
+            // De modal haalt deze nu uit shared ViewModel of vooraf geladen waardes.
 
             val years = withContext(Dispatchers.IO) {
                 musicService.getTags(refresh, "YEAR", null, null)
             }.sortedByDescending { it.name }
-            yearSpinner.setItems(years.map { it.name })
+            // Idem
         }
     }
 
     private fun calculateSpanCount(): Int {
         val displayMetrics = resources.displayMetrics
         val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
-        val desiredTileWidthDp = 120 + 12  // tile width + margin
+        val desiredTileWidthDp = 120 + 12
         return (screenWidthDp / desiredTileWidthDp).toInt().coerceAtLeast(2)
     }
 

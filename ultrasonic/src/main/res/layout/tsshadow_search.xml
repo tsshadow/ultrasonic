@@ -22,9 +22,6 @@
         android:clipToPadding="false"
         tools:listitem="@layout/tsshadow_tile_layout" />
 
-    <!-- Popup overlay with filter options -->
-    <include layout="@layout/tsshadow_filters" />
-
     <!-- Floating action button to open filters -->
     <ImageButton
         android:id="@+id/show_filters"

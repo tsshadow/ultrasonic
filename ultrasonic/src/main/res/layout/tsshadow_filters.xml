@@ -20,7 +20,7 @@
         android:background="@drawable/rounded_background_popup"
         android:elevation="8dp"
         android:orientation="vertical"
-        android:visibility="gone"
+
         tools:ignore="UselessParent">
 
         <!-- Header -->
@@ -45,9 +45,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_close_clear_cancel"
                 android:contentDescription="@string/close"
-                android:padding="4dp" />
+                android:padding="4dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
         </RelativeLayout>
 
         <!-- Content area with weight -->
@@ -174,8 +174,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -194,8 +193,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -214,9 +212,9 @@
             android:id="@+id/button_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="horizontal"
             android:padding="16dp"
-            android:gravity="center"
             android:weightSum="2">
 
             <!-- Save (default) -->
@@ -234,7 +232,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:visibility="gone"
+
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/update" />
@@ -258,7 +256,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:visibility="gone"
+
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/delete" />
