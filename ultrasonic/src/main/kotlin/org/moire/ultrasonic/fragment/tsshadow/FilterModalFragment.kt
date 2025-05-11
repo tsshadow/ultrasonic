@@ -142,8 +142,6 @@ class FilterModalFragment : DialogFragment() {
             android.R.layout.simple_spinner_item,
             translatedSortMethods
         )
-
-        festivalLineupSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listOf("","intents_2025"))
     }
 
     private fun showCorrectButtons(editMode: Boolean) {
@@ -230,6 +228,19 @@ class FilterModalFragment : DialogFragment() {
         filterOptionsViewModel.festivals.observe(viewLifecycleOwner, Observer { festivals ->
             festivalSpinner.setItems(festivals)
             initialFilters?.let { festivalSpinner.setSelectedItems(it.festival) }
+        })
+
+        filterOptionsViewModel.lineups.observe(viewLifecycleOwner, Observer { lineups ->
+            festivalLineupSpinner.adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                lineups
+            ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+
+            initialFilters?.festivalLineup?.let { lineup ->
+                val pos = lineups.indexOf(lineup).coerceAtLeast(0)
+                festivalLineupSpinner.setSelection(pos)
+            }
         })
 
         resultCountSlider.addOnChangeListener { _, value, _ ->

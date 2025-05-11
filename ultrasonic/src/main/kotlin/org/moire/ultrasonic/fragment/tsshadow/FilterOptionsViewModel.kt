@@ -6,4 +6,5 @@ class FilterOptionsViewModel : ViewModel() {
     val years = MutableLiveData<List<String>>()
     val labels = MutableLiveData<List<String>>()
     val festivals = MutableLiveData<List<String>>()
+    val lineups = MutableLiveData<List<String>>()
 }

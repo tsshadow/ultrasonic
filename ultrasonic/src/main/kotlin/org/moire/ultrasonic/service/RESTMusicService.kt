@@ -38,6 +38,7 @@ import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Share
 import org.moire.ultrasonic.domain.Tag
+import org.moire.ultrasonic.domain.Lineup
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
 import org.moire.ultrasonic.domain.toArtistList
@@ -522,6 +523,13 @@ open class RESTMusicService(
         val response = API.getTags(name, year, length).execute().throwOnFailure()
 
         return response.body()!!.tagsList.toDomainEntityList()
+    }
+
+    @Throws(Exception::class)
+    override fun getLineups(refresh: Boolean): List<Lineup> {
+        val response = API.getLineups().execute().throwOnFailure()
+
+        return response.body()!!.lineupList.toDomainEntityList()
     }
 
     @Throws(Exception::class)

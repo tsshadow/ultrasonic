@@ -34,6 +34,7 @@ import org.moire.ultrasonic.domain.ChatMessage
 import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
+import org.moire.ultrasonic.domain.Lineup
 import org.moire.ultrasonic.domain.Lyrics
 import org.moire.ultrasonic.domain.Mood
 import org.moire.ultrasonic.domain.MusicDirectory
@@ -436,6 +437,10 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Throws(Exception::class)
     override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> {
+        throw OfflineException("Getting Tags not available in offline mode")
+    }
+    @Throws(Exception::class)
+    override fun getLineups(refresh: Boolean): List<Lineup> {
         throw OfflineException("Getting Tags not available in offline mode")
     }
 

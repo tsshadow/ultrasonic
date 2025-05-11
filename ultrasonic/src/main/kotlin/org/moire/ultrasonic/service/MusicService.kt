@@ -6,7 +6,6 @@
  */
 package org.moire.ultrasonic.service
 
-import java.io.InputStream
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.domain.Album
@@ -16,9 +15,9 @@ import org.moire.ultrasonic.domain.ChatMessage
 import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
+import org.moire.ultrasonic.domain.Lineup
 import org.moire.ultrasonic.domain.Lyrics
 import org.moire.ultrasonic.domain.Mood
-import org.moire.ultrasonic.domain.Year
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.MusicFolder
 import org.moire.ultrasonic.domain.Playlist
@@ -29,6 +28,8 @@ import org.moire.ultrasonic.domain.Share
 import org.moire.ultrasonic.domain.Tag
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
+import org.moire.ultrasonic.domain.Year
+import java.io.InputStream
 
 @Suppress("TooManyFunctions")
 interface MusicService {
@@ -42,7 +43,10 @@ interface MusicService {
     fun getGenres(refresh: Boolean, year: Int? = null, length: String? = null): List<Genre>
 
     @Throws(Exception::class)
-    fun getTags(refresh: Boolean, name:String, year: Int?, length: String?): List<Tag>
+    fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag>
+
+    @Throws(Exception::class)
+    fun getLineups(refresh: Boolean): List<Lineup>
 
     @Throws(Exception::class)
     fun getMoods(refresh: Boolean, year: Int?, length: String?): List<Mood>
@@ -127,16 +131,47 @@ interface MusicService {
     fun getRandomSongs(size: Int): MusicDirectory
 
     @Throws(Exception::class)
-    fun getSongsByGenre(genre: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory
+    fun getSongsByGenre(
+        genre: String,
+        year: Int?,
+        length: String?,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int
+    ): MusicDirectory
 
     @Throws(Exception::class)
-    fun getSongs(filters: Filters, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, sortMethod: String?, festivalLineup: String? = null): MusicDirectory
+    fun getSongs(
+        filters: Filters,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int,
+        sortMethod: String?,
+        festivalLineup: String? = null
+    ): MusicDirectory
 
     @Throws(Exception::class)
-    fun getSongsByMood(mood: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory
+    fun getSongsByMood(
+        mood: String,
+        year: Int?,
+        length: String?,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int
+    ): MusicDirectory
 
     @Throws(Exception::class)
-    fun getSongsByYear(year: Int, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory
+    fun getSongsByYear(
+        year: Int,
+        length: String?,
+        ratingMin: Int?,
+        ratingMax: Int?,
+        count: Int,
+        offset: Int
+    ): MusicDirectory
 
     @Throws(Exception::class)
     fun getStarred(): SearchResult

@@ -22,6 +22,7 @@ import org.moire.ultrasonic.domain.ChatMessage
 import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
+import org.moire.ultrasonic.domain.Lineup
 import org.moire.ultrasonic.domain.Lyrics
 import org.moire.ultrasonic.domain.Mood
 import org.moire.ultrasonic.domain.MusicDirectory
@@ -55,6 +56,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         TimeLimitedCache<List<PodcastsChannel>?>(3600, TimeUnit.SECONDS)
     private val cachedGenres = TimeLimitedCache<List<Genre>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedTags = TimeLimitedCache<List<Tag>>(10 * 3600, TimeUnit.SECONDS)
+    private val cachedLineups = TimeLimitedCache<List<Lineup>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedMoods = TimeLimitedCache<List<Mood>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedYears = TimeLimitedCache<List<Year>>(10 * 3600, TimeUnit.SECONDS)
 
@@ -424,7 +426,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> {
         checkSettingsChanged()
 //        if (refresh) {
-        cachedTags.clear()
+        cachedLineups.clear()
 //        }
         var result = cachedTags.get()
         if (result == null) {
@@ -440,6 +442,19 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
             )
         }
         return sorted
+    }
+    @Throws(Exception::class)
+    override fun getLineups(refresh: Boolean): List<Lineup> {
+        checkSettingsChanged()
+        if (refresh) {
+            cachedLineups.clear()
+        }
+        var result = cachedLineups.get()
+        if (result == null) {
+            result = musicService.getLineups(refresh)
+            cachedLineups.set(result)
+        }
+        return result
     }
 
     @Throws(Exception::class)

@@ -34,6 +34,7 @@ import org.moire.ultrasonic.api.subsonic.response.GetStarredTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.GetUserResponse
 import org.moire.ultrasonic.api.subsonic.response.JukeboxResponse
 import org.moire.ultrasonic.api.subsonic.response.LicenseResponse
+import org.moire.ultrasonic.api.subsonic.response.LineupResponse
 import org.moire.ultrasonic.api.subsonic.response.MoodsResponse
 import org.moire.ultrasonic.api.subsonic.response.MusicFoldersResponse
 import org.moire.ultrasonic.api.subsonic.response.SearchResponse
@@ -294,6 +295,9 @@ interface SubsonicAPIDefinition {
 
     @GET("getTags.view")
     fun getTags(@Query("name") name: String, @Query("year") year: Int? = null, @Query("length") length: String? = null): Call<TagsResponse>
+
+    @GET("getLineups.view")
+    fun getLineups(): Call<LineupResponse>
 
     @GET("getMoods.view")
     fun getMoods(@Query("year") year: Int? = null, @Query("length") length: String? = null): Call<MoodsResponse>

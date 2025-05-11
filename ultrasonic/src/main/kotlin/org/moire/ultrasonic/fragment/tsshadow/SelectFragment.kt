@@ -251,10 +251,15 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
                 musicService.getTags(refresh, "FESTIVAL", null, null)
             }.map { it.name }.sorted()
 
+            val lineups = withContext(Dispatchers.IO) {
+                musicService.getLineups(refresh)
+            }.map { it.name }.sorted()
+
             filterOptionsViewModel.genres.postValue(genres)
             filterOptionsViewModel.years.postValue(years)
             filterOptionsViewModel.labels.postValue(labels)
             filterOptionsViewModel.festivals.postValue(festivals)
+            filterOptionsViewModel.lineups.postValue(lineups)
             Timber.d("Filter data loaded: genres=${genres.size}, years=${years.size}, labels=${labels.size}, festivals=${festivals.size}")
         }
     }
