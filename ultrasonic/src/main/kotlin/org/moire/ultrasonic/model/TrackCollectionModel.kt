@@ -21,6 +21,7 @@ import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.DownloadState
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.util.Util
+import timber.log.Timber
 
 /*
 * Model for retrieving different collections of tracks from the API
@@ -59,7 +60,20 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         offset: Int,
         append: Boolean,
         sortMethod: String,
+        festivalLineup: String?
     ) {
+        Timber.d(
+            """
+            getSongs called with:
+            - filters: $filters
+            - ratingMin: $ratingMin
+            - ratingMax: $ratingMax
+            - count: $count
+            - offset: $offset
+            - sortMethod: $sortMethod
+            - festivalLineup: $festivalLineup
+            """.trimIndent()
+        )
         // Handle the logic for endless scrolling:
         // If appending the existing list, set the offset from where to load
         var newOffset = offset
@@ -67,7 +81,15 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
 
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
-            val musicDirectory = service.getSongs(filters, ratingMin, ratingMax, count, newOffset, sortMethod)
+            val musicDirectory = service.getSongs(
+                filters,
+                ratingMin,
+                ratingMax,
+                count,
+                newOffset,
+                sortMethod,
+                festivalLineup
+            )
             currentListIsSortable = false
             updateList(musicDirectory, append)
 

@@ -153,6 +153,11 @@
             android:defaultValue="5"
             app:argType="integer" />
         <argument
+            android:name="festivalLineup"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
             android:name="shareId"
             android:defaultValue="@null"
             app:argType="string"

@@ -905,7 +905,7 @@ class MediaLibraryBrowser(
                         null,
                         maxSongs,
                         0,
-                        sortMethod
+                        sortMethod,
                     )
                 }
             }.await()

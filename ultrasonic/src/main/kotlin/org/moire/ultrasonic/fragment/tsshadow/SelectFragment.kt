@@ -169,7 +169,8 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             length = defaultLength,
             ratingMin = state.ratingMin,
             ratingMax = state.ratingMax,
-            size = state.count
+            size = state.count,
+            festivalLineup = state.festivalLineup,
         )
     }
 
@@ -177,12 +178,13 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
     override fun onEditTile(tile: TileInfo, position: Int) {
         lastEditedTilePosition = position
         val filterState = FilterState(
-            title = tile.title ?: "",
+            title = tile.title,
             genres = tile.genre ?: emptyList(),
             years = tile.year ?: emptyList(),
             label = tile.label ?: emptyList(),
+            festivalLineup = tile.festivalLineup,
             festival = tile.festival ?: emptyList(),
-            sortMethod = tile.sortMethod ?: "None",
+            sortMethod = tile.sortMethod,
             ratingMin = tile.ratingMin,
             ratingMax = tile.ratingMax,
             count = tile.size

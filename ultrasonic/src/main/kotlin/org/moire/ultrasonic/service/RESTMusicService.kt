@@ -561,12 +561,13 @@ open class RESTMusicService(
         ratingMax: Int?,
         count: Int,
         offset: Int,
-        sortMethod: String?): MusicDirectory {
+        sortMethod: String?,
+        festivalLineup: String?): MusicDirectory {
 
         Timber.d(filters.toString())
 
         val response = API.getSongs(if (filters.toString() == "")
-             null else filters.toString(), ratingMin, ratingMax, count, offset, null, sortMethod).execute().throwOnFailure()
+             null else filters.toString(), ratingMin, ratingMax, count, offset, null, sortMethod, festivalLineup).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))

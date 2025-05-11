@@ -536,6 +536,7 @@ open class TrackCollectionFragment(
         val length = navArgs.length
         val sortMethod = navArgs.sortMethod
         val ratingMin = navArgs.ratingMin
+        val festivalLineup = navArgs.festivalLineup
         val ratingMax = navArgs.ratingMax
 
         val getStarredTracks = displayStarred()
@@ -625,7 +626,8 @@ open class TrackCollectionFragment(
                     size,
                     offset,
                     append,
-                    effectiveSortMethod
+                    effectiveSortMethod,
+                    festivalLineup
                 )
 
             } else if (id == null || getRandomTracks) {

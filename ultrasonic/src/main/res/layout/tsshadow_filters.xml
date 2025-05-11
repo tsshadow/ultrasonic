@@ -135,6 +135,7 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
+
             <!-- Optional: Label -->
             <LinearLayout
                 android:id="@+id/select_label_container"
@@ -154,7 +155,24 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
+            <!-- Optional: Festival -->
+            <LinearLayout
+                android:id="@+id/select_festival_lineup_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/festival" />
+
+                <Spinner
+                    android:id="@+id/select_festival_lineup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
             <!-- Rating row -->
             <LinearLayout
                 android:layout_width="match_parent"

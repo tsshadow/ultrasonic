@@ -58,6 +58,7 @@ class TileInfo(
     val year: List<String>? = null,
     val size: Int = maxSongs,
     val festival: List<String>? = null,
+    val festivalLineup: String? = null,
     val label: List<String>? = null,
     val offset: Int = 0,
     val length: String = "short",
@@ -134,6 +135,7 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
         length = tile.length,
         ratingMin = tile.ratingMin,
         ratingMax = tile.ratingMax,
-        sortMethod = tile.sortMethod
+        sortMethod = tile.sortMethod,
+        festivalLineup = tile.festivalLineup
     )
 }

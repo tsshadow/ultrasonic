@@ -130,7 +130,7 @@ interface MusicService {
     fun getSongsByGenre(genre: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory
 
     @Throws(Exception::class)
-    fun getSongs(filters: Filters, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, sortMethod: String?): MusicDirectory
+    fun getSongs(filters: Filters, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int, sortMethod: String?, festivalLineup: String? = null): MusicDirectory
 
     @Throws(Exception::class)
     fun getSongsByMood(mood: String, year: Int?, length: String?, ratingMin: Int?, ratingMax: Int?, count: Int, offset: Int): MusicDirectory

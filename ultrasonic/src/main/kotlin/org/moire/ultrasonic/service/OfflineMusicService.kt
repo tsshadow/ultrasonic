@@ -399,7 +399,8 @@ class OfflineMusicService : MusicService, KoinComponent {
         ratingMax: Int?,
         count: Int,
         offset: Int,
-        sortMethod: String?
+        sortMethod: String?,
+        festivalLineup: String?
     ): MusicDirectory {
         throw OfflineException("Getting Songs By filters not available in offline mode")
     }

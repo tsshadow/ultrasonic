@@ -42,6 +42,8 @@ class FilterModalFragment : DialogFragment() {
     private lateinit var labelSpinner: MultiSpinnerView
     private lateinit var festivalContainer: View
     private lateinit var festivalSpinner: MultiSpinnerView
+    private lateinit var festivalLineupContainer: View
+    private lateinit var festivalLineupSpinner: Spinner
 
     private lateinit var modalType: FilterModalType
 
@@ -96,6 +98,8 @@ class FilterModalFragment : DialogFragment() {
         labelSpinner = view.findViewById(R.id.select_label)
         festivalContainer = view.findViewById(R.id.select_festival_container)
         festivalSpinner = view.findViewById(R.id.select_festival)
+        festivalLineupContainer = view.findViewById(R.id.select_festival_lineup_container)
+        festivalLineupSpinner = view.findViewById(R.id.select_festival_lineup)
         resultCountSlider = view.findViewById(R.id.select_result_count_slider)
         resultCountLabel = view.findViewById(R.id.select_result_count_label)
 
@@ -114,6 +118,7 @@ class FilterModalFragment : DialogFragment() {
         view.findViewById<TextView>(R.id.filter_title).text = modalTitle
 
         labelContainer.visibility = if (modalType == FilterModalType.SONG) View.VISIBLE else View.GONE
+        festivalLineupContainer.visibility = if (modalType == FilterModalType.SONG) View.VISIBLE else View.GONE
         festivalContainer.visibility = if (modalType == FilterModalType.LIVESET) View.VISIBLE else View.GONE
 
         showCorrectButtons(editMode)
@@ -137,6 +142,8 @@ class FilterModalFragment : DialogFragment() {
             android.R.layout.simple_spinner_item,
             translatedSortMethods
         )
+
+        festivalLineupSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listOf("","intents_2025"))
     }
 
     private fun showCorrectButtons(editMode: Boolean) {
@@ -180,7 +187,8 @@ class FilterModalFragment : DialogFragment() {
             ratingMax = ratingMaxSpinner.selectedItem as Int,
             sortMethod = sortMethodMap[sortMethodSpinner.selectedItem as? String ?: ""] ?: "None",
             label = labelSpinner.getSelectedItems(),
-            festival = festivalSpinner.getSelectedItems()
+            festival = festivalSpinner.getSelectedItems(),
+            festivalLineup = (festivalLineupSpinner.selectedItem as? String)?.takeIf { it.isNotBlank() }
         )
     }
 
@@ -193,6 +201,12 @@ class FilterModalFragment : DialogFragment() {
         resultCountSlider.value = resultIndex.toFloat()
         selectedResultCount = resultCountSteps[resultIndex]
         resultCountLabel.text = getString(R.string.result_count_format, selectedResultCount)
+
+        state.festivalLineup?.let { lineup ->
+            val adapter = festivalLineupSpinner.adapter as? ArrayAdapter<String>
+            val pos = adapter?.getPosition(lineup)?.coerceAtLeast(0) ?: 0
+            festivalLineupSpinner.setSelection(pos)
+        }
 
         val index = sortMethodMap.values.indexOf(state.sortMethod)
         if (index >= 0) {

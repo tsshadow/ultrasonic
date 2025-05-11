@@ -12,4 +12,5 @@ data class FilterState(
     val sortMethod: String = "None",
     val label: List<String> = emptyList(),
     val festival: List<String> = emptyList(),
+    val festivalLineup: String? = null,
 ) : Parcelable
