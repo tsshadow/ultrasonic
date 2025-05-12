@@ -35,6 +35,7 @@ class MultiSpinnerView @JvmOverloads constructor(
         val dialogView = LayoutInflater.from(context).inflate(R.layout.tsshadow_multispinner, null)
         val listView = dialogView.findViewById<ListView>(R.id.multi_select_list)
         val okButton = dialogView.findViewById<Button>(R.id.btn_ok)
+        val resetButton = dialogView.findViewById<Button>(R.id.btn_reset)
 
         val checked = BooleanArray(items.size) { selectedItems.contains(it) }
         val adapter =
@@ -54,6 +55,15 @@ class MultiSpinnerView @JvmOverloads constructor(
             }
             updateLabel()
             alertDialog.dismiss()
+        }
+
+
+        resetButton.setOnClickListener {
+            for (i in 0 until listView.count) {
+                listView.setItemChecked(i, false)
+            }
+            selectedItems.clear()
+            updateLabel()
         }
 
         alertDialog.show()
