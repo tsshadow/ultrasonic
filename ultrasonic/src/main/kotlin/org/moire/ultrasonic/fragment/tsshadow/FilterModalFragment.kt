@@ -231,14 +231,16 @@ class FilterModalFragment : DialogFragment() {
         })
 
         filterOptionsViewModel.lineups.observe(viewLifecycleOwner, Observer { lineups ->
+            val items = listOf("") + lineups  // prepend "" to the list
+
             festivalLineupSpinner.adapter = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_spinner_item,
-                lineups
+                items
             ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
 
             initialFilters?.festivalLineup?.let { lineup ->
-                val pos = lineups.indexOf(lineup).coerceAtLeast(0)
+                val pos = items.indexOf(lineup).coerceAtLeast(0)
                 festivalLineupSpinner.setSelection(pos)
             }
         })

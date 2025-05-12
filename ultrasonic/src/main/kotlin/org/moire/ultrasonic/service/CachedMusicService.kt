@@ -426,7 +426,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> {
         checkSettingsChanged()
 //        if (refresh) {
-        cachedLineups.clear()
+        cachedTags.clear()
 //        }
         var result = cachedTags.get()
         if (result == null) {
