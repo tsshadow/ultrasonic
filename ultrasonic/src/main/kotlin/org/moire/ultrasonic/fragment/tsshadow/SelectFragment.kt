@@ -196,6 +196,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
     open fun initializeViews(view: View) {
         recyclerView = view.findViewById(R.id.tileRecyclerView)
         toggleFiltersButton = view.findViewById(R.id.show_filters)
+        swipeRefresh = view.findViewById(R.id.swipeRefresh)
     }
 
     private fun populateTiles() {
@@ -262,6 +263,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             filterOptionsViewModel.lineups.postValue(lineups)
             Timber.d("Filter data loaded: genres=${genres.size}, years=${years.size}, labels=${labels.size}, festivals=${festivals.size}")
         }
+        swipeRefresh?.isRefreshing = false
     }
 
     private fun calculateSpanCount(): Int {
