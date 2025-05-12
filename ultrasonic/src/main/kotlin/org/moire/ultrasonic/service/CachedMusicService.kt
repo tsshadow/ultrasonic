@@ -40,27 +40,27 @@ import org.moire.ultrasonic.util.LRUCache
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.TimeLimitedCache
 import org.moire.ultrasonic.util.Util
-
 @Suppress("TooManyFunctions")
 class CachedMusicService(private val musicService: MusicService) : MusicService, KoinComponent {
     private val activeServerProvider: ActiveServerProvider by inject()
     private var metaDatabase: MetaDatabase = activeServerProvider.getActiveMetaDatabase()
 
     // Old style TimeLimitedCache
-    private val cachedMusicDirectories: LRUCache<String, TimeLimitedCache<MusicDirectory?>>
-    private val cachedAlbum: LRUCache<String, TimeLimitedCache<MusicDirectory?>>
-    private val cachedUserInfo: LRUCache<String, TimeLimitedCache<UserInfo?>>
+    private var cachedMusicDirectories: LRUCache<String, TimeLimitedCache<MusicDirectory?>>
+    private var cachedAlbum: LRUCache<String, TimeLimitedCache<MusicDirectory?>>
+    private var cachedUserInfo: LRUCache<String, TimeLimitedCache<UserInfo?>>
     private val cachedLicenseValid = TimeLimitedCache<Boolean>(120, TimeUnit.SECONDS)
     private val cachedPlaylists = TimeLimitedCache<List<Playlist>?>(3600, TimeUnit.SECONDS)
-    private val cachedPodcastsChannels =
-        TimeLimitedCache<List<PodcastsChannel>?>(3600, TimeUnit.SECONDS)
+    private val cachedPodcastsChannels = TimeLimitedCache<List<PodcastsChannel>?>(3600, TimeUnit.SECONDS)
     private val cachedGenres = TimeLimitedCache<List<Genre>>(10 * 3600, TimeUnit.SECONDS)
-    private val cachedTags = TimeLimitedCache<List<Tag>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedLineups = TimeLimitedCache<List<Lineup>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedMoods = TimeLimitedCache<List<Mood>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedYears = TimeLimitedCache<List<Year>>(10 * 3600, TimeUnit.SECONDS)
 
-    // New Room Database
+    // New multi-key cache for getTags, allowing separation by (name, year, length)
+    private val cachedTagsMap: MutableMap<String, TimeLimitedCache<List<Tag>>> = mutableMapOf()
+
+    // Room Database
     private var cachedArtists = metaDatabase.artistDao()
     private var cachedAlbums = metaDatabase.albumDao()
     private var cachedIndexes = metaDatabase.indexDao()
@@ -68,6 +68,19 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
 
     private var restUrl: String? = null
     private var cachedMusicFolderId: String? = null
+
+    init {
+        cachedMusicDirectories = LRUCache(MUSIC_DIR_CACHE_SIZE)
+        cachedAlbum = LRUCache(MUSIC_DIR_CACHE_SIZE)
+        cachedUserInfo = LRUCache(MUSIC_DIR_CACHE_SIZE)
+    }
+
+    /**
+     * Helper to build a unique cache key based on tag parameters.
+     */
+    private fun buildTagCacheKey(name: String, year: Int?, length: String?): String {
+        return listOf(name, year?.toString() ?: "", length ?: "").joinToString("_")
+    }
 
     @Throws(Exception::class)
     override fun ping() {
@@ -425,24 +438,25 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     @Throws(Exception::class)
     override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> {
         checkSettingsChanged()
-//        if (refresh) {
-        cachedTags.clear()
-//        }
-        var result = cachedTags.get()
+
+        val cacheKey = buildTagCacheKey(name, year, length)
+        val cache = if (refresh) null else cachedTagsMap[cacheKey]
+        var result = cache?.get()
+
         if (result == null) {
             result = musicService.getTags(refresh, name, year, length)
-            cachedTags.set(result)
+            val newCache = TimeLimitedCache<List<Tag>>(10 * 3600, TimeUnit.SECONDS)
+            newCache.set(result)
+            cachedTagsMap[cacheKey] = newCache
         }
 
         val sorted = result.toMutableList()
         sorted.sortWith { tag, tag2 ->
-            tag.name.compareTo(
-                tag2.name,
-                ignoreCase = true
-            )
+            tag.name.compareTo(tag2.name, ignoreCase = true)
         }
         return sorted
     }
+
     @Throws(Exception::class)
     override fun getLineups(refresh: Boolean): List<Lineup> {
         checkSettingsChanged()
