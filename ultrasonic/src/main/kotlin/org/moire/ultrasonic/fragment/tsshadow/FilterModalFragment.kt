@@ -6,49 +6,42 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.fragment.app.DialogFragment
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
-import androidx.lifecycle.Observer
+import androidx.core.os.bundleOf
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.slider.Slider
+import org.moire.ultrasonic.databinding.TsshadowFiltersBinding
 import org.moire.ultrasonic.R
-import org.moire.ultrasonic.view.MultiSpinnerView
 
-enum class FilterModalType {
-    SONG, LIVESET
-}
+enum class FilterModalType { SONG, LIVESET }
 
-class FilterModalFragment : DialogFragment() {
+class FilterModalFragment : BottomSheetDialogFragment() {
+
+    private var _binding: TsshadowFiltersBinding? = null
+    private val binding get() = _binding!!
 
     private val filterOptionsViewModel: FilterOptionsViewModel by activityViewModels()
 
-    private lateinit var genreSpinner: MultiSpinnerView
-    private lateinit var yearSpinner: MultiSpinnerView
-    private lateinit var ratingMinSpinner: Spinner
-    private lateinit var ratingMaxSpinner: Spinner
-    private lateinit var sortMethodSpinner: Spinner
-    private lateinit var titleInput: EditText
-    private lateinit var searchButton: Button
-    private lateinit var saveButton: Button
-    private lateinit var updateButton: Button
-    private lateinit var deleteButton: Button
-    private lateinit var resultCountSlider: Slider
-    private lateinit var resultCountLabel: TextView
-    private val resultCountSteps = listOf(10, 25, 50, 100, 500, 2500)
+    private val selectedGenres = mutableListOf<String>()
+    private val selectedYears = mutableListOf<String>()
+    private val selectedLabels = mutableListOf<String>()
+    private var selectedFestivalLineup: String? = null
+    private val selectedFestivals = mutableListOf<String>()
+
     private var selectedResultCount = 25
+    private val resultCountSteps = listOf(10, 25, 50, 100, 500, 2500)
 
-    private lateinit var labelContainer: View
-    private lateinit var labelSpinner: MultiSpinnerView
-    private lateinit var festivalContainer: View
-    private lateinit var festivalSpinner: MultiSpinnerView
-    private lateinit var festivalLineupContainer: View
-    private lateinit var festivalLineupSpinner: Spinner
-
-    private lateinit var modalType: FilterModalType
-
-    private val sortMethodMap by lazy {
-        mapOf(
+    private val sortOptions by lazy {
+        listOf(
             getString(R.string.sort_none) to "None",
             getString(R.string.sort_random) to "Random",
             getString(R.string.sort_added_desc) to "AddedDesc",
@@ -56,198 +49,251 @@ class FilterModalFragment : DialogFragment() {
         )
     }
 
+    private lateinit var modalType: FilterModalType
+
     companion object {
+        private const val ARG_INITIAL_FILTERS = "initialFilters"
+        private const val ARG_EDIT_MODE = "editMode"
+        private const val ARG_TYPE = "type"
+
         fun newInstance(
             initialFilters: FilterState?,
             editMode: Boolean,
             type: FilterModalType
-        ): FilterModalFragment {
-            val fragment = FilterModalFragment()
-            val args = Bundle().apply {
-                putParcelable("initialFilters", initialFilters)
-                putBoolean("editMode", editMode)
-                putSerializable("type", type)
+        ): FilterModalFragment = FilterModalFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(ARG_INITIAL_FILTERS, initialFilters)
+                putBoolean(ARG_EDIT_MODE, editMode)
+                putSerializable(ARG_TYPE, type)
             }
-            fragment.arguments = args
-            return fragment
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_FRAME, R.style.UltrasonicFilterDialogTheme)
+        setStyle(STYLE_NORMAL, R.style.UltrasonicFilterDialogTheme)
+        modalType = requireArguments().getSerializable(ARG_TYPE) as FilterModalType
     }
 
+    override fun onCreateDialog(savedInstanceState: Bundle?) =
+        BottomSheetDialog(requireContext(), theme).apply {
+            setOnShowListener {
+                val dialog = this as BottomSheetDialog
+                val bottomSheet = dialog.findViewById<View>(
+                    com.google.android.material.R.id.design_bottom_sheet
+                )
+                bottomSheet?.let {
+                    val behavior = BottomSheetBehavior.from(it)
+                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    behavior.peekHeight = resources.displayMetrics.heightPixels
+                    it.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    it.requestLayout()
+                }
+            }
+        }
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.tsshadow_filters, container, false)
+        _binding = TsshadowFiltersBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        genreSpinner = view.findViewById(R.id.select_genre)
-        yearSpinner = view.findViewById(R.id.select_year)
-        ratingMinSpinner = view.findViewById(R.id.select_rating_min)
-        ratingMaxSpinner = view.findViewById(R.id.select_rating_max)
-        sortMethodSpinner = view.findViewById(R.id.select_sort_method)
-        titleInput = view.findViewById(R.id.select_title)
-
-        labelContainer = view.findViewById(R.id.select_label_container)
-        labelSpinner = view.findViewById(R.id.select_label)
-        festivalContainer = view.findViewById(R.id.select_festival_container)
-        festivalSpinner = view.findViewById(R.id.select_festival)
-        festivalLineupContainer = view.findViewById(R.id.select_festival_lineup_container)
-        festivalLineupSpinner = view.findViewById(R.id.select_festival_lineup)
-        resultCountSlider = view.findViewById(R.id.select_result_count_slider)
-        resultCountLabel = view.findViewById(R.id.select_result_count_label)
-
-        searchButton = view.findViewById(R.id.search)
-        saveButton = view.findViewById(R.id.save)
-        updateButton = view.findViewById(R.id.update)
-        deleteButton = view.findViewById(R.id.delete)
-
         setupAdapters()
-
-        val initialFilters = arguments?.getParcelable<FilterState>("initialFilters")
-        val editMode = arguments?.getBoolean("editMode") ?: false
-        modalType = arguments?.getSerializable("type") as? FilterModalType ?: FilterModalType.SONG
-
-        val modalTitle = if (editMode) getString(R.string.edit_filter_title) else getString(R.string.new_filter_title)
-        view.findViewById<TextView>(R.id.filter_title).text = modalTitle
-
-        labelContainer.visibility = if (modalType == FilterModalType.SONG) View.VISIBLE else View.GONE
-        festivalLineupContainer.visibility = if (modalType == FilterModalType.SONG) View.VISIBLE else View.GONE
-        festivalContainer.visibility = if (modalType == FilterModalType.LIVESET) View.VISIBLE else View.GONE
-
-        showCorrectButtons(editMode)
         setupListeners()
-        observeFilterOptions(initialFilters)
-        initialFilters?.let { applyFilterState(it) }
+        applyInitialFilters()
+        observeFilterOptions()
 
-        view.findViewById<ImageButton>(R.id.close_button).setOnClickListener {
+        binding.closeButton.setOnClickListener {
             dismiss()
         }
     }
 
     private fun setupAdapters() {
-        ratingMinSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, (0..5).toList())
-        ratingMaxSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, (0..5).toList())
-        ratingMaxSpinner.setSelection(5)
-
-        val translatedSortMethods = sortMethodMap.keys.toList()
-        sortMethodSpinner.adapter = ArrayAdapter(
+        val ratings = (0..5).toList()
+        binding.selectRatingMin.adapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_item,
-            translatedSortMethods
+            android.R.layout.simple_spinner_dropdown_item,
+            ratings
         )
-    }
-
-    private fun showCorrectButtons(editMode: Boolean) {
-        if (editMode) {
-            saveButton.visibility = View.GONE
-            searchButton.visibility = View.GONE
-            updateButton.visibility = View.VISIBLE
-            deleteButton.visibility = View.VISIBLE
-        } else {
-            saveButton.visibility = View.VISIBLE
-            searchButton.visibility = View.VISIBLE
-            updateButton.visibility = View.GONE
-            deleteButton.visibility = View.GONE
-        }
+        binding.selectRatingMax.adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_dropdown_item,
+            ratings
+        )
+        binding.selectRatingMax.setSelection(ratings.lastIndex)
+        binding.selectSortMethod.adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_dropdown_item,
+            sortOptions.map { it.first }
+        )
     }
 
     private fun setupListeners() {
-        fun sendResult(action: String) {
-            val filterState = collectFilterState()
-            val result = Bundle().apply {
-                putParcelable("filters", filterState)
-                putString("action", action)
+        binding.selectResultCountSlider.apply {
+            valueFrom = 0f
+            valueTo = (resultCountSteps.size - 1).toFloat()
+            stepSize = 1f
+            value = resultCountSteps.indexOf(selectedResultCount).toFloat()
+            addOnChangeListener { _: Slider, value: Float, _: Boolean ->
+                selectedResultCount = resultCountSteps[value.toInt()]
+                binding.selectResultCountLabel.text =
+                    getString(R.string.result_count_format, selectedResultCount)
             }
-            setFragmentResult("filters_result", result)
-            dismiss()
         }
-
-        searchButton.setOnClickListener { sendResult("search") }
-        saveButton.setOnClickListener { sendResult("save") }
-        updateButton.setOnClickListener { sendResult("update") }
-        deleteButton.setOnClickListener { sendResult("delete") }
+        with(binding) {
+            search.setOnClickListener { sendResult("search") }
+            save.setOnClickListener { sendResult("save") }
+            update.setOnClickListener { sendResult("update") }
+            delete.setOnClickListener { sendResult("delete") }
+        }
     }
 
-    private fun collectFilterState(): FilterState {
-        return FilterState(
-            title = titleInput.text.toString(),
-            genres = genreSpinner.getSelectedItems(),
-            years = yearSpinner.getSelectedItems(),
-            count = selectedResultCount,
-            ratingMin = ratingMinSpinner.selectedItem as Int,
-            ratingMax = ratingMaxSpinner.selectedItem as Int,
-            sortMethod = sortMethodMap[sortMethodSpinner.selectedItem as? String ?: ""] ?: "None",
-            label = labelSpinner.getSelectedItems(),
-            festival = festivalSpinner.getSelectedItems(),
-            festivalLineup = (festivalLineupSpinner.selectedItem as? String)?.takeIf { it.isNotBlank() }
+    private fun sendResult(action: String) {
+        val filters = collectFilterState()
+        setFragmentResult(
+            "filters_result", bundleOf(
+                "filters" to filters,
+                "action" to action
+            )
         )
+        dismiss()
     }
 
-    private fun applyFilterState(state: FilterState) {
-        titleInput.setText(state.title)
-        ratingMinSpinner.setSelection(state.ratingMin)
-        ratingMaxSpinner.setSelection(state.ratingMax)
-
-        val resultIndex = resultCountSteps.indexOf(state.count).takeIf { it >= 0 } ?: 1
-        resultCountSlider.value = resultIndex.toFloat()
-        selectedResultCount = resultCountSteps[resultIndex]
-        resultCountLabel.text = getString(R.string.result_count_format, selectedResultCount)
-
-        state.festivalLineup?.let { lineup ->
-            val adapter = festivalLineupSpinner.adapter as? ArrayAdapter<String>
-            val pos = adapter?.getPosition(lineup)?.coerceAtLeast(0) ?: 0
-            festivalLineupSpinner.setSelection(pos)
+    private fun observeFilterOptions() {
+        filterOptionsViewModel.genres.observe(viewLifecycleOwner) { genres ->
+            redrawAllChips(genres, filterOptionsViewModel.years.value, filterOptionsViewModel.labels.value, filterOptionsViewModel.lineups.value, filterOptionsViewModel.festivals.value)
         }
-
-        val index = sortMethodMap.values.indexOf(state.sortMethod)
-        if (index >= 0) {
-            sortMethodSpinner.setSelection(index)
+        filterOptionsViewModel.years.observe(viewLifecycleOwner) { years ->
+            redrawAllChips(filterOptionsViewModel.genres.value, years, filterOptionsViewModel.labels.value, filterOptionsViewModel.lineups.value, filterOptionsViewModel.festivals.value)
+        }
+        filterOptionsViewModel.labels.observe(viewLifecycleOwner) { labels ->
+            redrawAllChips(filterOptionsViewModel.genres.value, filterOptionsViewModel.years.value, labels, filterOptionsViewModel.lineups.value, filterOptionsViewModel.festivals.value)
+        }
+        filterOptionsViewModel.lineups.observe(viewLifecycleOwner) { lineups ->
+            redrawAllChips(filterOptionsViewModel.genres.value, filterOptionsViewModel.years.value, filterOptionsViewModel.labels.value, lineups, filterOptionsViewModel.festivals.value)
+        }
+        filterOptionsViewModel.festivals.observe(viewLifecycleOwner) { festivals ->
+            redrawAllChips(filterOptionsViewModel.genres.value, filterOptionsViewModel.years.value, filterOptionsViewModel.labels.value, filterOptionsViewModel.lineups.value, festivals)
         }
     }
 
-    private fun observeFilterOptions(initialFilters: FilterState?) {
-        filterOptionsViewModel.genres.observe(viewLifecycleOwner, Observer { genres ->
-            genreSpinner.setItems(genres)
-            initialFilters?.let { genreSpinner.setSelectedItems(it.genres) }
-        })
-        filterOptionsViewModel.years.observe(viewLifecycleOwner, Observer { years ->
-            yearSpinner.setItems(years)
-            initialFilters?.let { yearSpinner.setSelectedItems(it.years) }
-        })
-        filterOptionsViewModel.labels.observe(viewLifecycleOwner, Observer { labels ->
-            labelSpinner.setItems(labels)
-            initialFilters?.let { labelSpinner.setSelectedItems(it.label) }
-        })
-        filterOptionsViewModel.festivals.observe(viewLifecycleOwner, Observer { festivals ->
-            festivalSpinner.setItems(festivals)
-            initialFilters?.let { festivalSpinner.setSelectedItems(it.festival) }
-        })
+    private fun redrawAllChips(genres: List<String>?, years: List<String>?, labels: List<String>?, lineups: List<String>?, festivals: List<String>?) {
+        val group = binding.addChipGroup
+        group.removeAllViews()
 
-        filterOptionsViewModel.lineups.observe(viewLifecycleOwner, Observer { lineups ->
-            val items = listOf("") + lineups  // prepend "" to the list
-
-            festivalLineupSpinner.adapter = ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_item,
-                items
-            ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
-
-            initialFilters?.festivalLineup?.let { lineup ->
-                val pos = items.indexOf(lineup).coerceAtLeast(0)
-                festivalLineupSpinner.setSelection(pos)
+        fun addSelectedChips(title: String, values: MutableList<String>, allOptions: List<String>?) {
+            values.forEach { value ->
+                val chip = layoutInflater.inflate(R.layout.tsshadow_chip, group, false) as Chip
+                chip.text = value
+                chip.setOnCloseIconClickListener {
+                    values.remove(value)
+                    redrawAllChips(genres, years, labels, lineups, festivals)
+                }
+                group.addView(chip)
             }
-        })
+            if (values.isEmpty() && allOptions != null) {
+                val addChip = layoutInflater.inflate(R.layout.tsshadow_chip_add, group, false) as Chip
+                addChip.text = "+ $title"
+                addChip.setOnClickListener {
+                    val checked = BooleanArray(allOptions.size)
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Select $title")
+                        .setMultiChoiceItems(allOptions.toTypedArray(), checked) { _, which, isChecked ->
+                            checked[which] = isChecked
+                        }
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            val result = allOptions.filterIndexed { index, _ -> checked[index] }
+                            values.clear()
+                            values.addAll(result)
+                            redrawAllChips(genres, years, labels, lineups, festivals)
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+                }
+                group.addView(addChip)
+            }
+        }
 
-        resultCountSlider.addOnChangeListener { _, value, _ ->
-            selectedResultCount = resultCountSteps[value.toInt()]
-            resultCountLabel.text = getString(R.string.result_count_format, selectedResultCount)
+        addSelectedChips(getString(R.string.year), selectedYears, years)
+        addSelectedChips(getString(R.string.genre), selectedGenres, genres)
+
+        if (modalType == FilterModalType.SONG) {
+            addSelectedChips(getString(R.string.label), selectedLabels, labels)
+            if (selectedFestivalLineup != null) {
+                val chip = layoutInflater.inflate(R.layout.tsshadow_chip, group, false) as Chip
+                chip.text = selectedFestivalLineup
+                chip.setOnCloseIconClickListener {
+                    selectedFestivalLineup = null
+                    redrawAllChips(genres, years, labels, lineups, festivals)
+                }
+                group.addView(chip)
+            } else if (lineups != null) {
+                val addChip = layoutInflater.inflate(R.layout.tsshadow_chip_add, group, false) as Chip
+                addChip.text = "+ ${getString(R.string.festival_lineup)}"
+                addChip.setOnClickListener {
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Select ${getString(R.string.festival_lineup)}")
+                        .setItems(lineups.toTypedArray()) { _, which ->
+                            selectedFestivalLineup = lineups[which]
+                            redrawAllChips(genres, years, labels, lineups, festivals)
+                        }
+                        .show()
+                }
+                group.addView(addChip)
+            }
+        }
+
+        if (modalType == FilterModalType.LIVESET) {
+            addSelectedChips(getString(R.string.festival), selectedFestivals, festivals)
         }
     }
+
+    private fun applyInitialFilters() {
+        val filters = arguments?.getParcelable<FilterState>(ARG_INITIAL_FILTERS) ?: return
+        binding.selectTitle.setText(filters.title)
+        selectedGenres.addAll(filters.genres)
+        selectedYears.addAll(filters.years)
+        selectedLabels.addAll(filters.label)
+        selectedFestivalLineup = filters.festivalLineup
+        selectedFestivals.addAll(filters.festival)
+        selectedResultCount = filters.count
+        binding.selectResultCountSlider.value =
+            resultCountSteps.indexOf(filters.count).toFloat()
+        binding.selectResultCountLabel.text =
+            getString(R.string.result_count_format, selectedResultCount)
+        binding.selectRatingMin.setSelection(filters.ratingMin)
+        binding.selectRatingMax.setSelection(filters.ratingMax)
+        sortOptions.indexOfFirst { it.second == filters.sortMethod }
+            .takeIf { it >= 0 }
+            ?.let { binding.selectSortMethod.setSelection(it) }
+        val isEdit = arguments?.getBoolean(ARG_EDIT_MODE) == true
+        binding.save.visibility = if (isEdit) GONE else VISIBLE
+        binding.search.visibility = if (isEdit) GONE else VISIBLE
+        binding.update.visibility = if (isEdit) VISIBLE else GONE
+        binding.delete.visibility = if (isEdit) VISIBLE else GONE
+    }
+
+    private fun collectFilterState(): FilterState = FilterState(
+        title = binding.selectTitle.text.toString().trim(),
+        genres = selectedGenres,
+        years = selectedYears,
+        count = selectedResultCount,
+        ratingMin = binding.selectRatingMin.selectedItem as Int,
+        ratingMax = binding.selectRatingMax.selectedItem as Int,
+        sortMethod = sortOptions[binding.selectSortMethod.selectedItemPosition].second,
+        label = selectedLabels,
+        festival = selectedFestivals,
+        festivalLineup = selectedFestivalLineup
+    )
 }

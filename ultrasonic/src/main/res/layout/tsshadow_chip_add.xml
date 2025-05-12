@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ tsshadow_chip_add.xml
+  ~ Copyright (C) 2009-2025 Ultrasonic developers
+  ~
+  ~ Distributed under terms of the GNU GPLv3 license.
+  -->
+<com.google.android.material.chip.Chip
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/add"
+    android:checkable="false"
+    app:chipIconTint="?attr/colorOnPrimaryContainer"
+    app:chipBackgroundColor="?attr/colorSurfaceVariant"
+    android:textColor="?attr/colorOnPrimaryContainer"
+    app:closeIconEnabled="false"
+    style="@style/Widget.MaterialComponents.Chip.Entry" />
