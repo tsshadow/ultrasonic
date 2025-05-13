@@ -277,7 +277,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         sortOptions.indexOfFirst { it.second == filters.sortMethod }
             .takeIf { it >= 0 }
             ?.let { binding.selectSortMethod.setSelection(it) }
-        val isEdit = arguments?.getBoolean(ARG_EDIT_MODE) == true
+        val isEdit = arguments?.getBoolean(ARG_EDIT_MODE)!!
         binding.save.visibility = if (isEdit) GONE else VISIBLE
         binding.search.visibility = if (isEdit) GONE else VISIBLE
         binding.update.visibility = if (isEdit) VISIBLE else GONE

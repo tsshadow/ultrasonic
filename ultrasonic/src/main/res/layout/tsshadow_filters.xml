@@ -170,6 +170,7 @@
         <!-- Button row -->
         <LinearLayout
             android:id="@+id/button_row"
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -179,6 +180,7 @@
 
             <Button
                 android:id="@+id/save"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -187,7 +189,17 @@
                 android:text="@string/save_preset" />
 
             <Button
+                android:id="@+id/search"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="@color/design_default_color_primary_dark"
+                android:text="@string/search" />
+            <Button
                 android:id="@+id/update"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -195,21 +207,10 @@
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/update" />
 
-            <View
-                android:layout_width="12dp"
-                android:layout_height="match_parent" />
-
-            <Button
-                android:id="@+id/search"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_button"
-                android:backgroundTint="@color/design_default_color_primary_dark"
-                android:text="@string/search_button" />
 
             <Button
                 android:id="@+id/delete"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

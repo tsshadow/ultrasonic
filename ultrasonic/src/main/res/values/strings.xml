@@ -497,7 +497,7 @@
     <string name="sort_method">Sort method</string>
     <string name="search_livesets">Search Livesets</string>
     <string name="save_preset">Save preset</string>
-    <string name="search_button">Search</string>
+    <string name="search">Search</string>
 
     <string name="sort_none">None</string>
     <string name="sort_random">Random</string>
