@@ -448,8 +448,7 @@
     <string name="sort_method">Sorteermethode</string>
     <string name="search_livesets">Livesets zoeken</string>
     <string name="save_preset">Opslaan</string>
-    <string name="search_button">Zoeken</string>
-
+    <string name="search">Zoeken</string>
     <string name="sort_none">Geen</string>
     <string name="sort_random">Willekeurig</string>
     <string name="sort_added_desc">Laatst toegevoegd</string>
