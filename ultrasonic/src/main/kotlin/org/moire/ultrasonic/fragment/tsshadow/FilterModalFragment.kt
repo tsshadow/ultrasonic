@@ -157,7 +157,15 @@ class FilterModalFragment : BottomSheetDialogFragment() {
             save.setOnClickListener { sendResult("save") }
             update.setOnClickListener { sendResult("update") }
             delete.setOnClickListener { sendResult("delete") }
+            favoriteButton.setOnClickListener {
+                favoriteButton.isSelected = !favoriteButton.isSelected
+                val iconRes =
+                    if (favoriteButton.isSelected) R.drawable.ic_star_full else R.drawable.ic_star_hollow
+                favoriteButton.setImageResource(iconRes)
+            }
         }
+
+
     }
 
     private fun sendResult(action: String) {
@@ -173,30 +181,72 @@ class FilterModalFragment : BottomSheetDialogFragment() {
 
     private fun observeFilterOptions() {
         filterOptionsViewModel.genres.observe(viewLifecycleOwner) { genres ->
-            redrawAllChips(genres, filterOptionsViewModel.years.value, filterOptionsViewModel.labels.value, filterOptionsViewModel.lineups.value, filterOptionsViewModel.festivals.value)
+            redrawAllChips(
+                genres,
+                filterOptionsViewModel.years.value,
+                filterOptionsViewModel.labels.value,
+                filterOptionsViewModel.lineups.value,
+                filterOptionsViewModel.festivals.value
+            )
         }
         filterOptionsViewModel.years.observe(viewLifecycleOwner) { years ->
-            redrawAllChips(filterOptionsViewModel.genres.value, years, filterOptionsViewModel.labels.value, filterOptionsViewModel.lineups.value, filterOptionsViewModel.festivals.value)
+            redrawAllChips(
+                filterOptionsViewModel.genres.value,
+                years,
+                filterOptionsViewModel.labels.value,
+                filterOptionsViewModel.lineups.value,
+                filterOptionsViewModel.festivals.value
+            )
         }
         filterOptionsViewModel.labels.observe(viewLifecycleOwner) { labels ->
-            redrawAllChips(filterOptionsViewModel.genres.value, filterOptionsViewModel.years.value, labels, filterOptionsViewModel.lineups.value, filterOptionsViewModel.festivals.value)
+            redrawAllChips(
+                filterOptionsViewModel.genres.value,
+                filterOptionsViewModel.years.value,
+                labels,
+                filterOptionsViewModel.lineups.value,
+                filterOptionsViewModel.festivals.value
+            )
         }
         filterOptionsViewModel.lineups.observe(viewLifecycleOwner) { lineups ->
-            redrawAllChips(filterOptionsViewModel.genres.value, filterOptionsViewModel.years.value, filterOptionsViewModel.labels.value, lineups, filterOptionsViewModel.festivals.value)
+            redrawAllChips(
+                filterOptionsViewModel.genres.value,
+                filterOptionsViewModel.years.value,
+                filterOptionsViewModel.labels.value,
+                lineups,
+                filterOptionsViewModel.festivals.value
+            )
         }
         filterOptionsViewModel.festivals.observe(viewLifecycleOwner) { festivals ->
-            redrawAllChips(filterOptionsViewModel.genres.value, filterOptionsViewModel.years.value, filterOptionsViewModel.labels.value, filterOptionsViewModel.lineups.value, festivals)
+            redrawAllChips(
+                filterOptionsViewModel.genres.value,
+                filterOptionsViewModel.years.value,
+                filterOptionsViewModel.labels.value,
+                filterOptionsViewModel.lineups.value,
+                festivals
+            )
         }
         filterOptionsViewModel.favorite.observe(viewLifecycleOwner) { favorite ->
             binding.favoriteButton.isSelected = favorite
+            val iconRes = if (favorite) R.drawable.ic_star_full else R.drawable.ic_star_hollow
+            binding.favoriteButton.setImageResource(iconRes)
         }
     }
 
-    private fun redrawAllChips(genres: List<String>?, years: List<String>?, labels: List<String>?, lineups: List<String>?, festivals: List<String>?) {
+    private fun redrawAllChips(
+        genres: List<String>?,
+        years: List<String>?,
+        labels: List<String>?,
+        lineups: List<String>?,
+        festivals: List<String>?
+    ) {
         val group = binding.addChipGroup
         group.removeAllViews()
 
-        fun addSelectedChips(title: String, values: MutableList<String>, allOptions: List<String>?) {
+        fun addSelectedChips(
+            title: String,
+            values: MutableList<String>,
+            allOptions: List<String>?
+        ) {
             values.forEach { value ->
                 val chip = layoutInflater.inflate(R.layout.tsshadow_chip, group, false) as Chip
                 chip.text = value
@@ -207,13 +257,17 @@ class FilterModalFragment : BottomSheetDialogFragment() {
                 group.addView(chip)
             }
             if (values.isEmpty() && allOptions != null) {
-                val addChip = layoutInflater.inflate(R.layout.tsshadow_chip_add, group, false) as Chip
+                val addChip =
+                    layoutInflater.inflate(R.layout.tsshadow_chip_add, group, false) as Chip
                 addChip.text = "+ $title"
                 addChip.setOnClickListener {
                     val checked = BooleanArray(allOptions.size)
                     AlertDialog.Builder(requireContext())
                         .setTitle("Select $title")
-                        .setMultiChoiceItems(allOptions.toTypedArray(), checked) { _, which, isChecked ->
+                        .setMultiChoiceItems(
+                            allOptions.toTypedArray(),
+                            checked
+                        ) { _, which, isChecked ->
                             checked[which] = isChecked
                         }
                         .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -243,7 +297,8 @@ class FilterModalFragment : BottomSheetDialogFragment() {
                 }
                 group.addView(chip)
             } else if (lineups != null) {
-                val addChip = layoutInflater.inflate(R.layout.tsshadow_chip_add, group, false) as Chip
+                val addChip =
+                    layoutInflater.inflate(R.layout.tsshadow_chip_add, group, false) as Chip
                 addChip.text = "+ ${getString(R.string.festival_lineup)}"
                 addChip.setOnClickListener {
                     AlertDialog.Builder(requireContext())
@@ -279,6 +334,8 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         binding.selectRatingMin.setSelection(filters.ratingMin)
         binding.selectRatingMax.setSelection(filters.ratingMax)
         binding.favoriteButton.isSelected = filters.favorite
+        val iconRes = if (filters.favorite) R.drawable.ic_star_full else R.drawable.`ic_star_hollow`
+        binding.favoriteButton.setImageResource(iconRes)
         sortOptions.indexOfFirst { it.second == filters.sortMethod }
             .takeIf { it >= 0 }
             ?.let { binding.selectSortMethod.setSelection(it) }
@@ -301,6 +358,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         sortMethod = sortOptions[binding.selectSortMethod.selectedItemPosition].second,
         label = selectedLabels,
         festival = selectedFestivals,
-        festivalLineup = selectedFestivalLineup
+        festivalLineup = selectedFestivalLineup,
+        favorite = binding.favoriteButton.isSelected
     )
 }

@@ -8,6 +8,7 @@
 package org.moire.ultrasonic.service.androidauto
 
 import TileInfo
+import android.content.Context
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS
@@ -22,6 +23,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.guava.future
+import okhttp3.internal.toImmutableList
 import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
@@ -38,6 +40,8 @@ import org.moire.ultrasonic.util.buildMediaItem
 import org.moire.ultrasonic.util.toMediaItem
 import timber.log.Timber
 import java.util.Calendar
+
+
 
 /**
  * @class MediaLibraryBrowser
@@ -213,8 +217,8 @@ class MediaLibraryBrowser(
         return when (action) {
             MEDIA_ROOT_ID -> getRootItems()
             MEDIA_LIBRARY_ID -> getLibrary()
-            MEDIA_SONGS_ID -> getSongsLibrary()
-            MEDIA_LIVESETS_ID -> getLivesetsLibrary()
+            MEDIA_SONGS_ID -> getSongsLibrary(UApp.applicationContext())
+            MEDIA_LIVESETS_ID -> getLivesetsLibrary(UApp.applicationContext())
             MEDIA_ARTIST_ID -> getArtists()
             MEDIA_ARTIST_SECTION -> {
                 val section = parts.getOrNull(1)
@@ -388,101 +392,54 @@ class MediaLibraryBrowser(
         return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems, null))
     }
 
-    private fun getSongsLibrary(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+    private fun getSongsLibrary(context: Context): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("getSongsLibrary")
-        val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        val currentYear = listOf(Calendar.getInstance().get(Calendar.YEAR).toString())
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+        // Default hardcoded presets
         val presets = listOf(
             TileInfo("Search"),
             TileInfo("Recent"),
             TileInfo("Random", sortMethod = "Random"),
             TileInfo("Starred", ratingMin = 5),
-            TileInfo(
-                "Bouncy Uptempo (${currentYear[0]})",
-                genre = listOf("Bouncy Uptempo"),
-                year = currentYear
-            ),
-            TileInfo(
-                "Euphoric Hardstyle (${currentYear[0]})",
-                genre = listOf("Euphoric Hardstyle"),
-                year = currentYear
-            ),
-            TileInfo(
-                "Hardcore (${currentYear[0]})",
-                genre = listOf("Hardcore"),
-                year = currentYear
-            ),
-            TileInfo(
-                "Hardstyle (${currentYear[0]})",
-                genre = listOf("Hardstyle"),
-                year = currentYear
-            ),
-            TileInfo("Hardstyle Classics", genre = listOf("Hardstyle Classics")),
-            TileInfo("Industrial Hardcore", genre = listOf("Industrial Hardcore")),
-            TileInfo(
-                "Mainstream Hardcore (${currentYear[0]})",
-                genre = listOf("Mainstream Hardcore"),
-                year = currentYear
-            ),
-            TileInfo("Millennium Hardcore", genre = listOf("Mainstream Hardcore"), year = listOf("2010","2011","2012","2013","2014")),
-            TileInfo(
-                "Mainstream Hardstyle (${currentYear[0]})",
-                genre = listOf("Mainstream Hardstyle"),
-                year = currentYear
-            ),
-            TileInfo(
-                "Raw Hardstyle (${currentYear[0]})",
-                genre = listOf("Raw Hardstyle"),
-                year = currentYear
-            ),
-            TileInfo(
-                "Uptempo Hardcore (${currentYear[0]})",
-                genre = listOf("Uptempo Hardcore"),
-                year = currentYear
-            ),
-            TileInfo("Zaagtempo", genre = listOf("Zaagtempo"))
         )
 
+        // Add hardcoded presets
         presets.mapNotNullTo(mediaItems) { it.toMediaItem() }
 
-        return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems, null))
+        // Load user-defined tiles from storage and filter favorites
+        val savedFavoriteTiles = TileStorage.loadTiles(context, "song")
+            .filter { it.favorite }
+
+        // Add favorite user-defined tiles
+        savedFavoriteTiles.mapNotNullTo(mediaItems) { it.toMediaItem() }
+
+        return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems.toImmutableList(), null))
     }
 
-    private fun getLivesetsLibrary(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.d("getLivesetsLibrary")
-        val mediaItems: MutableList<MediaItem> = ArrayList()
+    private fun getLivesetsLibrary(context: Context): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("getSongsLibrary")
 
-        val currentYear = listOf(Calendar.getInstance().get(Calendar.YEAR).toString())
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+        // Default hardcoded presets
         val presets = listOf(
             TileInfo("Search", length = "long"),
             TileInfo("Recent", length = "long"),
             TileInfo("Random", sortMethod = "Random", length = "long"),
             TileInfo("Starred", ratingMin = 5, length = "long"),
-            TileInfo("Bouncy Uptempo", genre = listOf("Bouncy Uptempo"), length = "long"),
-            TileInfo("Euphoric Hardstyle", genre = listOf("Euphoric Hardstyle"), length = "long"),
-            TileInfo("Hardcore", genre = listOf("Hardcore"), length = "long"),
-            TileInfo("Hardstyle", genre = listOf("Hardstyle"), length = "long"),
-            TileInfo("Hardstyle Classics", genre = listOf("Hardstyle Classics"), length = "long"),
-            TileInfo("Industrial Hardcore", genre = listOf("Industrial Hardcore"), length = "long"),
-            TileInfo(
-                "Mainstream Hardcore ",
-                genre = listOf("Mainstream Hardcore"),
-                length = "long"
-            ),
-            TileInfo(
-                "Mainstream Hardstyle ",
-                genre = listOf("Mainstream Hardstyle"),
-                length = "long"
-            ),
-            TileInfo("Raw Hardstyle ", genre = listOf("Raw Hardstyle"), length = "long"),
-            TileInfo("Uptempo Hardcore ", genre = listOf("Uptempo Hardcore"), length = "long"),
-            TileInfo("Zaagtempo", genre = listOf("Zaagtempo"), length = "long")
         )
 
+        // Add hardcoded presets
         presets.mapNotNullTo(mediaItems) { it.toMediaItem() }
 
-        return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems, null))
+        // Load user-defined tiles from storage and filter favorites
+        val savedFavoriteTiles = TileStorage.loadTiles(context, "liveset")
+            .filter { it.favorite }
+
+        // Add favorite user-defined tiles
+        savedFavoriteTiles.mapNotNullTo(mediaItems) { it.toMediaItem() }
+
+        return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems.toImmutableList(), null))
     }
 
     private fun getArtists(

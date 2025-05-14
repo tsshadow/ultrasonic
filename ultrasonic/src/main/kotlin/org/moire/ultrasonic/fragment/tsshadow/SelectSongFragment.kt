@@ -26,13 +26,14 @@ class SelectSongFragment : SelectFragment() {
     override fun defaultTileSet(): MutableList<TileInfo> {
         val currentYear = listOf(Year.now().value.toString())
         return mutableListOf(
-            TileInfo(genre = listOf("Euphoric Hardstyle"), length = defaultLength, year = currentYear),
-            TileInfo(genre = listOf("Hardstyle"), length = defaultLength, year = currentYear),
-            TileInfo(genre = listOf("Mainstream Hardstyle"), length = defaultLength, year = currentYear),
-            TileInfo(genre = listOf("Raw Hardstyle"), length = defaultLength, year = currentYear),
-            TileInfo(genre = listOf("Hardcore"), length = defaultLength, year = currentYear),
-            TileInfo(genre = listOf("Uptempo Hardcore"), length = defaultLength, year = currentYear),
-            TileInfo(genre = listOf("Bouncy Uptempo"), length = defaultLength, year = currentYear)
+            TileInfo(genre = listOf("Euphoric Hardstyle"), length = defaultLength, year = currentYear, favorite = true),
+            TileInfo(genre = listOf("Hardstyle"), length = defaultLength, year = currentYear, favorite = true),
+            TileInfo(genre = listOf("Mainstream Hardstyle"), length = defaultLength, year = currentYear, favorite = true),
+            TileInfo(genre = listOf("Raw Hardstyle"), length = defaultLength, year = currentYear, favorite = true),
+            TileInfo(genre = listOf("Hardcore"), length = defaultLength, year = currentYear, favorite = true),
+            TileInfo(genre = listOf("Mainstream Hardcore"), length = defaultLength, year = currentYear, favorite = true),
+            TileInfo(genre = listOf("Uptempo Hardcore"), length = defaultLength, year = currentYear, favorite = true),
+            TileInfo(genre = listOf("Bouncy Uptempo"), length = defaultLength, year = currentYear, favorite = true),
         )
     }
 }
