@@ -195,6 +195,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/save_preset" />
@@ -205,6 +206,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/search" />
@@ -215,6 +217,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/update" />
@@ -226,6 +229,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
+
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/delete" />
