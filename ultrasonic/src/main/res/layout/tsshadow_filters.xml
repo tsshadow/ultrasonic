@@ -9,8 +9,9 @@
 
     <LinearLayout
         android:id="@+id/filter_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_margin="12dp"
         android:background="@drawable/rounded_background_popup"
         android:elevation="8dp"
@@ -34,16 +35,17 @@
                 android:textStyle="bold"
                 tools:ignore="RelativeOverlap" />
 
+            <!-- Close Button -->
             <ImageButton
                 android:id="@+id/close_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_alignParentEnd="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/close"
-                android:padding="4dp"
                 android:src="@android:drawable/ic_menu_close_clear_cancel" />
         </RelativeLayout>
+
 
         <!-- Scrollable content -->
         <ScrollView
@@ -80,91 +82,89 @@
                     android:id="@+id/add_chip_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:singleLine="false"
-                    android:paddingBottom="8dp" />
+                    android:paddingBottom="8dp"
+                    app:singleLine="false" />
 
             </LinearLayout>
         </ScrollView>
-                <!-- Rating -->
-                <LinearLayout
-                    android:layout_width="match_parent"
+        <!-- Rating -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rating" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/select_rating_min"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
+                    android:layout_weight="1" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/rating" />
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="match_parent" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <Spinner
-                            android:id="@+id/select_rating_min"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-
-                        <View
-                            android:layout_width="8dp"
-                            android:layout_height="match_parent" />
-
-                        <Spinner
-                            android:id="@+id/select_rating_max"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Sort -->
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <Spinner
+                    android:id="@+id/select_rating_max"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
+                    android:layout_weight="1" />
+            </LinearLayout>
+        </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sort_method" />
+        <!-- Sort -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="vertical">
 
-                    <Spinner
-                        android:id="@+id/select_sort_method"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sort_method" />
 
-                <!-- Result count -->
-                <LinearLayout
-                    android:id="@+id/select_result_count_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical"
-                    android:paddingHorizontal="16dp">
+            <Spinner
+                android:id="@+id/select_sort_method"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/select_result_count_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/result_count"
-                        android:textStyle="bold" />
+        <!-- Result count -->
+        <LinearLayout
+            android:id="@+id/select_result_count_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp">
 
-                    <com.google.android.material.slider.Slider
-                        android:id="@+id/select_result_count_slider"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:stepSize="1"
-                        android:value="1"
-                        android:valueFrom="0"
-                        android:valueTo="5"
-                        app:labelBehavior="gone"
-                        app:tickVisible="true" />
-                </LinearLayout>
+            <TextView
+                android:id="@+id/select_result_count_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/result_count"
+                android:textStyle="bold" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/select_result_count_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stepSize="1"
+                android:value="1"
+                android:valueFrom="0"
+                android:valueTo="5"
+                app:tickVisible="true" />
+        </LinearLayout>
 
 
         <!-- Button row -->
@@ -175,7 +175,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
-            android:padding="16dp"
             android:weightSum="2">
 
             <Button
@@ -184,6 +183,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/save_preset" />
@@ -194,6 +194,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/search" />
@@ -203,6 +204,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/update" />
@@ -214,6 +216,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
+
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="@color/design_default_color_primary_dark"
                 android:text="@string/delete" />
