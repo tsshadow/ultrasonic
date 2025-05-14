@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import java.util.Collections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -57,13 +56,13 @@ import org.moire.ultrasonic.util.DownloadAction
 import org.moire.ultrasonic.util.DownloadUtil
 import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
 import org.moire.ultrasonic.util.Settings
-import org.moire.ultrasonic.util.Util.ifNotNull
 import org.moire.ultrasonic.util.Util.navigateToCurrent
 import org.moire.ultrasonic.util.Util.toast
 import org.moire.ultrasonic.util.toastingExceptionHandler
 import org.moire.ultrasonic.view.SortOrder
 import org.moire.ultrasonic.view.ViewCapabilities
 import timber.log.Timber
+import java.util.Collections
 
 /**
  * Displays a group of tracks, eg. the songs of an album, of a playlist etc.
@@ -90,6 +89,10 @@ open class TrackCollectionFragment(
     private var shareButtonVisible = false
     private var playAllButton: MenuItem? = null
     private var shareButton: MenuItem? = null
+    private var currentOffset = 0
+    private var isLoading = false
+    private var hasMoreData = true
+    private val pageSize get() = navArgs.size.takeIf { it > 0 } ?: Settings.maxSongs
 
     internal val mediaPlayerManager: MediaPlayerManager by inject()
     private val shareHandler: ShareHandler by inject()
@@ -192,9 +195,10 @@ open class TrackCollectionFragment(
     }
 
     private fun loadMoreTracks() {
-        if (displayRandom() || navArgs.genre != null) {
-            getLiveData(append = true)
-        }
+        if (isLoading || !hasMoreData) return
+
+        isLoading = true
+        getLiveData(append = true)
     }
 
     internal open fun handleRefresh() {
@@ -424,46 +428,41 @@ open class TrackCollectionFragment(
         }
     }
 
-    override val defaultObserver: (List<MusicDirectory.Child>) -> Unit = {
-
+    override val defaultObserver: (List<MusicDirectory.Child>) -> Unit = { newItems ->
         Timber.i("Received list")
-        val entryList: MutableList<MusicDirectory.Child> = it.toMutableList()
+        val entryList = newItems.toMutableList()
 
         if (listModel.currentListIsSortable && Settings.shouldSortByDisc) {
-            Collections.sort(entryList, EntryByDiscAndTrackComparator())
+            entryList.sortWith(EntryByDiscAndTrackComparator())
         }
 
         var allVideos = true
         var songCount = 0
 
         for (entry in entryList) {
-            if (!entry.isVideo) {
-                allVideos = false
-            }
-            if (!entry.isDirectory) {
-                songCount++
-            }
+            if (!entry.isVideo) allVideos = false
+            if (!entry.isDirectory) songCount++
         }
 
-        // Hide select button for video lists and singular selection lists
         selectButton!!.isVisible = !allVideos && viewAdapter.hasMultipleSelection() && songCount > 0
-
-        // Show a text if we have no entries
         emptyView.isVisible = entryList.isEmpty()
 
         triggerButtonUpdate()
 
         val isAlbumList = (navArgs.albumListType != null)
-
         playAllButtonVisible = !(isAlbumList || entryList.isEmpty()) && !allVideos
         shareButtonVisible = !isOffline() && songCount > 0
 
         playAllButton?.isVisible = playAllButtonVisible
         shareButton?.isVisible = shareButtonVisible
 
+        if (entryList.size < pageSize) {
+            hasMoreData = false
+        }
+
         if (songCount > 0 && listModel.showHeader) {
             val intentAlbumName = navArgs.name
-            val albumHeader = AlbumHeader(it, intentAlbumName)
+            val albumHeader = AlbumHeader(entryList, intentAlbumName)
             val mixedList: MutableList<Identifiable> = mutableListOf(albumHeader)
             mixedList.addAll(entryList)
             viewAdapter.submitList(mixedList)
@@ -471,14 +470,11 @@ open class TrackCollectionFragment(
             viewAdapter.submitList(entryList)
         }
 
-        val playAll = navArgs.autoPlay
-
-        if (playAll && songCount > 0) {
+        if (navArgs.autoPlay && songCount > 0) {
             playAll(navArgs.shuffle, MediaPlayerManager.InsertionMode.CLEAR)
         }
 
         listModel.currentListIsSortable = true
-
         Timber.i("Processed list")
     }
 
@@ -543,9 +539,14 @@ open class TrackCollectionFragment(
         val getVideos = navArgs.getVideos
         val getRandomTracks = displayRandom()
         val size = if (navArgs.size < 0) Settings.maxSongs else navArgs.size
-        val offset = navArgs.offset
-        val refresh2 = navArgs.refresh || refresh
 
+        val offset = if (append) currentOffset else 0
+        val refresh2 = navArgs.refresh || refresh
+        Timber.i("Lazy loading: size=$size, offset=$offset")
+        if (!append) {
+            currentOffset = 0
+            hasMoreData = true
+        }
         listModel.viewModelScope.launch(
             toastingExceptionHandler()
         ) {
@@ -644,7 +645,10 @@ open class TrackCollectionFragment(
                     listModel.getMusicDirectory(refresh2, id, name)
                 }
             }
-
+            if (append) {
+                currentOffset += pageSize
+            }
+            isLoading = false
             swipeRefresh?.isRefreshing = false
         }
         return listModel.currentList
