@@ -78,7 +78,6 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         // If appending the existing list, set the offset from where to load
         var newOffset = offset
         if (append) newOffset += (count + loadedUntil)
-
         withContext(Dispatchers.IO) {
             val service = MusicServiceFactory.getMusicService()
             val musicDirectory = service.getSongs(

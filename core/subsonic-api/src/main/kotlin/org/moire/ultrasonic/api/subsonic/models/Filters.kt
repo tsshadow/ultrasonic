@@ -55,4 +55,18 @@ class Filters {
     private var filters: MutableList<Filter> = mutableListOf()
 
     fun getAll(): List<Filter> = filters.toList()
+
+    fun sanitized(): Filters {
+        return Filters().apply {
+            for (filter in this) {
+                if (filter.value is String && filter.value.isNotBlank()) {
+                    add(filter)
+                } else if (filter.value is Collection<*> && filter.value.isNotEmpty()) {
+                    add(filter)
+                }
+            }
+        }
+    }
+
+    operator fun iterator(): Iterator<Filter> = filters.iterator()
 }

@@ -2,11 +2,13 @@ plugins {
     alias libs.plugins.ksp
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'kotlin-parcelize'
-apply plugin: "androidx.navigation.safeargs.kotlin"
-apply from: "../gradle_scripts/code_quality.gradle"
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
+    id("kotlin-parcelize")
+    id("androidx.navigation.safeargs.kotlin")
+}
 
 android {
     compileSdkVersion versions.compileSdk
@@ -152,5 +154,7 @@ dependencies {
     implementation libs.timber
     implementation(libs.media)
     implementation libs.gson
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 }
 
