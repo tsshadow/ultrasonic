@@ -171,6 +171,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             ratingMax = state.ratingMax,
             size = state.count,
             festivalLineup = state.festivalLineup,
+            favorite = state.favorite
         )
     }
 
@@ -187,7 +188,8 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             sortMethod = tile.sortMethod,
             ratingMin = tile.ratingMin,
             ratingMax = tile.ratingMax,
-            count = tile.size
+            count = tile.size,
+            favorite = tile.favorite
         )
         val modal = FilterModalFragment.newInstance(filterState, true, filterModalType)
         modal.show(childFragmentManager, "FilterModal")

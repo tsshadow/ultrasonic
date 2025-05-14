@@ -64,7 +64,8 @@ class TileInfo(
     val length: String = "short",
     val ratingMin: Int = 0,
     val ratingMax: Int = 5,
-    val sortMethod: String = "AddedDesc"
+    val sortMethod: String = "AddedDesc",
+    val favorite: Boolean = false,
 ) {
     init {
         if (title == "") title = createDefaultTitle()

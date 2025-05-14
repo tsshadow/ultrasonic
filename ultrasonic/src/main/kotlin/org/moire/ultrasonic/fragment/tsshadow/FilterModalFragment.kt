@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ArrayAdapter
+import android.widget.ImageButton
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -186,6 +187,9 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         filterOptionsViewModel.festivals.observe(viewLifecycleOwner) { festivals ->
             redrawAllChips(filterOptionsViewModel.genres.value, filterOptionsViewModel.years.value, filterOptionsViewModel.labels.value, filterOptionsViewModel.lineups.value, festivals)
         }
+        filterOptionsViewModel.favorite.observe(viewLifecycleOwner) { favorite ->
+            binding.favoriteButton.isSelected = favorite
+        }
     }
 
     private fun redrawAllChips(genres: List<String>?, years: List<String>?, labels: List<String>?, lineups: List<String>?, festivals: List<String>?) {
@@ -274,9 +278,12 @@ class FilterModalFragment : BottomSheetDialogFragment() {
             getString(R.string.result_count_format, selectedResultCount)
         binding.selectRatingMin.setSelection(filters.ratingMin)
         binding.selectRatingMax.setSelection(filters.ratingMax)
+        binding.favoriteButton.isSelected = filters.favorite
         sortOptions.indexOfFirst { it.second == filters.sortMethod }
             .takeIf { it >= 0 }
             ?.let { binding.selectSortMethod.setSelection(it) }
+
+
         val isEdit = arguments?.getBoolean(ARG_EDIT_MODE)!!
         binding.save.visibility = if (isEdit) GONE else VISIBLE
         binding.search.visibility = if (isEdit) GONE else VISIBLE

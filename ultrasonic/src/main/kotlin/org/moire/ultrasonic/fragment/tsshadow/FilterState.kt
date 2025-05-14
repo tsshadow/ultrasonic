@@ -13,4 +13,5 @@ data class FilterState(
     val label: List<String> = emptyList(),
     val festival: List<String> = emptyList(),
     val festivalLineup: String? = null,
+    val favorite: Boolean = false
 ) : Parcelable
