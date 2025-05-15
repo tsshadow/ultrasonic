@@ -912,8 +912,9 @@ class MediaLibraryBrowser(
                         listOf(MEDIA_SONG_RANDOM_ID).joinToString("|")
                     )
                 }
-
-                songs.getTracks().map { song ->
+                val items = songs.getTracks()
+                dataProvider.randomSongsCache = items
+                items.map { song ->
                     mediaItems.add(
                         song.toMediaItem(
                             listOf(MEDIA_SONG_RANDOM_ITEM, song.id).joinToString("|")
