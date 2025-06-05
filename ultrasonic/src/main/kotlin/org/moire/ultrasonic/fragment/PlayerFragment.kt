@@ -1083,9 +1083,9 @@ class PlayerFragment :
             }
 
             if (Settings.showNowPlayingDetails) {
-                genreTextView.text = currentSong!!.genre
+                genreTextView.text = currentSong!!.genre?.joinToString(", ")
                 genreTextView.isVisible =
-                    (currentSong!!.genre != null && currentSong!!.genre!!.isNotBlank())
+                    (currentSong!!.genre != null && currentSong!!.genre!!.isNotEmpty())
 
                 var bitRate = ""
                 if (currentSong!!.bitRate != null && currentSong!!.bitRate!! > 0) {

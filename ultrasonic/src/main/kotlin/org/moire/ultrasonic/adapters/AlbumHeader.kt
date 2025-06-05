@@ -61,8 +61,8 @@ class AlbumHeader(
                     }
                     _artists.add(entry.artist!!)
                 }
-                if (entry.genre != null) {
-                    _genres.add(entry.genre!!)
+                entry.genre?.let {
+                    _genres.addAll(it)
                 }
                 if (entry.year != null) {
                     _years.add(entry.year!!)

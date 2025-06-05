@@ -49,7 +49,7 @@ class MusicDirectory : ArrayList<MusicDirectory.Child>() {
         abstract var artistId: String?
         abstract var duration: Int?
         abstract var year: Int?
-        abstract var genre: String?
+        abstract var genre: List<String>?
         abstract var starred: Boolean
         abstract var path: String?
         abstract var closeness: Int

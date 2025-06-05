@@ -35,7 +35,7 @@ class APIAlbumConverterTest {
             duration `should be equal to` entity.duration
             created `should be equal to` entity.created?.time
             year `should be equal to` entity.year
-            genre `should be equal to` entity.genre
+            genre `should be equal to` listOf(entity.genre)
         }
     }
 

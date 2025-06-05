@@ -62,7 +62,7 @@ class APIMusicDirectoryConverterTest : BaseTest() {
             artistId `should be equal to` entity.artistId
             track `should be equal to` entity.track
             year `should be equal to` entity.year!!
-            genre `should be equal to` entity.genre
+            genre `should be equal to` listOf(entity.genre)
             contentType `should be equal to` entity.contentType
             suffix `should be equal to` entity.suffix
             transcodedContentType `should be equal to` entity.transcodedContentType

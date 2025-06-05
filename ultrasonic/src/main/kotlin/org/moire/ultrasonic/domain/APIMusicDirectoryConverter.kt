@@ -44,7 +44,11 @@ private fun populateCommonProps(entry: MusicDirectory.Child, source: MusicDirect
     entry.artist = source.artist
     entry.artistId = source.artistId
     entry.year = source.year
-    entry.genre = source.genre
+    entry.genre = when {
+        source.genres.isNotEmpty() -> source.genres.map { it.name }
+        source.genre.isNotBlank() -> listOf(source.genre)
+        else -> emptyList()
+    }
     entry.coverArt = source.coverArt
     entry.duration = source.duration
     entry.path = source.path

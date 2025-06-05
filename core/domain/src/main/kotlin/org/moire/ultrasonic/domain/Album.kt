@@ -28,7 +28,7 @@ data class Album(
     override var artistId: String? = null,
     override var duration: Int? = 0,
     override var year: Int? = 0,
-    override var genre: String? = null,
+    override var genre: List<String>? = null,
     override var starred: Boolean = false,
     override var path: String? = null,
     override var closeness: Int = 0

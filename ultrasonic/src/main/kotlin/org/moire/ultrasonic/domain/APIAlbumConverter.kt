@@ -26,7 +26,7 @@ fun Album.toDomainEntity(serverId: Int): DomainAlbum = Album(
     duration = this@toDomainEntity.duration,
     created = this@toDomainEntity.created?.time,
     year = this@toDomainEntity.year,
-    genre = this@toDomainEntity.genre,
+    genre = if (this@toDomainEntity.genre.isNotBlank()) listOf(this@toDomainEntity.genre) else emptyList(),
     starred = this@toDomainEntity.starredDate.isNotEmpty()
 )
 

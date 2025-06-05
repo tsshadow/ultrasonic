@@ -1,6 +1,7 @@
 package org.moire.ultrasonic.api.subsonic.models
 
 import java.util.Calendar
+import com.fasterxml.jackson.annotation.JsonProperty
 
 data class MusicDirectoryChild(
     val id: String = "",
@@ -12,6 +13,7 @@ data class MusicDirectoryChild(
     val track: Int = -1,
     val year: Int? = null,
     val genre: String = "",
+    @JsonProperty("genres") val genres: List<Genre> = emptyList(),
     val coverArt: String = "",
     val size: Long = -1,
     val contentType: String = "",

@@ -67,6 +67,16 @@ class Converters {
     fun dateToTimestamp(date: Date?): Long? {
         return date?.time
     }
+
+    @TypeConverter
+    fun listToString(list: List<String>?): String? {
+        return list?.joinToString(separator = "|")
+    }
+
+    @TypeConverter
+    fun stringToList(value: String?): List<String>? {
+        return value?.takeIf { it.isNotBlank() }?.split("|")
+    }
 }
 
 val META_MIGRATION_2_3: Migration = object : Migration(2, 3) {
