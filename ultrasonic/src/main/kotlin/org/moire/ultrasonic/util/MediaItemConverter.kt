@@ -17,6 +17,8 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MUSIC
 import androidx.media3.common.StarRating
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import java.text.DateFormat
 import java.text.ParseException
 import java.util.Date
@@ -70,6 +72,7 @@ fun Track.toMediaItem(mediaId: String = id): MediaItem {
 
     val artworkUri = AlbumArtContentProvider.mapArtworkToContentProviderUri(this)
 
+
     val mediaItem = buildMediaItem(
         title = title ?: "",
         mediaId = mediaId,
@@ -120,7 +123,12 @@ fun Track.toMediaItem(mediaId: String = id): MediaItem {
     mediaItem.mediaMetadata.extras?.putInt("closeness", closeness)
     mediaItem.mediaMetadata.extras?.putInt("bookmarkPosition", bookmarkPosition)
     mediaItem.mediaMetadata.extras?.putString("name", name)
-
+    if (!genres.isNullOrEmpty()) {
+        mediaItem.mediaMetadata.extras?.putString(
+            "genreValues",
+            Gson().toJson(genres)
+        )
+    }
     if (userRating != null) {
         mediaItem.mediaMetadata.extras?.putInt("userRating", userRating!!)
         metadataBuilder.setUserRating(StarRating(5, userRating!!.toFloat()))
@@ -151,7 +159,9 @@ fun MediaItem.toTrack(): Track {
     // No cache hit, generate it
     val created = mediaMetadata.extras?.getString("created")
     val createdDate = safeParseDate(created)
-
+    val genres: List<String>? = mediaMetadata.extras?.getString("genreValues")?.let {
+        Gson().fromJson<List<String>>(it, object : TypeToken<List<String>>() {}.type)
+    }
     val track = Track(
         mediaId,
         mediaMetadata.extras?.getInt("serverId") ?: -1,
@@ -165,6 +175,7 @@ fun MediaItem.toTrack(): Track {
         mediaMetadata.trackNumber,
         mediaMetadata.releaseYear,
         mediaMetadata.genre as String?,
+        genres,
         mediaMetadata.extras?.getString("contentType"),
         mediaMetadata.extras?.getString("suffix"),
         mediaMetadata.extras?.getString("transcodedContentType"),
@@ -196,7 +207,7 @@ fun MediaItem.toTrack(): Track {
         mediaMetadata.extras?.getInt("bookmarkPosition", 0) ?: 0,
         mediaMetadata.extras?.getInt("userRating", 0) ?: 0,
         mediaMetadata.extras?.getFloat("averageRating", 0F) ?: 0F,
-        mediaMetadata.extras?.getString("name")
+        mediaMetadata.extras?.getString("name"),
     )
     if (mediaMetadata.userRating is HeartRating) {
         track.starred = (mediaMetadata.userRating as HeartRating).isHeart

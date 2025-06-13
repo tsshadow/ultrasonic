@@ -159,6 +159,7 @@ class ActiveServerProvider(
             METADATA_DB + serverId
         )
             .addMigrations(META_MIGRATION_2_3)
+            .addMigrations(META_MIGRATION_3_4)
             .fallbackToDestructiveMigrationOnDowngrade()
             .build()
     }

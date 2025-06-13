@@ -65,6 +65,7 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
         offset: Int,
         count: Int
     ) {
+        Timber.d(if (isOffline) "Is Offline" else "Is Online")
         CoroutineScope(Dispatchers.IO).launch {
             val musicFolderId = activeServer.musicFolderId
 

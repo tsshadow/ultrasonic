@@ -1,5 +1,6 @@
 package org.moire.ultrasonic.api.subsonic.models
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.Calendar
 
 data class MusicDirectoryChild(
@@ -12,6 +13,7 @@ data class MusicDirectoryChild(
     val track: Int = -1,
     val year: Int? = null,
     val genre: String = "",
+    @JsonProperty("genres") val genresValue: List<ApiGenre> = emptyList(),
     val coverArt: String = "",
     val size: Long = -1,
     val contentType: String = "",
@@ -37,3 +39,17 @@ data class MusicDirectoryChild(
     val userRating: Int? = null,
     val averageRating: Float? = null
 )
+
+class ApiGenre {
+    @JsonProperty("name") val name: String = ""
+}
+/** List of genre names from the API. */
+val MusicDirectoryChild.genreNames: List<String>
+    get() = genresValue.map { it.name }
+
+/**
+ * Genre string used by the player. Joins [genreNames] when present or falls back to
+ * the single [genre] field.
+ */
+val MusicDirectoryChild.combinedGenre: String
+    get() = if (genreNames.isNotEmpty()) genreNames.joinToString() else genre

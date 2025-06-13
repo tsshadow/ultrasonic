@@ -40,8 +40,6 @@ import org.moire.ultrasonic.util.Util.ifNotNull
 import org.moire.ultrasonic.util.buildMediaItem
 import org.moire.ultrasonic.util.toMediaItem
 import timber.log.Timber
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 /**
  * @class MediaLibraryBrowser
@@ -105,7 +103,7 @@ class MediaLibraryBrowser(
         browser: MediaSession.ControllerInfo,
         params: MediaLibraryService.LibraryParams?
     ): ListenableFuture<LibraryResult<MediaItem>> {
-        Timber.i("onGetLibraryRoot")
+        Timber.i("onGetLibraryRoot", session, browser)
         return Futures.immediateFuture(
             LibraryResult.ofItem(
                 buildMediaItem(
@@ -202,7 +200,7 @@ class MediaLibraryBrowser(
         pageSize: Int,
         params: MediaLibraryService.LibraryParams?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.i("getChildren")
+        Timber.i("getChildren", session, browser, params)
         return loadChildren(parentId, page, pageSize)
     }
 
@@ -234,8 +232,8 @@ class MediaLibraryBrowser(
             MEDIA_ALBUM_ID -> getAlbums(AlbumListType.SORTED_BY_NAME)
             MEDIA_ALBUM_PAGE_ID -> {
                 val listType = parts.getOrNull(1)?.let { AlbumListType.fromName(it) }
-                val page = parts.getOrNull(2)?.toIntOrNull()
-                if (listType != null && page != null) getAlbums(listType, page)
+                val lPage = parts.getOrNull(2)?.toIntOrNull()
+                if (listType != null && lPage != null) getAlbums(listType, lPage)
                 else emptyResult("Invalid album page params in $parentId")
             }
 

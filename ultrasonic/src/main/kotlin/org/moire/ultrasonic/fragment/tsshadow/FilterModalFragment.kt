@@ -2,6 +2,7 @@ package org.moire.ultrasonic.fragment.tsshadow
 
 import FilterOptionsViewModel
 import FilterState
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -71,16 +73,17 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.UltrasonicFilterDialogTheme)
-        modalType = requireArguments().getSerializable(ARG_TYPE) as FilterModalType
+        modalType = requireArguments().getSerializable(ARG_TYPE, FilterModalType::class.java)!!
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?) =
         BottomSheetDialog(requireContext(), theme).apply {
             setOnShowListener {
-                val dialog = this as BottomSheetDialog
+                val dialog = this
                 val bottomSheet = dialog.findViewById<View>(
                     com.google.android.material.R.id.design_bottom_sheet
                 )
@@ -319,8 +322,9 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun applyInitialFilters() {
-        val filters = arguments?.getParcelable<FilterState>(ARG_INITIAL_FILTERS) ?: return
+        val filters = arguments?.getParcelable(ARG_INITIAL_FILTERS, FilterState::class.java) ?: return
         binding.selectTitle.setText(filters.title)
         selectedGenres.addAll(filters.genres)
         selectedYears.addAll(filters.years)

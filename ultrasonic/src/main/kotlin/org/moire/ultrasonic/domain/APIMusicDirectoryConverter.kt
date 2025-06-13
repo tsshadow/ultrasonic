@@ -14,6 +14,8 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import org.moire.ultrasonic.api.subsonic.models.MusicDirectory as APIMusicDirectory
 import org.moire.ultrasonic.api.subsonic.models.MusicDirectoryChild
+import org.moire.ultrasonic.api.subsonic.models.genreNames
+import timber.log.Timber
 
 /*
  * Converts MusicDirectory entity from [org.moire.ultrasonic.api.subsonic.SubsonicAPIClient]
@@ -45,6 +47,8 @@ private fun populateCommonProps(entry: MusicDirectory.Child, source: MusicDirect
     entry.artistId = source.artistId
     entry.year = source.year
     entry.genre = source.genre
+    entry.genres = source.genreNames
+    Timber.d("entry.genres = ${entry.genres}")
     entry.coverArt = source.coverArt
     entry.duration = source.duration
     entry.path = source.path

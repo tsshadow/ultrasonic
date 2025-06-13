@@ -1083,7 +1083,13 @@ class PlayerFragment :
             }
 
             if (Settings.showNowPlayingDetails) {
-                genreTextView.text = currentSong!!.genre
+                val genres = currentSong?.genres
+                val genreString = if (!genres.isNullOrEmpty()) {
+                    genres.joinToString(", ")
+                } else {
+                    currentSong?.genre ?: ""
+                }
+                genreTextView.text = genreString
                 genreTextView.isVisible =
                     (currentSong!!.genre != null && currentSong!!.genre!!.isNotBlank())
 

@@ -32,8 +32,8 @@ abstract class AppDatabase : RoomDatabase() {
 }
 
 val MIGRATION_1_2: Migration = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             "ALTER TABLE ServerSetting ADD COLUMN minimumApiVersion TEXT"
         )
     }
@@ -79,17 +79,17 @@ val MIGRATION_2_1: Migration = object : Migration(2, 1) {
 }
 
 val MIGRATION_2_3: Migration = object : Migration(2, 3) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             "ALTER TABLE ServerSetting ADD COLUMN chatSupport INTEGER"
         )
-        database.execSQL(
+        db.execSQL(
             "ALTER TABLE ServerSetting ADD COLUMN bookmarkSupport INTEGER"
         )
-        database.execSQL(
+        db.execSQL(
             "ALTER TABLE ServerSetting ADD COLUMN shareSupport INTEGER"
         )
-        database.execSQL(
+        db.execSQL(
             "ALTER TABLE ServerSetting ADD COLUMN podcastSupport INTEGER"
         )
     }

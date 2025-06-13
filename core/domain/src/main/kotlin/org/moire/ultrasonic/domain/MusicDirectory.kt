@@ -50,6 +50,7 @@ class MusicDirectory : ArrayList<MusicDirectory.Child>() {
         abstract var duration: Int?
         abstract var year: Int?
         abstract var genre: String?
+        abstract var genres: List<String>?
         abstract var starred: Boolean
         abstract var path: String?
         abstract var closeness: Int

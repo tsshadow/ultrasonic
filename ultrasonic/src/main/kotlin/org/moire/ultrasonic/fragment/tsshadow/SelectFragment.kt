@@ -95,13 +95,14 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
 
     protected abstract fun setTitle()
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun setupFilterModalListener() {
         childFragmentManager.setFragmentResultListener(
             "filters_result",
             viewLifecycleOwner
         ) { _, bundle ->
-            val filterState =
-                bundle.getParcelable<FilterState>("filters") ?: return@setFragmentResultListener
+            val filterState = bundle.getParcelable("filters", FilterState::class.java) ?: return@setFragmentResultListener
+
             val action = bundle.getString("action") ?: return@setFragmentResultListener
 
             when (action) {
