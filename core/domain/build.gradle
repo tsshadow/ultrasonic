@@ -11,7 +11,7 @@ dependencies {
     ksp libs.room
 }
 android {
-    namespace 'org.moire.ultrasonic.subsonic.domain'
+    namespace 'org.moire.ultrasonic.domain'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
@@ -26,3 +26,6 @@ android {
     }
 }
 
+android {
+    sourceSets["main"].java.srcDirs("src/main/kotlin")
+}
