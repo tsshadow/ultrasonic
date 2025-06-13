@@ -54,6 +54,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
         mapOf(
             getString(R.string.sort_none) to "None",
             getString(R.string.sort_random) to "Random",
+            getString(R.string.sort_date_and_release) to "DateDescAndRelease",
             getString(R.string.sort_added_desc) to "AddedDesc",
             getString(R.string.sort_written_desc) to "LastWrittenDesc"
         )

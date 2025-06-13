@@ -297,6 +297,8 @@ class MediaLibraryBrowser(
 
                 val sortMethod = parts.getOrNull(4)
                 val festivalLineup = parts.getOrNull(5)
+                val ratingMin = parts.getOrNull(6)?.toIntOrNull() ?: 0
+                val ratingMax = parts.getOrNull(7)?.toIntOrNull() ?: 5
 
                 if (length != null && sortMethod != null) {
                     getGenre(
@@ -306,7 +308,9 @@ class MediaLibraryBrowser(
                         sortMethod = sortMethod,
                         page = safePage,
                         pageSize = safePageSize,
-                        festivalLineup = festivalLineup
+                        festivalLineup = festivalLineup ,
+                        ratingMin = ratingMin,
+                        ratingMax = ratingMax,
                     )
                 } else {
                     emptyResult("Invalid genre/song filter in $parentId")
@@ -846,9 +850,10 @@ class MediaLibraryBrowser(
         return mainScope.future {
 
             val sortMethods = mapOf(
+                "Willekeurig" to "Random",
+                "Release datum" to "DateDescAndRelease",
                 "Recent toegevoegd" to "AddedDesc",
-                "Recent aangepast" to "LastWrittenDesc",
-                "Willekeurig" to "Random"
+                "Recent aangepast" to "LastWrittenDesc"
             )
 
             sortMethods.forEach { (name, value) ->
@@ -872,7 +877,9 @@ class MediaLibraryBrowser(
         sortMethod: String,
         festivalLineup: String? = null,
         page: Int,
-        pageSize: Int
+        pageSize: Int,
+        ratingMin: Int? = 0,
+        ratingMax: Int? = 5
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
         Timber.i("getGenre: genres=$genres years=$years length=$length page=$page pageSize=$pageSize")
@@ -896,8 +903,8 @@ class MediaLibraryBrowser(
                 callWithErrorHandling {
                     musicService.getSongs(
                         filters = filters,
-                        ratingMin = null,
-                        ratingMax = null,
+                        ratingMin = ratingMin,
+                        ratingMax = ratingMax,
                         count = pageSize,
                         offset = offset,
                         sortMethod = sortMethod,
@@ -1045,7 +1052,7 @@ class MediaLibraryBrowser(
             title.contains("Recent", ignoreCase = true) -> "$MEDIA_SONG_RECENT|$length"
             title.contains("Starred", ignoreCase = true) -> "$MEDIA_SONG_STARRED_ID|$length"
             title.contains("Search", ignoreCase = true) -> "$MEDIA_GET_GENRES|$length"
-            else -> "$MEDIA_GET_SONGS_BY_GENRE|$length|$genreValue|$yearValue|$sortMethod|$festivalLineup"
+            else -> "$MEDIA_GET_SONGS_BY_GENRE|$length|$genreValue|$yearValue|$sortMethod|$festivalLineup|$ratingMin|$ratingMax"
         }
 
         val groupName = context.getString(
