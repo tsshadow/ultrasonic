@@ -176,6 +176,7 @@ fun MediaItem.toTrack(): Track {
         mediaMetadata.releaseYear,
         mediaMetadata.genre as String?,
         genres,
+        mediaMetadata.extras?.getString("date"),
         mediaMetadata.extras?.getString("contentType"),
         mediaMetadata.extras?.getString("suffix"),
         mediaMetadata.extras?.getString("transcodedContentType"),

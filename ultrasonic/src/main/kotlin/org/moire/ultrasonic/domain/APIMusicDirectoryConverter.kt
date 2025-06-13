@@ -48,7 +48,7 @@ private fun populateCommonProps(entry: MusicDirectory.Child, source: MusicDirect
     entry.year = source.year
     entry.genre = source.genre
     entry.genres = source.genreNames
-    Timber.d("entry.genres = ${entry.genres}")
+    entry.date = source.date
     entry.coverArt = source.coverArt
     entry.duration = source.duration
     entry.path = source.path

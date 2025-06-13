@@ -158,6 +158,7 @@ class PlayerFragment :
     private lateinit var artistTextView: TextView
     private lateinit var albumTextView: TextView
     private lateinit var genreTextView: TextView
+    private lateinit var releaseDateView: TextView
     private lateinit var bitrateFormatTextView: TextView
     private lateinit var albumArtImageView: ImageView
     private lateinit var playlistView: RecyclerView
@@ -213,6 +214,7 @@ class PlayerFragment :
         artistTextView = view.findViewById(R.id.current_playing_artist)
         albumTextView = view.findViewById(R.id.current_playing_album)
         genreTextView = view.findViewById(R.id.current_playing_genre)
+        releaseDateView = view.findViewById(R.id.current_playing_release_date)
         bitrateFormatTextView = view.findViewById(R.id.current_playing_bitrate_format)
         albumArtImageView = view.findViewById(R.id.current_playing_album_art_image)
         positionTextView = view.findViewById(R.id.current_playing_position)
@@ -1078,9 +1080,7 @@ class PlayerFragment :
             songTitleTextView.text = currentSong!!.title
             artistTextView.text = currentSong!!.artist
             albumTextView.text = currentSong!!.album
-            if (currentSong!!.year != null && Settings.showNowPlayingDetails) {
-                albumTextView.append(String.format(Locale.ROOT, " (%d)", currentSong!!.year))
-            }
+
 
             if (Settings.showNowPlayingDetails) {
                 val genres = currentSong?.genres
@@ -1092,7 +1092,8 @@ class PlayerFragment :
                 genreTextView.text = genreString
                 genreTextView.isVisible =
                     (currentSong!!.genre != null && currentSong!!.genre!!.isNotBlank())
-
+                releaseDateView.text = currentSong!!.date
+                releaseDateView.isVisible = currentSong!!.date != null
                 var bitRate = ""
                 if (currentSong!!.bitRate != null && currentSong!!.bitRate!! > 0) {
                     bitRate = String.format(
@@ -1107,6 +1108,7 @@ class PlayerFragment :
                 bitrateFormatTextView.isVisible = true
             } else {
                 genreTextView.isVisible = false
+                releaseDateView.isVisible = false
                 bitrateFormatTextView.isVisible = false
             }
 
@@ -1123,6 +1125,7 @@ class PlayerFragment :
             artistTextView.text = null
             albumTextView.text = null
             genreTextView.text = null
+            releaseDateView.isVisible = false
             bitrateFormatTextView.text = null
             downloadTrackTextView.text = null
             downloadTotalDurationTextView.text = null

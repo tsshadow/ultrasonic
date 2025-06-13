@@ -14,6 +14,7 @@ data class MusicDirectoryChild(
     val year: Int? = null,
     val genre: String = "",
     @JsonProperty("genres") val genresValue: List<ApiGenre> = emptyList(),
+    val date: String = "",
     val coverArt: String = "",
     val size: Long = -1,
     val contentType: String = "",

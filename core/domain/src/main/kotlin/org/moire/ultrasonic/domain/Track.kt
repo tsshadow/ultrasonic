@@ -28,6 +28,7 @@ data class Track(
     override var year: Int? = null,
     override var genre: String? = null,
     override var genres: List<String>? = null,
+    override var date: String? = null,
     var contentType: String? = null,
     var suffix: String? = null,
     var transcodedContentType: String? = null,
