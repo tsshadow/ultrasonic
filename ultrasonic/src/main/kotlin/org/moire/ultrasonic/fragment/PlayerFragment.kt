@@ -1092,8 +1092,9 @@ class PlayerFragment :
                 genreTextView.text = genreString
                 genreTextView.isVisible =
                     (currentSong!!.genre != null && currentSong!!.genre!!.isNotBlank())
-                releaseDateView.text = currentSong!!.date
-                releaseDateView.isVisible = currentSong!!.date != null
+                val dateText = currentSong!!.date ?: currentSong!!.year?.toString() ?: ""
+                releaseDateView.text = dateText
+                releaseDateView.isVisible = dateText.isNotBlank()
                 var bitRate = ""
                 if (currentSong!!.bitRate != null && currentSong!!.bitRate!! > 0) {
                     bitRate = String.format(
