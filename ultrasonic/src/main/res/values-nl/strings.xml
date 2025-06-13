@@ -452,6 +452,7 @@
     <string name="sort_none">Geen</string>
     <string name="sort_random">Willekeurig</string>
     <string name="sort_added_desc">Laatst toegevoegd</string>
+    <string name="sort_date_and_release">Release Datum</string>
     <string name="sort_written_desc">Laatst bewerkt</string>
     <string name="close">sluiten</string>
     <string name="select_items_placeholder">Alles</string>

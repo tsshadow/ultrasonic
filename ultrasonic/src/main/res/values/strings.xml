@@ -502,6 +502,7 @@
     <string name="sort_none">None</string>
     <string name="sort_random">Random</string>
     <string name="sort_added_desc">Last Added</string>
+    <string name="sort_date_and_release">Release Date</string>
     <string name="sort_written_desc">Last Edited</string>
     <string name="close">close</string>
     <string name="select_items_placeholder">All</string>
