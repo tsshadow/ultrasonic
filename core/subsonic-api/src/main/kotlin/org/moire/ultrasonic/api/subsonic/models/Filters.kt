@@ -31,7 +31,7 @@ class Filters {
     constructor()
 
     constructor(filters: Array<Filter>) {
-        this.filters = filters.toMutableList()
+        this.filterItems = filters.toMutableList()
     }
 
     constructor(filter: Filter) {
@@ -39,22 +39,22 @@ class Filters {
     }
 
     override fun toString(): String {
-        return if (filters.isNotEmpty()) {
-            filters.joinToString(prefix = "[", postfix = "]") { it.toString() }
+        return if (filterItems.isNotEmpty()) {
+            filterItems.joinToString(prefix = "[", postfix = "]") { it.toString() }
         } else {
             ""
         }
     }
 
     fun add(filter: Filter) {
-        filters.add(filter)
+        filterItems.add(filter)
     }
 
-    fun isEmpty(): Boolean = filters.isEmpty()
+    fun isEmpty(): Boolean = filterItems.isEmpty()
 
-    private var filters: MutableList<Filter> = mutableListOf()
+    private var filterItems: MutableList<Filter> = mutableListOf()
 
-    fun getAll(): List<Filter> = filters.toList()
+    fun getAll(): List<Filter> = filterItems.toList()
 
     fun sanitized(): Filters {
         return Filters().apply {
@@ -68,5 +68,5 @@ class Filters {
         }
     }
 
-    operator fun iterator(): Iterator<Filter> = filters.iterator()
+    operator fun iterator(): Iterator<Filter> = filterItems.iterator()
 }

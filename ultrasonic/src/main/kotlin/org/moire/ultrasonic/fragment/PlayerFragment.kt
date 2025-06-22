@@ -96,6 +96,7 @@ import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.fragment.PlayerFragmentDirections
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
@@ -812,6 +813,11 @@ class PlayerFragment :
                 )
                 return true
             }
+            R.id.menu_refresh_track -> {
+                if (track == null) return true
+                refreshTrack(track)
+                return true
+            }
             else -> return false
         }
     }
@@ -849,6 +855,13 @@ class PlayerFragment :
                 )
                 toast(msg)
             }
+        }
+    }
+
+    private fun refreshTrack(track: Track) {
+        ioScope.launch {
+            DownloadService.deleteAsync(listOf(track))
+            DownloadService.downloadAsync(listOf(track), save = false, isHighPriority = true)
         }
     }
 

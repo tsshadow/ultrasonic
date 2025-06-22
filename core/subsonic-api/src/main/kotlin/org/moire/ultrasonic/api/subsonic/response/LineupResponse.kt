@@ -11,8 +11,8 @@ class LineupResponse(
     error: SubsonicError?
 ) : SubsonicResponse(status, version, error) {
     @JsonProperty("lineups")
-    private val LineupWrapper = LineupWrapper()
-    val lineupList: List<Lineup> get() = LineupWrapper.lineupList
+    private val lineupWrapper = LineupWrapper()
+    val lineupList: List<Lineup> get() = lineupWrapper.lineupList
 }
 
 internal class LineupWrapper(@JsonProperty("lineup") val lineupList: List<Lineup> = emptyList())

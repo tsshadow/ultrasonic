@@ -69,6 +69,7 @@
     <string name="download.menu_screen_off">Scherm uit</string>
     <string name="download.menu_screen_on">Scherm aan</string>
     <string name="download.menu_show_album">Album tonen</string>
+    <string name="download.menu_refresh_track">Vernieuw nummer</string>
     <string name="download.menu_shuffle">Willekeurig</string>
     <string name="download.menu_shuffle_on">Willekeurige modus is ingeschakeld</string>
     <string name="download.menu_shuffle_off">Willekeurige modus is uitgeschakeld</string>

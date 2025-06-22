@@ -14,6 +14,10 @@
         a:id="@+id/menu_lyrics"
         a:title="@string/download.menu_lyrics"/>
     <item
+        a:id="@+id/menu_refresh_track"
+        a:title="@string/download.menu_refresh_track"
+        a:visible="true" />
+    <item
         a:id="@+id/menu_shuffle"
         a:title="@string/download.menu_shuffle"/>
 

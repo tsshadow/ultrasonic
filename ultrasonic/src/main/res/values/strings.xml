@@ -70,6 +70,7 @@
     <string name="download.menu_screen_on">Screen On</string>
     <string name="download.menu_show_album">Go to Album</string>
     <string name="download.menu_show_metadata">Show metadata</string>
+    <string name="download.menu_refresh_track">Refresh Track</string>
     <string name="download.menu_shuffle">Shuffle</string>
     <string name="download.menu_shuffle_on">Shuffle mode enabled</string>
     <string name="download.menu_shuffle_off">Shuffle mode disabled</string>

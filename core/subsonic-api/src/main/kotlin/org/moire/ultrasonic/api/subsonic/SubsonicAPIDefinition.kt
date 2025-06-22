@@ -80,7 +80,11 @@ interface SubsonicAPIDefinition {
     fun getMusicDirectory(@Query("id") id: String): Call<GetMusicDirectoryResponse>
 
     @GET("getArtists.view")
-    fun getArtists(@Query("musicFolderId") musicFolderId: String? = null, @Query("offset") offset: Int? = null, @Query("count") count: Int? = null): Call<GetArtistsResponse>
+    fun getArtists(
+        @Query("musicFolderId") musicFolderId: String? = null,
+        @Query("offset") offset: Int? = null,
+        @Query("count") count: Int? = null
+    ): Call<GetArtistsResponse>
 
     @GET("star.view")
     fun star(
@@ -291,16 +295,26 @@ interface SubsonicAPIDefinition {
     ): Call<SubsonicResponse>
 
     @GET("getGenres.view")
-    fun getGenres(@Query("year") year: Int? = null, @Query("length") length: String? = null): Call<GenresResponse>
+    fun getGenres(
+        @Query("year") year: Int? = null,
+        @Query("length") length: String? = null
+    ): Call<GenresResponse>
 
     @GET("getTags.view")
-    fun getTags(@Query("name") name: String, @Query("year") year: Int? = null, @Query("length") length: String? = null): Call<TagsResponse>
+    fun getTags(
+        @Query("name") name: String,
+        @Query("year") year: Int? = null,
+        @Query("length") length: String? = null
+    ): Call<TagsResponse>
 
     @GET("getLineups.view")
     fun getLineups(): Call<LineupResponse>
 
     @GET("getMoods.view")
-    fun getMoods(@Query("year") year: Int? = null, @Query("length") length: String? = null): Call<MoodsResponse>
+    fun getMoods(
+        @Query("year") year: Int? = null,
+        @Query("length") length: String? = null
+    ): Call<MoodsResponse>
 
     @GET("getYears.view")
     fun getYears(): Call<YearsResponse>
@@ -340,6 +354,7 @@ interface SubsonicAPIDefinition {
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null
     ): Call<GetSongsByMoodResponse>
+
     @GET("getSongsByYear.view")
     fun getSongsByYear(
         @Query("year") year: Int? = null,

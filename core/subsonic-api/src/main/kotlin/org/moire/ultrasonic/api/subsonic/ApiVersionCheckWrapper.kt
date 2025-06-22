@@ -59,7 +59,11 @@ internal class ApiVersionCheckWrapper(
     var currentApiVersion: SubsonicAPIVersions,
     var isRealProtocolVersion: Boolean = false
 ) : SubsonicAPIDefinition by api {
-    override fun getArtists(musicFolderId: String?, offset: Int?, count: Int?): Call<GetArtistsResponse> {
+    override fun getArtists(
+        musicFolderId: String?,
+        offset: Int?,
+        count: Int?
+    ): Call<GetArtistsResponse> {
         checkVersion(V1_8_0)
         return api.getArtists(musicFolderId, offset, count)
     }
@@ -327,7 +331,16 @@ internal class ApiVersionCheckWrapper(
     ): Call<GetSongsByGenreResponse> {
         checkVersion(V1_9_0)
         checkParamVersion(musicFolderId, V1_12_0)
-        return api.getSongsByGenre(genre, year, length, ratingMin, ratingMax, count, offset, musicFolderId)
+        return api.getSongsByGenre(
+            genre,
+            year,
+            length,
+            ratingMin,
+            ratingMax,
+            count,
+            offset,
+            musicFolderId
+        )
     }
 
     override fun getUser(username: String): Call<GetUserResponse> {
