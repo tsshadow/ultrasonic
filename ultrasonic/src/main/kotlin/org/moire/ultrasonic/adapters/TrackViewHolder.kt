@@ -62,7 +62,8 @@ class TrackViewHolder(val view: View) :
     private var fiveStar4: ImageView = view.findViewById(R.id.song_five_star_4)
     private var fiveStar5: ImageView = view.findViewById(R.id.song_five_star_5)
     private var star: ImageView = view.findViewById(R.id.song_star)
-    private var track: TextView = view.findViewById(R.id.song_track)
+    private var track: TextView = view.findViewById(R.id.song_track_number)
+    private var album: TextView = view.findViewById(R.id.song_album)
     private var title: TextView = view.findViewById(R.id.song_title)
     private var artist: TextView = view.findViewById(R.id.song_artist)
     private var date: TextView = view.findViewById(R.id.song_date)
@@ -92,6 +93,8 @@ class TrackViewHolder(val view: View) :
         val dateText = song.date ?: song.year?.toString() ?: ""
         date.text = dateText
         date.isVisible = dateText.isNotBlank()
+        album.text = song.album ?: ""
+        album.isVisible = true
 
         if (Settings.shouldShowTrackNumber && song.track != null && song.track!! > 0) {
             track.text = entryDescription.trackNumber

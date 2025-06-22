@@ -1,0 +1,6 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Licht transparante achtergrond op donkere modus -->
+    <solid android:color="#111111" />
+    <corners android:radius="8dp" />
+</shape>

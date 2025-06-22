@@ -3,11 +3,15 @@
 <LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     a:id="@+id/song_layout"
-    a:layout_width="fill_parent"
-    a:layout_height="?android:attr/listPreferredItemHeight"
+    a:layout_width="match_parent"
+    a:layout_height="wrap_content"
     a:minHeight="?android:attr/listPreferredItemHeight"
-    a:orientation="horizontal">
-
+    a:orientation="horizontal"
+    a:background="@drawable/song_card_background"
+    a:padding="8dp"
+    a:layout_marginVertical="4dp"
+    a:layout_marginHorizontal="4dp"
+    a:elevation="2dp">
     <ImageView
         a:id="@+id/song_drag"
         a:layout_width="38dp"

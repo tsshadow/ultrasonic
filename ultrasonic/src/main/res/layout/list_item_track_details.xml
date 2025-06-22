@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- DON'T CONVERT TO ConstraintLayout! We have been there and it was slower than LinearLayout :) -->
+<?xml version="1.0" encoding="utf-8"?><!-- DON'T CONVERT TO ConstraintLayout! We have been there and it was slower than LinearLayout :) -->
 <LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,110 +8,121 @@
     a:layout_marginStart="4dp"
     a:layout_weight="1"
     a:orientation="vertical"
+    a:layout_marginRight="2dp"
     tools:layout_height="?android:attr/listPreferredItemHeight"
     tools:layout_width="match_parent">
-
+    <!-- Titel + status -->
     <LinearLayout
-        a:layout_width="fill_parent"
+        a:layout_width="match_parent"
         a:layout_height="wrap_content"
+        a:gravity="center_vertical"
         a:orientation="horizontal">
 
+        <!-- Tracknummer optioneel -->
         <TextView
-            a:id="@+id/song_track"
+            a:id="@+id/song_track_number"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
-            a:layout_gravity="left|center_vertical"
-            a:paddingEnd="6dip"
+            a:layout_marginEnd="6dp"
+            a:text="1."
             a:textAppearance="?android:attr/textAppearanceMedium"
+            a:textColor="?android:textColorSecondary"
             a:visibility="gone"
-            tools:text="0/1" />
+            tools:ignore="HardcodedText" />
 
+        <!-- Titel -->
         <TextView
             a:id="@+id/song_title"
             a:layout_width="0dp"
             a:layout_height="wrap_content"
-            a:layout_gravity="bottom|left"
             a:layout_weight="1"
-            a:drawablePadding="4dip"
             a:ellipsize="end"
-            a:paddingEnd="4dip"
-            a:singleLine="true"
+            a:maxLines="1"
+            a:text="Song Title"
             a:textAppearance="?android:attr/textAppearanceMedium"
-            tools:text="Title"
-            tools:ignore="NestedWeights" />
+            a:textStyle="bold"
+            a:textColor="?attr/colorAccent"
+            tools:ignore="HardcodedText" />
 
+        <!-- Status icons -->
         <ImageView
             a:id="@+id/song_status_image"
-            a:layout_width="wrap_content"
-            a:layout_height="match_parent"
-            a:layout_marginTop="8dp"
-            a:layout_marginEnd="10dip"
-            a:importantForAccessibility="no"
-            a:visibility="gone" />
+            a:layout_width="20dp"
+            a:layout_height="20dp"
+            a:layout_marginStart="8dp"
+            a:layout_marginEnd="4dp"
+            a:contentDescription="@null"
+            a:visibility="gone"
+            app:tint="?android:textColorSecondary" />
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             a:id="@+id/song_status_progress"
-            a:layout_width="wrap_content"
-            a:layout_height="match_parent"
-            a:layout_gravity="bottom|right"
-            a:layout_marginTop="8dp"
-            a:layout_marginEnd="10dip"
+            a:layout_width="20dp"
+            a:layout_height="20dp"
+            a:layout_marginEnd="4dp"
             a:indeterminate="true"
             a:visibility="gone"
             app:indicatorColor="?attr/colorOnSurface"
             app:indicatorSize="20dp"
-            app:trackColor="?attr/colorSurfaceVariant"
-            tools:visibility="visible" />
+            app:trackColor="?attr/colorSurfaceVariant" />
     </LinearLayout>
 
+    <!-- Artiest + Duur -->
     <LinearLayout
-        a:layout_width="fill_parent"
+        a:layout_width="match_parent"
         a:layout_height="wrap_content"
-        a:layout_gravity="center_vertical"
+        a:layout_marginTop="2dp"
         a:orientation="horizontal">
 
         <TextView
             a:id="@+id/song_artist"
-            a:layout_width="0dip"
+            a:layout_width="0dp"
             a:layout_height="wrap_content"
-            a:layout_gravity="top|left"
             a:layout_weight="1"
-            a:ellipsize="middle"
-            a:paddingStart="1dip"
-            a:paddingEnd="4dip"
-            a:singleLine="true"
+            a:ellipsize="end"
+            a:maxLines="1"
+            a:text="Artist name"
             a:textAppearance="?android:attr/textAppearanceSmall"
-            tools:text="Artist"
-            tools:ignore="NestedWeights" />
+            a:textColor="?android:textColorSecondary"
+            tools:ignore="HardcodedText" />
 
         <TextView
             a:id="@+id/song_duration"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
-            a:layout_gravity="right|top"
-            a:paddingStart="3dip"
-            a:paddingEnd="9dip"
-            a:singleLine="true"
+            a:text="2:42"
             a:textAppearance="?android:attr/textAppearanceSmall"
-            tools:text="00:00" />
+            a:textColor="?android:textColorSecondary"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
+    <!-- Album + Date -->
     <LinearLayout
-        a:layout_width="fill_parent"
+        a:layout_width="match_parent"
         a:layout_height="wrap_content"
+        a:layout_marginTop="2dp"
         a:orientation="horizontal">
 
         <TextView
-            a:id="@+id/song_date"
+            a:id="@+id/song_album"
             a:layout_width="0dp"
             a:layout_height="wrap_content"
             a:layout_weight="1"
             a:ellipsize="end"
-            a:paddingStart="1dip"
-            a:paddingEnd="4dip"
-            a:singleLine="true"
+            a:maxLines="1"
+            a:text="Album name"
             a:textAppearance="?android:attr/textAppearanceSmall"
-            tools:text="2023-01-01" />
-    </LinearLayout>
+            a:textColor="?android:textColorHint"
+            tools:ignore="HardcodedText" />
 
+        <TextView
+            a:id="@+id/song_date"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:layout_marginTop="1dp"
+            a:text="2025-06-14"
+            a:textAppearance="?android:attr/textAppearanceSmall"
+            a:textColor="?android:textColorHint"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
 </LinearLayout>

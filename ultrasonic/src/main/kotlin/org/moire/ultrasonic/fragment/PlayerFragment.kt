@@ -187,15 +187,6 @@ class PlayerFragment :
     // This property is only valid between onCreateView and
     // onDestroyView.
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = CurrentPlayingBinding.inflate(inflater, container, false)
-        return _binding!!.root
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -521,14 +512,6 @@ class PlayerFragment :
     override fun onPause() {
         super.onPause()
         executorService.shutdown()
-    }
-
-    override fun onDestroyView() {
-        rxBusSubscription.dispose()
-        cancel("CoroutineScope cancelled because the view was destroyed")
-        cancellationToken.cancel()
-        _binding = null
-        super.onDestroyView()
     }
 
     private val menuProvider: MenuProvider = object : MenuProvider {
