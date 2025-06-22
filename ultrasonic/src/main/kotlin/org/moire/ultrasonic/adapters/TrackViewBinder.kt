@@ -74,7 +74,7 @@ class TrackViewBinder(
 
         holder.itemView.setOnClickListener {
             if (checkable && !track.isVideo) {
-                val nowChecked = !holder.check.isChecked
+                val nowChecked = !holder.isChecked
                 holder.isChecked = nowChecked
             } else {
                 onItemClick(track, holder.bindingAdapterPosition)
@@ -105,7 +105,7 @@ class TrackViewBinder(
         ) {
             val newStatus = diffAdapter.isSelected(track.longId)
 
-            if (newStatus != holder.check.isChecked) holder.check.isChecked = newStatus
+            if (newStatus != holder.isChecked) holder.isChecked = newStatus
         }
     }
 

@@ -1,9 +1,7 @@
 package org.moire.ultrasonic.adapters
 
-import android.graphics.Color
 import android.view.View
 import android.widget.Checkable
-import android.widget.CheckedTextView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -14,7 +12,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.HeartRating
 import androidx.media3.common.StarRating
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.color.MaterialColors
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
@@ -51,9 +48,10 @@ class TrackViewHolder(val view: View) :
     var entry: Track? = null
         private set
     var songLayout: LinearLayout = view.findViewById(R.id.song_layout)
-    var check: CheckedTextView = view.findViewById(R.id.song_check)
     var drag: ImageView = view.findViewById(R.id.song_drag)
     var observableChecked = MutableLiveData(false)
+
+    private var isCheckedInternal = false
 
     private var rating: LinearLayout = view.findViewById(R.id.song_rating)
     private var fiveStar1: ImageView = view.findViewById(R.id.song_five_star_1)
@@ -103,8 +101,7 @@ class TrackViewHolder(val view: View) :
         }
 
         val checkValue = (checkable && !song.isVideo)
-        if (check.isVisible != checkValue) check.isVisible = checkValue
-        if (checkValue) initChecked(isSelected)
+        if (checkValue) initChecked(isSelected) else initChecked(false)
         if (drag.isVisible != draggable) drag.isVisible = draggable
 
         if (ActiveServerProvider.isOffline()) {
@@ -178,9 +175,7 @@ class TrackViewHolder(val view: View) :
                 null,
                 null
             )
-            val color = MaterialColors.getColor(view, COLOR_HIGHLIGHT)
-            songLayout.setBackgroundColor(color)
-            songLayout.elevation = 3F
+            updateBackground()
         } else if (!isPlaying && isPlayingCached) {
             isPlayingCached = false
             title.setCompoundDrawablesWithIntrinsicBounds(
@@ -189,8 +184,7 @@ class TrackViewHolder(val view: View) :
                 0,
                 0
             )
-            songLayout.setBackgroundColor(Color.TRANSPARENT)
-            songLayout.elevation = 0F
+            updateBackground()
         }
     }
 
@@ -305,6 +299,16 @@ class TrackViewHolder(val view: View) :
         progressIndicator.trackThickness = INDICATOR_THICKNESS_DEFINITE
     }
 
+    private fun updateBackground() {
+        if (isPlayingCached || isCheckedInternal) {
+            songLayout.setBackgroundResource(R.drawable.song_card_background_selected)
+            songLayout.elevation = 3F
+        } else {
+            songLayout.setBackgroundResource(R.drawable.song_card_background)
+            songLayout.elevation = 2F
+        }
+    }
+
     /*
      * Set the checked value and re-init the MutableLiveData.
      * If we would post a new value, there might be a short glitch where the track is shown with its
@@ -312,7 +316,8 @@ class TrackViewHolder(val view: View) :
      */
     private fun initChecked(newStatus: Boolean) {
         observableChecked = MutableLiveData(newStatus)
-        check.isChecked = newStatus
+        isCheckedInternal = newStatus
+        updateBackground()
     }
 
     /*
@@ -321,15 +326,17 @@ class TrackViewHolder(val view: View) :
      *  (might be false for Singular SelectionTrackers) then it will cause the actual modification.
      */
     override fun setChecked(newStatus: Boolean) {
+        isCheckedInternal = newStatus
         observableChecked.postValue(newStatus)
+        updateBackground()
     }
 
     override fun isChecked(): Boolean {
-        return check.isChecked
+        return isCheckedInternal
     }
 
     override fun toggle() {
-        isChecked = isChecked
+        setChecked(!isCheckedInternal)
     }
 
     fun maximizeOrMinimize() {

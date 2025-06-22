@@ -25,15 +25,6 @@
         a:src="@drawable/ic_drag_vertical"
         a:visibility="gone" />
 
-    <CheckedTextView
-        a:id="@+id/song_check"
-        a:layout_width="38dp"
-        a:layout_height="fill_parent"
-        a:checkMark="@drawable/btn_check_custom"
-        a:gravity="center_vertical"
-        a:paddingEnd="4dip"
-        a:visibility="gone" />
-
     <include layout="@layout/list_item_track_details" />
 
     <LinearLayout

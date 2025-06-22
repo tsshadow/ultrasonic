@@ -1,0 +1,12 @@
+<!--
+  ~ song_card_background_selected.xml
+  ~ Copyright (C) 2009-2025 Ultrasonic developers
+  ~
+  ~ Distributed under terms of the GNU GPLv3 license.
+  -->
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/colorSecondaryContainer" />
+    <corners android:radius="8dp" />
+</shape>
