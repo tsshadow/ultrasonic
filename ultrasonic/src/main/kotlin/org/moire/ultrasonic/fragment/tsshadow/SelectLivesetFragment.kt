@@ -1,9 +1,6 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
 import TileInfo
-import android.os.Build
-import androidx.annotation.RequiresApi
-import java.time.Year
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 
@@ -20,18 +17,16 @@ class SelectLivesetFragment : SelectFragment() {
         setTitle(this, R.string.main_livesets_title)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun defaultTileSet(): MutableList<TileInfo> {
-        val currentYear = listOf(Year.now().value.toString())
         return mutableListOf(
-            TileInfo(genre = listOf("Euphoric Hardstyle"), length = defaultLength, year = currentYear, favorite = true),
-            TileInfo(genre = listOf("Hardstyle"), length = defaultLength, year = currentYear, favorite = true),
-            TileInfo(genre = listOf("Mainstream Hardstyle"), length = defaultLength, year = currentYear, favorite = true),
-            TileInfo(genre = listOf("Raw Hardstyle"), length = defaultLength, year = currentYear, favorite = true),
-            TileInfo(genre = listOf("Hardcore"), length = defaultLength, year = currentYear, favorite = true),
-            TileInfo(genre = listOf("Mainstream Hardcore"), length = defaultLength, year = currentYear, favorite = true),
-            TileInfo(genre = listOf("Uptempo Hardcore"), length = defaultLength, year = currentYear, favorite = true),
-            TileInfo(genre = listOf("Bouncy Uptempo"), length = defaultLength, year = currentYear, favorite = true),
+            TileInfo(genre = listOf("Euphoric Hardstyle"), length = defaultLength, sortMethod = "DateDescAndRelease", favorite = true),
+            TileInfo(genre = listOf("Hardstyle"), length = defaultLength, sortMethod = "DateDescAndRelease", favorite = true),
+            TileInfo(genre = listOf("Mainstream Hardstyle"), length = defaultLength, sortMethod = "DateDescAndRelease", favorite = true),
+            TileInfo(genre = listOf("Raw Hardstyle"), length = defaultLength, sortMethod = "DateDescAndRelease", favorite = true),
+            TileInfo(genre = listOf("Hardcore"), length = defaultLength, sortMethod = "DateDescAndRelease", favorite = true),
+            TileInfo(genre = listOf("Mainstream Hardcore"), length = defaultLength, sortMethod = "DateDescAndRelease", favorite = true),
+            TileInfo(genre = listOf("Uptempo Hardcore"), length = defaultLength, sortMethod = "DateDescAndRelease", favorite = true),
+            TileInfo(genre = listOf("Bouncy Uptempo"), length = defaultLength, sortMethod = "DateDescAndRelease", favorite = true),
         )
     }
 }

@@ -75,6 +75,7 @@ class TileInfo(
         return buildString {
             when (sortMethod) {
                 "AddedDesc" -> append("Recent ")
+                "DateDescAndRelease" -> append("Recent ")
                 "Random" -> append("Random ")
                 "LastWrittenDesc" -> append("Recent Modified ")
             }
