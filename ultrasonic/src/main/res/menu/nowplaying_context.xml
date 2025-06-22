@@ -8,6 +8,9 @@
         a:id="@+id/menu_show_album"
         a:title="@string/download.menu_show_album"/>
     <item
+        a:id="@+id/menu_show_metadata"
+        a:title="@string/download.menu_show_metadata"/>
+    <item
         a:id="@+id/menu_lyrics"
         a:title="@string/download.menu_lyrics"/>
     <item

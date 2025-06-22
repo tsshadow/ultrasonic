@@ -69,6 +69,7 @@
     <string name="download.menu_screen_off">Screen Off</string>
     <string name="download.menu_screen_on">Screen On</string>
     <string name="download.menu_show_album">Go to Album</string>
+    <string name="download.menu_show_metadata">Show metadata</string>
     <string name="download.menu_shuffle">Shuffle</string>
     <string name="download.menu_shuffle_on">Shuffle mode enabled</string>
     <string name="download.menu_shuffle_off">Shuffle mode disabled</string>
@@ -88,6 +89,16 @@
     <string name="error.label">Error</string>
     <string name="jukebox.is_default">Jukebox By Default</string>
     <string name="lyrics.nomatch">No lyrics found</string>
+    <string name="metadata.label">Metadata</string>
+    <string name="meta_title">Title: %1$s</string>
+    <string name="meta_artist">Artist: %1$s</string>
+    <string name="meta_album">Album: %1$s</string>
+    <string name="meta_year">Year: %1$s</string>
+    <string name="meta_genre">Genre: %1$s</string>
+    <string name="meta_track">Track: %1$s</string>
+    <string name="meta_duration">Duration: %1$s</string>
+    <string name="meta_bitrate">Bitrate: %1$s kbps</string>
+    <string name="meta_path">Path: %1$s</string>
     <string name="language.default">System default</string>
     <string name="language.zh_CN">Chinese (China)</string>
     <string name="language.zh_TW">Chinese (Taiwan)</string>

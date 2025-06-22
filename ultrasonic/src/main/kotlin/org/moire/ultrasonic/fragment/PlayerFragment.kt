@@ -93,6 +93,7 @@ import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
+import org.moire.ultrasonic.fragment.PlayerFragmentDirections
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.service.RxBus
@@ -535,6 +536,7 @@ class PlayerFragment :
         val screenOption = menu.findItem(R.id.menu_item_screen_on_off)
         val goToAlbum = menu.findItem(R.id.menu_show_album)
         val goToArtist = menu.findItem(R.id.menu_show_artist)
+        val showMetadata = menu.findItem(R.id.menu_show_metadata)
         val jukeboxOption = menu.findItem(R.id.menu_item_jukebox)
         val equalizerMenuItem = menu.findItem(R.id.menu_item_equalizer)
         val shareMenuItem = menu.findItem(R.id.menu_item_share)
@@ -596,11 +598,13 @@ class PlayerFragment :
             shareSongMenuItem.isVisible = true
             goToAlbum.isVisible = true
             goToArtist.isVisible = true
+            showMetadata.isVisible = true
         } else {
             starMenuItem.setIcon(hollowStar)
             shareSongMenuItem.isVisible = false
             goToAlbum.isVisible = false
             goToArtist.isVisible = false
+            showMetadata.isVisible = false
         }
 
         if (mediaPlayerManager.keepScreenOn) {
@@ -637,6 +641,7 @@ class PlayerFragment :
 
         // Only show the lyrics when the user is online
         popup.menu.findItem(R.id.menu_lyrics)?.isVisible = !isOffline()
+        popup.menu.findItem(R.id.menu_show_metadata)?.isVisible = true
         popup.show()
         return popup
     }
@@ -676,6 +681,13 @@ class PlayerFragment :
                     parentId = track.parent,
                     isAlbum = true
                 )
+                findNavController().navigate(action)
+                return true
+            }
+            R.id.menu_show_metadata -> {
+                if (track == null) return false
+
+                val action = PlayerFragmentDirections.playerToMetadata(track)
                 findNavController().navigate(action)
                 return true
             }
