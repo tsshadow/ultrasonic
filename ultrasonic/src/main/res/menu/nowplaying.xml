@@ -24,6 +24,9 @@
     <item
         a:id="@+id/menu_show_metadata"
         a:title="@string/download.menu_show_metadata"/>
+    <item
+        a:id="@+id/menu_refresh_track"
+        a:title="@string/download.menu_refresh_track"/>
 
     <item
         a:id="@+id/menu_item_share_song"

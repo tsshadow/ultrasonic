@@ -542,6 +542,7 @@ class PlayerFragment :
         val equalizerMenuItem = menu.findItem(R.id.menu_item_equalizer)
         val shareMenuItem = menu.findItem(R.id.menu_item_share)
         val shareSongMenuItem = menu.findItem(R.id.menu_item_share_song)
+        val refreshSongItem = menu.findItem(R.id.menu_refresh_track)
         val starMenuItem = menu.findItem(R.id.menu_item_star)
         val bookmarkMenuItem = menu.findItem(R.id.menu_item_bookmark_set)
         val bookmarkRemoveMenuItem = menu.findItem(R.id.menu_item_bookmark_delete)
@@ -600,12 +601,14 @@ class PlayerFragment :
             goToAlbum.isVisible = true
             goToArtist.isVisible = true
             showMetadata.isVisible = true
+            refreshSongItem.isVisible = true
         } else {
             starMenuItem.setIcon(hollowStar)
             shareSongMenuItem.isVisible = false
             goToAlbum.isVisible = false
             goToArtist.isVisible = false
             showMetadata.isVisible = false
+            refreshSongItem.isVisible = false
         }
 
         if (mediaPlayerManager.keepScreenOn) {
