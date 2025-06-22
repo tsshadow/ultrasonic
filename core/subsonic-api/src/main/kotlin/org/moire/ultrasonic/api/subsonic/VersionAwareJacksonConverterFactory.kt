@@ -3,9 +3,11 @@ package org.moire.ultrasonic.api.subsonic
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectReader
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.lang.reflect.Type
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.moire.ultrasonic.api.subsonic.response.SubsonicResponse
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -72,17 +74,27 @@ class VersionAwareJacksonConverterFactory(
     ) : Converter<ResponseBody, T> {
         override fun convert(value: ResponseBody): T {
             value.use {
-                // The response stream contains the version of the API for parsing the stream
-                // to an object. Currently the parsing is independent from the version as new
-                // versions only contain extra optional fields.
-                val response: T = adapter.readValue(value.charStream())
+                // Read the raw JSON string from the response body
+                val rawJson = value.string()
+
+                // Sanitize: remove control characters (e.g., ESC, NULL, etc.)
+                val sanitized = rawJson.replace(Regex("[\\x00-\\x1F\\x7F]"), "")
+
+                // Wrap the sanitized string as a new ResponseBody for Jackson to parse
+                val cleanedBody = sanitized.toResponseBody("application/json".toMediaTypeOrNull())
+
+                // Parse the sanitized JSON using the configured Jackson ObjectReader
+                val response: T = adapter.readValue(cleanedBody.charStream())
+
+                // Notify API version if applicable
                 if (response is SubsonicResponse) {
                     try {
                         notifier(response.version)
                     } catch (ignored: IllegalArgumentException) {
-                        // no-op
+                        // Ignore unknown or malformed version values
                     }
                 }
+
                 return response
             }
         }
