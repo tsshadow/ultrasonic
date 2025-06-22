@@ -186,6 +186,20 @@ class PlayerFragment :
 
     // This property is only valid between onCreateView and
     // onDestroyView.
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = CurrentPlayingBinding.inflate(inflater, container, false)
+        return _binding!!.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
     private val binding get() = _binding!!
 
     private val viewAdapter: BaseAdapter<Identifiable> by lazy {
