@@ -188,8 +188,11 @@ class PlayerFragment :
     // onDestroyView.
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        rxBusSubscription.dispose()
+        cancel("CoroutineScope cancelled because the view was destroyed")
+        cancellationToken.cancel()
         _binding = null
+        super.onDestroyView()
     }
     private val binding get() = _binding!!
 
@@ -207,8 +210,8 @@ class PlayerFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = CurrentPlayingBinding.inflate(layoutInflater, container, false)
-        return binding.root
+        _binding = CurrentPlayingBinding.inflate(inflater, container, false)
+        return _binding!!.root
     }
 
     // TODO: Switch them all over to use the view binding
