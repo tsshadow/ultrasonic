@@ -1,8 +1,7 @@
-plugins {
-    alias libs.plugins.ksp
-}
+
 
 plugins {
+    id("com.google.devtools.ksp") version "2.1.21-2.0.1"
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
@@ -155,6 +154,6 @@ dependencies {
     implementation(libs.media)
     implementation libs.gson
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation(libs.kotlinxSerializationJson)
 }
 

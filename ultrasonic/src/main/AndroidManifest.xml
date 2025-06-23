@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <uses-sdk tools:overrideLibrary="androidx.car.app" />
 
@@ -70,7 +71,8 @@
         <service
             android:name=".service.DownloadService"
             android:label="Ultrasonic Media Player Service"
-            android:exported="false">
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback">
         </service>
 
         <!-- Needs to be exported: https://android.googlesource.com/platform/developers/build/+/4de32d4/prebuilts/gradle/MediaBrowserService/README.md -->

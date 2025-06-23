@@ -1,3 +1,11 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+    }
+}
+
 include ':core:domain'
 include ':core:subsonic-api'
 include ':ultrasonic'
