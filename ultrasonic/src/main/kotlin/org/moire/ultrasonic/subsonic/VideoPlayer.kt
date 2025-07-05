@@ -2,7 +2,7 @@ package org.moire.ultrasonic.subsonic
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import org.moire.ultrasonic.activity.VideoPlaybackActivity
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MusicServiceFactory
@@ -20,16 +20,13 @@ class VideoPlayer {
                 return
             }
             try {
-                val intent = Intent(Intent.ACTION_VIEW)
                 val url = MusicServiceFactory.getMusicService().getStreamUrl(
                     track.id,
                     maxBitRate = null,
                     format = "raw"
                 )
-                intent.setDataAndType(
-                    Uri.parse(url),
-                    "video/*"
-                )
+                val intent = Intent(context, VideoPlaybackActivity::class.java)
+                intent.putExtra(VideoPlaybackActivity.EXTRA_URL, url)
                 context.startActivity(intent)
             } catch (all: Exception) {
                 Util.toast(all.toString(), false, context)

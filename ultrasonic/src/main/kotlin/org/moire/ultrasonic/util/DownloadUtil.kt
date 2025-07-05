@@ -112,9 +112,7 @@ object DownloadUtil {
             return
         }
         for (song in parent.getTracks()) {
-            if (!song.isVideo) {
-                songs.add(song)
-            }
+            songs.add(song)
         }
         val musicService = MusicServiceFactory.getMusicService()
         for ((id1, _, _, title) in parent.getAlbums()) {
@@ -139,9 +137,7 @@ object DownloadUtil {
                 false
             )
             for (song in albumDirectory.getTracks()) {
-                if (!song.isVideo) {
-                    songs.add(song)
-                }
+                songs.add(song)
             }
         }
         return songs
