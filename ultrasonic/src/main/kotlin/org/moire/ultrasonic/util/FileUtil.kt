@@ -73,7 +73,20 @@ object FileUtil {
                 fileName.append(trackNumber).append('-')
             }
         }
-        fileName.append(fileSystemSafe(track.title)).append('.')
+        fileName.append(fileSystemSafe(track.title))
+
+        val sanitizedPath = fileSystemSafeDir(track.path)
+        val sanitizedArtist = fileSystemSafe(track.artist)
+        val needsUniqueSuffix = !track.path.isNullOrEmpty() &&
+            sanitizedArtist != UNNAMED &&
+            !sanitizedPath.contains(sanitizedArtist)
+
+        if (needsUniqueSuffix) {
+            val hash = Util.md5Hex("${track.serverId}_${track.id}")?.substring(0, 8)
+            fileName.append('-').append(hash)
+        }
+
+        fileName.append('.')
         if (!TextUtils.isEmpty(track.transcodedSuffix)) {
             fileName.append(track.transcodedSuffix)
         } else {

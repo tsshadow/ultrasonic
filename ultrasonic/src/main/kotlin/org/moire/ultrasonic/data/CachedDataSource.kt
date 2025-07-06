@@ -65,7 +65,8 @@ class CachedDataSource(
         bytesToRead = 0
 
         val components = dataSpec.uri.toString().split('|')
-        val path = components[2]
+        // Support additional metadata in the uri by always using the last component as the path
+        val path = components.last()
         val cacheLength = checkCache(path)
 
         // We have found an item in the cache, return early
