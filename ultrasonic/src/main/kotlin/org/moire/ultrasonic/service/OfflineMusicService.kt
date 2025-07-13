@@ -67,6 +67,20 @@ class OfflineMusicService : MusicService, KoinComponent {
     private var cachedAlbums = metaDatabase.albumDao()
     private var cachedTracks = metaDatabase.trackDao()
 
+    /**
+     * Simple in-memory cache of all tracks. This avoids hitting the database
+     * repeatedly when multiple song queries are performed during one session.
+     */
+    private var allTracksCache: List<Track>? = null
+
+    private fun getAllTracks(): List<Track> {
+        val cached = allTracksCache
+        if (cached != null) return cached
+        val tracks = cachedTracks.get()
+        allTracksCache = tracks
+        return tracks
+    }
+
     override fun getIndexes(musicFolderId: String?, refresh: Boolean): List<Index> {
         val indexes: MutableList<Index> = ArrayList()
         val root = FileUtil.musicDirectory
@@ -390,7 +404,12 @@ class OfflineMusicService : MusicService, KoinComponent {
         count: Int,
         offset: Int
     ): MusicDirectory {
-        throw OfflineException("Getting Songs By Genre not available in offline mode")
+        val filters = Filters().apply {
+            add(org.moire.ultrasonic.api.subsonic.models.Filter("GENRE", genre))
+            year?.let { add(org.moire.ultrasonic.api.subsonic.models.Filter("YEAR", it)) }
+            length?.let { add(org.moire.ultrasonic.api.subsonic.models.Filter("LENGTH", it)) }
+        }
+        return getSongs(filters, ratingMin, ratingMax, count, offset, null, null)
     }
 
     @Throws(Exception::class)
@@ -403,7 +422,54 @@ class OfflineMusicService : MusicService, KoinComponent {
         sortMethod: String?,
         festivalLineup: String?
     ): MusicDirectory {
-        throw OfflineException("Getting Songs By filters not available in offline mode")
+        var list = getAllTracks()
+
+        for (filter in filters.getAll()) {
+            when (filter.name.uppercase(Locale.ROOT)) {
+                "GENRE" -> {
+                    val values = if (filter.value is Collection<*>) {
+                        (filter.value as Collection<*>).filterIsInstance<String>()
+                    } else listOf(filter.value.toString())
+                    list = list.filter { track ->
+                        val genres = track.genres ?: track.genre?.let { listOf(it) } ?: emptyList()
+                        values.any { value -> genres.any { g -> g.equals(value, true) } }
+                    }
+                }
+                "YEAR" -> {
+                    val years = if (filter.value is Collection<*>) {
+                        (filter.value as Collection<*>).mapNotNull { it.toString().toIntOrNull() }
+                    } else listOfNotNull(filter.value.toString().toIntOrNull())
+                    list = list.filter { track -> track.year != null && years.contains(track.year) }
+                }
+                "LENGTH" -> {
+                    val value = filter.value.toString().lowercase(Locale.ROOT)
+                    list = when (value) {
+                        "long" -> list.filter { (it.duration ?: 0) >= 600 }
+                        "short" -> list.filter { (it.duration ?: 0) < 600 }
+                        else -> list
+                    }
+                }
+            }
+        }
+
+        ratingMin?.let { min ->
+            list = list.filter { (it.userRating ?: it.averageRating?.toInt() ?: 0) >= min }
+        }
+        ratingMax?.let { max ->
+            list = list.filter { (it.userRating ?: it.averageRating?.toInt() ?: 0) <= max }
+        }
+
+        list = when (sortMethod) {
+            "Random" -> list.shuffled()
+            "AddedDesc" -> list.sortedByDescending { it.created }
+            "DateDescAndRelease" -> list.sortedWith(compareByDescending<Track> { it.year }.thenByDescending { it.created })
+            "LastWrittenDesc" -> list.sortedByDescending { it.created }
+            else -> list
+        }
+
+        val paged = list.drop(offset).take(count)
+
+        return MusicDirectory().apply { addAll(paged) }
     }
     @Throws(Exception::class)
     override fun getSongsByMood(
@@ -415,7 +481,12 @@ class OfflineMusicService : MusicService, KoinComponent {
         count: Int,
         offset: Int
     ): MusicDirectory {
-        throw OfflineException("Getting Songs By Mood not available in offline mode")
+        val filters = Filters().apply {
+            add(org.moire.ultrasonic.api.subsonic.models.Filter("GENRE", mood))
+            year?.let { add(org.moire.ultrasonic.api.subsonic.models.Filter("YEAR", it)) }
+            length?.let { add(org.moire.ultrasonic.api.subsonic.models.Filter("LENGTH", it)) }
+        }
+        return getSongs(filters, ratingMin, ratingMax, count, offset, null, null)
     }
     @Throws(Exception::class)
     override fun getSongsByYear(
@@ -426,7 +497,11 @@ class OfflineMusicService : MusicService, KoinComponent {
         count: Int,
         offset: Int
     ): MusicDirectory {
-        throw OfflineException("Getting Songs By Year not available in offline mode")
+        val filters = Filters().apply {
+            add(org.moire.ultrasonic.api.subsonic.models.Filter("YEAR", year))
+            length?.let { add(org.moire.ultrasonic.api.subsonic.models.Filter("LENGTH", it)) }
+        }
+        return getSongs(filters, ratingMin, ratingMax, count, offset, null, null)
     }
 
 
