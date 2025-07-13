@@ -18,15 +18,22 @@
  */
 package org.moire.ultrasonic.service
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.qualifier.named
+import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.di.OFFLINE_MUSIC_SERVICE
 import org.moire.ultrasonic.di.ONLINE_MUSIC_SERVICE
 import org.moire.ultrasonic.di.musicServiceModule
+import org.moire.ultrasonic.service.RxBus
 import timber.log.Timber
 
 /*
@@ -36,13 +43,52 @@ import timber.log.Timber
  * Instead it would probably be faster to listen to Rx
  */
 object MusicServiceFactory : KoinComponent {
+    private val connectivityManager: ConnectivityManager
+        get() =
+            UApp.applicationContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+
+    private fun isNetworkAvailable(): Boolean {
+        val cm = connectivityManager
+        val network = cm.activeNetwork ?: return false
+        val capabilities = cm.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
+    private fun registerNetworkCallback() {
+        if (networkCallback != null) return
+
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                Timber.i("Network available, resetting music service")
+                resetMusicService()
+                RxBus.createServiceCommandPublisher.onNext(Unit)
+                networkCallback?.let { connectivityManager.unregisterNetworkCallback(it) }
+                networkCallback = null
+            }
+        }
+        connectivityManager.registerNetworkCallback(request, callback)
+        networkCallback = callback
+    }
+
     @JvmStatic
     fun getMusicService(): MusicService {
-        return if (ActiveServerProvider.isOffline()) {
-            get(named(OFFLINE_MUSIC_SERVICE))
-        } else {
-            get(named(ONLINE_MUSIC_SERVICE))
+        if (ActiveServerProvider.isOffline()) {
+            return get(named(OFFLINE_MUSIC_SERVICE))
         }
+
+        if (!isNetworkAvailable()) {
+            Timber.w("Active server unreachable, falling back to offline service")
+            registerNetworkCallback()
+            return get(named(OFFLINE_MUSIC_SERVICE))
+        }
+
+        return get(named(ONLINE_MUSIC_SERVICE))
     }
 
     /**
