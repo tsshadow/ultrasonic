@@ -108,6 +108,8 @@ val META_MIGRATION_2_3: Migration = object : Migration(2, 3) {
 val META_MIGRATION_3_4: Migration = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE `tracks` ADD COLUMN `genres` TEXT")
+        db.execSQL("ALTER TABLE `tracks` ADD COLUMN `date` TEXT")
         db.execSQL("ALTER TABLE `albums` ADD COLUMN `genres` TEXT")
+        db.execSQL("ALTER TABLE `albums` ADD COLUMN `date` TEXT")
     }
 }
