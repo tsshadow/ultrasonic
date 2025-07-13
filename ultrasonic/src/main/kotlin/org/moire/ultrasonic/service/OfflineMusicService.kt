@@ -432,26 +432,26 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     @Throws(Exception::class)
     override fun getGenres(refresh: Boolean, year: Int?, length: String?): List<Genre> {
-        throw OfflineException("Getting Genres not available in offline mode")
+        return buildGenreList()
     }
 
     @Throws(Exception::class)
     override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> {
-        throw OfflineException("Getting Tags not available in offline mode")
+        return buildTagList(name)
     }
     @Throws(Exception::class)
     override fun getLineups(refresh: Boolean): List<Lineup> {
-        throw OfflineException("Getting Tags not available in offline mode")
+        return buildLineupList()
     }
 
     @Throws(Exception::class)
     override fun getMoods(refresh: Boolean, year: Int?, length: String?): List<Mood> {
-        throw OfflineException("Getting Moods not available in offline mode")
+        return buildMoodList()
     }
 
     @Throws(Exception::class)
     override fun getYears(refresh: Boolean): List<Year> {
-        throw OfflineException("Getting Years not available in offline mode")
+        return buildYearList()
     }
 
     @Throws(Exception::class)
@@ -789,6 +789,113 @@ class OfflineMusicService : MusicService, KoinComponent {
                 listFilesRecursively(file, children)
             }
         }
+    }
+
+    private fun buildGenreList(): List<Genre> {
+        val tracks = cachedTracks.get()
+        val counts = mutableMapOf<String, Int>()
+
+        fun addGenre(name: String?) {
+            name?.split(';', ',', '/')?.map { it.trim() }?.filter { it.isNotEmpty() }?.forEach {
+                counts[it] = counts.getOrDefault(it, 0) + 1
+            }
+        }
+
+        for (track in tracks) {
+            addGenre(track.genre)
+            track.genres?.forEach { addGenre(it) }
+        }
+
+        return counts.map { (name, count) ->
+            Genre(index = name.substring(0, 1), name = name, songCount = count)
+        }.sortedBy { it.name.lowercase(Locale.ROOT) }
+    }
+
+    private fun buildTagList(tagName: String): List<Tag> {
+        val tracks = cachedTracks.get()
+        val counts = mutableMapOf<String, Int>()
+
+        when (tagName.uppercase(Locale.ROOT)) {
+            "YEAR" -> {
+                for (track in tracks) {
+                    track.year?.toString()?.let { year ->
+                        counts[year] = counts.getOrDefault(year, 0) + 1
+                    }
+                }
+            }
+            else -> {
+                val prefix = "$tagName:"
+                for (track in tracks) {
+                    val all = mutableListOf<String>()
+                    track.genre?.let { all.add(it) }
+                    track.genres?.let { all.addAll(it) }
+                    for (value in all) {
+                        if (value.startsWith(prefix, ignoreCase = true)) {
+                            val name = value.substring(prefix.length).trim()
+                            if (name.isNotEmpty()) {
+                                counts[name] = counts.getOrDefault(name, 0) + 1
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return counts.map { (name, count) ->
+            Tag(index = name.substring(0, 1), name = name, songCount = count)
+        }.sortedBy { it.name.lowercase(Locale.ROOT) }
+    }
+
+    private fun buildLineupList(): List<Lineup> {
+        val tracks = cachedTracks.get()
+        val values = mutableSetOf<String>()
+        val prefix = "LINEUP:"
+
+        for (track in tracks) {
+            val all = mutableListOf<String>()
+            track.genre?.let { all.add(it) }
+            track.genres?.let { all.addAll(it) }
+            for (value in all) {
+                if (value.startsWith(prefix, ignoreCase = true)) {
+                    val name = value.substring(prefix.length).trim()
+                    if (name.isNotEmpty()) values.add(name)
+                }
+            }
+        }
+
+        return values.map { Lineup(index = it.substring(0, 1), name = it) }
+            .sortedBy { it.name.lowercase(Locale.ROOT) }
+    }
+
+    private fun buildMoodList(): List<Mood> {
+        val tracks = cachedTracks.get()
+        val counts = mutableMapOf<String, Int>()
+        val prefix = "MOOD:"
+
+        for (track in tracks) {
+            val all = mutableListOf<String>()
+            track.genre?.let { all.add(it) }
+            track.genres?.let { all.addAll(it) }
+            for (value in all) {
+                if (value.startsWith(prefix, ignoreCase = true)) {
+                    val name = value.substring(prefix.length).trim()
+                    if (name.isNotEmpty()) {
+                        counts[name] = counts.getOrDefault(name, 0) + 1
+                    }
+                }
+            }
+        }
+
+        return counts.map { (name, count) ->
+            Mood(index = name.substring(0, 1), name = name, songCount = count)
+        }.sortedBy { it.name.lowercase(Locale.ROOT) }
+    }
+
+    private fun buildYearList(): List<Year> {
+        val tracks = cachedTracks.get()
+        val years = tracks.mapNotNull { it.year?.toString() }.toSet()
+        return years.map { Year(index = it.substring(0, 1), name = it) }
+            .sortedByDescending { it.name }
     }
 
     data class RawMetadata(val id: String?) {

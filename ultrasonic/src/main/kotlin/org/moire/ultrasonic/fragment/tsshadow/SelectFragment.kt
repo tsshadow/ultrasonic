@@ -28,6 +28,8 @@ import org.moire.ultrasonic.api.subsonic.models.Filter
 import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.api.subsonic.models.Genre
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
+import org.moire.ultrasonic.domain.Tag
 import org.moire.ultrasonic.util.toastingExceptionHandler
 import timber.log.Timber
 
@@ -242,10 +244,22 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
 
             val genres = withContext(Dispatchers.IO) {
                 musicService.getGenres(refresh, null, null)
-            }.filter { it.songCount > 10 }.map { it.name }
+            }.let { list ->
+                if (isOffline()) list.map { it.name } else list.filter { it.songCount > 10 }.map { it.name }
+            }
 
             val years = withContext(Dispatchers.IO) {
-                musicService.getTags(refresh, "YEAR", null, null)
+                if (isOffline()) {
+                    musicService.getYears(refresh).map { year ->
+                        Tag(
+                            index = year.index,
+                            name = year.name,
+                            songCount = 0 // default value, since Year has no songCount
+                        )
+                    }
+                } else {
+                    musicService.getTags(refresh, "YEAR", null, null)
+                }
             }.map { it.name }.sortedDescending()
 
             val labels = withContext(Dispatchers.IO) {
