@@ -52,6 +52,8 @@ import org.moire.ultrasonic.util.AbstractFile
 import org.moire.ultrasonic.util.Constants
 import org.moire.ultrasonic.util.EntryByDiscAndTrackComparator
 import org.moire.ultrasonic.util.FileUtil
+import org.moire.ultrasonic.util.FileUtil.getCompleteFile
+import org.moire.ultrasonic.util.FileUtil.getPinnedFile
 import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.Util.safeClose
 import timber.log.Timber
@@ -76,9 +78,17 @@ class OfflineMusicService : MusicService, KoinComponent {
     private fun getAllTracks(): List<Track> {
         val cached = allTracksCache
         if (cached != null) return cached
+
         val tracks = cachedTracks.get()
-        allTracksCache = tracks
-        return tracks
+
+        val downloaded = tracks.filter { track ->
+            val complete = Storage.isPathExists(track.getCompleteFile())
+            val pinned = Storage.isPathExists(track.getPinnedFile())
+            complete || pinned
+        }
+
+        allTracksCache = downloaded
+        return downloaded
     }
 
     override fun getIndexes(musicFolderId: String?, refresh: Boolean): List<Index> {
