@@ -184,8 +184,8 @@ class MediaPlayerManager(
 
         rxBusSubscription += RxBus.activeServerChangingObservable
             // All interaction with the Media3 needs to happen on the main thread
-            .subscribeOn(RxBus.mainThread())
-            .subscribe { oldServer ->
+            .observeOn(RxBus.mainThread())
+            .subscribe({ oldServer ->
                 if (oldServer != OFFLINE_DB_ID) {
                     // When the server changes, the playlist can retain the downloaded songs.
                     // Incomplete songs should be removed as the new server won't recognise them.
@@ -197,7 +197,9 @@ class MediaPlayerManager(
                     // The new server won't understand the jukebox requests of the old one.
                     switchToLocalPlayer()
                 }
-            }
+            }, { error ->
+                Timber.e(error, "activeServerChangingObservable failed")
+            })
 
         rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
             val jukebox = it.jukeboxByDefault

@@ -30,9 +30,9 @@ class RxBus {
         var activeServerChangingPublisher: PublishSubject<Int> =
             PublishSubject.create()
 
-        // Subscribers should be called synchronously, not on another thread
+        // Subscribers should be called on the UI thread
         var activeServerChangingObservable: Observable<Int> =
-            activeServerChangingPublisher
+            activeServerChangingPublisher.observeOn(mainThread())
 
         var activeServerChangedPublisher: PublishSubject<ServerSetting> =
             PublishSubject.create()
