@@ -113,6 +113,12 @@ class ActiveServerProvider(
         val oldServerId = Settings.activeServer
         if (oldServerId == serverId) return
 
+        if (oldServerId != OFFLINE_DB_ID && serverId == OFFLINE_DB_ID) {
+            Util.toast(R.string.server_switched_offline, true, UApp.applicationContext())
+        } else if (oldServerId == OFFLINE_DB_ID && serverId != OFFLINE_DB_ID) {
+            Util.toast(R.string.server_switched_online, true, UApp.applicationContext())
+        }
+
         // Notify components about the change before actually resetting the MusicService
         // so they can react by e.g. stopping playback on the old server
         RxBus.activeServerChangingPublisher.onNext(oldServerId)

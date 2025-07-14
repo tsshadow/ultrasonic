@@ -138,6 +138,8 @@
     <string name="main.landing_page_title">Home</string>
     <string name="main.livesets">livesets</string>
     <string name="main.offline">Offline</string>
+    <string name="server_switched_offline">Server unreachable. Switched to offline mode.</string>
+    <string name="server_switched_online">Server reachable. Online mode restored.</string>
     <string name="main.setup_server">%s - Set up Server</string>
     <string name="main.songs_random">Random</string>
     <string name="main.songs_random_this_year">Random (2025)</string>
