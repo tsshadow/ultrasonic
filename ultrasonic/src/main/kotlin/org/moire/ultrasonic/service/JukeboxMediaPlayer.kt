@@ -70,6 +70,11 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     private var listeners: ListenerSet<Player.Listener>
     private val playlist: MutableList<MediaItem> = mutableListOf()
+    /**
+     * Last playlist that was sent to listeners and the remote jukebox.
+     * Helps to avoid unnecessary events on timeline changes.
+     */
+    private var lastPublishedPlaylist: List<MediaItem>? = null
 
     private var _currentIndex: Int = 0
     private var currentIndex: Int
@@ -584,6 +589,11 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     private fun updatePlaylist() {
         if (!running.get()) return
+        // Avoid unnecessary remote calls and UI refreshes when the playlist has
+        // not actually changed.
+        val currentList = playlist.toList()
+        if (currentList == lastPublishedPlaylist) return
+        lastPublishedPlaylist = currentList
         tasks.remove(Skip::class.java)
         tasks.remove(Stop::class.java)
         tasks.remove(Start::class.java)
