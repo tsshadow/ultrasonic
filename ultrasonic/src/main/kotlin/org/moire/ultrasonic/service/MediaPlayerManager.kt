@@ -106,7 +106,10 @@ class MediaPlayerManager(
                 deferredPlay = null
             }
             val playlist = Util.getPlayListFromTimeline(timeline, false).map(MediaItem::toTrack)
-            RxBus.playlistPublisher.onNext(playlist)
+            if (playlist != lastPublishedPlaylist) {
+                lastPublishedPlaylist = playlist
+                RxBus.playlistPublisher.onNext(playlist)
+            }
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -175,6 +178,13 @@ class MediaPlayerManager(
     private var deferredPlay: (() -> Unit)? = null
 
     private var cachedMediaItem: MediaItem? = null
+
+    /**
+     * Cache the last playlist that was published via [RxBus].
+     * This helps to avoid redundant updates which would refresh the UI
+     * unnecessarily.
+     */
+    private var lastPublishedPlaylist: List<Track>? = null
 
     fun onCreate(onCreated: () -> Unit) {
         if (created) return
