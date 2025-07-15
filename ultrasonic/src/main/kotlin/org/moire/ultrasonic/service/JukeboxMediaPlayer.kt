@@ -584,11 +584,6 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     private fun updatePlaylist() {
         if (!running.get()) return
-        // Avoid unnecessary remote calls and UI refreshes when the playlist has
-        // not actually changed.
-        val currentList = playlist.toList()
-        if (currentList == lastPublishedPlaylist) return
-        lastPublishedPlaylist = currentList
         tasks.remove(Skip::class.java)
         tasks.remove(Stop::class.java)
         tasks.remove(Start::class.java)
