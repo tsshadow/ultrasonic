@@ -106,10 +106,6 @@ class MediaPlayerManager(
                 deferredPlay = null
             }
             val playlist = Util.getPlayListFromTimeline(timeline, false).map(MediaItem::toTrack)
-            if (playlist != lastPublishedPlaylist) {
-                lastPublishedPlaylist = playlist
-                RxBus.playlistPublisher.onNext(playlist)
-            }
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
