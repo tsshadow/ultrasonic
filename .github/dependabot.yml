@@ -7,7 +7,7 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(gradle-deps)"
-    versioning-strategy: increase
+      
   - package-ecosystem: "gradle"
     directory: "/ultrasonic"
     schedule:
@@ -15,7 +15,7 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(gradle-deps)"
-    versioning-strategy: increase
+      
   - package-ecosystem: "gradle"
     directory: "/core/subsonic-api"
     schedule:
@@ -23,7 +23,7 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(gradle-deps)"
-    versioning-strategy: increase
+      
   - package-ecosystem: "gradle"
     directory: "/core/domain"
     schedule:
@@ -31,7 +31,7 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(gradle-deps)"
-    versioning-strategy: increase
+      
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -39,4 +39,3 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(actions)"
-    versioning-strategy: increase
