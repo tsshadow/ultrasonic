@@ -70,11 +70,6 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     private var listeners: ListenerSet<Player.Listener>
     private val playlist: MutableList<MediaItem> = mutableListOf()
-    /**
-     * Last playlist that was sent to listeners and the remote jukebox.
-     * Helps to avoid unnecessary events on timeline changes.
-     */
-    private var lastPublishedPlaylist: List<MediaItem>? = null
 
     private var _currentIndex: Int = 0
     private var currentIndex: Int
