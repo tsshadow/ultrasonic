@@ -175,13 +175,6 @@ class MediaPlayerManager(
 
     private var cachedMediaItem: MediaItem? = null
 
-    /**
-     * Cache the last playlist that was published via [RxBus].
-     * This helps to avoid redundant updates which would refresh the UI
-     * unnecessarily.
-     */
-    private var lastPublishedPlaylist: List<Track>? = null
-
     fun onCreate(onCreated: () -> Unit) {
         if (created) return
         externalStorageMonitor.onCreate { reset() }
