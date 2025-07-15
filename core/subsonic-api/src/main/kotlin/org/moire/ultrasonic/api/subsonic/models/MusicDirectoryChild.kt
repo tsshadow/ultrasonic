@@ -42,8 +42,10 @@ data class MusicDirectoryChild(
 )
 
 class ApiGenre {
-    @JsonProperty("name") val name: String = ""
+    @JsonProperty("name")
+    val name: String = ""
 }
+
 /** List of genre names from the API. */
 val MusicDirectoryChild.genreNames: List<String>
     get() = genresValue.map { it.name }

@@ -3,8 +3,8 @@ package org.moire.ultrasonic.api.subsonic
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectReader
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.lang.reflect.Type
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -12,7 +12,6 @@ import org.moire.ultrasonic.api.subsonic.response.SubsonicResponse
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
-
 /**
  * Retrofit Converter Factory which uses Jackson for conversion and maintains the
  * version of the Subsonic API.
