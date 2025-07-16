@@ -664,6 +664,17 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(OfflineException::class)
+    override fun getSingles(artistId: String, refresh: Boolean): MusicDirectory {
+        val list = cachedTracks.byArtist(artistId)
+            .sortedWith(EntryByDiscAndTrackComparator())
+
+        val dir = MusicDirectory()
+        dir.addAll(list)
+
+        return dir
+    }
+
+    @Throws(OfflineException::class)
     override fun getPodcastEpisodes(podcastChannelId: String?): MusicDirectory? {
         throw OfflineException("getPodcastEpisodes isn't available in offline mode")
     }

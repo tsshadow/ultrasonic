@@ -8,6 +8,8 @@
 package org.moire.ultrasonic.model
 
 import android.app.Application
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -131,6 +133,16 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
             val musicDirectory = service.getRandomSongs(size)
             currentListIsSortable = false
             updateList(musicDirectory, append)
+        }
+    }
+
+    suspend fun getSingles(artistId: String, refresh: Boolean) {
+        withContext(Dispatchers.IO) {
+            Timber.d("getSingles", artistId, refresh)
+            val service = MusicServiceFactory.getMusicService()
+            val musicDirectory = service.getSingles(artistId, refresh)
+            currentListIsSortable = true
+            updateList(musicDirectory)
         }
     }
 

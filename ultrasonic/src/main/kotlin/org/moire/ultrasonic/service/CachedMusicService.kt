@@ -227,6 +227,10 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         return cache
     }
 
+    override fun getSingles(artistId: String, refresh: Boolean): MusicDirectory {
+        return musicService.getSingles(artistId, refresh)
+    }
+
     @Throws(Exception::class)
     override fun search(criteria: SearchCriteria): SearchResult? {
         return musicService.search(criteria)

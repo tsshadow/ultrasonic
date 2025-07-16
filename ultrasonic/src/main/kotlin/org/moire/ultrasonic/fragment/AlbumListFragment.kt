@@ -242,7 +242,8 @@ class AlbumListFragment(
             item.id,
             isAlbum = item.isDirectory,
             name = item.title,
-            parentId = item.parent
+            parentId = item.parent,
+            artistId = navArgs.artistId // Pass artist id to track collection
         )
         findNavController().navigate(action)
     }

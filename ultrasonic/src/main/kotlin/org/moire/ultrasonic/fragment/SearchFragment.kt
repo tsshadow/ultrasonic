@@ -190,7 +190,8 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinScopeComponent, Re
                 id = item.id,
                 name = item.name,
                 parentId = item.id,
-                isArtist = false
+                isArtist = false,
+                artistId = item.id
             )
         } else {
             SearchFragmentDirections.searchToAlbumsList(
@@ -199,7 +200,8 @@ class SearchFragment : MultiListFragment<Identifiable>(), KoinScopeComponent, Re
                 id = item.id,
                 title = item.name,
                 size = 1000,
-                offset = 0
+                offset = 0,
+                artistId = item.id
             )
         }
 

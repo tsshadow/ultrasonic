@@ -58,12 +58,22 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="id"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/trackCollectionFragment"
         android:name="org.moire.ultrasonic.fragment.TrackCollectionFragment">
         <argument
             android:name="id"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="artistId"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
@@ -239,6 +249,11 @@
             app:argType="boolean" />
         <argument
             android:name="id"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="artistId"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />

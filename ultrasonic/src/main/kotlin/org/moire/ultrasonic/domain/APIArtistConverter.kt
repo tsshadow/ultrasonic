@@ -31,9 +31,15 @@ fun APIArtist.toIndexEntity(serverId: Int): Index = Index(
 
 fun APIArtist.toMusicDirectoryDomainEntity(serverId: Int): MusicDirectory = MusicDirectory().apply {
     name = this@toMusicDirectoryDomainEntity.name
-    addAll(this@toMusicDirectoryDomainEntity.albumsList.map { it.toDomainEntity(serverId) })
+    addAll(
+        this@toMusicDirectoryDomainEntity.albumsList
+            .filter { it.id != "no_album" || it.songCount > 0 }
+            .map { it.toDomainEntity(serverId) }
+    )
 }
 
 fun APIArtist.toDomainEntityList(serverId: Int): List<Album> {
-    return this.albumsList.map { it.toDomainEntity(serverId) }
+    return this.albumsList
+        .filter { it.id != "no_album" || it.songCount > 0 }
+        .map { it.toDomainEntity(serverId) }
 }

@@ -94,7 +94,8 @@ class ArtistListFragment : EntryListFragment<ArtistOrIndex>() {
                 id = item.id,
                 name = item.name,
                 parentId = item.id,
-                isArtist = (item is Artist)
+                isArtist = (item is Artist),
+                artistId = item.id
             )
         } else {
             NavigationGraphDirections.toAlbumList(
@@ -103,7 +104,8 @@ class ArtistListFragment : EntryListFragment<ArtistOrIndex>() {
                 id = item.id,
                 title = item.name,
                 size = 1000,
-                offset = 0
+                offset = 0,
+                artistId = item.id
             )
         }
 

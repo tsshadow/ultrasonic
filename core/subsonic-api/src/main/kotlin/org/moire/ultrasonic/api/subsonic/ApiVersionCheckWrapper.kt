@@ -19,6 +19,7 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_6_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_7_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_8_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_9_0
+import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_16_0
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
 import org.moire.ultrasonic.api.subsonic.response.BookmarksResponse
@@ -34,6 +35,7 @@ import org.moire.ultrasonic.api.subsonic.response.GetPlaylistsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetPodcastsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetRandomSongsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetSongsByGenreResponse
+import org.moire.ultrasonic.api.subsonic.response.GetSongsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetStarredResponse
 import org.moire.ultrasonic.api.subsonic.response.GetStarredTwoResponse
 import org.moire.ultrasonic.api.subsonic.response.GetUserResponse
@@ -86,6 +88,11 @@ internal class ApiVersionCheckWrapper(
     override fun getAlbum(id: String): Call<GetAlbumResponse> {
         checkVersion(V1_8_0)
         return api.getAlbum(id)
+    }
+
+    override fun getSingles(artistId: String): Call<GetSongsResponse> {
+        checkVersion(V1_16_0)
+        return api.getSingles(artistId)
     }
 
     override fun search2(

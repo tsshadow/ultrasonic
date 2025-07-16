@@ -109,6 +109,9 @@ interface SubsonicAPIDefinition {
     @GET("getAlbum.view")
     fun getAlbum(@Query("id") id: String): Call<GetAlbumResponse>
 
+    @GET("getSingles.view")
+    fun getSingles(@Query("artistId") artistId: String): Call<GetSongsResponse>
+
     @GET("search.view")
     fun search(
         @Query("artist") artist: String? = null,

@@ -7,11 +7,13 @@
 
 package org.moire.ultrasonic.fragment
 
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -517,6 +519,7 @@ open class TrackCollectionFragment(
     ): LiveData<List<MusicDirectory.Child>> {
         Timber.i("Starting gathering track collection data...")
         val id = navArgs.id
+        val artistId = navArgs.artistId
         val isAlbum = navArgs.isAlbum
         val name = navArgs.name
         val playlistId = navArgs.playlistId
@@ -640,7 +643,14 @@ open class TrackCollectionFragment(
                 setTitle(name)
 
                 if (isAlbum && ActiveServerProvider.shouldUseId3Tags()) {
-                    listModel.getAlbum(refresh2, id, name)
+                    Timber.d("Loading album with id3 tags $id $artistId")
+                    if (id == "no_album") {
+                        if (artistId != null) {
+                            listModel.getSingles(artistId, refresh2)
+                        }
+                    } else {
+                        listModel.getAlbum(refresh2, id, name)
+                    }
                 } else {
                     listModel.getMusicDirectory(refresh2, id, name)
                 }

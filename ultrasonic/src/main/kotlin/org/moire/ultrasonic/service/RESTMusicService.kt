@@ -147,6 +147,17 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
+    override fun getSingles(artistId: String, refresh: Boolean): MusicDirectory {
+        val response = API.getSingles(artistId).execute().throwOnFailure()
+
+
+        val result = MusicDirectory()
+        result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
+
+        return result
+    }
+
+    @Throws(Exception::class)
     override fun search(criteria: SearchCriteria): SearchResult {
         return try {
             if (shouldUseId3Tags()) {
