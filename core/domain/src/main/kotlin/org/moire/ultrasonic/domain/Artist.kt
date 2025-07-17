@@ -10,6 +10,12 @@ package org.moire.ultrasonic.domain
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 
+/**
+ * Represents an artist which can optionally contain genre information and a
+ * textual description. The list of genres is stored using Room's
+ * {@link Converters} which serialises lists as JSON strings.
+ */
+
 @Entity(tableName = "artists", primaryKeys = ["id", "serverId"])
 data class Artist(
     override var id: String,
@@ -19,5 +25,8 @@ data class Artist(
     override var index: String? = null,
     override var coverArt: String? = null,
     override var albumCount: Long? = null,
+    var genre: String? = null,
+    var genres: List<String>? = null,
+    var description: String? = null,
     override var closeness: Int = 0
 ) : ArtistOrIndex(id, serverId)

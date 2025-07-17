@@ -44,7 +44,7 @@ import org.moire.ultrasonic.domain.Track
         )
     ],
     exportSchema = true,
-    version = 4
+    version = 5
 )
 @TypeConverters(Converters::class)
 abstract class MetaDatabase : RoomDatabase() {
@@ -95,7 +95,7 @@ val META_MIGRATION_2_3: Migration = object : Migration(2, 3) {
             "CREATE TABLE IF NOT EXISTS `indexes` (`id` TEXT NOT NULL, `serverId` INTEGER NOT NULL DEFAULT -1, `name` TEXT, `index` TEXT, `coverArt` TEXT, `albumCount` INTEGER, `closeness` INTEGER NOT NULL, `musicFolderId` TEXT, PRIMARY KEY(`id`, `serverId`))"
         )
         db.execSQL(
-            "CREATE TABLE IF NOT EXISTS `artists` (`id` TEXT NOT NULL, `serverId` INTEGER NOT NULL DEFAULT -1, `name` TEXT, `index` TEXT, `coverArt` TEXT, `albumCount` INTEGER, `closeness` INTEGER NOT NULL, PRIMARY KEY(`id`, `serverId`))"
+            "CREATE TABLE IF NOT EXISTS `artists` (`id` TEXT NOT NULL, `serverId` INTEGER NOT NULL DEFAULT -1, `name` TEXT, `index` TEXT, `coverArt` TEXT, `albumCount` INTEGER, `genre` TEXT, `genres` TEXT, `description` TEXT, `closeness` INTEGER NOT NULL, PRIMARY KEY(`id`, `serverId`))"
         )
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS `music_folders` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `serverId` INTEGER NOT NULL DEFAULT -1, PRIMARY KEY(`id`, `serverId`))"
@@ -111,5 +111,13 @@ val META_MIGRATION_3_4: Migration = object : Migration(3, 4) {
         db.execSQL("ALTER TABLE `tracks` ADD COLUMN `date` TEXT")
         db.execSQL("ALTER TABLE `albums` ADD COLUMN `genres` TEXT")
         db.execSQL("ALTER TABLE `albums` ADD COLUMN `date` TEXT")
+    }
+}
+
+val META_MIGRATION_4_5: Migration = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `artists` ADD COLUMN `genre` TEXT")
+        db.execSQL("ALTER TABLE `artists` ADD COLUMN `genres` TEXT")
+        db.execSQL("ALTER TABLE `artists` ADD COLUMN `description` TEXT")
     }
 }
