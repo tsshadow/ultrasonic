@@ -18,6 +18,7 @@ import org.moire.ultrasonic.api.subsonic.response.GetAlbumListResponse
 import org.moire.ultrasonic.api.subsonic.response.GetAlbumResponse
 import org.moire.ultrasonic.api.subsonic.response.GetArtistResponse
 import org.moire.ultrasonic.api.subsonic.response.GetArtistsResponse
+import org.moire.ultrasonic.api.subsonic.response.GetArtistInfo2Response
 import org.moire.ultrasonic.api.subsonic.response.GetIndexesResponse
 import org.moire.ultrasonic.api.subsonic.response.GetLyricsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetMusicDirectoryResponse
@@ -105,6 +106,13 @@ interface SubsonicAPIDefinition {
 
     @GET("getArtist.view")
     fun getArtist(@Query("id") id: String): Call<GetArtistResponse>
+
+    @GET("getArtistInfo2.view")
+    fun getArtistInfo2(
+        @Query("id") id: String,
+        @Query("count") count: Int? = null,
+        @Query("includeNotPresent") includeNotPresent: Boolean? = null
+    ): Call<GetArtistInfo2Response>
 
     @GET("getAlbum.view")
     fun getAlbum(@Query("id") id: String): Call<GetAlbumResponse>

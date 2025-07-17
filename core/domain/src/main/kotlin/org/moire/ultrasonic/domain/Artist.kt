@@ -25,8 +25,7 @@ data class Artist(
     override var index: String? = null,
     override var coverArt: String? = null,
     override var albumCount: Long? = null,
+    override var closeness: Int = 0,
     var genre: String? = null,
-    var genres: List<String>? = null,
-    var description: String? = null,
-    override var closeness: Int = 0
+    var description: String? = null
 ) : ArtistOrIndex(id, serverId)
