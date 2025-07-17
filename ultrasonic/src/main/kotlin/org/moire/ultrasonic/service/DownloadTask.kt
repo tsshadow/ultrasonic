@@ -282,9 +282,17 @@ class DownloadTask(
 //            }
 //        }
 
-        // If we have found an artist, cache it.
-        if (artist != null) {
-            offlineDB.artistDao().insert(artist)
+        // If we have found an artist, try to enrich it with additional info.
+        artist?.let { existing ->
+            try {
+                musicService.getArtistInfo(artistId)?.let { info ->
+                    if (existing.genre == null) existing.genre = info.genre
+                    if (existing.description == null) existing.description = info.description
+                }
+            } catch (e: Exception) {
+                Timber.w(e, "Failed to fetch artist info")
+            }
+            offlineDB.artistDao().insert(existing)
         }
 
         return artist

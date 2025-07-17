@@ -73,6 +73,9 @@ interface MusicService {
     fun getArtists(refresh: Boolean, offset: Int? = null, count: Int? = null): List<Artist>
 
     @Throws(Exception::class)
+    fun getArtistInfo(id: String): Artist?
+
+    @Throws(Exception::class)
     fun getMusicDirectory(id: String, name: String?, refresh: Boolean): MusicDirectory
 
     @Throws(Exception::class)

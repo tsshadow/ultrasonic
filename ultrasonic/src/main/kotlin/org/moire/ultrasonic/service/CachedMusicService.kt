@@ -157,6 +157,11 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
+    override fun getArtistInfo(id: String): Artist? {
+        return musicService.getArtistInfo(id)
+    }
+
+    @Throws(Exception::class)
     override fun getMusicDirectory(id: String, name: String?, refresh: Boolean): MusicDirectory {
         checkSettingsChanged()
         var cache = if (refresh) null else cachedMusicDirectories[id]

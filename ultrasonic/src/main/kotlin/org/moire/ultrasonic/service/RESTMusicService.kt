@@ -104,6 +104,22 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
+    override fun getArtistInfo(id: String): Artist? {
+        return try {
+            val response = API.getArtistInfo2(id, null, null).execute().throwOnFailure()
+            val info = response.body()!!.artistInfo
+            Artist(
+                id = id,
+                serverId = activeServerId,
+                genre = info.genre,
+                description = info.biography
+            )
+        } catch (e: ApiNotSupportedException) {
+            null
+        }
+    }
+
+    @Throws(Exception::class)
     override fun star(id: String?, albumId: String?, artistId: String?) {
         API.star(id, albumId, artistId).execute().throwOnFailure()
     }

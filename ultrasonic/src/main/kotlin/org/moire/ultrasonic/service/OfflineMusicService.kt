@@ -141,6 +141,11 @@ class OfflineMusicService : MusicService, KoinComponent {
         return cachedArtists.get()
     }
 
+    @Throws(OfflineException::class)
+    override fun getArtistInfo(id: String): Artist? {
+        throw OfflineException("Artist info not available in offline mode")
+    }
+
     /*
      * Especially when dealing with indexes, this method can return Albums, Entries or a mix of both!
      */
