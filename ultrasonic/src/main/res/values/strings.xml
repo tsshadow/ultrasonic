@@ -178,6 +178,8 @@
     <string name="select_album.no_network">Warning: No usable network available.\n If you are using mobile data, you may need to allow downloads on metered connections in the settings.</string>
     <string name="select_album.no_sdcard">Error: No SD card available.</string>
     <string name="select_album.play_all">Play All</string>
+    <string name="artist_detail_eps">EPs</string>
+    <string name="artist_detail_singles">Singles</string>
     <string name="select_artist.all_folders">All Folders</string>
     <string name="select_artist.folder">Select Folder</string>
     <string name="select_genre.empty">No genres found</string>
