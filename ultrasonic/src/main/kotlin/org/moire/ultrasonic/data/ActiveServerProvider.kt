@@ -166,6 +166,7 @@ class ActiveServerProvider(
         )
             .addMigrations(META_MIGRATION_2_3)
             .addMigrations(META_MIGRATION_3_4)
+            .addMigrations(META_MIGRATION_4_5)
             .fallbackToDestructiveMigrationOnDowngrade()
             .build()
     }
