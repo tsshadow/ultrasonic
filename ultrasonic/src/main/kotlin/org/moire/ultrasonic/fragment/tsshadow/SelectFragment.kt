@@ -76,7 +76,6 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
         return inflater.inflate(R.layout.tsshadow_search, container, false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initializeViews(view)
@@ -97,7 +96,6 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
 
     protected abstract fun setTitle()
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun setupFilterModalListener() {
         childFragmentManager.setFragmentResultListener(
             "filters_result",
@@ -179,7 +177,6 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onEditTile(tile: TileInfo, position: Int) {
         lastEditedTilePosition = position
         val filterState = FilterState(

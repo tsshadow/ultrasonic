@@ -64,7 +64,6 @@ import org.moire.ultrasonic.util.toastingExceptionHandler
 import org.moire.ultrasonic.view.SortOrder
 import org.moire.ultrasonic.view.ViewCapabilities
 import timber.log.Timber
-import java.util.Collections
 
 /**
  * Displays a group of tracks, eg. the songs of an album, of a playlist etc.

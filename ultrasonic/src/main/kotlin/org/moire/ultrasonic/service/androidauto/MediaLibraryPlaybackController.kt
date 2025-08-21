@@ -10,6 +10,7 @@ package org.moire.ultrasonic.service.androidauto
 import androidx.media3.common.MediaItem
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.future
 import org.moire.ultrasonic.app.UApp
@@ -145,6 +146,11 @@ class MediaLibraryPlaybackController(
     fun onAddLegacyAutoItems(
         mediaItems: MutableList<MediaItem>
     ): ListenableFuture<List<MediaItem>> {
+        if (mediaItems.isEmpty()) {
+            Timber.w("onAddLegacyAutoItems called with no items")
+            return Futures.immediateFuture(emptyList())
+        }
+
         Timber.i("onAddLegacyAutoItems %s", mediaItems.first().mediaId)
 
         val mediaIdParts = mediaItems.first().mediaId.split('|')
@@ -207,7 +213,7 @@ class MediaLibraryPlaybackController(
             query
         }
 
-        return serviceScope.future {
+        val searchFuture = serviceScope.future {
             val criteria = SearchCriteria(mediaTitle, SEARCH_LIMIT, SEARCH_LIMIT, SEARCH_LIMIT)
             val searchResult = callWithErrorHandling { musicService.search(criteria) }
 
@@ -240,15 +246,32 @@ class MediaLibraryPlaybackController(
                 }
             }
 
+            if (mediaItems.isEmpty()) {
+                Timber.i("No media found for query: %s", query)
+                return@future listOf<MediaItem>()
+            }
+
             // TODO This just picks the first result and plays it.
             // We could make this more advanced.
             val firstItem = mediaItems.first()
             val tracks = dataProvider.tracksFromMediaId(firstItem.mediaId)
             Timber.i("Found media id: %s", firstItem.mediaId)
-            val result = tracks?.map { it.toMediaItem() }
-            Timber.i("Result size: %d", result?.size ?: 0)
-            return@future result ?: listOf()
+            val result = tracks?.map { it.toMediaItem() } ?: listOf()
+            Timber.i("Result size: %d", result.size)
+            return@future result
         }
+
+        return Futures.transformAsync(
+            searchFuture,
+            { result ->
+                if (result.isEmpty()) {
+                    Futures.immediateFuture(emptyList())
+                } else {
+                    Futures.immediateFuture(result)
+                }
+            },
+            MoreExecutors.directExecutor()
+        )
     }
 
     fun playPodcast(id: String): List<Track>? {

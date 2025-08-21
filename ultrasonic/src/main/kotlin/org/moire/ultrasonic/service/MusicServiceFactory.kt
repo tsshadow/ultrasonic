@@ -53,7 +53,6 @@ object MusicServiceFactory : KoinComponent {
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var previousServerId: Int? = null
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private fun isNetworkAvailable(): Boolean {
         val cm = connectivityManager
         val network = cm.activeNetwork ?: return false
@@ -85,7 +84,6 @@ object MusicServiceFactory : KoinComponent {
         networkCallback = callback
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     @JvmStatic
     fun getMusicService(): MusicService {
         if (ActiveServerProvider.isOffline()) {

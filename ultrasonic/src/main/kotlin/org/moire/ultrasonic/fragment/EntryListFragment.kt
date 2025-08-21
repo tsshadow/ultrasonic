@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.inject
+import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.adapters.FolderSelectorBinder
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Artist
@@ -50,7 +51,7 @@ abstract class EntryListFragment<T : GenericEntry> : MultiListFragment<T>(), Koi
     }
 
     override fun onItemClick(item: T) {
-        val action = EntryListFragmentDirections.entryListToTrackCollection(
+        val action = NavigationGraphDirections.toTrackCollection(
             id = item.id,
             name = item.name,
             parentId = item.id,

@@ -73,7 +73,6 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.UltrasonicFilterDialogTheme)
@@ -322,7 +321,6 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun applyInitialFilters() {
         val filters = arguments?.getParcelable(ARG_INITIAL_FILTERS, FilterState::class.java) ?: return
         binding.selectTitle.setText(filters.title)

@@ -18,7 +18,6 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.activity.NavigationActivity
 
 object ShortcutUtil {
-    @RequiresApi(Build.VERSION_CODES.N_MR1)
     fun registerShortcuts(activity: Activity) {
         val shortcutIntent = Intent(activity, NavigationActivity::class.java).apply {
             action = Constants.INTENT_PLAY_RANDOM_SONGS
