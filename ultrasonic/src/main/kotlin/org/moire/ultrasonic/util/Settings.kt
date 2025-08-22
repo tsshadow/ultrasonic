@@ -90,6 +90,12 @@ object Settings {
     )
 
     @JvmStatic
+    var autoSwitchOffline by BooleanSetting(
+        getKey(R.string.setting_key_auto_switch_offline),
+        true
+    )
+
+    @JvmStatic
     var shareOnServer by BooleanSetting(getKey(R.string.setting_key_share_on_server), true)
 
     @JvmStatic

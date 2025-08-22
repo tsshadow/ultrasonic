@@ -36,6 +36,7 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.di.OFFLINE_MUSIC_SERVICE
 import org.moire.ultrasonic.di.ONLINE_MUSIC_SERVICE
 import org.moire.ultrasonic.di.musicServiceModule
+import org.moire.ultrasonic.util.Settings
 import timber.log.Timber
 
 /*
@@ -93,15 +94,17 @@ object MusicServiceFactory : KoinComponent {
 
         if (!isNetworkAvailable()) {
             Timber.w("Active server unreachable, falling back to offline service")
-            if (previousServerId == null) {
-                previousServerId = ActiveServerProvider.getActiveServerId()
-                activeServerProvider.setActiveServerById(ActiveServerProvider.OFFLINE_DB_ID)
+            if (Settings.autoSwitchOffline) {
+                if (previousServerId == null) {
+                    previousServerId = ActiveServerProvider.getActiveServerId()
+                    activeServerProvider.setActiveServerById(ActiveServerProvider.OFFLINE_DB_ID)
+                }
+                registerNetworkCallback()
+                return get(named(OFFLINE_MUSIC_SERVICE))
             }
-            registerNetworkCallback()
-            return get(named(OFFLINE_MUSIC_SERVICE))
         }
 
-        if (previousServerId != null && ActiveServerProvider.isOffline()) {
+        if (Settings.autoSwitchOffline && previousServerId != null && ActiveServerProvider.isOffline()) {
             activeServerProvider.setActiveServerById(previousServerId!!)
             previousServerId = null
         }
