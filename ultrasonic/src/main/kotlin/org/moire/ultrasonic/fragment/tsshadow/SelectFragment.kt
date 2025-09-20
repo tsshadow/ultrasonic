@@ -31,6 +31,7 @@ import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Tag
 import org.moire.ultrasonic.util.toastingExceptionHandler
+import java.util.Locale
 import timber.log.Timber
 
 abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCallback {
@@ -110,6 +111,8 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
                     val filters = Filters().apply {
                         if (filterState.genres.isNotEmpty())
                             add(Filter("GENRE", filterState.genres))
+                        if (filterState.artists.isNotEmpty())
+                            add(Filter("ARTIST", filterState.artists))
                         if (filterState.years.isNotEmpty())
                             add(Filter("YEAR", filterState.years))
                         if (filterState.label.isNotEmpty())
@@ -164,6 +167,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
         return TileInfo(
             title = state.title,
             genre = state.genres,
+            artists = state.artists,
             year = state.years,
             label = state.label,
             festival = state.festival,
@@ -182,6 +186,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
         val filterState = FilterState(
             title = tile.title,
             genres = tile.genre ?: emptyList(),
+            artists = tile.artists ?: emptyList(),
             years = tile.year ?: emptyList(),
             label = tile.label ?: emptyList(),
             festivalLineup = tile.festivalLineup,
@@ -271,12 +276,22 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
                 musicService.getLineups(refresh)
             }.map { it.name }.sorted()
 
+            val artists = withContext(Dispatchers.IO) {
+                musicService.getArtists(refresh, null, null)
+            }.mapNotNull { it.name?.takeIf(String::isNotBlank) }
+                .distinctBy { it.lowercase(Locale.ROOT) }
+                .sortedWith(String.CASE_INSENSITIVE_ORDER)
+
             filterOptionsViewModel.genres.postValue(genres)
             filterOptionsViewModel.years.postValue(years)
             filterOptionsViewModel.labels.postValue(labels)
             filterOptionsViewModel.festivals.postValue(festivals)
             filterOptionsViewModel.lineups.postValue(lineups)
-            Timber.d("Filter data loaded: genres=${genres.size}, years=${years.size}, labels=${labels.size}, festivals=${festivals.size}")
+            filterOptionsViewModel.artists.postValue(artists)
+            Timber.d(
+                "Filter data loaded: genres=${genres.size}, years=${years.size}, " +
+                    "labels=${labels.size}, festivals=${festivals.size}, artists=${artists.size}"
+            )
         }
         swipeRefresh?.isRefreshing = false
     }

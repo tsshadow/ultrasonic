@@ -450,6 +450,18 @@ class OfflineMusicService : MusicService, KoinComponent {
                         values.any { value -> genres.any { g -> g.equals(value, true) } }
                     }
                 }
+                "ARTIST" -> {
+                    val values = if (filter.value is Collection<*>) {
+                        (filter.value as Collection<*>).mapNotNull { it?.toString()?.takeIf(String::isNotBlank) }
+                    } else listOf(filter.value.toString())
+                    if (values.isNotEmpty()) {
+                        val normalized = values.map { it.lowercase(Locale.ROOT) }
+                        list = list.filter { track ->
+                            val artistName = track.artist?.lowercase(Locale.ROOT)
+                            artistName != null && normalized.any { it == artistName }
+                        }
+                    }
+                }
                 "YEAR" -> {
                     val years = if (filter.value is Collection<*>) {
                         (filter.value as Collection<*>).mapNotNull { it.toString().toIntOrNull() }

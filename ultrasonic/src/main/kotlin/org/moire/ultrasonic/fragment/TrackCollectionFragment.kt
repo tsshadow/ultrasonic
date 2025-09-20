@@ -527,6 +527,7 @@ open class TrackCollectionFragment(
         val shareId = navArgs.shareId
         val shareName = navArgs.shareName
         val genre = navArgs.genre
+        val artists = navArgs.artists?.filter { it.isNotBlank() } ?: emptyList()
         val festival = navArgs.festival
         val label = navArgs.label
         val songs = navArgs.songs
@@ -587,6 +588,13 @@ open class TrackCollectionFragment(
                         }
                         if (!festival.isNullOrBlank()) append(festival)
                         if (!label.isNullOrBlank()) append(label)
+                        if (artists.isNotEmpty()) {
+                            if (isNotEmpty()) append(" ")
+                            append(
+                                if (artists.size == 1) artists.first()
+                                else getString(R.string.common_artist)
+                            )
+                        }
                         if (!genre.isNullOrBlank() && genre != "All") {
                             if (isNotEmpty()) append(" ")
                             append(genre)
@@ -608,6 +616,12 @@ open class TrackCollectionFragment(
                         }
                         genre?.takeIf { it != "All" && it.isNotBlank() }?.let {
                             add(Filter("GENRE", it))
+                        }
+                        if (artists.isNotEmpty()) {
+                            add(
+                                if (artists.size == 1) Filter("ARTIST", artists.first())
+                                else Filter("ARTIST", artists)
+                            )
                         }
                         festival?.takeIf { it != "All" && it.isNotBlank() }?.let {
                             add(Filter("FESTIVAL", it))

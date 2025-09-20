@@ -35,6 +35,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
     private val filterOptionsViewModel: FilterOptionsViewModel by activityViewModels()
 
     private val selectedGenres = mutableListOf<String>()
+    private val selectedArtists = mutableListOf<String>()
     private val selectedYears = mutableListOf<String>()
     private val selectedLabels = mutableListOf<String>()
     private var selectedFestivalLineup: String? = null
@@ -183,51 +184,22 @@ class FilterModalFragment : BottomSheetDialogFragment() {
     }
 
     private fun observeFilterOptions() {
-        filterOptionsViewModel.genres.observe(viewLifecycleOwner) { genres ->
-            redrawAllChips(
-                genres,
-                filterOptionsViewModel.years.value,
-                filterOptionsViewModel.labels.value,
-                filterOptionsViewModel.lineups.value,
-                filterOptionsViewModel.festivals.value
-            )
-        }
-        filterOptionsViewModel.years.observe(viewLifecycleOwner) { years ->
-            redrawAllChips(
-                filterOptionsViewModel.genres.value,
-                years,
-                filterOptionsViewModel.labels.value,
-                filterOptionsViewModel.lineups.value,
-                filterOptionsViewModel.festivals.value
-            )
-        }
-        filterOptionsViewModel.labels.observe(viewLifecycleOwner) { labels ->
-            redrawAllChips(
-                filterOptionsViewModel.genres.value,
-                filterOptionsViewModel.years.value,
-                labels,
-                filterOptionsViewModel.lineups.value,
-                filterOptionsViewModel.festivals.value
-            )
-        }
-        filterOptionsViewModel.lineups.observe(viewLifecycleOwner) { lineups ->
-            redrawAllChips(
-                filterOptionsViewModel.genres.value,
-                filterOptionsViewModel.years.value,
-                filterOptionsViewModel.labels.value,
-                lineups,
-                filterOptionsViewModel.festivals.value
-            )
-        }
-        filterOptionsViewModel.festivals.observe(viewLifecycleOwner) { festivals ->
+        val redraw: () -> Unit = {
             redrawAllChips(
                 filterOptionsViewModel.genres.value,
                 filterOptionsViewModel.years.value,
                 filterOptionsViewModel.labels.value,
                 filterOptionsViewModel.lineups.value,
-                festivals
+                filterOptionsViewModel.festivals.value,
+                filterOptionsViewModel.artists.value
             )
         }
+        filterOptionsViewModel.genres.observe(viewLifecycleOwner) { redraw() }
+        filterOptionsViewModel.years.observe(viewLifecycleOwner) { redraw() }
+        filterOptionsViewModel.labels.observe(viewLifecycleOwner) { redraw() }
+        filterOptionsViewModel.lineups.observe(viewLifecycleOwner) { redraw() }
+        filterOptionsViewModel.festivals.observe(viewLifecycleOwner) { redraw() }
+        filterOptionsViewModel.artists.observe(viewLifecycleOwner) { redraw() }
         filterOptionsViewModel.favorite.observe(viewLifecycleOwner) { favorite ->
             binding.favoriteButton.isSelected = favorite
             val iconRes = if (favorite) R.drawable.ic_star_full else R.drawable.ic_star_hollow
@@ -240,7 +212,8 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         years: List<String>?,
         labels: List<String>?,
         lineups: List<String>?,
-        festivals: List<String>?
+        festivals: List<String>?,
+        artists: List<String>?
     ) {
         val group = binding.addChipGroup
         group.removeAllViews()
@@ -255,7 +228,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
                 chip.text = value
                 chip.setOnCloseIconClickListener {
                     values.remove(value)
-                    redrawAllChips(genres, years, labels, lineups, festivals)
+                    redrawAllChips(genres, years, labels, lineups, festivals, artists)
                 }
                 group.addView(chip)
             }
@@ -277,7 +250,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
                             val result = allOptions.filterIndexed { index, _ -> checked[index] }
                             values.clear()
                             values.addAll(result)
-                            redrawAllChips(genres, years, labels, lineups, festivals)
+                            redrawAllChips(genres, years, labels, lineups, festivals, artists)
                         }
                         .setNegativeButton(android.R.string.cancel, null)
                         .show()
@@ -290,13 +263,14 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         addSelectedChips(getString(R.string.genre), selectedGenres, genres)
 
         if (modalType == FilterModalType.SONG) {
+            addSelectedChips(getString(R.string.common_artist), selectedArtists, artists)
             addSelectedChips(getString(R.string.label), selectedLabels, labels)
             if (selectedFestivalLineup != null) {
                 val chip = layoutInflater.inflate(R.layout.tsshadow_chip, group, false) as Chip
                 chip.text = selectedFestivalLineup
                 chip.setOnCloseIconClickListener {
                     selectedFestivalLineup = null
-                    redrawAllChips(genres, years, labels, lineups, festivals)
+                    redrawAllChips(genres, years, labels, lineups, festivals, artists)
                 }
                 group.addView(chip)
             } else if (lineups != null) {
@@ -308,7 +282,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
                         .setTitle("Select ${getString(R.string.festival_lineup)}")
                         .setItems(lineups.toTypedArray()) { _, which ->
                             selectedFestivalLineup = lineups[which]
-                            redrawAllChips(genres, years, labels, lineups, festivals)
+                            redrawAllChips(genres, years, labels, lineups, festivals, artists)
                         }
                         .show()
                 }
@@ -325,6 +299,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         val filters = arguments?.getParcelable(ARG_INITIAL_FILTERS, FilterState::class.java) ?: return
         binding.selectTitle.setText(filters.title)
         selectedGenres.addAll(filters.genres)
+        selectedArtists.addAll(filters.artists)
         selectedYears.addAll(filters.years)
         selectedLabels.addAll(filters.label)
         selectedFestivalLineup = filters.festivalLineup
@@ -354,6 +329,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
     private fun collectFilterState(): FilterState = FilterState(
         title = binding.selectTitle.text.toString().trim(),
         genres = selectedGenres,
+        artists = selectedArtists,
         years = selectedYears,
         count = selectedResultCount,
         ratingMin = binding.selectRatingMin.selectedItem as Int,
