@@ -54,7 +54,6 @@ import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util
-import org.moire.ultrasonic.util.Util.ifNotNull
 import org.moire.ultrasonic.util.buildMediaItem
 import org.moire.ultrasonic.util.toMediaItem
 import org.moire.ultrasonic.util.toTrack
@@ -655,7 +654,42 @@ class MediaLibrarySessionCallbackOriginal :
 
             // Genre -> songs
             MEDIA_GENRES_SONGS -> getGenres(null, "short")
-            MEDIA_GENRE_SONGS -> getGenre(parentIdParts[1], null, "short")
+            MEDIA_GENRE_SONGS -> {
+                if (parentIdParts.size > 2) {
+                    val length = parentIdParts.getOrNull(1) ?: "short"
+                    val genres = parentIdParts.getOrNull(2)
+                        ?.takeIf { it.isNotBlank() }
+                        ?.split(",")
+                        ?.filter { it.isNotBlank() }
+                        ?: emptyList()
+
+                    val years = parentIdParts.getOrNull(3)
+                        ?.takeIf { it.isNotBlank() }
+                        ?.split(",")
+                        ?.mapNotNull { it.toIntOrNull() }
+                        ?: emptyList()
+
+                    val sortMethod = parentIdParts.getOrNull(4).orEmpty()
+
+                    val festivalLineup = parentIdParts.getOrNull(5)
+                        ?.takeUnless { it.isBlank() || it.equals("null", ignoreCase = true) }
+
+                    val ratingMin = parentIdParts.getOrNull(6)?.toIntOrNull()
+                    val ratingMax = parentIdParts.getOrNull(7)?.toIntOrNull()
+
+                    getGenre(
+                        length = length,
+                        genres = genres,
+                        years = years,
+                        sortMethod = sortMethod,
+                        festivalLineup = festivalLineup,
+                        ratingMin = ratingMin,
+                        ratingMax = ratingMax
+                    )
+                } else {
+                    getGenre(parentIdParts.getOrNull(1) ?: "", null, "short")
+                }
+            }
             MEDIA_GENRES_SONGS_THIS_YEAR -> getGenres(year, "short")
             MEDIA_GENRES_SONGS_LAST_YEAR -> getGenres(lastYear, "short")
             MEDIA_GENRE_SONGS_THIS_YEAR -> getGenre(parentIdParts[1], year, "short")
@@ -1713,24 +1747,67 @@ class MediaLibrarySessionCallbackOriginal :
         year: Int?,
         length: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val genres = if (genre.isNotBlank()) listOf(genre) else emptyList()
+        val years = year?.let { listOf(it) } ?: emptyList()
+        val sortMethod = if (year != null) "AddedDesc" else "Random"
+
+        return getGenre(
+            length = length,
+            genres = genres,
+            years = years,
+            sortMethod = sortMethod,
+            festivalLineup = null,
+            ratingMin = null,
+            ratingMax = null
+        )
+    }
+
+    @Suppress("LongParameterList")
+    private fun getGenre(
+        length: String,
+        genres: List<String>,
+        years: List<Int>,
+        sortMethod: String?,
+        festivalLineup: String?,
+        ratingMin: Int?,
+        ratingMax: Int?
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
-        Timber.i("getGenre: genre=$genre year=$year length=$length")
+        Timber.i(
+            "getGenre: genres=%s years=%s length=%s sortMethod=%s festivalLineup=%s ratingMin=%s ratingMax=%s",
+            genres,
+            years,
+            length,
+            sortMethod,
+            festivalLineup,
+            ratingMin,
+            ratingMax
+        )
         return mainScope.future {
             val songs = serviceScope.future {
-                val filters = Filters(Filter("GENRE", genre))
+                val filters = Filters()
+
+                if (genres.isNotEmpty()) {
+                    val genreFilterValue = if (genres.size == 1) genres.first() else genres
+                    filters.add(Filter("GENRE", genreFilterValue))
+                }
+
                 filters.add(Filter("LENGTH", length))
-                year.ifNotNull { filters.add(Filter("YEAR", year.toString())) }
-                val sortMethod = if (year !== null) "AddedDesc" else "Random"
+                if (years.isNotEmpty()) {
+                    val yearFilterValue = if (years.size == 1) years.first().toString() else years
+                    filters.add(Filter("YEAR", yearFilterValue))
+                }
 
                 callWithErrorHandling {
                     musicService.getSongs(
-                        filters,
-                        null,
-                        null,
-                        maxSongs,
-                        0,
-                        sortMethod
+                        filters = filters,
+                        ratingMin = ratingMin,
+                        ratingMax = ratingMax,
+                        count = maxSongs,
+                        offset = 0,
+                        sortMethod = if (sortMethod.isNullOrBlank()) "Random" else sortMethod,
+                        festivalLineup = festivalLineup
                     )
                 }
             }.await()
