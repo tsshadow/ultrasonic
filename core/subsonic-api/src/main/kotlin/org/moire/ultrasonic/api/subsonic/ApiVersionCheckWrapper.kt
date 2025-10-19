@@ -11,6 +11,7 @@ import okhttp3.ResponseBody
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_11_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_12_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_14_0
+import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_16_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_2_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_3_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_4_0
@@ -19,7 +20,6 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_6_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_7_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_8_0
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_9_0
-import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions.V1_16_0
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
 import org.moire.ultrasonic.api.subsonic.response.BookmarksResponse
@@ -28,10 +28,10 @@ import org.moire.ultrasonic.api.subsonic.response.GenresResponse
 import org.moire.ultrasonic.api.subsonic.response.GetAlbumList2Response
 import org.moire.ultrasonic.api.subsonic.response.GetAlbumListResponse
 import org.moire.ultrasonic.api.subsonic.response.GetAlbumResponse
+import org.moire.ultrasonic.api.subsonic.response.GetArtistInfo2Response
 import org.moire.ultrasonic.api.subsonic.response.GetArtistResponse
 import org.moire.ultrasonic.api.subsonic.response.GetArtistsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetLyricsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetArtistInfo2Response
 import org.moire.ultrasonic.api.subsonic.response.GetPlaylistsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetPodcastsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetRandomSongsResponse
