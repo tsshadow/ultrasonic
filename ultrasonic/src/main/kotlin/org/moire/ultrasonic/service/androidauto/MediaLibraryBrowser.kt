@@ -10,6 +10,7 @@ package org.moire.ultrasonic.service.androidauto
 import TileInfo
 import TileStorage
 import android.content.Context
+import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS
@@ -285,28 +286,32 @@ class MediaLibraryBrowser(
                 val genreList = parts.getOrNull(2)
                     ?.takeIf { it.isNotBlank() }
                     ?.split(",")
+                    ?.map { Uri.decode(it).trim() }
                     ?.filter { it.isNotBlank() }
                     ?: emptyList()
 
                 val yearList = parts.getOrNull(3)
                     ?.takeIf { it.isNotBlank() }
                     ?.split(",")
-                    ?.filter { it.isNotBlank() }
+                    ?.mapNotNull { Uri.decode(it).trim().toIntOrNull() }
                     ?: emptyList()
 
                 val sortMethod = parts.getOrNull(4)
                 val festivalLineup = parts.getOrNull(5)
                     ?.takeUnless { it.equals("null", ignoreCase = true) || it.isBlank() }
+                    ?.let { Uri.decode(it) }
                 val ratingMin = parts.getOrNull(6)?.toIntOrNull() ?: 0
                 val ratingMax = parts.getOrNull(7)?.toIntOrNull() ?: 5
                 val festivalList = parts.getOrNull(8)
                     ?.takeIf { it.isNotBlank() }
                     ?.split(",")
+                    ?.map { Uri.decode(it).trim() }
                     ?.filter { it.isNotBlank() }
                     ?: emptyList()
                 val labelList = parts.getOrNull(9)
                     ?.takeIf { it.isNotBlank() }
                     ?.split(",")
+                    ?.map { Uri.decode(it).trim() }
                     ?.filter { it.isNotBlank() }
                     ?: emptyList()
                 val offsetOverride = parts.getOrNull(10)?.toIntOrNull()?.coerceAtLeast(0)
@@ -890,7 +895,7 @@ class MediaLibraryBrowser(
     private fun getGenre(
         length: String,
         genres: List<String>,
-        years: List<String>,
+        years: List<Int>,
         sortMethod: String,
         festivalLineup: String? = null,
         festivals: List<String> = emptyList(),
@@ -1101,17 +1106,40 @@ class MediaLibraryBrowser(
             normalizedYears.isNotEmpty() ||
             normalizedFestivals.isNotEmpty() ||
             normalizedLabels.isNotEmpty() ||
-            normalizedFestivalLineup != null ||
-            offset != 0 ||
-            size != maxSongs
+            normalizedFestivalLineup != null
         val usesRatingFilter = ratingMin != 0 || ratingMax != 5
+        val normalizedTitle = title.trim()
 
-        val isStarredPreset = ratingMin >= 5 && ratingMax >= 5 && !hasCollectionFilters
-        val isRandomPreset = sortMethod.equals("Random", ignoreCase = true) && !hasCollectionFilters && !usesRatingFilter
-        val isRecentPreset = !isRandomPreset &&
-            sortMethod in setOf("AddedDesc", "DateDescAndRelease", "LastWrittenDesc") &&
-            !hasCollectionFilters && !usesRatingFilter
-        val isSearchPreset = title.equals("Search", ignoreCase = true) && !hasCollectionFilters && !usesRatingFilter
+        fun matchesAny(keywords: List<String?>): Boolean {
+            return keywords.filterNotNull().any { keyword ->
+                keyword.isNotBlank() && normalizedTitle.contains(keyword, ignoreCase = true)
+            }
+        }
+
+        val randomKeywords = listOf("Random", context.getString(R.string.sort_random))
+        val recentKeywords = listOf(
+            "Recent",
+            context.getString(R.string.main_songs_recent),
+            context.getString(R.string.main_songs_recent_added),
+            context.getString(R.string.main_songs_recent_modified)
+        )
+        val starredKeywords = listOf("Starred", context.getString(R.string.main_songs_starred))
+        val searchKeywords = listOf("Search", context.getString(R.string.search), context.getString(R.string.search_livesets))
+
+        val noCollectionFilters = !hasCollectionFilters
+        val isStarredPreset =
+            ((ratingMin >= 5 && ratingMax >= 5) || (matchesAny(starredKeywords) && !usesRatingFilter)) &&
+                noCollectionFilters
+        val isRandomPreset =
+            (sortMethod.equals("Random", ignoreCase = true) || matchesAny(randomKeywords)) &&
+                noCollectionFilters && !usesRatingFilter
+        val isRecentPreset =
+            (sortMethod.equals("AddedDesc", ignoreCase = true) ||
+                sortMethod.equals("DateDescAndRelease", ignoreCase = true) ||
+                sortMethod.equals("LastWrittenDesc", ignoreCase = true) ||
+                matchesAny(recentKeywords)) &&
+                noCollectionFilters && !usesRatingFilter
+        val isSearchPreset = matchesAny(searchKeywords) && noCollectionFilters && !usesRatingFilter
 
         val mediaId = when {
             isRandomPreset -> "$MEDIA_SONG_RANDOM_ID|$length"
@@ -1121,14 +1149,14 @@ class MediaLibraryBrowser(
             else -> buildString {
                 append(MEDIA_GET_SONGS_BY_GENRE)
                 append('|').append(length)
-                append('|').append(normalizedGenres.joinToString(","))
-                append('|').append(normalizedYears.joinToString(","))
+                append('|').append(normalizedGenres.joinToString(",") { Uri.encode(it) })
+                append('|').append(normalizedYears.joinToString(",") { Uri.encode(it) })
                 append('|').append(sortMethod)
-                append('|').append(normalizedFestivalLineup ?: "")
+                append('|').append(normalizedFestivalLineup?.let { Uri.encode(it) } ?: "")
                 append('|').append(ratingMin)
                 append('|').append(ratingMax)
-                append('|').append(normalizedFestivals.joinToString(","))
-                append('|').append(normalizedLabels.joinToString(","))
+                append('|').append(normalizedFestivals.joinToString(",") { Uri.encode(it) })
+                append('|').append(normalizedLabels.joinToString(",") { Uri.encode(it) })
                 append('|').append(offset)
                 append('|').append(size)
             }
