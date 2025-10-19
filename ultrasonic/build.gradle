@@ -34,12 +34,17 @@ android {
 
     bundle.language.enableSplit = false
 
+    def storeLocation = envOrProp('SIGNING_STORE_FILE', rootProject.file('keystore.jks').path)
+    File resolvedStoreFile = null
+    if (storeLocation != null) {
+        def candidate = new File(storeLocation)
+        resolvedStoreFile = candidate.isAbsolute() ? candidate : rootProject.file(storeLocation)
+    }
+
     signingConfigs {
         release {
-            def storeLocation = envOrProp('SIGNING_STORE_FILE', rootProject.file('keystore.jks').path)
-            if (storeLocation != null) {
-                def candidate = new File(storeLocation)
-                storeFile candidate.isAbsolute() ? candidate : rootProject.file(storeLocation)
+            if (resolvedStoreFile != null) {
+                storeFile resolvedStoreFile
             }
             storePassword envOrProp('SIGNING_STORE_PASSWORD')
             keyAlias envOrProp('SIGNING_KEY_ALIAS')
@@ -52,7 +57,9 @@ android {
             }
         }
         debug {
-            initWith signingConfigs.release
+            if (resolvedStoreFile?.exists()) {
+                initWith signingConfigs.release
+            }
         }
     }
 

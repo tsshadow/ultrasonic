@@ -33,7 +33,10 @@ SIGNING_KEY_PASSWORD=***replace***
 
 Place the referenced `keystore.jks` in the project root or adjust the path to
 match your setup. You can generate a development keystore with
-`./gradlew generateKeystore` when `keytool` is available on your PATH.
+`./gradlew generateKeystore` when `keytool` is available on your PATH. Debug
+builds will keep using the default Android Studio debug keystore until the
+shared upload key is present, so you can still run the app before finishing the
+signing setup.
 
 ### GitHub Actions
 
