@@ -285,18 +285,32 @@ class MediaLibraryBrowser(
                 val genreList = parts.getOrNull(2)
                     ?.takeIf { it.isNotBlank() }
                     ?.split(",")
+                    ?.filter { it.isNotBlank() }
                     ?: emptyList()
 
                 val yearList = parts.getOrNull(3)
                     ?.takeIf { it.isNotBlank() }
                     ?.split(",")
-                    ?.mapNotNull { it.toIntOrNull() }
+                    ?.filter { it.isNotBlank() }
                     ?: emptyList()
 
                 val sortMethod = parts.getOrNull(4)
                 val festivalLineup = parts.getOrNull(5)
+                    ?.takeUnless { it.equals("null", ignoreCase = true) || it.isBlank() }
                 val ratingMin = parts.getOrNull(6)?.toIntOrNull() ?: 0
                 val ratingMax = parts.getOrNull(7)?.toIntOrNull() ?: 5
+                val festivalList = parts.getOrNull(8)
+                    ?.takeIf { it.isNotBlank() }
+                    ?.split(",")
+                    ?.filter { it.isNotBlank() }
+                    ?: emptyList()
+                val labelList = parts.getOrNull(9)
+                    ?.takeIf { it.isNotBlank() }
+                    ?.split(",")
+                    ?.filter { it.isNotBlank() }
+                    ?: emptyList()
+                val offsetOverride = parts.getOrNull(10)?.toIntOrNull()?.coerceAtLeast(0)
+                val sizeOverride = parts.getOrNull(11)?.toIntOrNull()?.coerceIn(1, 500)
 
                 if (length != null && sortMethod != null) {
                     getGenre(
@@ -304,11 +318,15 @@ class MediaLibraryBrowser(
                         genres = genreList,
                         years = yearList,
                         sortMethod = sortMethod,
+                        festivalLineup = festivalLineup,
+                        festivals = festivalList,
+                        labels = labelList,
                         page = safePage,
                         pageSize = safePageSize,
-                        festivalLineup = festivalLineup ,
                         ratingMin = ratingMin,
                         ratingMax = ratingMax,
+                        offsetOverride = offsetOverride,
+                        pageSizeOverride = sizeOverride,
                     )
                 } else {
                     emptyResult("Invalid genre/song filter in $parentId")
@@ -868,19 +886,35 @@ class MediaLibraryBrowser(
         }
     }
 
+    @Suppress("LongParameterList")
     private fun getGenre(
         length: String,
         genres: List<String>,
-        years: List<Int>,
+        years: List<String>,
         sortMethod: String,
         festivalLineup: String? = null,
+        festivals: List<String> = emptyList(),
+        labels: List<String> = emptyList(),
         page: Int,
         pageSize: Int,
         ratingMin: Int? = 0,
-        ratingMax: Int? = 5
+        ratingMax: Int? = 5,
+        offsetOverride: Int? = null,
+        pageSizeOverride: Int? = null,
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
-        Timber.i("getGenre: genres=$genres years=$years length=$length page=$page pageSize=$pageSize")
+        Timber.i(
+            "getGenre: genres=%s years=%s length=%s page=%s pageSize=%s festivals=%s labels=%s ratingMin=%s ratingMax=%s",
+            genres,
+            years,
+            length,
+            page,
+            pageSize,
+            festivals,
+            labels,
+            ratingMin,
+            ratingMax,
+        )
 
         return mainScope.future {
             val songs = serviceScope.future {
@@ -896,14 +930,23 @@ class MediaLibraryBrowser(
                     filters.add(Filter("YEAR", years))
                 }
 
-                val offset = page * pageSize
+                if (festivals.isNotEmpty()) {
+                    filters.add(Filter("FESTIVAL", festivals))
+                }
+
+                if (labels.isNotEmpty()) {
+                    filters.add(Filter("PUBLISHER", labels))
+                }
+
+                val effectivePageSize = pageSizeOverride?.takeIf { it > 0 } ?: pageSize
+                val offset = (page * effectivePageSize) + (offsetOverride?.coerceAtLeast(0) ?: 0)
 
                 callWithErrorHandling {
                     musicService.getSongs(
                         filters = filters,
                         ratingMin = ratingMin,
                         ratingMax = ratingMax,
-                        count = pageSize,
+                        count = effectivePageSize,
                         offset = offset,
                         sortMethod = sortMethod,
                         festivalLineup = festivalLineup
@@ -1041,16 +1084,54 @@ class MediaLibraryBrowser(
     private fun TileInfo.toMediaItem(): MediaItem? {
         val context = UApp.applicationContext()
 
-        // Avoid passing empty genre/year lists
-        val genreValue = genre?.takeIf { it.isNotEmpty() }?.joinToString(",") ?: ""
-        val yearValue = year?.takeIf { it.isNotEmpty() }?.joinToString(",") ?: ""
+        fun List<String>?.normalize(): List<String> {
+            return this
+                ?.map { it.trim() }
+                ?.filter { it.isNotEmpty() && !it.equals("All", ignoreCase = true) }
+                .orEmpty()
+        }
+
+        val normalizedGenres = genre.normalize()
+        val normalizedYears = year.normalize()
+        val normalizedFestivals = festival.normalize()
+        val normalizedLabels = label.normalize()
+        val normalizedFestivalLineup = festivalLineup?.takeUnless { it.isBlank() || it.equals("null", true) }
+
+        val hasCollectionFilters = normalizedGenres.isNotEmpty() ||
+            normalizedYears.isNotEmpty() ||
+            normalizedFestivals.isNotEmpty() ||
+            normalizedLabels.isNotEmpty() ||
+            normalizedFestivalLineup != null ||
+            offset != 0 ||
+            size != maxSongs
+        val usesRatingFilter = ratingMin != 0 || ratingMax != 5
+
+        val isStarredPreset = ratingMin >= 5 && ratingMax >= 5 && !hasCollectionFilters
+        val isRandomPreset = sortMethod.equals("Random", ignoreCase = true) && !hasCollectionFilters && !usesRatingFilter
+        val isRecentPreset = !isRandomPreset &&
+            sortMethod in setOf("AddedDesc", "DateDescAndRelease", "LastWrittenDesc") &&
+            !hasCollectionFilters && !usesRatingFilter
+        val isSearchPreset = title.equals("Search", ignoreCase = true) && !hasCollectionFilters && !usesRatingFilter
 
         val mediaId = when {
-            title.contains("Random", ignoreCase = true) -> "$MEDIA_SONG_RANDOM_ID|$length"
-            title.contains("Recent", ignoreCase = true) -> "$MEDIA_SONG_RECENT|$length"
-            title.contains("Starred", ignoreCase = true) -> "$MEDIA_SONG_STARRED_ID|$length"
-            title.contains("Search", ignoreCase = true) -> "$MEDIA_GET_GENRES|$length"
-            else -> "$MEDIA_GET_SONGS_BY_GENRE|$length|$genreValue|$yearValue|$sortMethod|$festivalLineup|$ratingMin|$ratingMax"
+            isRandomPreset -> "$MEDIA_SONG_RANDOM_ID|$length"
+            isRecentPreset -> "$MEDIA_SONG_RECENT|$length"
+            isStarredPreset -> "$MEDIA_SONG_STARRED_ID|$length"
+            isSearchPreset -> "$MEDIA_GET_GENRES|$length"
+            else -> buildString {
+                append(MEDIA_GET_SONGS_BY_GENRE)
+                append('|').append(length)
+                append('|').append(normalizedGenres.joinToString(","))
+                append('|').append(normalizedYears.joinToString(","))
+                append('|').append(sortMethod)
+                append('|').append(normalizedFestivalLineup ?: "")
+                append('|').append(ratingMin)
+                append('|').append(ratingMax)
+                append('|').append(normalizedFestivals.joinToString(","))
+                append('|').append(normalizedLabels.joinToString(","))
+                append('|').append(offset)
+                append('|').append(size)
+            }
         }
 
         val groupName = context.getString(

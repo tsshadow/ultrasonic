@@ -666,7 +666,7 @@ class MediaLibrarySessionCallbackOriginal :
                     val years = parentIdParts.getOrNull(3)
                         ?.takeIf { it.isNotBlank() }
                         ?.split(",")
-                        ?.mapNotNull { it.toIntOrNull() }
+                        ?.filter { it.isNotBlank() }
                         ?: emptyList()
 
                     val sortMethod = parentIdParts.getOrNull(4).orEmpty()
@@ -676,6 +676,18 @@ class MediaLibrarySessionCallbackOriginal :
 
                     val ratingMin = parentIdParts.getOrNull(6)?.toIntOrNull()
                     val ratingMax = parentIdParts.getOrNull(7)?.toIntOrNull()
+                    val festivals = parentIdParts.getOrNull(8)
+                        ?.takeIf { it.isNotBlank() }
+                        ?.split(",")
+                        ?.filter { it.isNotBlank() }
+                        ?: emptyList()
+                    val labels = parentIdParts.getOrNull(9)
+                        ?.takeIf { it.isNotBlank() }
+                        ?.split(",")
+                        ?.filter { it.isNotBlank() }
+                        ?: emptyList()
+                    val offsetOverride = parentIdParts.getOrNull(10)?.toIntOrNull()?.coerceAtLeast(0)
+                    val pageSizeOverride = parentIdParts.getOrNull(11)?.toIntOrNull()?.coerceIn(1, 500)
 
                     getGenre(
                         length = length,
@@ -684,7 +696,11 @@ class MediaLibrarySessionCallbackOriginal :
                         sortMethod = sortMethod,
                         festivalLineup = festivalLineup,
                         ratingMin = ratingMin,
-                        ratingMax = ratingMax
+                        ratingMax = ratingMax,
+                        festivals = festivals,
+                        labels = labels,
+                        offsetOverride = offsetOverride,
+                        pageSizeOverride = pageSizeOverride,
                     )
                 } else {
                     getGenre(parentIdParts.getOrNull(1) ?: "", null, "short")
@@ -1748,7 +1764,7 @@ class MediaLibrarySessionCallbackOriginal :
         length: String
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val genres = if (genre.isNotBlank()) listOf(genre) else emptyList()
-        val years = year?.let { listOf(it) } ?: emptyList()
+        val years = year?.let { listOf(it.toString()) } ?: emptyList()
         val sortMethod = if (year != null) "AddedDesc" else "Random"
 
         return getGenre(
@@ -1766,23 +1782,29 @@ class MediaLibrarySessionCallbackOriginal :
     private fun getGenre(
         length: String,
         genres: List<String>,
-        years: List<Int>,
+        years: List<String>,
         sortMethod: String?,
         festivalLineup: String?,
         ratingMin: Int?,
-        ratingMax: Int?
+        ratingMax: Int?,
+        festivals: List<String> = emptyList(),
+        labels: List<String> = emptyList(),
+        offsetOverride: Int? = null,
+        pageSizeOverride: Int? = null,
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         Timber.i(
-            "getGenre: genres=%s years=%s length=%s sortMethod=%s festivalLineup=%s ratingMin=%s ratingMax=%s",
+            "getGenre: genres=%s years=%s length=%s sortMethod=%s festivalLineup=%s ratingMin=%s ratingMax=%s festivals=%s labels=%s",
             genres,
             years,
             length,
             sortMethod,
             festivalLineup,
             ratingMin,
-            ratingMax
+            ratingMax,
+            festivals,
+            labels
         )
         return mainScope.future {
             val songs = serviceScope.future {
@@ -1795,8 +1817,18 @@ class MediaLibrarySessionCallbackOriginal :
 
                 filters.add(Filter("LENGTH", length))
                 if (years.isNotEmpty()) {
-                    val yearFilterValue = if (years.size == 1) years.first().toString() else years
+                    val yearFilterValue = if (years.size == 1) years.first() else years
                     filters.add(Filter("YEAR", yearFilterValue))
+                }
+
+                if (festivals.isNotEmpty()) {
+                    val festivalValue = if (festivals.size == 1) festivals.first() else festivals
+                    filters.add(Filter("FESTIVAL", festivalValue))
+                }
+
+                if (labels.isNotEmpty()) {
+                    val labelValue = if (labels.size == 1) labels.first() else labels
+                    filters.add(Filter("PUBLISHER", labelValue))
                 }
 
                 callWithErrorHandling {
@@ -1804,8 +1836,8 @@ class MediaLibrarySessionCallbackOriginal :
                         filters = filters,
                         ratingMin = ratingMin,
                         ratingMax = ratingMax,
-                        count = maxSongs,
-                        offset = 0,
+                        count = pageSizeOverride?.takeIf { it > 0 } ?: maxSongs,
+                        offset = offsetOverride?.coerceAtLeast(0) ?: 0,
                         sortMethod = if (sortMethod.isNullOrBlank()) "Random" else sortMethod,
                         festivalLineup = festivalLineup
                     )
