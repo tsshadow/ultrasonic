@@ -57,6 +57,32 @@ allprojects {
     }
 }
 
+tasks.register("generateKeystore") {
+    doLast {
+        def keystoreFile = file("keystore.jks")
+        if (keystoreFile.exists()) {
+            println "keystore.jks bestaat al"
+            return
+        }
+
+        def storePass = System.getenv("SIGNING_STORE_PASSWORD") ?: "changeit"
+        def keyPass = System.getenv("SIGNING_KEY_PASSWORD") ?: storePass
+        def alias = System.getenv("SIGNING_KEY_ALIAS") ?: "upload"
+
+        exec {
+            commandLine "keytool", "-genkeypair",
+                    "-v", "-keystore", keystoreFile.absolutePath,
+                    "-storepass", storePass,
+                    "-keypass", keyPass,
+                    "-alias", alias,
+                    "-keyalg", "RSA", "-keysize", "2048",
+                    "-validity", "36500",
+                    "-dname", "CN=Android,O=App,C=NL"
+        }
+        println "keystore.jks aangemaakt"
+    }
+}
+
 wrapper {
     gradleVersion(libs.versions.gradle.get())
     distributionType("all")

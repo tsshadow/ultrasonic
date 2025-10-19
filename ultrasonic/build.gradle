@@ -10,6 +10,16 @@ plugins {
 }
 
 android {
+    def signingProperties = new Properties()
+    def localPropsFile = rootProject.file("local.properties")
+    if (localPropsFile.exists()) {
+        localPropsFile.withInputStream { signingProperties.load(it) }
+    }
+
+    def envOrProp = { String key, String defVal = null ->
+        return System.getenv(key) ?: signingProperties.getProperty(key, defVal)
+    }
+
     compileSdkVersion versions.compileSdk
 
     defaultConfig {
@@ -24,8 +34,31 @@ android {
 
     bundle.language.enableSplit = false
 
+    signingConfigs {
+        release {
+            def storeLocation = envOrProp('SIGNING_STORE_FILE', rootProject.file('keystore.jks').path)
+            if (storeLocation != null) {
+                def candidate = new File(storeLocation)
+                storeFile candidate.isAbsolute() ? candidate : rootProject.file(storeLocation)
+            }
+            storePassword envOrProp('SIGNING_STORE_PASSWORD')
+            keyAlias envOrProp('SIGNING_KEY_ALIAS')
+            keyPassword envOrProp('SIGNING_KEY_PASSWORD')
+            enableV1Signing true
+            enableV2Signing true
+            enableV3Signing true
+            if (this.respondsTo('enableV4Signing')) {
+                enableV4Signing true
+            }
+        }
+        debug {
+            initWith signingConfigs.release
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'minify/proguard-main.pro',
@@ -36,6 +69,7 @@ android {
                     'minify/proguard-kotlin.pro'
         }
         debug {
+            signingConfig signingConfigs.debug
             minifyEnabled false
             multiDexEnabled true
             applicationIdSuffix '.debug'
