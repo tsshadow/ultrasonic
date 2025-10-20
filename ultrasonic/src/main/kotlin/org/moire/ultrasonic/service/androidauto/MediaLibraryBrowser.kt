@@ -36,7 +36,6 @@ import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MusicService
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util
-import org.moire.ultrasonic.util.Util.ifNotNull
 import org.moire.ultrasonic.util.buildMediaItem
 import org.moire.ultrasonic.util.toMediaItem
 import timber.log.Timber
@@ -65,7 +64,6 @@ class MediaLibraryBrowser(
 ) : MediaLibraryBase() {
     lateinit var dataProvider: MediaLibraryDataProvider
 
-    private val isOffline get() = ActiveServerProvider.isOffline()
     private val activeServerProvider: ActiveServerProvider by inject(ActiveServerProvider::class.java)
     private val musicFolderId get() = activeServerProvider.getActiveServer().musicFolderId
 
@@ -414,7 +412,7 @@ class MediaLibraryBrowser(
             TileInfo("Starred Songs", ratingMin = 5)
         )
 
-        presets.mapNotNullTo(mediaItems) { it.toMediaItem() }
+        presets.mapTo(mediaItems) { it.toMediaItem() }
 
         return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems, null))
     }
@@ -432,14 +430,14 @@ class MediaLibraryBrowser(
         )
 
         // Add hardcoded presets
-        presets.mapNotNullTo(mediaItems) { it.toMediaItem() }
+        presets.mapTo(mediaItems) { it.toMediaItem() }
 
         // Load user-defined tiles from storage and filter favorites
         val savedFavoriteTiles = TileStorage.loadTiles(context, "song")
             .filter { it.favorite }
 
         // Add favorite user-defined tiles
-        savedFavoriteTiles.mapNotNullTo(mediaItems) { it.toMediaItem() }
+        savedFavoriteTiles.mapTo(mediaItems) { it.toMediaItem() }
 
         return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems.toImmutableList(), null))
     }
@@ -457,14 +455,14 @@ class MediaLibraryBrowser(
         )
 
         // Add hardcoded presets
-        presets.mapNotNullTo(mediaItems) { it.toMediaItem() }
+        presets.mapTo(mediaItems) { it.toMediaItem() }
 
         // Load user-defined tiles from storage and filter favorites
         val savedFavoriteTiles = TileStorage.loadTiles(context, "liveset")
             .filter { it.favorite }
 
         // Add favorite user-defined tiles
-        savedFavoriteTiles.mapNotNullTo(mediaItems) { it.toMediaItem() }
+        savedFavoriteTiles.mapTo(mediaItems) { it.toMediaItem() }
 
         return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems.toImmutableList(), null))
     }
@@ -1038,7 +1036,7 @@ class MediaLibraryBrowser(
         }
     }
 
-    private fun TileInfo.toMediaItem(): MediaItem? {
+    private fun TileInfo.toMediaItem(): MediaItem {
         val context = UApp.applicationContext()
 
         // Avoid passing empty genre/year lists
@@ -1046,10 +1044,10 @@ class MediaLibraryBrowser(
         val yearValue = year?.takeIf { it.isNotEmpty() }?.joinToString(",") ?: ""
 
         val mediaId = when {
-            title.contains("Random", ignoreCase = true) -> "$MEDIA_SONG_RANDOM_ID|$length"
-            title.contains("Recent", ignoreCase = true) -> "$MEDIA_SONG_RECENT|$length"
-            title.contains("Starred", ignoreCase = true) -> "$MEDIA_SONG_STARRED_ID|$length"
-            title.contains("Search", ignoreCase = true) -> "$MEDIA_GET_GENRES|$length"
+            title.equals("Random", ignoreCase = true) -> "$MEDIA_SONG_RANDOM_ID|$length"
+            title.equals("Recent", ignoreCase = true) -> "$MEDIA_SONG_RECENT|$length"
+            title.equals("Starred", ignoreCase = true) -> "$MEDIA_SONG_STARRED_ID|$length"
+            title.equals("Search", ignoreCase = true) -> "$MEDIA_GET_GENRES|$length"
             else -> "$MEDIA_GET_SONGS_BY_GENRE|$length|$genreValue|$yearValue|$sortMethod|$festivalLineup|$ratingMin|$ratingMax"
         }
 
