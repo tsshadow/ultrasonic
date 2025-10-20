@@ -185,18 +185,6 @@ abstract class MediaLibraryBase {
         internal const val MEDIA_GET_YEARS = "MEDIA_GET_YEARS"
         internal const val MEDIA_GET_SORT_METHOD = "MEDIA_GET_SORT_METHOD"
         internal const val MEDIA_GET_SONGS_BY_GENRE = "MEDIA_GENRE_SONGS"
-        internal const val MEDIA_GENRES_SONGS_THIS_YEAR = "MEDIA_GENRES_SONGS_THIS_YEAR"
-        internal const val MEDIA_GENRES_SONGS_LAST_YEAR = "MEDIA_GENRES_SONGS_LAST_YEAR"
-        internal const val MEDIA_GENRE_SONGS_THIS_YEAR = "MEDIA_GENRE_SONGS_THIS_YEAR"
-        internal const val MEDIA_GENRE_SONGS_LAST_YEAR = "MEDIA_GENRE_SONGS_LAST_YEAR"
-
-        // Genres -> Livesets
-        internal const val MEDIA_GENRES_LIVESETS = "MEDIA_GENRES_LIVESETS"
-        internal const val MEDIA_GENRE_LIVESETS = "MEDIA_GENRE_LIVESETS"
-        internal const val MEDIA_GENRES_LIVESETS_THIS_YEAR = "MEDIA_GENRES_LIVESETS_THIS_YEAR"
-        internal const val MEDIA_GENRES_LIVESETS_LAST_YEAR = "MEDIA_GENRES_LIVESETS_LAST_YEAR"
-        internal const val MEDIA_GENRE_LIVESETS_THIS_YEAR = "MEDIA_GENRE_LIVESETS_THIS_YEAR"
-        internal const val MEDIA_GENRE_LIVESETS_LAST_YEAR = "MEDIA_GENRE_LIVESETS_LAST_YEAR"
 
         // Currently the display limit for long lists is 100 items
         internal const val DISPLAY_LIMIT = 100
