@@ -32,6 +32,7 @@ import org.moire.ultrasonic.api.subsonic.models.Filter
 import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MusicService
 import org.moire.ultrasonic.util.Settings.maxSongs

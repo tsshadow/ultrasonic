@@ -7,10 +7,12 @@
 
 package org.moire.ultrasonic.service.androidauto
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Rating
 import androidx.media3.common.StarRating
 import androidx.media3.common.util.UnstableApi
@@ -18,6 +20,7 @@ import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
 import androidx.media3.session.SessionResult.RESULT_SUCCESS
 import com.google.common.collect.ImmutableList
@@ -33,6 +36,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.moire.ultrasonic.data.RatingUpdate
+import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.PlaybackService
 import org.moire.ultrasonic.service.PlaybackStateSerializer
@@ -66,6 +70,7 @@ class MediaLibrarySessionCallback :
     KoinComponent {
 
     private val commandHandler: MediaLibraryCommandHandler = MediaLibraryCommandHandler()
+    private val searchCache = mutableMapOf<Pair<String, String>, List<MediaItem>>() // (packageName, query) -> items
 
     private val playbackStateSerializer: PlaybackStateSerializer by inject()
     private val serviceJob = SupervisorJob()
@@ -295,6 +300,130 @@ class MediaLibrarySessionCallback :
         mediaId: String
     ): ListenableFuture<LibraryResult<MediaItem>> {
         return mediaLibrarBrowser.getItem(mediaId)
+    }
+
+
+    @OptIn(UnstableApi::class)
+    override fun onSearch(
+        session: MediaLibraryService.MediaLibrarySession,
+        browser: MediaSession.ControllerInfo,
+        query: String,
+        params: MediaLibraryService.LibraryParams?
+    ): ListenableFuture<LibraryResult<Void>> {
+        Timber.d("onSearch query=%s from=%s", query, browser.packageName)
+
+        return serviceScope.future {
+            try {
+                val items = getSearchItems(query)
+                searchCache[browser.packageName to query] = items
+
+                session.notifySearchResultChanged(browser, query, items.size, params)
+
+                LibraryResult.ofVoid()
+            } catch (e: Exception) {
+                Timber.e(e, "Error during search")
+                LibraryResult.ofError(SessionError.ERROR_BAD_VALUE)
+            }
+        }
+    }
+
+    override fun onGetSearchResult(
+        session: MediaLibraryService.MediaLibrarySession,
+        browser: MediaSession.ControllerInfo,
+        query: String,
+        page: Int,
+        pageSize: Int,
+        params: MediaLibraryService.LibraryParams?
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.d("onGetSearchResult query=%s page=%d size=%d", query, page, pageSize)
+
+        return serviceScope.future {
+            val all = searchCache[browser.packageName to query] ?: getSearchItems(query)
+            val from = if (pageSize > 0) (page * pageSize).coerceAtMost(all.size) else 0
+            val to = if (pageSize > 0) (from + pageSize).coerceAtMost(all.size) else all.size
+            val pageItems = if (from < to) all.subList(from, to) else emptyList()
+
+            Timber.d("onGetSearchResult: total=%d from=%d to=%d returning=%d",
+                all.size, from, to, pageItems.size)
+            pageItems.forEachIndexed { i, it ->
+                Timber.d("result[%d]: id=%s title=%s browsable=%s playable=%s folderType=%s",
+                    i,
+                    it.mediaId,
+                    it.mediaMetadata.title,
+                    it.mediaMetadata.isBrowsable,
+                    it.mediaMetadata.isPlayable,
+                    it.mediaMetadata.folderType
+                )
+            }
+
+            LibraryResult.ofItemList(ImmutableList.copyOf(pageItems), /*params=*/null)
+        }
+    }
+
+    private suspend fun getSearchItems(query: String): List<MediaItem> {
+        Timber.d("getSearchItems: %s", query)
+        val mediaItems = mutableListOf<MediaItem>()
+
+        val searchResult = callWithErrorHandling {
+            musicService.search(SearchCriteria(query, /*artists*/10, /*albums*/10, /*songs*/10))
+        }
+
+        if (searchResult != null) {
+            // Artists (browsable folders)
+            searchResult.artists.forEach { artist ->
+                mediaItems.add(
+                    buildFolderItem(
+                        title = artist.name ?: "",
+                        mediaId = listOf(MEDIA_ARTIST_ITEM, artist.id, artist.name).joinToString("|"),
+                        folderMixed = true
+                    )
+                )
+            }
+
+            // Albums (browsable or playable depending on je model)
+            searchResult.albums.forEach { album ->
+                mediaItems.add(
+                    buildFolderItem(
+                        title = album.title ?: (album.name ?: ""),
+                        mediaId = listOf(MEDIA_ALBUM_ITEM, album.id, album.name ?: album.title ?: "").joinToString("|"),
+                        folderMixed = false
+                    )
+                )
+            }
+
+            // Songs (playable)
+            dataProvider.searchSongsCache = searchResult.songs
+            searchResult.songs.map { song ->
+                mediaItems.add(
+                    song.toMediaItem(
+                        listOf(MEDIA_SEARCH_SONG_ITEM, song.id).joinToString("|")
+                    )
+                )
+            }
+        }
+
+        return mediaItems
+    }
+
+    private fun buildFolderItem(
+        title: String,
+        mediaId: String,
+        folderMixed: Boolean
+    ): MediaItem {
+        val metadata = MediaMetadata.Builder()
+            .setTitle(title)
+            .setIsBrowsable(true)
+            .setIsPlayable(false) // <- belangrijk voor Android Auto
+            .setFolderType(
+                if (folderMixed) MediaMetadata.FOLDER_TYPE_MIXED else MediaMetadata.FOLDER_TYPE_ALBUMS
+            )
+            .build()
+
+        return MediaItem.Builder()
+            .setMediaId(mediaId)
+            .setMediaMetadata(metadata)
+            // .setUri(null as Uri?)  // <- weglaten; onnodig en soms problematisch
+            .build()
     }
 
     fun getCommandHelper(): MediaLibraryCommandHandler {
