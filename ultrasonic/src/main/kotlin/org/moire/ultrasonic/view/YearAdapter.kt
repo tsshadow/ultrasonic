@@ -17,7 +17,8 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Year
 
 class YearAdapter(context: Context, moods: List<Year>) :
-    ArrayAdapter<Year?>(context, R.layout.list_item_generic, moods), SectionIndexer {
+    ArrayAdapter<Year?>(context, R.layout.list_item_generic, moods),
+    SectionIndexer {
     private val layoutInflater: LayoutInflater
 
     // Both arrays are indexed by section ID.
@@ -48,13 +49,9 @@ class YearAdapter(context: Context, moods: List<Year>) :
         return rowView!!
     }
 
-    override fun getSections(): Array<Any> {
-        return sections
-    }
+    override fun getSections(): Array<Any> = sections
 
-    override fun getPositionForSection(section: Int): Int {
-        return positions[section]
-    }
+    override fun getPositionForSection(section: Int): Int = positions[section]
 
     override fun getSectionForPosition(pos: Int): Int {
         for (i in 0 until sections.size - 1) {

@@ -5,11 +5,7 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions
 import org.moire.ultrasonic.api.subsonic.SubsonicError
 import org.moire.ultrasonic.api.subsonic.models.Mood
 
-class MoodsResponse(
-    status: Status,
-    version: SubsonicAPIVersions,
-    error: SubsonicError?
-) : SubsonicResponse(status, version, error) {
+class MoodsResponse(status: Status, version: SubsonicAPIVersions, error: SubsonicError?) : SubsonicResponse(status, version, error) {
     @JsonProperty("mood")
     private val moodsWrapper = MoodsWrapper()
     val moodsList: List<Mood> get() = moodsWrapper.moodsList

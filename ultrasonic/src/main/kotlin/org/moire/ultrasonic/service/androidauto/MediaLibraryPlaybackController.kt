@@ -44,7 +44,6 @@ class MediaLibraryPlaybackController(
 ) : MediaLibraryBase() {
     lateinit var dataProvider: MediaLibraryDataProvider
 
-
     fun playRandomSongs(): List<Track>? {
         if (dataProvider.randomSongsCache == null) {
             // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
@@ -88,7 +87,6 @@ class MediaLibraryPlaybackController(
         return null
     }
 
-
     fun playSearch(id: String): List<Track>? {
         // If there is no cache, we can't play the selected song.
         if (dataProvider.searchSongsCache != null) {
@@ -97,7 +95,6 @@ class MediaLibraryPlaybackController(
         }
         return null
     }
-
 
     fun playPlaylist(id: String, name: String): List<Track>? {
         Timber.d("playPlaylist")
@@ -142,7 +139,6 @@ class MediaLibraryPlaybackController(
         return null
     }
 
-
     fun onAddLegacyAutoItems(
         mediaItems: MutableList<MediaItem>
     ): ListenableFuture<List<MediaItem>> {
@@ -156,34 +152,34 @@ class MediaLibraryPlaybackController(
         val mediaIdParts = mediaItems.first().mediaId.split('|')
 
         val tracks = when (mediaIdParts.first()) {
-            MEDIA_PLAYLIST_ITEM -> playPlaylist(mediaIdParts[1], mediaIdParts[2])
+            MEDIA_PLAYLIST_ITEM -> playPlaylist(mediaIdParts[INDEX_ID], mediaIdParts[INDEX_NAME])
             MEDIA_PLAYLIST_SONG_ITEM -> playPlaylistSong(
-                mediaIdParts[1],
-                mediaIdParts[2],
-                mediaIdParts[3]
+                mediaIdParts[INDEX_ID],
+                mediaIdParts[INDEX_NAME],
+                mediaIdParts[INDEX_SONG_ID]
             )
 
-            MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[1], mediaIdParts[2])
+            MEDIA_ALBUM_ITEM -> playAlbum(mediaIdParts[INDEX_ID], mediaIdParts[INDEX_NAME])
             MEDIA_ALBUM_SONG_ITEM -> playAlbumSong(
-                mediaIdParts[1],
-                mediaIdParts[2],
-                mediaIdParts[3]
+                mediaIdParts[INDEX_ID],
+                mediaIdParts[INDEX_NAME],
+                mediaIdParts[INDEX_SONG_ID]
             )
 
             MEDIA_SONG_STARRED_ID -> playStarredSongs()
-            MEDIA_SONG_STARRED_ITEM -> playStarredSong(mediaIdParts[1])
+            MEDIA_SONG_STARRED_ITEM -> playStarredSong(mediaIdParts[INDEX_ID])
             MEDIA_SONG_RANDOM_ID -> playRandomSongs()
-            MEDIA_SONG_RANDOM_ITEM -> playRandomSong(mediaIdParts[1])
-            MEDIA_SHARE_ITEM -> playShare(mediaIdParts[1])
-            MEDIA_SHARE_SONG_ITEM -> playShareSong(mediaIdParts[1], mediaIdParts[2])
-            MEDIA_BOOKMARK_ITEM -> playBookmark(mediaIdParts[1])
-            MEDIA_PODCAST_ITEM -> playPodcast(mediaIdParts[1])
+            MEDIA_SONG_RANDOM_ITEM -> playRandomSong(mediaIdParts[INDEX_ID])
+            MEDIA_SHARE_ITEM -> playShare(mediaIdParts[INDEX_ID])
+            MEDIA_SHARE_SONG_ITEM -> playShareSong(mediaIdParts[INDEX_ID], mediaIdParts[INDEX_NAME])
+            MEDIA_BOOKMARK_ITEM -> playBookmark(mediaIdParts[INDEX_ID])
+            MEDIA_PODCAST_ITEM -> playPodcast(mediaIdParts[INDEX_ID])
             MEDIA_PODCAST_EPISODE_ITEM -> playPodcastEpisode(
-                mediaIdParts[1],
-                mediaIdParts[2]
+                mediaIdParts[INDEX_ID],
+                mediaIdParts[INDEX_NAME]
             )
 
-            MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[1])
+            MEDIA_SEARCH_SONG_ITEM -> playSearch(mediaIdParts[INDEX_ID])
             else -> null
         }
 
@@ -196,7 +192,6 @@ class MediaLibraryPlaybackController(
             }
             ?: Futures.immediateFuture(mediaItems)
     }
-
 
     fun playFromSearch(query: String): ListenableFuture<List<MediaItem>> {
         Timber.w("App state: %s", UApp.instance != null)
@@ -299,7 +294,6 @@ class MediaLibraryPlaybackController(
         return null
     }
 
-
     fun playBookmark(id: String): List<Track>? {
         Timber.d("playBookmark")
         val bookmarks = serviceScope.future {
@@ -312,7 +306,6 @@ class MediaLibraryPlaybackController(
         }
         return null
     }
-
 
     fun playShare(id: String): List<Track>? {
         Timber.d("playShare")
@@ -338,5 +331,4 @@ class MediaLibraryPlaybackController(
         }
         return null
     }
-
 }

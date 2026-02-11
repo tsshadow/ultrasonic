@@ -1,9 +1,10 @@
+import org.gradle.process.ExecOperations
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    apply from: 'gradle/versions.gradle'
     ext.bootstrap = [
             kotlinModule : "${project.rootDir}/gradle_scripts/kotlin-module-bootstrap.gradle",
             androidModule : "${project.rootDir}/gradle_scripts/android-module-bootstrap.gradle"
@@ -13,7 +14,6 @@ buildscript {
         google()
         mavenCentral()
         gradlePluginPortal()
-        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath libs.gradle
@@ -24,7 +24,7 @@ buildscript {
     }
 }
 plugins {
-    id "com.github.ben-manes.versions" version "0.52.0"
+    id "com.github.ben-manes.versions" version "0.53.0"
 }
 
 allprojects {
@@ -45,8 +45,8 @@ allprojects {
 
     // Set Kotlin JVM target to the same for all subprojects
     tasks.withType(KotlinCompile).configureEach {
-        kotlinOptions {
-            jvmTarget = "21"
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 
@@ -69,7 +69,7 @@ tasks.register("generateKeystore") {
         def keyPass = System.getenv("SIGNING_KEY_PASSWORD") ?: storePass
         def alias = System.getenv("SIGNING_KEY_ALIAS") ?: "upload"
 
-        exec {
+        services.get(ExecOperations).exec {
             commandLine "keytool", "-genkeypair",
                     "-v", "-keystore", keystoreFile.absolutePath,
                     "-storepass", storePass,

@@ -31,14 +31,15 @@ object CoroutinePatterns {
     }
 }
 
-fun Fragment.toastingExceptionHandler(prefix: String = ""): CoroutineExceptionHandler {
-    return CoroutineExceptionHandler { _, exception ->
-        // Stop the spinner if applicable
-        if (this is RefreshableFragment) {
-            this.swipeRefresh?.isRefreshing = false
-        }
-        toast("$prefix ${getErrorMessage(exception)}", shortDuration = false)
+fun Fragment.toastingExceptionHandler(prefix: String = ""): CoroutineExceptionHandler = CoroutineExceptionHandler {
+        _,
+        exception
+    ->
+    // Stop the spinner if applicable
+    if (this is RefreshableFragment) {
+        this.swipeRefresh?.isRefreshing = false
     }
+    toast("$prefix ${getErrorMessage(exception)}", shortDuration = false)
 }
 
 /*

@@ -12,5 +12,5 @@ class GetArtistInfo2Response(
     status: Status,
     version: SubsonicAPIVersions,
     error: SubsonicError?,
-    @JsonProperty("artistInfo2") val artistInfo: ArtistInfo = ArtistInfo(),
+    @JsonProperty("artistInfo2") val artistInfo: ArtistInfo = ArtistInfo()
 ) : SubsonicResponse(status, version, error)

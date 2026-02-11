@@ -10,13 +10,9 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 /**
  * Loads avatars from subsonic api.
  */
-class AvatarRequestHandler(
-    private val client: SubsonicAPIClient
-) : RequestHandler() {
-    override fun canHandleRequest(data: Request): Boolean {
-        return with(data.uri) {
-            scheme == SCHEME && path == "/$AVATAR_PATH"
-        }
+class AvatarRequestHandler(private val client: SubsonicAPIClient) : RequestHandler() {
+    override fun canHandleRequest(data: Request): Boolean = with(data.uri) {
+        scheme == SCHEME && path == "/$AVATAR_PATH"
     }
 
     override fun load(request: Request, networkPolicy: Int): Result {

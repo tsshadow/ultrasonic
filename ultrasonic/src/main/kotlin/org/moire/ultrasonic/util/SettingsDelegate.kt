@@ -22,60 +22,40 @@ abstract class SettingsDelegate<T> : ReadWriteProperty<Any, T> {
     }
 }
 
-class StringSetting(private val key: String, private val defaultValue: String = "") :
-    SettingsDelegate<String>() {
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        sharedPreferences.getString(key, defaultValue)!!
+class StringSetting(private val key: String, private val defaultValue: String = "") : SettingsDelegate<String>() {
+    override fun getValue(thisRef: Any, property: KProperty<*>) = sharedPreferences.getString(key, defaultValue)!!
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: String) =
-        sharedPreferences.edit { putString(key, value) }
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: String) = sharedPreferences.edit { putString(key, value) }
 }
 
-class IntSetting(private val key: String, private val defaultValue: Int = 0) :
-    SettingsDelegate<Int>() {
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        sharedPreferences.getInt(key, defaultValue)
+class IntSetting(private val key: String, private val defaultValue: Int = 0) : SettingsDelegate<Int>() {
+    override fun getValue(thisRef: Any, property: KProperty<*>) = sharedPreferences.getInt(key, defaultValue)
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) =
-        sharedPreferences.edit { putInt(key, value) }
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) = sharedPreferences.edit { putInt(key, value) }
 }
 
-class StringIntSetting(private val key: String, private val defaultValue: Int = 0) :
-    SettingsDelegate<Int>() {
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        sharedPreferences.getString(key, defaultValue.toString())!!.toInt()
+class StringIntSetting(private val key: String, private val defaultValue: Int = 0) : SettingsDelegate<Int>() {
+    override fun getValue(thisRef: Any, property: KProperty<*>) = sharedPreferences.getString(key, defaultValue.toString())!!.toInt()
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) =
-        sharedPreferences.edit { putString(key, value.toString()) }
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) = sharedPreferences.edit { putString(key, value.toString()) }
 }
 
-class LongSetting(private val key: String, private val defaultValue: Long = 0.toLong()) :
-    SettingsDelegate<Long>() {
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        sharedPreferences.getLong(key, defaultValue)
+class LongSetting(private val key: String, private val defaultValue: Long = 0.toLong()) : SettingsDelegate<Long>() {
+    override fun getValue(thisRef: Any, property: KProperty<*>) = sharedPreferences.getLong(key, defaultValue)
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Long) =
-        sharedPreferences.edit { putLong(key, value) }
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Long) = sharedPreferences.edit { putLong(key, value) }
 }
 
-class FloatSetting(
-    private val key: String,
-    private val defaultValue: Float = 0.toFloat()
-) : SettingsDelegate<Float>() {
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        sharedPreferences.getFloat(key, defaultValue)
+class FloatSetting(private val key: String, private val defaultValue: Float = 0.toFloat()) : SettingsDelegate<Float>() {
+    override fun getValue(thisRef: Any, property: KProperty<*>) = sharedPreferences.getFloat(key, defaultValue)
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Float) =
-        sharedPreferences.edit { putFloat(key, value) }
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Float) = sharedPreferences.edit { putFloat(key, value) }
 }
 
-class BooleanSetting(private val key: String, private val defaultValue: Boolean = false) :
-    SettingsDelegate<Boolean>() {
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        sharedPreferences.getBoolean(key, defaultValue)
+class BooleanSetting(private val key: String, private val defaultValue: Boolean = false) : SettingsDelegate<Boolean>() {
+    override fun getValue(thisRef: Any, property: KProperty<*>) = sharedPreferences.getBoolean(key, defaultValue)
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) =
-        sharedPreferences.edit { putBoolean(key, value) }
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) = sharedPreferences.edit { putBoolean(key, value) }
 
     constructor(stringId: Int, defaultValue: Boolean = false) : this(
         Util.appContext().getString(stringId),

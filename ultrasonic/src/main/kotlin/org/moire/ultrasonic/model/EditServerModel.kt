@@ -31,7 +31,9 @@ import retrofit2.HttpException
 import timber.log.Timber
 
 @Suppress("MagicNumber")
-class EditServerModel(val app: Application) : AndroidViewModel(app), KoinComponent {
+class EditServerModel(val app: Application) :
+    AndroidViewModel(app),
+    KoinComponent {
 
     val activeServerProvider: ActiveServerProvider by inject()
 
@@ -55,37 +57,34 @@ class EditServerModel(val app: Application) : AndroidViewModel(app), KoinCompone
      * This extension checks API call results for errors, API version, etc
      * @return Boolean: True if everything was ok, false if an error was found
      */
-    private fun SubsonicResponse.falseOnFailure(): Boolean {
-        return (this.status === SubsonicResponse.Status.OK)
-    }
+    private fun SubsonicResponse.falseOnFailure(): Boolean = (this.status === SubsonicResponse.Status.OK)
 
-    private fun requestFlow(type: ServerFeature, api: SubsonicAPIDefinition, userName: String) =
-        flow {
-            when (type) {
-                ServerFeature.CHAT -> emit(
-                    serverFunctionAvailable(type, api::getChatMessagesSuspend)
-                )
-                ServerFeature.BOOKMARK -> emit(
-                    serverFunctionAvailable(type, api::getBookmarksSuspend)
-                )
-                ServerFeature.SHARE -> emit(
-                    serverFunctionAvailable(type, api::getSharesSuspend)
-                )
-                ServerFeature.PODCAST -> emit(
-                    serverFunctionAvailable(type, api::getPodcastsSuspend)
-                )
-                ServerFeature.JUKEBOX -> emit(
-                    serverFunctionAvailable(type) {
-                        val response = api.getUserSuspend(userName)
-                        if (!response.user.jukeboxRole) throw IOException()
-                        response
-                    }
-                )
-                ServerFeature.VIDEO -> emit(
-                    serverFunctionAvailable(type, api::getVideosSuspend)
-                )
-            }
+    private fun requestFlow(type: ServerFeature, api: SubsonicAPIDefinition, userName: String) = flow {
+        when (type) {
+            ServerFeature.CHAT -> emit(
+                serverFunctionAvailable(type, api::getChatMessagesSuspend)
+            )
+            ServerFeature.BOOKMARK -> emit(
+                serverFunctionAvailable(type, api::getBookmarksSuspend)
+            )
+            ServerFeature.SHARE -> emit(
+                serverFunctionAvailable(type, api::getSharesSuspend)
+            )
+            ServerFeature.PODCAST -> emit(
+                serverFunctionAvailable(type, api::getPodcastsSuspend)
+            )
+            ServerFeature.JUKEBOX -> emit(
+                serverFunctionAvailable(type) {
+                    val response = api.getUserSuspend(userName)
+                    if (!response.user.jukeboxRole) throw IOException()
+                    response
+                }
+            )
+            ServerFeature.VIDEO -> emit(
+                serverFunctionAvailable(type, api::getVideosSuspend)
+            )
         }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun queryFeatureSupport(currentServerSetting: ServerSetting): Flow<FeatureSupport> {

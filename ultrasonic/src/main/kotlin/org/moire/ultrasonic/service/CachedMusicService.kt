@@ -41,7 +41,9 @@ import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.TimeLimitedCache
 import org.moire.ultrasonic.util.Util
 @Suppress("TooManyFunctions")
-class CachedMusicService(private val musicService: MusicService) : MusicService, KoinComponent {
+class CachedMusicService(private val musicService: MusicService) :
+    MusicService,
+    KoinComponent {
     private val activeServerProvider: ActiveServerProvider by inject()
     private var metaDatabase: MetaDatabase = activeServerProvider.getActiveMetaDatabase()
 
@@ -51,7 +53,8 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     private var cachedUserInfo: LRUCache<String, TimeLimitedCache<UserInfo?>>
     private val cachedLicenseValid = TimeLimitedCache<Boolean>(120, TimeUnit.SECONDS)
     private val cachedPlaylists = TimeLimitedCache<List<Playlist>?>(3600, TimeUnit.SECONDS)
-    private val cachedPodcastsChannels = TimeLimitedCache<List<PodcastsChannel>?>(3600, TimeUnit.SECONDS)
+    private val cachedPodcastsChannels =
+        TimeLimitedCache<List<PodcastsChannel>?>(3600, TimeUnit.SECONDS)
     private val cachedGenres = TimeLimitedCache<List<Genre>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedLineups = TimeLimitedCache<List<Lineup>>(10 * 3600, TimeUnit.SECONDS)
     private val cachedMoods = TimeLimitedCache<List<Mood>>(10 * 3600, TimeUnit.SECONDS)
@@ -78,9 +81,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     /**
      * Helper to build a unique cache key based on tag parameters.
      */
-    private fun buildTagCacheKey(name: String, year: Int?, length: String?): String {
-        return listOf(name, year?.toString() ?: "", length ?: "").joinToString("_")
-    }
+    private fun buildTagCacheKey(name: String, year: Int?, length: String?): String = listOf(name, year?.toString() ?: "", length ?: "").joinToString("_")
 
     @Throws(Exception::class)
     override fun ping() {
@@ -157,9 +158,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun getArtistInfo(id: String): Artist? {
-        return musicService.getArtistInfo(id)
-    }
+    override fun getArtistInfo(id: String): Artist? = musicService.getArtistInfo(id)
 
     @Throws(Exception::class)
     override fun getMusicDirectory(id: String, name: String?, refresh: Boolean): MusicDirectory {
@@ -169,7 +168,8 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         if (dir == null) {
             dir = musicService.getMusicDirectory(id, name, refresh)
             cache = TimeLimitedCache(
-                Settings.directoryCacheTime.toLong(), TimeUnit.SECONDS
+                Settings.directoryCacheTime.toLong(),
+                TimeUnit.SECONDS
             )
             cache.set(dir)
             cachedMusicDirectories.put(id, cache)
@@ -209,7 +209,8 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         if (dir == null) {
             dir = musicService.getAlbumAsDir(id, name, refresh)
             cache = TimeLimitedCache(
-                Settings.directoryCacheTime.toLong(), TimeUnit.SECONDS
+                Settings.directoryCacheTime.toLong(),
+                TimeUnit.SECONDS
             )
             cache.set(dir)
             cachedAlbum.put(id, cache)
@@ -232,19 +233,13 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         return cache
     }
 
-    override fun getSingles(artistId: String, refresh: Boolean): MusicDirectory {
-        return musicService.getSingles(artistId, refresh)
-    }
+    override fun getSingles(artistId: String, refresh: Boolean): MusicDirectory = musicService.getSingles(artistId, refresh)
 
     @Throws(Exception::class)
-    override fun search(criteria: SearchCriteria): SearchResult? {
-        return musicService.search(criteria)
-    }
+    override fun search(criteria: SearchCriteria): SearchResult? = musicService.search(criteria)
 
     @Throws(Exception::class)
-    override fun getPlaylist(id: String, name: String): MusicDirectory {
-        return musicService.getPlaylist(id, name)
-    }
+    override fun getPlaylist(id: String, name: String): MusicDirectory = musicService.getPlaylist(id, name)
 
     @Throws(Exception::class)
     override fun getPodcastsChannels(refresh: Boolean): List<PodcastsChannel> {
@@ -258,9 +253,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun getPodcastEpisodes(podcastChannelId: String?): MusicDirectory? {
-        return musicService.getPodcastEpisodes(podcastChannelId)
-    }
+    override fun getPodcastEpisodes(podcastChannelId: String?): MusicDirectory? = musicService.getPodcastEpisodes(podcastChannelId)
 
     @Throws(Exception::class)
     override fun getPlaylists(refresh: Boolean): List<Playlist> {
@@ -290,9 +283,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun getLyrics(artist: String, title: String): Lyrics? {
-        return musicService.getLyrics(artist, title)
-    }
+    override fun getLyrics(artist: String, title: String): Lyrics? = musicService.getLyrics(artist, title)
 
     @Throws(Exception::class)
     override fun scrobble(id: String, submission: Boolean) {
@@ -305,9 +296,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         size: Int,
         offset: Int,
         musicFolderId: String?
-    ): List<Album> {
-        return musicService.getAlbumList(type, size, offset, musicFolderId)
-    }
+    ): List<Album> = musicService.getAlbumList(type, size, offset, musicFolderId)
 
     @Throws(Exception::class)
     override fun getAlbumList2(
@@ -315,14 +304,10 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         size: Int,
         offset: Int,
         musicFolderId: String?
-    ): List<Album> {
-        return musicService.getAlbumList2(type, size, offset, musicFolderId)
-    }
+    ): List<Album> = musicService.getAlbumList2(type, size, offset, musicFolderId)
 
     @Throws(Exception::class)
-    override fun getRandomSongs(size: Int): MusicDirectory {
-        return musicService.getRandomSongs(size)
-    }
+    override fun getRandomSongs(size: Int): MusicDirectory = musicService.getRandomSongs(size)
 
     @Throws(Exception::class)
     override fun getStarred(): SearchResult = musicService.getStarred()
@@ -336,51 +321,33 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         offset: Long,
         maxBitrate: Int,
         save: Boolean
-    ): Pair<InputStream, Boolean> {
-        return musicService.getDownloadInputStream(song, offset, maxBitrate, save)
-    }
+    ): Pair<InputStream, Boolean> = musicService.getDownloadInputStream(song, offset, maxBitrate, save)
 
     @Throws(Exception::class)
-    override fun getStreamUrl(id: String, maxBitRate: Int?, format: String?): String? {
-        return musicService.getStreamUrl(id, maxBitRate, format)
-    }
+    override fun getStreamUrl(id: String, maxBitRate: Int?, format: String?): String? = musicService.getStreamUrl(id, maxBitRate, format)
 
-    override fun isJukeboxAvailable(): Boolean {
-        return musicService.isJukeboxAvailable()
-    }
+    override fun isJukeboxAvailable(): Boolean = musicService.isJukeboxAvailable()
 
     @Throws(Exception::class)
-    override fun updateJukeboxPlaylist(ids: List<String>): JukeboxStatus {
-        return musicService.updateJukeboxPlaylist(ids)
-    }
+    override fun updateJukeboxPlaylist(ids: List<String>): JukeboxStatus = musicService.updateJukeboxPlaylist(ids)
 
     @Throws(Exception::class)
-    override fun skipJukebox(index: Int, offsetSeconds: Int): JukeboxStatus {
-        return musicService.skipJukebox(index, offsetSeconds)
-    }
+    override fun skipJukebox(index: Int, offsetSeconds: Int): JukeboxStatus = musicService.skipJukebox(index, offsetSeconds)
 
     @Throws(Exception::class)
-    override fun stopJukebox(): JukeboxStatus {
-        return musicService.stopJukebox()
-    }
+    override fun stopJukebox(): JukeboxStatus = musicService.stopJukebox()
 
     @Throws(Exception::class)
-    override fun clearJukebox(): JukeboxStatus {
-        return musicService.clearJukebox()
-    }
+    override fun clearJukebox(): JukeboxStatus = musicService.clearJukebox()
 
     @Throws(Exception::class)
-    override fun startJukebox(): JukeboxStatus {
-        return musicService.startJukebox()
-    }
+    override fun startJukebox(): JukeboxStatus = musicService.startJukebox()
 
     @Throws(Exception::class)
     override fun getJukeboxStatus(): JukeboxStatus = musicService.getJukeboxStatus()
 
     @Throws(Exception::class)
-    override fun setJukeboxGain(gain: Float): JukeboxStatus {
-        return musicService.setJukeboxGain(gain)
-    }
+    override fun setJukeboxGain(gain: Float): JukeboxStatus = musicService.setJukeboxGain(gain)
 
     @Synchronized
     private fun checkSettingsChanged() {
@@ -533,18 +500,15 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         ratingMax: Int?,
         count: Int,
         offset: Int
-    ): MusicDirectory {
-        return musicService.getSongsByGenre(
-            genre,
-            year,
-            length,
-            ratingMin,
-            ratingMax,
-            count,
-            offset
-        )
-    }
-
+    ): MusicDirectory = musicService.getSongsByGenre(
+        genre,
+        year,
+        length,
+        ratingMin,
+        ratingMax,
+        count,
+        offset
+    )
 
     @Throws(Exception::class)
     override fun getSongs(
@@ -555,9 +519,15 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         offset: Int,
         sortMethod: String?,
         festivalLineup: String?
-    ): MusicDirectory {
-        return musicService.getSongs(filters, ratingMin, ratingMax, count, offset, sortMethod, festivalLineup)
-    }
+    ): MusicDirectory = musicService.getSongs(
+        filters,
+        ratingMin,
+        ratingMax,
+        count,
+        offset,
+        sortMethod,
+        festivalLineup
+    )
 
     @Throws(Exception::class)
     override fun getSongsByMood(
@@ -568,9 +538,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         ratingMax: Int?,
         count: Int,
         offset: Int
-    ): MusicDirectory {
-        return musicService.getSongsByMood(mood, year, length, ratingMin, ratingMax, count, offset)
-    }
+    ): MusicDirectory = musicService.getSongsByMood(mood, year, length, ratingMin, ratingMax, count, offset)
 
     @Throws(Exception::class)
     override fun getSongsByYear(
@@ -580,19 +548,13 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         ratingMax: Int?,
         count: Int,
         offset: Int
-    ): MusicDirectory {
-        return musicService.getSongsByYear(year, length, ratingMin, ratingMax, count, offset)
-    }
+    ): MusicDirectory = musicService.getSongsByYear(year, length, ratingMin, ratingMax, count, offset)
 
     @Throws(Exception::class)
-    override fun getShares(refresh: Boolean): List<Share> {
-        return musicService.getShares(refresh)
-    }
+    override fun getShares(refresh: Boolean): List<Share> = musicService.getShares(refresh)
 
     @Throws(Exception::class)
-    override fun getChatMessages(since: Long?): List<ChatMessage?>? {
-        return musicService.getChatMessages(since)
-    }
+    override fun getChatMessages(since: Long?): List<ChatMessage?>? = musicService.getChatMessages(since)
 
     @Throws(Exception::class)
     override fun addChatMessage(message: String) {
@@ -621,7 +583,8 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         if (dir == null) {
             dir = musicService.getVideos(refresh)
             cache = TimeLimitedCache(
-                Settings.directoryCacheTime.toLong(), TimeUnit.SECONDS
+                Settings.directoryCacheTime.toLong(),
+                TimeUnit.SECONDS
             )
             cache.set(dir)
             cachedMusicDirectories.put(CACHE_KEY_VIDEOS, cache)
@@ -637,7 +600,8 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
         if (userInfo == null) {
             userInfo = musicService.getUser(username)
             cache = TimeLimitedCache(
-                Settings.directoryCacheTime.toLong(), TimeUnit.SECONDS
+                Settings.directoryCacheTime.toLong(),
+                TimeUnit.SECONDS
             )
             cache.set(userInfo)
             cachedUserInfo.put(username, cache)
@@ -646,9 +610,7 @@ class CachedMusicService(private val musicService: MusicService) : MusicService,
     }
 
     @Throws(Exception::class)
-    override fun createShare(ids: List<String>, description: String?, expires: Long?): List<Share> {
-        return musicService.createShare(ids, description, expires)
-    }
+    override fun createShare(ids: List<String>, description: String?, expires: Long?): List<Share> = musicService.createShare(ids, description, expires)
 
     @Throws(Exception::class)
     override fun deleteShare(id: String) {

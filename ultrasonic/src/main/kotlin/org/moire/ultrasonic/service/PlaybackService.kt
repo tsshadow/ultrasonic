@@ -79,9 +79,7 @@ class PlaybackService :
         instance = this
     }
 
-    private fun getWakeModeFlag(): Int {
-        return if (ActiveServerProvider.isOffline()) C.WAKE_MODE_LOCAL else C.WAKE_MODE_NETWORK
-    }
+    private fun getWakeModeFlag(): Int = if (ActiveServerProvider.isOffline()) C.WAKE_MODE_LOCAL else C.WAKE_MODE_NETWORK
 
     override fun onDestroy() {
         Timber.i("onDestroy called")
@@ -89,9 +87,7 @@ class PlaybackService :
         super.onDestroy()
     }
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession {
-        return mediaLibrarySession
-    }
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession = mediaLibrarySession
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         Timber.i("Stopping the playback because we were swiped away")
@@ -149,7 +145,9 @@ class PlaybackService :
             .build()
 
         // Send custom layout to legacy session.
-        mediaLibrarySession.setCustomLayout(librarySessionCallback.getCommandHelper().defaultCustomCommands)
+        mediaLibrarySession.setCustomLayout(
+            librarySessionCallback.getCommandHelper().defaultCustomCommands
+        )
 
         // Set a listener to update the API client when the active server has changed
         rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
@@ -212,17 +210,13 @@ class PlaybackService :
         actualBackend = newBackend
     }
 
-    private fun createNewBackend(newBackend: MediaPlayerManager.PlayerBackend): Player {
-        return if (newBackend == MediaPlayerManager.PlayerBackend.JUKEBOX) {
-            getJukeboxPlayer()
-        } else {
-            getLocalPlayer()
-        }
+    private fun createNewBackend(newBackend: MediaPlayerManager.PlayerBackend): Player = if (newBackend == MediaPlayerManager.PlayerBackend.JUKEBOX) {
+        getJukeboxPlayer()
+    } else {
+        getLocalPlayer()
     }
 
-    private fun getJukeboxPlayer(): Player {
-        return JukeboxMediaPlayer()
-    }
+    private fun getJukeboxPlayer(): Player = JukeboxMediaPlayer()
 
     private fun getLocalPlayer(): Player {
         // Create a new plain OkHttpClient
@@ -313,7 +307,10 @@ class PlaybackService :
     }
 
     private fun updateCustomHeartButton(isHeart: Boolean) {
-        librarySessionCallback.getCommandHelper().updateCustomHeartButton(mediaLibrarySession, isHeart)
+        librarySessionCallback.getCommandHelper().updateCustomHeartButton(
+            mediaLibrarySession,
+            isHeart
+        )
     }
 
     private fun cacheNextSongs() {
@@ -344,12 +341,10 @@ class PlaybackService :
         return PendingIntent.getActivity(this, 0, intent, flags)
     }
 
-    private fun getAudioAttributes(): AudioAttributes {
-        return AudioAttributes.Builder()
-            .setUsage(USAGE_MEDIA)
-            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-            .build()
-    }
+    private fun getAudioAttributes(): AudioAttributes = AudioAttributes.Builder()
+        .setUsage(USAGE_MEDIA)
+        .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+        .build()
 
     private fun updateWidgetTrack(song: Track?) {
         val context = UApp.applicationContext()

@@ -55,7 +55,9 @@ private const val QUEUE_POLL_INTERVAL_SECONDS = 1L
  */
 @Suppress("TooManyFunctions", "DeprecatedCallableAddReplaceWith")
 @SuppressLint("UnsafeOptInUsageError")
-class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
+class JukeboxMediaPlayer :
+    JukeboxUnimplementedFunctions(),
+    Player {
     private val tasks = TaskQueue()
     private val executorService = Executors.newSingleThreadScheduledExecutor()
     private var statusUpdateFuture: ScheduledFuture<*>? = null
@@ -137,17 +139,11 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         return playlist[currentIndex]
     }
 
-    override fun getCurrentMediaItemIndex(): Int {
-        return currentIndex
-    }
+    override fun getCurrentMediaItemIndex(): Int = currentIndex
 
-    override fun getCurrentPeriodIndex(): Int {
-        return currentIndex
-    }
+    override fun getCurrentPeriodIndex(): Int = currentIndex
 
-    override fun getContentPosition(): Long {
-        return currentPosition
-    }
+    override fun getContentPosition(): Long = currentPosition
 
     override fun play() {
         tasks.remove(Stop::class.java)
@@ -193,15 +189,11 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun prepare() {}
 
-    override fun isPlaying(): Boolean {
-        return jukeboxStatus?.isPlaying ?: false
-    }
+    override fun isPlaying(): Boolean = jukeboxStatus?.isPlaying ?: false
 
-    override fun getPlaybackState(): Int {
-        return when (jukeboxStatus?.isPlaying) {
-            true -> Player.STATE_READY
-            null, false -> Player.STATE_IDLE
-        }
+    override fun getPlaybackState(): Int = when (jukeboxStatus?.isPlaying) {
+        true -> Player.STATE_READY
+        null, false -> Player.STATE_IDLE
     }
 
     override fun getAvailableCommands(): Player.Commands {
@@ -237,9 +229,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         return commandsBuilder.build()
     }
 
-    override fun isCommandAvailable(command: Int): Boolean {
-        return availableCommands.contains(command)
-    }
+    override fun isCommandAvailable(command: Int): Boolean = availableCommands.contains(command)
 
     private fun updateAvailableCommands() {
         Handler(Looper.getMainLooper()).post {
@@ -253,9 +243,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         }
     }
 
-    override fun getPlayWhenReady(): Boolean {
-        return isPlaying
-    }
+    override fun getPlayWhenReady(): Boolean = isPlaying
 
     override fun pause() {
         stop()
@@ -268,13 +256,9 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         tasks.add(Stop())
     }
 
-    override fun getCurrentTimeline(): Timeline {
-        return PlaylistTimeline(playlist)
-    }
+    override fun getCurrentTimeline(): Timeline = PlaylistTimeline(playlist)
 
-    override fun getMediaItemCount(): Int {
-        return playlist.size
-    }
+    override fun getMediaItemCount(): Int = playlist.size
 
     override fun getMediaItemAt(index: Int): MediaItem {
         if (playlist.size == 0) return MediaItem.EMPTY
@@ -282,9 +266,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         return playlist[index]
     }
 
-    override fun getShuffleModeEnabled(): Boolean {
-        return false
-    }
+    override fun getShuffleModeEnabled(): Boolean = false
 
     override fun setShuffleModeEnabled(shuffleModeEnabled: Boolean) {}
 
@@ -316,8 +298,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun increaseDeviceVolume(flags: Int) {
         gain = (gain + 1).coerceAtMost(MAX_GAIN)
-        @Suppress("DEPRECATION")
-        deviceVolume = gain
+        setDeviceVolume(gain, 0)
     }
 
     @Deprecated("Deprecated in Java")
@@ -327,8 +308,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun decreaseDeviceVolume(flags: Int) {
         gain = (gain - 1).coerceAtLeast(0)
-        @Suppress("DEPRECATION")
-        deviceVolume = gain
+        setDeviceVolume(gain, 0)
     }
 
     @Deprecated("Deprecated in Java")
@@ -338,26 +318,19 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun setDeviceMuted(muted: Boolean, flags: Int) {
         gain = 0
-        @Suppress("DEPRECATION")
-        deviceVolume = gain
+        setDeviceVolume(gain, 0)
     }
 
-    override fun getVolume(): Float {
-        return floatGain
-    }
+    override fun getVolume(): Float = floatGain
 
-    override fun getDeviceVolume(): Int {
-        return gain
-    }
+    override fun getDeviceVolume(): Int = gain
 
     override fun addMediaItems(index: Int, mediaItems: MutableList<MediaItem>) {
         playlist.addAll(index, mediaItems)
         updatePlaylist()
     }
 
-    override fun getBufferedPercentage(): Int {
-        return 0
-    }
+    override fun getBufferedPercentage(): Int = 0
 
     override fun moveMediaItem(currentIndex: Int, newIndex: Int) {
         if (playlist.size == 0) return
@@ -383,15 +356,11 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
         updatePlaylist()
     }
 
-    override fun getRepeatMode(): Int {
-        return Player.REPEAT_MODE_OFF
-    }
+    override fun getRepeatMode(): Int = Player.REPEAT_MODE_OFF
 
     override fun setRepeatMode(repeatMode: Int) {}
 
-    override fun getCurrentPosition(): Long {
-        return positionSeconds * 1000L
-    }
+    override fun getCurrentPosition(): Long = positionSeconds * 1000L
 
     override fun getDuration(): Long {
         if (playlist.isEmpty()) return 0
@@ -401,9 +370,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
             .toLong() * 1000
     }
 
-    override fun getContentDuration(): Long {
-        return duration
-    }
+    override fun getContentDuration(): Long = duration
 
     override fun getMediaMetadata(): MediaMetadata {
         if (playlist.isEmpty()) return MediaMetadata.EMPTY
@@ -635,9 +602,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
             queue.add(jukeboxTask)
         }
 
-        fun poll(): JukeboxTask? {
-            return queue.poll(QUEUE_POLL_INTERVAL_SECONDS, TimeUnit.SECONDS)
-        }
+        fun poll(): JukeboxTask? = queue.poll(QUEUE_POLL_INTERVAL_SECONDS, TimeUnit.SECONDS)
 
         fun remove(taskClass: Class<out JukeboxTask?>) {
             try {
@@ -661,164 +626,94 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
     private abstract class JukeboxTask {
         @Throws(Exception::class)
         abstract fun execute(): JukeboxStatus
-        override fun toString(): String {
-            return javaClass.simpleName
-        }
+        override fun toString(): String = javaClass.simpleName
     }
 
     private inner class GetStatus : JukeboxTask() {
         @Throws(Exception::class)
-        override fun execute(): JukeboxStatus {
-            return musicService.getJukeboxStatus()
-        }
+        override fun execute(): JukeboxStatus = musicService.getJukeboxStatus()
     }
 
-    private inner class SetPlaylist(private val ids: List<String>) :
-        JukeboxTask() {
+    private inner class SetPlaylist(private val ids: List<String>) : JukeboxTask() {
         @Throws(Exception::class)
-        override fun execute(): JukeboxStatus {
-            return musicService.updateJukeboxPlaylist(ids)
-        }
+        override fun execute(): JukeboxStatus = musicService.updateJukeboxPlaylist(ids)
     }
 
-    private inner class Skip(
-        private val index: Int,
-        private val offsetSeconds: Int
-    ) : JukeboxTask() {
+    private inner class Skip(private val index: Int, private val offsetSeconds: Int) : JukeboxTask() {
         @Throws(Exception::class)
-        override fun execute(): JukeboxStatus {
-            return musicService.skipJukebox(index, offsetSeconds)
-        }
+        override fun execute(): JukeboxStatus = musicService.skipJukebox(index, offsetSeconds)
     }
 
     private inner class Stop : JukeboxTask() {
         @Throws(Exception::class)
-        override fun execute(): JukeboxStatus {
-            return musicService.stopJukebox()
-        }
+        override fun execute(): JukeboxStatus = musicService.stopJukebox()
     }
 
     private inner class ClearPlaylist : JukeboxTask() {
         @Throws(Exception::class)
-        override fun execute(): JukeboxStatus {
-            return musicService.clearJukebox()
-        }
+        override fun execute(): JukeboxStatus = musicService.clearJukebox()
     }
 
     private inner class Start : JukeboxTask() {
         @Throws(Exception::class)
-        override fun execute(): JukeboxStatus {
-            return musicService.startJukebox()
-        }
+        override fun execute(): JukeboxStatus = musicService.startJukebox()
     }
 
     private inner class SetGain(private val gain: Float) : JukeboxTask() {
         @Throws(Exception::class)
-        override fun execute(): JukeboxStatus {
-            return musicService.setJukeboxGain(gain)
-        }
+        override fun execute(): JukeboxStatus = musicService.setJukeboxGain(gain)
     }
 
     // The constants below are necessary so a MediaSession can be built from the Jukebox Service
-    override fun isCurrentMediaItemDynamic(): Boolean {
-        return false
-    }
+    override fun isCurrentMediaItemDynamic(): Boolean = false
 
-    override fun getTrackSelectionParameters(): TrackSelectionParameters {
-        return TrackSelectionParameters.DEFAULT_WITHOUT_CONTEXT
-    }
+    override fun getTrackSelectionParameters(): TrackSelectionParameters = TrackSelectionParameters.getDefaults(applicationContext())
 
-    override fun getMaxSeekToPreviousPosition(): Long {
-        return Settings.seekInterval.toLong()
-    }
+    override fun getMaxSeekToPreviousPosition(): Long = Settings.seekInterval.toLong()
 
-    override fun getSeekBackIncrement(): Long {
-        return Settings.seekInterval.toLong()
-    }
+    override fun getSeekBackIncrement(): Long = Settings.seekInterval.toLong()
 
-    override fun getSeekForwardIncrement(): Long {
-        return Settings.seekInterval.toLong()
-    }
+    override fun getSeekForwardIncrement(): Long = Settings.seekInterval.toLong()
 
-    override fun isLoading(): Boolean {
-        return false
-    }
+    override fun isLoading(): Boolean = false
 
-    override fun getPlaybackSuppressionReason(): Int {
-        return Player.PLAYBACK_SUPPRESSION_REASON_NONE
-    }
+    override fun getPlaybackSuppressionReason(): Int = Player.PLAYBACK_SUPPRESSION_REASON_NONE
 
-    override fun isDeviceMuted(): Boolean {
-        return false
-    }
+    override fun isDeviceMuted(): Boolean = false
 
-    override fun getCurrentCues(): CueGroup {
-        return CueGroup.EMPTY_TIME_ZERO
-    }
+    override fun getCurrentCues(): CueGroup = CueGroup.EMPTY_TIME_ZERO
 
-    override fun getAudioAttributes(): AudioAttributes {
-        return AudioAttributes.DEFAULT
-    }
+    override fun getAudioAttributes(): AudioAttributes = AudioAttributes.DEFAULT
 
     override fun setVolume(volume: Float) {}
 
-    override fun getVideoSize(): VideoSize {
-        return VideoSize(0, 0)
-    }
+    override fun getVideoSize(): VideoSize = VideoSize(0, 0)
 
-    override fun getSurfaceSize(): Size {
-        return Size(0, 0)
-    }
+    override fun getSurfaceSize(): Size = Size(0, 0)
 
-    override fun getContentBufferedPosition(): Long {
-        return bufferedPosition
-    }
+    override fun getContentBufferedPosition(): Long = bufferedPosition
 
-    override fun getCurrentLiveOffset(): Long {
-        return C.TIME_UNSET
-    }
+    override fun getCurrentLiveOffset(): Long = C.TIME_UNSET
 
-    override fun getTotalBufferedDuration(): Long {
-        return 0
-    }
+    override fun getTotalBufferedDuration(): Long = 0
 
-    override fun isPlayingAd(): Boolean {
-        return false
-    }
+    override fun isPlayingAd(): Boolean = false
 
-    override fun getCurrentAdIndexInAdGroup(): Int {
-        return C.INDEX_UNSET
-    }
+    override fun getCurrentAdIndexInAdGroup(): Int = C.INDEX_UNSET
 
-    override fun getCurrentAdGroupIndex(): Int {
-        return C.INDEX_UNSET
-    }
+    override fun getCurrentAdGroupIndex(): Int = C.INDEX_UNSET
 
-    override fun canAdvertiseSession(): Boolean {
-        return true
-    }
+    override fun canAdvertiseSession(): Boolean = true
 
-    override fun getApplicationLooper(): Looper {
-        return applicationContext().mainLooper
-    }
+    override fun getApplicationLooper(): Looper = applicationContext().mainLooper
 
-    override fun getPlaylistMetadata(): MediaMetadata {
-        return MediaMetadata.EMPTY
-    }
+    override fun getPlaylistMetadata(): MediaMetadata = MediaMetadata.EMPTY
 
-    override fun getDeviceInfo(): DeviceInfo {
-        return DEVICE_INFO
-    }
+    override fun getDeviceInfo(): DeviceInfo = DEVICE_INFO
 
-    override fun getPlayerError(): PlaybackException? {
-        return null
-    }
+    override fun getPlayerError(): PlaybackException? = null
 
-    override fun getPlaybackParameters(): PlaybackParameters {
-        return PlaybackParameters(1F, 1F)
-    }
+    override fun getPlaybackParameters(): PlaybackParameters = PlaybackParameters(1F, 1F)
 
-    override fun getBufferedPosition(): Long {
-        return 0
-    }
+    override fun getBufferedPosition(): Long = 0
 }

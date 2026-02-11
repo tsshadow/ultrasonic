@@ -35,14 +35,17 @@ import timber.log.Timber
 /**
  * Responsible for cleaning up files from the offline download cache on the filesystem.
  */
-class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO), KoinComponent {
+class CacheCleaner :
+    CoroutineScope by CoroutineScope(Dispatchers.IO),
+    KoinComponent {
 
     private val activeServerProvider by inject<ActiveServerProvider>()
 
-    private fun exceptionHandler(tag: String): CoroutineExceptionHandler {
-        return CoroutineExceptionHandler { _, exception ->
-            Timber.w(exception, "Exception in CacheCleaner.$tag")
-        }
+    private fun exceptionHandler(tag: String): CoroutineExceptionHandler = CoroutineExceptionHandler {
+            _,
+            exception
+        ->
+        Timber.w(exception, "Exception in CacheCleaner.$tag")
     }
 
     // Cache cleaning shouldn't run concurrently, as it is started after every completed download
@@ -308,13 +311,9 @@ class CacheCleaner : CoroutineScope by CoroutineScope(Dispatchers.IO), KoinCompo
             return bytesToDelete
         }
 
-        private fun isPartial(file: AbstractFile): Boolean {
-            return file.name.endsWith(".partial") || file.name.contains(".partial.")
-        }
+        private fun isPartial(file: AbstractFile): Boolean = file.name.endsWith(".partial") || file.name.contains(".partial.")
 
-        private fun isComplete(file: AbstractFile): Boolean {
-            return file.name.endsWith(".complete") || file.name.contains(".complete.")
-        }
+        private fun isComplete(file: AbstractFile): Boolean = file.name.endsWith(".complete") || file.name.contains(".complete.")
 
         @Suppress("NestedBlockDepth")
         private fun deleteFiles(

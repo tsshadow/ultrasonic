@@ -59,7 +59,9 @@ import org.moire.ultrasonic.util.Util.safeClose
 import timber.log.Timber
 
 @Suppress("TooManyFunctions")
-class OfflineMusicService : MusicService, KoinComponent {
+class OfflineMusicService :
+    MusicService,
+    KoinComponent {
     private val activeServerProvider: ActiveServerProvider by inject()
 
     private var metaDatabase: MetaDatabase = activeServerProvider.getActiveMetaDatabase()
@@ -137,14 +139,10 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(OfflineException::class)
-    override fun getArtists(refresh: Boolean, offset: Int?, count: Int?): List<Artist> {
-        return cachedArtists.get()
-    }
+    override fun getArtists(refresh: Boolean, offset: Int?, count: Int?): List<Artist> = cachedArtists.get()
 
     @Throws(OfflineException::class)
-    override fun getArtistInfo(id: String): Artist? {
-        throw OfflineException("Artist info not available in offline mode")
-    }
+    override fun getArtistInfo(id: String): Artist? = throw OfflineException("Artist info not available in offline mode")
 
     /*
      * Especially when dealing with indexes, this method can return Albums, Entries or a mix of both!
@@ -321,24 +319,16 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(Exception::class)
-    override fun deletePlaylist(id: String) {
-        throw OfflineException("Playlists not available in offline mode")
-    }
+    override fun deletePlaylist(id: String): Unit = throw OfflineException("Playlists not available in offline mode")
 
     @Throws(Exception::class)
-    override fun updatePlaylist(id: String, name: String?, comment: String?, pub: Boolean) {
-        throw OfflineException("Updating playlist not available in offline mode")
-    }
+    override fun updatePlaylist(id: String, name: String?, comment: String?, pub: Boolean): Unit = throw OfflineException("Updating playlist not available in offline mode")
 
     @Throws(Exception::class)
-    override fun getLyrics(artist: String, title: String): Lyrics? {
-        throw OfflineException("Lyrics not available in offline mode")
-    }
+    override fun getLyrics(artist: String, title: String): Lyrics? = throw OfflineException("Lyrics not available in offline mode")
 
     @Throws(Exception::class)
-    override fun scrobble(id: String, submission: Boolean) {
-        throw OfflineException("Scrobbling not available in offline mode")
-    }
+    override fun scrobble(id: String, submission: Boolean): Unit = throw OfflineException("Scrobbling not available in offline mode")
 
     @Throws(Exception::class)
     override fun getAlbumList(
@@ -346,9 +336,7 @@ class OfflineMusicService : MusicService, KoinComponent {
         size: Int,
         offset: Int,
         musicFolderId: String?
-    ): List<Album> {
-        throw OfflineException("Album lists not available in offline mode")
-    }
+    ): List<Album> = throw OfflineException("Album lists not available in offline mode")
 
     @Throws(OfflineException::class)
     override fun getAlbumList2(
@@ -365,49 +353,31 @@ class OfflineMusicService : MusicService, KoinComponent {
         }
     }
 
-    override fun isJukeboxAvailable(): Boolean {
-        return false
-    }
+    override fun isJukeboxAvailable(): Boolean = false
 
     @Throws(Exception::class)
-    override fun updateJukeboxPlaylist(ids: List<String>): JukeboxStatus {
-        throw OfflineException("Jukebox not available in offline mode")
-    }
+    override fun updateJukeboxPlaylist(ids: List<String>): JukeboxStatus = throw OfflineException("Jukebox not available in offline mode")
 
     @Throws(Exception::class)
-    override fun skipJukebox(index: Int, offsetSeconds: Int): JukeboxStatus {
-        throw OfflineException("Jukebox not available in offline mode")
-    }
+    override fun skipJukebox(index: Int, offsetSeconds: Int): JukeboxStatus = throw OfflineException("Jukebox not available in offline mode")
 
     @Throws(Exception::class)
-    override fun stopJukebox(): JukeboxStatus {
-        throw OfflineException("Jukebox not available in offline mode")
-    }
+    override fun stopJukebox(): JukeboxStatus = throw OfflineException("Jukebox not available in offline mode")
 
     @Throws(Exception::class)
-    override fun clearJukebox(): JukeboxStatus {
-        throw OfflineException("Jukebox not available in offline mode")
-    }
+    override fun clearJukebox(): JukeboxStatus = throw OfflineException("Jukebox not available in offline mode")
 
     @Throws(Exception::class)
-    override fun startJukebox(): JukeboxStatus {
-        throw OfflineException("Jukebox not available in offline mode")
-    }
+    override fun startJukebox(): JukeboxStatus = throw OfflineException("Jukebox not available in offline mode")
 
     @Throws(Exception::class)
-    override fun getJukeboxStatus(): JukeboxStatus {
-        throw OfflineException("Jukebox not available in offline mode")
-    }
+    override fun getJukeboxStatus(): JukeboxStatus = throw OfflineException("Jukebox not available in offline mode")
 
     @Throws(Exception::class)
-    override fun setJukeboxGain(gain: Float): JukeboxStatus {
-        throw OfflineException("Jukebox not available in offline mode")
-    }
+    override fun setJukeboxGain(gain: Float): JukeboxStatus = throw OfflineException("Jukebox not available in offline mode")
 
     @Throws(Exception::class)
-    override fun getStarred(): SearchResult {
-        throw OfflineException("Starred not available in offline mode")
-    }
+    override fun getStarred(): SearchResult = throw OfflineException("Starred not available in offline mode")
 
     @Throws(Exception::class)
     override fun getSongsByGenre(
@@ -444,7 +414,9 @@ class OfflineMusicService : MusicService, KoinComponent {
                 "GENRE" -> {
                     val values = if (filter.value is Collection<*>) {
                         (filter.value as Collection<*>).filterIsInstance<String>()
-                    } else listOf(filter.value.toString())
+                    } else {
+                        listOf(filter.value.toString())
+                    }
                     list = list.filter { track ->
                         val genres = track.genres ?: track.genre?.let { listOf(it) } ?: emptyList()
                         values.any { value -> genres.any { g -> g.equals(value, true) } }
@@ -453,14 +425,16 @@ class OfflineMusicService : MusicService, KoinComponent {
                 "YEAR" -> {
                     val years = if (filter.value is Collection<*>) {
                         (filter.value as Collection<*>).mapNotNull { it.toString().toIntOrNull() }
-                    } else listOfNotNull(filter.value.toString().toIntOrNull())
+                    } else {
+                        listOfNotNull(filter.value.toString().toIntOrNull())
+                    }
                     list = list.filter { track -> track.year != null && years.contains(track.year) }
                 }
                 "LENGTH" -> {
                     val value = filter.value.toString().lowercase(Locale.ROOT)
                     list = when (value) {
-                        "long" -> list.filter { (it.duration ?: 0) >= 600 }
-                        "short" -> list.filter { (it.duration ?: 0) < 600 }
+                        "long" -> list.filter { (it.duration ?: 0) >= LONG_SONG_THRESHOLD_SECONDS }
+                        "short" -> list.filter { (it.duration ?: 0) < LONG_SONG_THRESHOLD_SECONDS }
                         else -> list
                     }
                 }
@@ -477,7 +451,11 @@ class OfflineMusicService : MusicService, KoinComponent {
         list = when (sortMethod) {
             "Random" -> list.shuffled()
             "AddedDesc" -> list.sortedByDescending { it.created }
-            "DateDescAndRelease" -> list.sortedWith(compareByDescending<Track> { it.year }.thenByDescending { it.created })
+            "DateDescAndRelease" -> list.sortedWith(
+                compareByDescending<Track> {
+                    it.year
+                }.thenByDescending { it.created }
+            )
             "LastWrittenDesc" -> list.sortedByDescending { it.created }
             else -> list
         }
@@ -486,6 +464,7 @@ class OfflineMusicService : MusicService, KoinComponent {
 
         return MusicDirectory().apply { addAll(paged) }
     }
+
     @Throws(Exception::class)
     override fun getSongsByMood(
         mood: String,
@@ -503,6 +482,7 @@ class OfflineMusicService : MusicService, KoinComponent {
         }
         return getSongs(filters, ratingMin, ratingMax, count, offset, null, null)
     }
+
     @Throws(Exception::class)
     override fun getSongsByYear(
         year: Int,
@@ -519,110 +499,68 @@ class OfflineMusicService : MusicService, KoinComponent {
         return getSongs(filters, ratingMin, ratingMax, count, offset, null, null)
     }
 
+    @Throws(Exception::class)
+    override fun getGenres(refresh: Boolean, year: Int?, length: String?): List<Genre> = buildGenreList()
 
     @Throws(Exception::class)
-    override fun getGenres(refresh: Boolean, year: Int?, length: String?): List<Genre> {
-        return buildGenreList()
-    }
+    override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> = buildTagList(name)
 
     @Throws(Exception::class)
-    override fun getTags(refresh: Boolean, name: String, year: Int?, length: String?): List<Tag> {
-        return buildTagList(name)
-    }
-    @Throws(Exception::class)
-    override fun getLineups(refresh: Boolean): List<Lineup> {
-        return buildLineupList()
-    }
+    override fun getLineups(refresh: Boolean): List<Lineup> = buildLineupList()
 
     @Throws(Exception::class)
-    override fun getMoods(refresh: Boolean, year: Int?, length: String?): List<Mood> {
-        return buildMoodList()
-    }
+    override fun getMoods(refresh: Boolean, year: Int?, length: String?): List<Mood> = buildMoodList()
 
     @Throws(Exception::class)
-    override fun getYears(refresh: Boolean): List<Year> {
-        return buildYearList()
-    }
+    override fun getYears(refresh: Boolean): List<Year> = buildYearList()
 
     @Throws(Exception::class)
-    override fun getUser(username: String): UserInfo {
-        throw OfflineException("Getting user info not available in offline mode")
-    }
+    override fun getUser(username: String): UserInfo = throw OfflineException("Getting user info not available in offline mode")
 
     @Throws(Exception::class)
-    override fun createShare(ids: List<String>, description: String?, expires: Long?): List<Share> {
-        throw OfflineException("Creating shares not available in offline mode")
-    }
+    override fun createShare(ids: List<String>, description: String?, expires: Long?): List<Share> = throw OfflineException("Creating shares not available in offline mode")
 
     @Throws(Exception::class)
-    override fun getShares(refresh: Boolean): List<Share> {
-        throw OfflineException("Getting shares not available in offline mode")
-    }
+    override fun getShares(refresh: Boolean): List<Share> = throw OfflineException("Getting shares not available in offline mode")
 
     @Throws(Exception::class)
-    override fun deleteShare(id: String) {
-        throw OfflineException("Deleting shares not available in offline mode")
-    }
+    override fun deleteShare(id: String): Unit = throw OfflineException("Deleting shares not available in offline mode")
 
     @Throws(Exception::class)
-    override fun updateShare(id: String, description: String?, expires: Long?) {
-        throw OfflineException("Updating shares not available in offline mode")
-    }
+    override fun updateShare(id: String, description: String?, expires: Long?): Unit = throw OfflineException("Updating shares not available in offline mode")
 
     @Throws(Exception::class)
-    override fun star(id: String?, albumId: String?, artistId: String?) {
-        throw OfflineException("Star not available in offline mode")
-    }
+    override fun star(id: String?, albumId: String?, artistId: String?): Unit = throw OfflineException("Star not available in offline mode")
 
     @Throws(Exception::class)
-    override fun unstar(id: String?, albumId: String?, artistId: String?) {
-        throw OfflineException("UnStar not available in offline mode")
-    }
+    override fun unstar(id: String?, albumId: String?, artistId: String?): Unit = throw OfflineException("UnStar not available in offline mode")
 
     @Throws(Exception::class)
-    override fun getMusicFolders(refresh: Boolean): List<MusicFolder> {
-        throw OfflineException("Music folders not available in offline mode")
-    }
+    override fun getMusicFolders(refresh: Boolean): List<MusicFolder> = throw OfflineException("Music folders not available in offline mode")
 
     @Throws(OfflineException::class)
-    override fun getStreamUrl(id: String, maxBitRate: Int?, format: String?): String? {
-        throw OfflineException("getStreamUrl isn't available in offline mode")
-    }
+    override fun getStreamUrl(id: String, maxBitRate: Int?, format: String?): String? = throw OfflineException("getStreamUrl isn't available in offline mode")
 
     @Throws(OfflineException::class)
-    override fun getChatMessages(since: Long?): List<ChatMessage?>? {
-        throw OfflineException("getChatMessages isn't available in offline mode")
-    }
+    override fun getChatMessages(since: Long?): List<ChatMessage?>? = throw OfflineException("getChatMessages isn't available in offline mode")
 
     @Throws(OfflineException::class)
-    override fun addChatMessage(message: String) {
-        throw OfflineException("addChatMessage isn't available in offline mode")
-    }
+    override fun addChatMessage(message: String): Unit = throw OfflineException("addChatMessage isn't available in offline mode")
 
     @Throws(OfflineException::class)
-    override fun getBookmarks(): List<Bookmark> {
-        throw OfflineException("getBookmarks isn't available in offline mode")
-    }
+    override fun getBookmarks(): List<Bookmark> = throw OfflineException("getBookmarks isn't available in offline mode")
 
     @Throws(OfflineException::class)
-    override fun deleteBookmark(id: String) {
-        throw OfflineException("deleteBookmark isn't available in offline mode")
-    }
+    override fun deleteBookmark(id: String): Unit = throw OfflineException("deleteBookmark isn't available in offline mode")
 
     @Throws(OfflineException::class)
-    override fun createBookmark(id: String, position: Int) {
-        throw OfflineException("createBookmark isn't available in offline mode")
-    }
+    override fun createBookmark(id: String, position: Int): Unit = throw OfflineException("createBookmark isn't available in offline mode")
 
     @Throws(OfflineException::class)
-    override fun getVideos(refresh: Boolean): MusicDirectory? {
-        throw OfflineException("getVideos isn't available in offline mode")
-    }
+    override fun getVideos(refresh: Boolean): MusicDirectory? = throw OfflineException("getVideos isn't available in offline mode")
 
     @Throws(OfflineException::class)
-    override fun getStarred2(): SearchResult {
-        throw OfflineException("getStarred2 isn't available in offline mode")
-    }
+    override fun getStarred2(): SearchResult = throw OfflineException("getStarred2 isn't available in offline mode")
 
     override fun ping() {
         // Void
@@ -664,9 +602,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(OfflineException::class)
-    override fun getAlbum(id: String, name: String?, refresh: Boolean): Album? {
-        return cachedAlbums.get(id)
-    }
+    override fun getAlbum(id: String, name: String?, refresh: Boolean): Album? = cachedAlbums.get(id)
 
     @Throws(OfflineException::class)
     override fun getSingles(artistId: String, refresh: Boolean): MusicDirectory {
@@ -680,9 +616,7 @@ class OfflineMusicService : MusicService, KoinComponent {
     }
 
     @Throws(OfflineException::class)
-    override fun getPodcastEpisodes(podcastChannelId: String?): MusicDirectory? {
-        throw OfflineException("getPodcastEpisodes isn't available in offline mode")
-    }
+    override fun getPodcastEpisodes(podcastChannelId: String?): MusicDirectory? = throw OfflineException("getPodcastEpisodes isn't available in offline mode")
 
     @Throws(OfflineException::class)
     override fun getDownloadInputStream(
@@ -690,25 +624,20 @@ class OfflineMusicService : MusicService, KoinComponent {
         offset: Long,
         maxBitrate: Int,
         save: Boolean
-    ): Pair<InputStream, Boolean> {
-        throw OfflineException("getDownloadInputStream isn't available in offline mode")
-    }
+    ): Pair<InputStream, Boolean> = throw OfflineException("getDownloadInputStream isn't available in offline mode")
 
     @Throws(OfflineException::class)
-    override fun setRating(id: String, rating: Int) {
-        throw OfflineException("setRating isn't available in offline mode")
-    }
+    override fun setRating(id: String, rating: Int): Unit = throw OfflineException("setRating isn't available in offline mode")
 
     @Throws(OfflineException::class)
-    override fun getPodcastsChannels(refresh: Boolean): List<PodcastsChannel> {
-        throw OfflineException("getPodcastsChannels isn't available in offline mode")
-    }
+    override fun getPodcastsChannels(refresh: Boolean): List<PodcastsChannel> = throw OfflineException("getPodcastsChannels isn't available in offline mode")
 
     private fun getName(fileName: String, isDirectory: Boolean): String? {
         if (isDirectory) {
             return fileName
         }
-        if (fileName.endsWith(".partial") || fileName.contains(".partial.") ||
+        if (fileName.endsWith(".partial") ||
+            fileName.contains(".partial.") ||
             fileName == Constants.ALBUM_ART_FILE
         ) {
             return null
@@ -737,7 +666,8 @@ class OfflineMusicService : MusicService, KoinComponent {
         parent = file.parent!!.path
         val root = FileUtil.musicDirectory.path
         path = file.path.replaceFirst(
-            String.format(Locale.ROOT, "^%s/", root).toRegex(), ""
+            String.format(Locale.ROOT, "^%s/", root).toRegex(),
+            ""
         )
         title = name
 
@@ -1013,5 +943,6 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     companion object {
         private val COMPILE = Pattern.compile(" ")
+        private const val LONG_SONG_THRESHOLD_SECONDS = 600
     }
 }

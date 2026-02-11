@@ -10,7 +10,7 @@ class AlbumExtensionsTest {
         val album = Album(
             id = "1",
             songCount = 6,
-            duration = 29 * 60,
+            duration = 29 * 60
         )
         album.isEP() `should be equal to` true
     }
@@ -20,7 +20,7 @@ class AlbumExtensionsTest {
         val album = Album(
             id = "2",
             songCount = 6,
-            duration = 31 * 60,
+            duration = 31 * 60
         )
         album.isEP() `should be equal to` false
     }
@@ -37,4 +37,3 @@ class AlbumExtensionsTest {
         album.isSingle() `should be equal to` false
     }
 }
-

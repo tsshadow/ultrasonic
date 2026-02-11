@@ -39,7 +39,9 @@ import org.moire.ultrasonic.view.SortOrder
 import org.moire.ultrasonic.view.ViewCapabilities
 import timber.log.Timber
 
-class MainFragment : ScopeFragment(), KoinScopeComponent {
+class MainFragment :
+    ScopeFragment(),
+    KoinScopeComponent {
 
     private var filterButtonBar: FilterButtonBar? = null
     private var layoutType: LayoutType = LayoutType.COVER
@@ -129,9 +131,7 @@ class MainFragment : ScopeFragment(), KoinScopeComponent {
         }
     }
 
-    private fun findCurrentFragment(): Fragment? {
-        return findFragmentAtPosition(childFragmentManager, viewPager.currentItem)
-    }
+    private fun findCurrentFragment(): Fragment? = findFragmentAtPosition(childFragmentManager, viewPager.currentItem)
 
     private fun findFragmentAtPosition(fragmentManager: FragmentManager, position: Int): Fragment? {
         // If a fragment was recently created and never shown the fragment manager might not
@@ -152,8 +152,7 @@ private fun FilterButtonBar.configureWithCapabilitiesFromFragment(frag: Fragment
 }
 
 @Suppress("MagicNumber")
-class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = LayoutType.LIST) :
-    FragmentStateAdapter(fragment) {
+class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = LayoutType.LIST) : FragmentStateAdapter(fragment) {
 
     var filterButtonBar: FilterButtonBar? = null
     private var layoutType: LayoutType = initialType
@@ -203,14 +202,12 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
         return fragment
     }
 
-    fun getTitleForFragment(pos: Int, context: Context): String {
-        return when (pos) {
-            0 -> context.getString(R.string.main_songs_title)
-            1 -> context.getString(R.string.main_livesets_title)
-            2 -> context.getString(R.string.main_albums_title)
-            3 -> context.getString(R.string.main_artists_title)
-            else -> "Unknown"
-        }
+    fun getTitleForFragment(pos: Int, context: Context): String = when (pos) {
+        0 -> context.getString(R.string.main_songs_title)
+        1 -> context.getString(R.string.main_livesets_title)
+        2 -> context.getString(R.string.main_albums_title)
+        3 -> context.getString(R.string.main_artists_title)
+        else -> "Unknown"
     }
 }
 

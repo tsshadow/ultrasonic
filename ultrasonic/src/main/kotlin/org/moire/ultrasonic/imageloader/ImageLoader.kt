@@ -74,13 +74,11 @@ class ImageLoader(
             .into(request.imageView)
     }
 
-    private fun getCoverArt(request: ImageRequest.CoverArt): Bitmap {
-        return picasso.load(createLoadCoverArtRequest(request.entityId, request.size.toLong()))
-            .addPlaceholder(request)
-            .addError(request)
-            .stableKey(request.cacheKey)
-            .get()
-    }
+    private fun getCoverArt(request: ImageRequest.CoverArt): Bitmap = picasso.load(createLoadCoverArtRequest(request.entityId, request.size.toLong()))
+        .addPlaceholder(request)
+        .addError(request)
+        .stableKey(request.cacheKey)
+        .get()
 
     private fun loadAvatar(request: ImageRequest.Avatar) {
         picasso.load(createLoadAvatarRequest(request.username))
@@ -260,12 +258,10 @@ class ImageLoader(
         }
     }
 
-    private fun resolveSize(requested: Int, large: Boolean): Int {
-        return if (requested <= 0) {
-            if (large) config.largeSize else config.defaultSize
-        } else {
-            requested
-        }
+    private fun resolveSize(requested: Int, large: Boolean): Int = if (requested <= 0) {
+        if (large) config.largeSize else config.defaultSize
+    } else {
+        requested
     }
 
     private fun calculateMemoryCacheSize(context: Context): Int {

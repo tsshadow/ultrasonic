@@ -8,10 +8,12 @@ data class PodcastsChannel(
     val url: String?,
     val description: String?,
     val status: String?
-) : Serializable, GenericEntry() {
-    companion object {
-        private const val serialVersionUID = -4160515427075433798L
-    }
-
+) : GenericEntry(),
+    Serializable {
     override fun toString(): String = title.toString()
+
+    companion object {
+        @Suppress("unused")
+        private const val serialVersionUID = 1L
+    }
 }

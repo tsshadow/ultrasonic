@@ -5,11 +5,9 @@ import androidx.room.PrimaryKey
 import java.io.Serializable
 
 @Entity
-data class Year(
-    @PrimaryKey val index: String,
-    val name: String
-) : Serializable {
+data class Year(@PrimaryKey val index: String, val name: String) : Serializable {
     companion object {
-        private const val serialVersionUID = -3943025175219134028L
+        @Suppress("unused")
+        private const val serialVersionUID = 1L
     }
 }

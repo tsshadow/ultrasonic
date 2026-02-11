@@ -72,7 +72,6 @@ fun Track.toMediaItem(mediaId: String = id): MediaItem {
 
     val artworkUri = AlbumArtContentProvider.mapArtworkToContentProviderUri(this)
 
-
     val mediaItem = buildMediaItem(
         title = title ?: "",
         mediaId = mediaId,
@@ -208,7 +207,7 @@ fun MediaItem.toTrack(): Track {
         mediaMetadata.extras?.getInt("bookmarkPosition", 0) ?: 0,
         mediaMetadata.extras?.getInt("userRating", 0) ?: 0,
         mediaMetadata.extras?.getFloat("averageRating", 0F) ?: 0F,
-        mediaMetadata.extras?.getString("name"),
+        mediaMetadata.extras?.getString("name")
     )
     if (mediaMetadata.userRating is HeartRating) {
         track.starred = (mediaMetadata.userRating as HeartRating).isHeart
@@ -221,16 +220,14 @@ fun MediaItem.toTrack(): Track {
     return track
 }
 
-private fun safeParseDate(created: String?): Date? {
-    return if (created != null) {
-        try {
-            DateFormat.getDateInstance().parse(created)
-        } catch (_: ParseException) {
-            null
-        }
-    } else {
+private fun safeParseDate(created: String?): Date? = if (created != null) {
+    try {
+        DateFormat.getDateInstance().parse(created)
+    } catch (_: ParseException) {
         null
     }
+} else {
+    null
 }
 
 /**

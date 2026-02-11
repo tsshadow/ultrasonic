@@ -4,11 +4,12 @@ import FilterOptionsViewModel
 import FilterState
 import TileInfo
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
-import android.view.*
-import android.widget.*
-import androidx.annotation.RequiresApi
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageButton
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -16,24 +17,26 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import org.moire.ultrasonic.R
-import org.moire.ultrasonic.util.RefreshableFragment
-import org.moire.ultrasonic.util.Util.applyTheme
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.NavigationGraphDirections
+import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.Filter
 import org.moire.ultrasonic.api.subsonic.models.Filters
-import org.moire.ultrasonic.api.subsonic.models.Genre
-import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Tag
+import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.util.RefreshableFragment
+import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.toastingExceptionHandler
 import timber.log.Timber
 
-abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCallback {
+abstract class SelectFragment :
+    Fragment(),
+    RefreshableFragment,
+    TileAdapterCallback {
     private val filterOptionsViewModel: FilterOptionsViewModel by activityViewModels()
     private lateinit var recyclerView: RecyclerView
     private lateinit var tileAdapter: TileAdapter
@@ -49,20 +52,6 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
     private var tiles = mutableListOf<TileInfo>()
     private var lastEditedTilePosition: Int? = null
 
-    protected open val additionalSpinnerIds: List<Int> = emptyList()
-    protected open val additionalFilterLists: MutableList<MutableList<String>> = mutableListOf()
-
-    private val sortMethodMap by lazy {
-        mapOf(
-            getString(R.string.sort_none) to "None",
-            getString(R.string.sort_random) to "Random",
-            getString(R.string.sort_date_and_release) to "DateDescAndRelease",
-            getString(R.string.sort_added_desc) to "AddedDesc",
-            getString(R.string.sort_written_desc) to "LastWrittenDesc"
-        )
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme(requireContext())
@@ -72,9 +61,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.tsshadow_search, container, false)
-    }
+    ): View = inflater.inflate(R.layout.tsshadow_search, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -101,21 +88,27 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             "filters_result",
             viewLifecycleOwner
         ) { _, bundle ->
-            val filterState = bundle.getParcelable("filters", FilterState::class.java) ?: return@setFragmentResultListener
+            val filterState =
+                BundleCompat.getParcelable(bundle, "filters", FilterState::class.java)
+                    ?: return@setFragmentResultListener
 
             val action = bundle.getString("action") ?: return@setFragmentResultListener
 
             when (action) {
                 "search" -> {
                     val filters = Filters().apply {
-                        if (filterState.genres.isNotEmpty())
+                        if (filterState.genres.isNotEmpty()) {
                             add(Filter("GENRE", filterState.genres))
-                        if (filterState.years.isNotEmpty())
+                        }
+                        if (filterState.years.isNotEmpty()) {
                             add(Filter("YEAR", filterState.years))
-                        if (filterState.label.isNotEmpty())
+                        }
+                        if (filterState.label.isNotEmpty()) {
                             add(Filter("PUBLISHER", filterState.label))
-                        if (filterState.festival.isNotEmpty())
+                        }
+                        if (filterState.festival.isNotEmpty()) {
                             add(Filter("FESTIVAL", filterState.festival))
+                        }
                         add(Filter("LENGTH", defaultLength))
                     }
 
@@ -160,22 +153,20 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
         }
     }
 
-    private fun tileInfoFromFilterState(state: FilterState): TileInfo {
-        return TileInfo(
-            title = state.title,
-            genre = state.genres,
-            year = state.years,
-            label = state.label,
-            festival = state.festival,
-            sortMethod = state.sortMethod,
-            length = defaultLength,
-            ratingMin = state.ratingMin,
-            ratingMax = state.ratingMax,
-            size = state.count,
-            festivalLineup = state.festivalLineup,
-            favorite = state.favorite
-        )
-    }
+    private fun tileInfoFromFilterState(state: FilterState): TileInfo = TileInfo(
+        title = state.title,
+        genre = state.genres,
+        year = state.years,
+        label = state.label,
+        festival = state.festival,
+        sortMethod = state.sortMethod,
+        length = defaultLength,
+        ratingMin = state.ratingMin,
+        ratingMax = state.ratingMax,
+        size = state.count,
+        festivalLineup = state.festivalLineup,
+        favorite = state.favorite
+    )
 
     override fun onEditTile(tile: TileInfo, position: Int) {
         lastEditedTilePosition = position
@@ -225,7 +216,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
                 tiles = defaultTileSet()
                 TileStorage.saveTiles(requireContext(), tiles, pageKey)
             }
-        } catch (e: Exception) {
+        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Timber.e(e, "Failed to load saved tiles, falling back to defaults.")
             tiles = defaultTileSet()
             TileStorage.saveTiles(requireContext(), tiles, pageKey)
@@ -242,7 +233,13 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             val genres = withContext(Dispatchers.IO) {
                 musicService.getGenres(refresh, null, null)
             }.let { list ->
-                if (isOffline()) list.map { it.name } else list.filter { it.songCount > 10 }.map { it.name }
+                if (isOffline()) {
+                    list.map {
+                        it.name
+                    }
+                } else {
+                    list.filter { it.songCount > 10 }.map { it.name }
+                }
             }
 
             val years = withContext(Dispatchers.IO) {
@@ -276,7 +273,9 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             filterOptionsViewModel.labels.postValue(labels)
             filterOptionsViewModel.festivals.postValue(festivals)
             filterOptionsViewModel.lineups.postValue(lineups)
-            Timber.d("Filter data loaded: genres=${genres.size}, years=${years.size}, labels=${labels.size}, festivals=${festivals.size}")
+            Timber.d(
+                "Filter data loaded: genres=${genres.size}, years=${years.size}, labels=${labels.size}, festivals=${festivals.size}"
+            )
         }
         swipeRefresh?.isRefreshing = false
     }
@@ -284,8 +283,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
     private fun calculateSpanCount(): Int {
         val displayMetrics = resources.displayMetrics
         val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
-        val desiredTileWidthDp = 120 + 12
-        return (screenWidthDp / desiredTileWidthDp).toInt().coerceAtLeast(2)
+        return (screenWidthDp / DESIRED_TILE_WIDTH_DP).toInt().coerceAtLeast(MIN_SPAN_COUNT)
     }
 
     private fun updateGridLayoutManager() {
@@ -296,5 +294,10 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         updateGridLayoutManager()
+    }
+
+    companion object {
+        private const val DESIRED_TILE_WIDTH_DP = 132
+        private const val MIN_SPAN_COUNT = 2
     }
 }

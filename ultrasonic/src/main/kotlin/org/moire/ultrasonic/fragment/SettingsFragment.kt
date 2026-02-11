@@ -278,19 +278,17 @@ class SettingsFragment :
             .create().show()
     }
 
-    private fun bluetoothDevicePreferenceToString(preferenceValue: Int): String {
-        return when (preferenceValue) {
-            Constants.PREFERENCE_VALUE_ALL -> {
-                getString(R.string.settings_playback_bluetooth_all)
-            }
-            Constants.PREFERENCE_VALUE_A2DP -> {
-                getString(R.string.settings_playback_bluetooth_a2dp)
-            }
-            Constants.PREFERENCE_VALUE_DISABLED -> {
-                getString(R.string.settings_playback_bluetooth_disabled)
-            }
-            else -> ""
+    private fun bluetoothDevicePreferenceToString(preferenceValue: Int): String = when (preferenceValue) {
+        Constants.PREFERENCE_VALUE_ALL -> {
+            getString(R.string.settings_playback_bluetooth_all)
         }
+        Constants.PREFERENCE_VALUE_A2DP -> {
+            getString(R.string.settings_playback_bluetooth_a2dp)
+        }
+        Constants.PREFERENCE_VALUE_DISABLED -> {
+            getString(R.string.settings_playback_bluetooth_disabled)
+        }
+        else -> ""
     }
 
     private fun setupClearSearchPreference() {
@@ -315,7 +313,8 @@ class SettingsFragment :
         if (debugLogToFile?.isChecked == true) {
             debugLogToFile?.summary = getString(
                 R.string.settings_debug_log_path,
-                ultrasonicDirectory, FileLoggerTree.FILENAME
+                ultrasonicDirectory,
+                FileLoggerTree.FILENAME
             )
         } else {
             debugLogToFile?.summary = ""

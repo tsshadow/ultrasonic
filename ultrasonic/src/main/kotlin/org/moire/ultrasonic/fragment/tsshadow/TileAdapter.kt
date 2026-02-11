@@ -1,6 +1,7 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
 import TileInfo
+import TileStorage.saveTiles
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -11,11 +12,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
-import org.moire.ultrasonic.R
-import TileStorage.saveTiles
 import genreIconMap
-import tileInfoColors
 import navigateToGenre
+import org.moire.ultrasonic.R
+import tileInfoColors
 
 interface TileAdapterCallback {
     fun onEditTile(tile: TileInfo, position: Int)
@@ -52,12 +52,13 @@ class TileAdapter(
             val gradient = GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
                 intArrayOf(tileInfoColors[index % tileInfoColors.size], Color.BLACK)
-            ).apply { cornerRadius = 24f }
+            ).apply { cornerRadius = TILE_CORNER_RADIUS }
             tileCard.background = gradient
         }
 
         private fun setupIconAndText(tile: TileInfo) {
-            val iconRes = genreIconMap[tile.genre?.firstOrNull()] ?: R.drawable.baseline_music_note_24
+            val iconRes =
+                genreIconMap[tile.genre?.firstOrNull()] ?: R.drawable.baseline_music_note_24
             tileIcon.setImageResource(iconRes)
             tileIcon.contentDescription = tile.genre?.firstOrNull() ?: tile.title
             tileText.text = tile.title
@@ -80,5 +81,9 @@ class TileAdapter(
         tiles.add(tile)
         saveTiles(context, tiles, pageKey)
         notifyItemInserted(tiles.size - 1)
+    }
+
+    companion object {
+        private const val TILE_CORNER_RADIUS = 24f
     }
 }

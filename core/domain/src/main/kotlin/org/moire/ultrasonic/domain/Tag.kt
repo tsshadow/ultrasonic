@@ -5,12 +5,9 @@ import androidx.room.PrimaryKey
 import java.io.Serializable
 
 @Entity
-data class Tag(
-    @PrimaryKey val index: String,
-    val name: String,
-    val songCount: Int
-) : Serializable {
+data class Tag(@PrimaryKey val index: String, val name: String, val songCount: Int) : Serializable {
     companion object {
-        private const val serialVersionUID = -3943025175219134029L
+        @Suppress("unused")
+        private const val serialVersionUID = 1L
     }
 }

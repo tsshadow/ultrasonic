@@ -19,4 +19,3 @@ fun Album.isSingle(): Boolean {
     val tracks = this.songCount ?: return false
     return tracks == 1L
 }
-

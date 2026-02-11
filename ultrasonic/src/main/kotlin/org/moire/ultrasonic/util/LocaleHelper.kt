@@ -7,11 +7,10 @@
 
 package org.moire.ultrasonic.util
 
-import android.annotation.TargetApi
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
-import android.os.Build
 import java.util.Locale
 
 /**
@@ -25,11 +24,7 @@ class LocaleHelper(base: Context?) : ContextWrapper(base) {
                 val config = context.resources.configuration
                 val locale = Locale.forLanguageTag(language)
                 Locale.setDefault(locale)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    setSystemLocale(config, locale)
-                } else {
-                    setSystemLocaleLegacy(config, locale)
-                }
+                setSystemLocale(config, locale)
 
                 config.setLayoutDirection(locale)
                 context = context.createConfigurationContext(config)
@@ -37,12 +32,7 @@ class LocaleHelper(base: Context?) : ContextWrapper(base) {
             return LocaleHelper(context)
         }
 
-        @Suppress("DEPRECATION")
-        private fun setSystemLocaleLegacy(config: Configuration, locale: Locale?) {
-            config.locale = locale
-        }
-
-        @TargetApi(Build.VERSION_CODES.N)
+        @SuppressLint("AppBundleLocaleChanges")
         fun setSystemLocale(config: Configuration, locale: Locale?) {
             config.setLocale(locale)
         }

@@ -1,5 +1,0 @@
-ext.versions = [
-        minSdk               : 32,
-        compileSdk : 35,
-        targetSdk  : 35,
-]

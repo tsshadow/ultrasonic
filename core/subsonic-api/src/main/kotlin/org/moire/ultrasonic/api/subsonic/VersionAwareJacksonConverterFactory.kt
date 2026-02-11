@@ -47,14 +47,12 @@ class VersionAwareJacksonConverterFactory(
         parameterAnnotations: Array<Annotation>,
         methodAnnotations: Array<Annotation>,
         retrofit: Retrofit
-    ): Converter<*, RequestBody>? {
-        return jacksonConverterFactory?.requestBodyConverter(
-            type,
-            parameterAnnotations,
-            methodAnnotations,
-            retrofit
-        )
-    }
+    ): Converter<*, RequestBody>? = jacksonConverterFactory?.requestBodyConverter(
+        type,
+        parameterAnnotations,
+        methodAnnotations,
+        retrofit
+    )
 
     companion object {
         @JvmOverloads // Guarding public API nullability.
@@ -89,7 +87,7 @@ class VersionAwareJacksonConverterFactory(
                 if (response is SubsonicResponse) {
                     try {
                         notifier(response.version)
-                    } catch (ignored: IllegalArgumentException) {
+                    } catch (_: IllegalArgumentException) {
                         // Ignore unknown or malformed version values
                     }
                 }

@@ -27,9 +27,9 @@ import org.moire.ultrasonic.domain.ChatMessage
 import org.moire.ultrasonic.domain.Genre
 import org.moire.ultrasonic.domain.Index
 import org.moire.ultrasonic.domain.JukeboxStatus
+import org.moire.ultrasonic.domain.Lineup
 import org.moire.ultrasonic.domain.Lyrics
 import org.moire.ultrasonic.domain.Mood
-import org.moire.ultrasonic.domain.Year
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.MusicFolder
 import org.moire.ultrasonic.domain.Playlist
@@ -38,9 +38,9 @@ import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Share
 import org.moire.ultrasonic.domain.Tag
-import org.moire.ultrasonic.domain.Lineup
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
+import org.moire.ultrasonic.domain.Year
 import org.moire.ultrasonic.domain.toArtistList
 import org.moire.ultrasonic.domain.toDomainEntitiesList
 import org.moire.ultrasonic.domain.toDomainEntity
@@ -104,19 +104,17 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun getArtistInfo(id: String): Artist? {
-        return try {
-            val response = API.getArtistInfo2(id, null, null).execute().throwOnFailure()
-            val info = response.body()!!.artistInfo
-            Artist(
-                id = id,
-                serverId = activeServerId,
-                genre = info.genre,
-                description = info.biography
-            )
-        } catch (e: ApiNotSupportedException) {
-            null
-        }
+    override fun getArtistInfo(id: String): Artist? = try {
+        val response = API.getArtistInfo2(id, null, null).execute().throwOnFailure()
+        val info = response.body()!!.artistInfo
+        Artist(
+            id = id,
+            serverId = activeServerId,
+            genre = info.genre,
+            description = info.biography
+        )
+    } catch (e: ApiNotSupportedException) {
+        null
     }
 
     @Throws(Exception::class)
@@ -166,7 +164,6 @@ open class RESTMusicService(
     override fun getSingles(artistId: String, refresh: Boolean): MusicDirectory {
         val response = API.getSingles(artistId).execute().throwOnFailure()
 
-
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
 
@@ -174,17 +171,15 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    override fun search(criteria: SearchCriteria): SearchResult {
-        return try {
-            if (shouldUseId3Tags()) {
-                search3(criteria)
-            } else {
-                search2(criteria)
-            }
-        } catch (ignored: ApiNotSupportedException) {
-            // Ensure backward compatibility with REST 1.3.
-            searchOld(criteria)
+    override fun search(criteria: SearchCriteria): SearchResult = try {
+        if (shouldUseId3Tags()) {
+            search3(criteria)
+        } else {
+            search2(criteria)
         }
+    } catch (ignored: ApiNotSupportedException) {
+        // Ensure backward compatibility with REST 1.3.
+        searchOld(criteria)
     }
 
     /**
@@ -565,6 +560,7 @@ open class RESTMusicService(
 
         return response.body()!!.moodsList.toDomainEntityList()
     }
+
     @Throws(Exception::class)
     override fun getYears(refresh: Boolean): List<Year> {
         val response = API.getYears().execute().throwOnFailure()
@@ -580,8 +576,18 @@ open class RESTMusicService(
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,
-        offset: Int): MusicDirectory {
-        val response = API.getSongsByGenre(genre, year, length, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByGenre(
+            genre,
+            year,
+            length,
+            ratingMin,
+            ratingMax,
+            count,
+            offset,
+            null
+        ).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
@@ -597,12 +603,24 @@ open class RESTMusicService(
         count: Int,
         offset: Int,
         sortMethod: String?,
-        festivalLineup: String?): MusicDirectory {
-
+        festivalLineup: String?
+    ): MusicDirectory {
         Timber.d(filters.toString())
 
-        val response = API.getSongs(if (filters.toString() == "")
-             null else filters.toString(), ratingMin, ratingMax, count, offset, null, sortMethod, festivalLineup).execute().throwOnFailure()
+        val response = API.getSongs(
+            if (filters.toString() == "") {
+                null
+            } else {
+                filters.toString()
+            },
+            ratingMin,
+            ratingMax,
+            count,
+            offset,
+            null,
+            sortMethod,
+            festivalLineup
+        ).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
@@ -618,8 +636,18 @@ open class RESTMusicService(
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,
-        offset: Int): MusicDirectory {
-        val response = API.getSongsByMood(mood, year, length, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByMood(
+            mood,
+            year,
+            length,
+            ratingMin,
+            ratingMax,
+            count,
+            offset,
+            null
+        ).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))
@@ -634,8 +662,17 @@ open class RESTMusicService(
         ratingMin: Int?,
         ratingMax: Int?,
         count: Int,
-        offset: Int): MusicDirectory {
-        val response = API.getSongsByYear(year, length, ratingMin, ratingMax, count, offset, null).execute().throwOnFailure()
+        offset: Int
+    ): MusicDirectory {
+        val response = API.getSongsByYear(
+            year,
+            length,
+            ratingMin,
+            ratingMax,
+            count,
+            offset,
+            null
+        ).execute().throwOnFailure()
 
         val result = MusicDirectory()
         result.addAll(response.body()!!.songsList.toDomainEntityList(activeServerId))

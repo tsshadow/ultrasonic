@@ -12,14 +12,9 @@ enum class JukeboxAction(val action: String) {
     START("start"),
     STOP("stop"),
     SKIP("skip"),
-    ADD("add"),
     CLEAR("clear"),
-    REMOVE("remove"),
-    SHUFFLE("shuffle"),
     SET_GAIN("setGain")
     ;
 
-    override fun toString(): String {
-        return action
-    }
+    override fun toString(): String = action
 }

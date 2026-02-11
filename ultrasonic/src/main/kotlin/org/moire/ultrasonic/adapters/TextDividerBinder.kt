@@ -11,9 +11,7 @@ import org.moire.ultrasonic.domain.Identifiable
 
 /** Binder for simple divider rows with dynamic text */
 class TextDividerBinder : ItemViewBinder<TextDividerBinder.TextDivider, TextDividerBinder.ViewHolder>() {
-    override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
-        return ViewHolder(inflater.inflate(R.layout.list_item_divider, parent, false))
-    }
+    override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder = ViewHolder(inflater.inflate(R.layout.list_item_divider, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, item: TextDivider) {
         holder.textView.text = item.text

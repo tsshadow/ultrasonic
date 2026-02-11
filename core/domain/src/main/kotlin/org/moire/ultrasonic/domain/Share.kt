@@ -12,7 +12,8 @@ data class Share(
     var expires: String? = null,
     var visitCount: Long? = null,
     private val tracks: MutableList<Track> = mutableListOf()
-) : Serializable, GenericEntry() {
+) : GenericEntry(),
+    Serializable {
     override val name: String?
         get() {
             if (url != null) {
@@ -21,16 +22,11 @@ data class Share(
             return null
         }
 
-    fun getEntries(): List<Track> {
-        return tracks.toList()
-    }
-
-    fun addEntry(track: Track) {
-        tracks.add(track)
-    }
+    fun getEntries(): List<Track> = tracks.toList()
 
     companion object {
-        private const val serialVersionUID = 1487561657691009668L
+        @Suppress("unused")
+        private const val serialVersionUID = 1L
         private val urlPattern = ".*/([^/?]+).*".toPattern()
     }
 }

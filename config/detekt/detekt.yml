@@ -28,7 +28,10 @@ performance:
 exceptions:
   active: true
   TooGenericExceptionCaught:
+    active: false
     allowedExceptionNameRegex: '_|(all|ignore|expected).*'
+  SwallowedException:
+    active: false
 
 empty-blocks:
   active: true
@@ -39,12 +42,27 @@ empty-blocks:
 complexity:
   active: true
   TooManyFunctions:
-    thresholdInFiles: 25
-    thresholdInClasses: 25
-    thresholdInInterfaces: 20
-    thresholdInObjects: 30
+    thresholdInFiles: 30
+    thresholdInClasses: 30
+    thresholdInInterfaces: 25
+    thresholdInObjects: 35
   LabeledExpression:
     active: false
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 50
+  LongMethod:
+    active: true
+    threshold: 100
+  NestedBlockDepth:
+    active: true
+    threshold: 6
+  LargeClass:
+    active: false
+  LongParameterList:
+    active: true
+    functionThreshold: 10
+    constructorThreshold: 16
 
 style:
   active: true
@@ -62,6 +80,7 @@ style:
   MaxLineLength:
     active: false
   MagicNumber:
+    active: false
     # 100 common in percentage, 1000 in milliseconds
     ignoreNumbers: ['-1', '0', '1', '2', '5', '10', '100', '256', '512', '1000', '1024', '4096']
     ignoreEnums: true
