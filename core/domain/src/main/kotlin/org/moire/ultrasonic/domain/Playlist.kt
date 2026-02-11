@@ -13,4 +13,9 @@ data class Playlist @JvmOverloads constructor(
 ) : GenericEntry(),
     Serializable {
     override fun toString(): String = name
+
+    companion object {
+        @Suppress("unused")
+        private const val serialVersionUID = 1L
+    }
 }

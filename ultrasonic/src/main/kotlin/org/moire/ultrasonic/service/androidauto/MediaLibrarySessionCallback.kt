@@ -348,14 +348,14 @@ class MediaLibrarySessionCallback :
 
             Timber.d("onGetSearchResult: total=%d from=%d to=%d returning=%d",
                 all.size, from, to, pageItems.size)
-            pageItems.forEachIndexed { i, it ->
+            pageItems.forEachIndexed { i, item ->
                 Timber.d("result[%d]: id=%s title=%s browsable=%s playable=%s mediaType=%s",
                     i,
-                    it.mediaId,
-                    it.mediaMetadata.title,
-                    it.mediaMetadata.isBrowsable,
-                    it.mediaMetadata.isPlayable,
-                    it.mediaMetadata.mediaType
+                    item.mediaId,
+                    item.mediaMetadata.title,
+                    item.mediaMetadata.isBrowsable,
+                    item.mediaMetadata.isPlayable,
+                    item.mediaMetadata.mediaType
                 )
             }
 

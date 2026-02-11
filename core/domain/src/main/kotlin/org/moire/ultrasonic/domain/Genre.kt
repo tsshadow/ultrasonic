@@ -6,4 +6,9 @@ import java.io.Serializable
 
 @Entity
 data class Genre(@PrimaryKey val index: String, val name: String, val songCount: Int) :
-    Serializable
+    Serializable {
+    companion object {
+        @Suppress("unused")
+        private const val serialVersionUID = 1L
+    }
+}

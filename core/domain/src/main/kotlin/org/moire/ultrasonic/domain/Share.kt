@@ -25,6 +25,8 @@ data class Share(
     fun getEntries(): List<Track> = tracks.toList()
 
     companion object {
+        @Suppress("unused")
+        private const val serialVersionUID = 1L
         private val urlPattern = ".*/([^/?]+).*".toPattern()
     }
 }

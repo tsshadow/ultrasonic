@@ -11,4 +11,9 @@ data class PodcastsChannel(
 ) : GenericEntry(),
     Serializable {
     override fun toString(): String = title.toString()
+
+    companion object {
+        @Suppress("unused")
+        private const val serialVersionUID = 1L
+    }
 }

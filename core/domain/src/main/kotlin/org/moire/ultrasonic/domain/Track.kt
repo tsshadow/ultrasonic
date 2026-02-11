@@ -51,6 +51,10 @@ data class Track(
     override var name: String? = null
 ) : MusicDirectory.Child(),
     Serializable {
+    companion object {
+        @Suppress("unused")
+        private const val serialVersionUID = 1L
+    }
 
     fun compareTo(other: Track): Int = when {
         this.closeness == other.closeness -> {

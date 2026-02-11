@@ -12,6 +12,8 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
 }
 
+apply from: "${project.rootDir}/gradle_scripts/code_quality.gradle"
+
 android {
     def signingProperties = new Properties()
     def localPropsFile = rootProject.file("local.properties")

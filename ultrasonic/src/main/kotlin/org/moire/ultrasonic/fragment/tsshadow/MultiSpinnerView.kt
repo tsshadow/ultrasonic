@@ -1,10 +1,14 @@
-package org.moire.ultrasonic.view
+package org.moire.ultrasonic.fragment.tsshadow
 
 import android.app.AlertDialog
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.ListView
+import android.widget.TextView
 import org.moire.ultrasonic.R
 
 class MultiSpinnerView @JvmOverloads constructor(
