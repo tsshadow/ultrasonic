@@ -4,11 +4,10 @@ import FilterOptionsViewModel
 import FilterState
 import TileInfo
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.*
-import androidx.annotation.RequiresApi
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -26,7 +25,6 @@ import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.api.subsonic.models.Filter
 import org.moire.ultrasonic.api.subsonic.models.Filters
-import org.moire.ultrasonic.api.subsonic.models.Genre
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Tag
@@ -48,20 +46,6 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
 
     private var tiles = mutableListOf<TileInfo>()
     private var lastEditedTilePosition: Int? = null
-
-    protected open val additionalSpinnerIds: List<Int> = emptyList()
-    protected open val additionalFilterLists: MutableList<MutableList<String>> = mutableListOf()
-
-    private val sortMethodMap by lazy {
-        mapOf(
-            getString(R.string.sort_none) to "None",
-            getString(R.string.sort_random) to "Random",
-            getString(R.string.sort_date_and_release) to "DateDescAndRelease",
-            getString(R.string.sort_added_desc) to "AddedDesc",
-            getString(R.string.sort_written_desc) to "LastWrittenDesc"
-        )
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,7 +85,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
             "filters_result",
             viewLifecycleOwner
         ) { _, bundle ->
-            val filterState = bundle.getParcelable("filters", FilterState::class.java) ?: return@setFragmentResultListener
+            val filterState = BundleCompat.getParcelable(bundle, "filters", FilterState::class.java) ?: return@setFragmentResultListener
 
             val action = bundle.getString("action") ?: return@setFragmentResultListener
 

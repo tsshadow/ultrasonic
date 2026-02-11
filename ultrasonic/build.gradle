@@ -1,11 +1,14 @@
 
 
+import com.android.build.api.dsl.ManagedVirtualDevice
+
 plugins {
     alias libs.plugins.ksp
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     alias(libs.plugins.kotlinSerialization)
     id("kotlin-parcelize")
+    id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
 }
 
@@ -20,19 +23,23 @@ android {
         return System.getenv(key) ?: signingProperties.getProperty(key, defVal)
     }
 
-    compileSdkVersion versions.compileSdk
+    compileSdk libs.versions.compileSdk.get().toInteger()
 
     defaultConfig {
         applicationId "org.moire.ultrasonic"
         versionCode 130
         versionName "4.8.0"
 
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.targetSdk
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
         resourceConfigurations += ['cs', 'de', 'en', 'es', 'fr', 'gl', 'hu', 'it', 'ja', 'nb-rNO', 'nl', 'pl', 'pt', 'pt-rBR', 'ru', 'zh-rCN', 'zh-rTW']
     }
 
-    bundle.language.enableSplit = false
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
 
     def storeLocation = envOrProp('SIGNING_STORE_FILE', rootProject.file('keystore.jks').path)
     File resolvedStoreFile = null
@@ -67,7 +74,7 @@ android {
         release {
             signingConfig signingConfigs.release
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'minify/proguard-main.pro',
                     'minify/proguard-okhttp.pro',
                     'minify/proguard-retrofit.pro',
@@ -120,7 +127,6 @@ android {
         abortOnError true
         warningsAsErrors true
         warning 'ImpliedQuantity'
-        disable 'IconMissingDensityFolder', 'VectorPath'
         disable 'MissingTranslation', 'UnusedQuantity', 'MissingQuantity'
         disable 'ObsoleteLintCustomCheck'
         // We manage dependencies on Gitlab with RenovateBot
@@ -128,6 +134,18 @@ android {
         disable 'AndroidGradlePluginVersion'
         textReport true
         checkDependencies true
+    }
+
+    testOptions {
+        managedDevices {
+            devices {
+                pixel10Pro (ManagedVirtualDevice) {
+                    device = "Pixel 10 Pro"
+                    apiLevel = 35
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
     }
     namespace 'org.moire.ultrasonic'
 

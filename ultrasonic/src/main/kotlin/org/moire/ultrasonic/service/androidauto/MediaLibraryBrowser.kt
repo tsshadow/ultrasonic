@@ -18,13 +18,14 @@ import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionError
+import androidx.media3.common.util.UnstableApi
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.guava.future
-import okhttp3.internal.toImmutableList
 import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
@@ -32,7 +33,6 @@ import org.moire.ultrasonic.api.subsonic.models.Filter
 import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.domain.SearchCriteria
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MusicService
 import org.moire.ultrasonic.util.Settings.maxSongs
@@ -58,6 +58,7 @@ import timber.log.Timber
  * @note This class interacts with `MediaLibraryDataProvider` for data access and `MusicService`
  * for retrieving media items.
  */
+@UnstableApi
 class MediaLibraryBrowser(
     val mainScope: CoroutineScope,
     val serviceScope: CoroutineScope,
@@ -102,7 +103,7 @@ class MediaLibraryBrowser(
         browser: MediaSession.ControllerInfo,
         params: MediaLibraryService.LibraryParams?
     ): ListenableFuture<LibraryResult<MediaItem>> {
-        Timber.i("onGetLibraryRoot", session, browser)
+        Timber.i("onGetLibraryRoot session: %s, browser: %s", session, browser)
         return Futures.immediateFuture(
             LibraryResult.ofItem(
                 buildMediaItem(
@@ -134,7 +135,7 @@ class MediaLibraryBrowser(
             )
         } else {
             Futures.immediateFuture(
-                LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
+                LibraryResult.ofError(SessionError.ERROR_BAD_VALUE)
             )
         }
     }
@@ -199,7 +200,7 @@ class MediaLibraryBrowser(
         pageSize: Int,
         params: MediaLibraryService.LibraryParams?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.i("getChildren", session, browser, params)
+        Timber.i("getChildren session: %s, browser: %s, params: %s", session, browser, params)
         return loadChildren(parentId, page, pageSize)
     }
 
@@ -440,7 +441,7 @@ class MediaLibraryBrowser(
         // Add favorite user-defined tiles
         savedFavoriteTiles.mapTo(mediaItems) { it.toMediaItem() }
 
-        return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems.toImmutableList(), null))
+        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
     }
 
     private fun getLivesetsLibrary(context: Context): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
@@ -465,7 +466,7 @@ class MediaLibraryBrowser(
         // Add favorite user-defined tiles
         savedFavoriteTiles.mapTo(mediaItems) { it.toMediaItem() }
 
-        return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems.toImmutableList(), null))
+        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
     }
 
     private fun getArtists(

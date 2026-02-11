@@ -7,7 +7,6 @@
 
 package org.moire.ultrasonic.service.androidauto
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.media3.common.HeartRating
@@ -64,6 +63,7 @@ import timber.log.Timber
  * and `MediaLibraryBrowser` to provide a seamless media experience.
  *
  */
+@OptIn(UnstableApi::class)
 class MediaLibrarySessionCallback :
     MediaLibraryBase(),
     MediaLibraryService.MediaLibrarySession.Callback,
@@ -283,6 +283,7 @@ class MediaLibrarySessionCallback :
         )
     }
 
+    @OptIn(UnstableApi::class)
     override fun onGetChildren(
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,
@@ -294,6 +295,7 @@ class MediaLibrarySessionCallback :
         return mediaLibrarBrowser.getChildren(session, browser, parentId, page, pageSize, params)
     }
 
+    @OptIn(UnstableApi::class)
     override fun onGetItem(
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,
@@ -327,6 +329,7 @@ class MediaLibrarySessionCallback :
         }
     }
 
+    @OptIn(UnstableApi::class)
     override fun onGetSearchResult(
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,
@@ -346,13 +349,13 @@ class MediaLibrarySessionCallback :
             Timber.d("onGetSearchResult: total=%d from=%d to=%d returning=%d",
                 all.size, from, to, pageItems.size)
             pageItems.forEachIndexed { i, it ->
-                Timber.d("result[%d]: id=%s title=%s browsable=%s playable=%s folderType=%s",
+                Timber.d("result[%d]: id=%s title=%s browsable=%s playable=%s mediaType=%s",
                     i,
                     it.mediaId,
                     it.mediaMetadata.title,
                     it.mediaMetadata.isBrowsable,
                     it.mediaMetadata.isPlayable,
-                    it.mediaMetadata.folderType
+                    it.mediaMetadata.mediaType
                 )
             }
 
@@ -360,7 +363,7 @@ class MediaLibrarySessionCallback :
         }
     }
 
-    private suspend fun getSearchItems(query: String): List<MediaItem> {
+    private fun getSearchItems(query: String): List<MediaItem> {
         Timber.d("getSearchItems: %s", query)
         val mediaItems = mutableListOf<MediaItem>()
 
@@ -414,8 +417,8 @@ class MediaLibrarySessionCallback :
             .setTitle(title)
             .setIsBrowsable(true)
             .setIsPlayable(false) // <- belangrijk voor Android Auto
-            .setFolderType(
-                if (folderMixed) MediaMetadata.FOLDER_TYPE_MIXED else MediaMetadata.FOLDER_TYPE_ALBUMS
+            .setMediaType(
+                if (folderMixed) MediaMetadata.MEDIA_TYPE_FOLDER_MIXED else MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS
             )
             .build()
 

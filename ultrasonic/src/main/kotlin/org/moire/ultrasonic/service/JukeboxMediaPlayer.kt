@@ -316,8 +316,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun increaseDeviceVolume(flags: Int) {
         gain = (gain + 1).coerceAtMost(MAX_GAIN)
-        @Suppress("DEPRECATION")
-        deviceVolume = gain
+        setDeviceVolume(gain, 0)
     }
 
     @Deprecated("Deprecated in Java")
@@ -327,8 +326,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun decreaseDeviceVolume(flags: Int) {
         gain = (gain - 1).coerceAtLeast(0)
-        @Suppress("DEPRECATION")
-        deviceVolume = gain
+        setDeviceVolume(gain, 0)
     }
 
     @Deprecated("Deprecated in Java")
@@ -338,8 +336,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
 
     override fun setDeviceMuted(muted: Boolean, flags: Int) {
         gain = 0
-        @Suppress("DEPRECATION")
-        deviceVolume = gain
+        setDeviceVolume(gain, 0)
     }
 
     override fun getVolume(): Float {
@@ -725,7 +722,7 @@ class JukeboxMediaPlayer : JukeboxUnimplementedFunctions(), Player {
     }
 
     override fun getTrackSelectionParameters(): TrackSelectionParameters {
-        return TrackSelectionParameters.DEFAULT_WITHOUT_CONTEXT
+        return TrackSelectionParameters.getDefaults(applicationContext())
     }
 
     override fun getMaxSeekToPreviousPosition(): Long {

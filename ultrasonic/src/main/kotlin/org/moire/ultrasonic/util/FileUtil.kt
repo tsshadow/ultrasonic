@@ -8,8 +8,6 @@
 package org.moire.ultrasonic.util
 
 import android.content.Context
-import android.os.Build
-import android.os.Environment
 import android.text.TextUtils
 import android.util.Pair
 import java.io.BufferedWriter
@@ -100,13 +98,13 @@ object FileUtil {
     }
 
     fun Track.getPartialFile(): String {
-        return getParentPath(this.getPinnedFile()) + "/" +
-            getPartialFile(getNameFromPath(this.getPinnedFile()))
+        return getParentPath(getPinnedFile()) + "/" +
+            getPartialFile(getNameFromPath(getPinnedFile()))
     }
 
     fun Track.getCompleteFile(): String {
-        return getParentPath(this.getPinnedFile()) + "/" +
-            getCompleteFile(getNameFromPath(this.getPinnedFile()))
+        return getParentPath(getPinnedFile()) + "/" +
+            getCompleteFile(getNameFromPath(getPinnedFile()))
     }
 
     @JvmStatic
@@ -183,15 +181,6 @@ object FileUtil {
         return String.format(Locale.ROOT, "%s%s", Util.md5Hex(albumDirPath), suffix)
     }
 
-    fun getAvatarFile(username: String?): File? {
-        if (username == null) {
-            return null
-        }
-        val albumArtDir = albumArtDirectory
-        val md5Hex = Util.md5Hex(username)
-        return File(albumArtDir, String.format(Locale.ROOT, "%s%s", md5Hex, SUFFIX_LARGE))
-    }
-
     /**
      * Get the album art file for a given album directory
      * @param albumDir The album directory
@@ -264,24 +253,13 @@ object FileUtil {
 
     var cachedUltrasonicDirectory: File? = null
 
-    // After Android M, the location of the files must be queried differently.
-    // GetExternalFilesDir will always return a directory which Ultrasonic
-    // can access without any extra privileges.
     @JvmStatic
     val ultrasonicDirectory: File
         get() {
             // Return cached if possible
             if (cachedUltrasonicDirectory != null) return cachedUltrasonicDirectory!!
 
-            @Suppress("DEPRECATION")
-            cachedUltrasonicDirectory = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                File(
-                    Environment.getExternalStorageDirectory(),
-                    "Android/data/org.moire.ultrasonic"
-                )
-            } else {
-                UApp.applicationContext().getExternalFilesDir(null)!!
-            }
+            cachedUltrasonicDirectory = UApp.applicationContext().getExternalFilesDir(null)!!
 
             return cachedUltrasonicDirectory!!
         }
@@ -353,14 +331,14 @@ object FileUtil {
      * @return The the directory name with special characters replaced by hyphens.
      */
     private fun fileSystemSafeDir(path: String?): String {
-        var filepath = path
-        if (filepath == null || filepath.trim { it <= ' ' }.isEmpty()) {
+        if (path == null || path.trim { it <= ' ' }.isEmpty()) {
             return ""
         }
+        var filepath: String = path
         for (s in FILE_SYSTEM_UNSAFE_DIR) {
-            filepath = filepath!!.replace(s, "-")
+            filepath = filepath.replace(s, "-")
         }
-        return filepath!!
+        return filepath
     }
 
     /**
@@ -449,14 +427,6 @@ object FileUtil {
         return path.substringBeforeLast('/')
     }
 
-    fun getPinnedFile(name: String): String {
-        val baseName = getBaseName(name)
-        if (baseName.endsWith(".partial") || baseName.endsWith(".complete")) {
-            return "${getBaseName(baseName)}.${getExtension(name)}"
-        }
-        return name
-    }
-
     /**
      * Returns the file name of a .complete file of the given file.
      *
@@ -476,7 +446,7 @@ object FileUtil {
             out.writeObject(obj)
             Timber.i("Serialized object to %s", file)
             true
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             Timber.w("Failed to serialize object to %s", file)
             false
         } finally {

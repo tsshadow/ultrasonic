@@ -13,7 +13,6 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.media.AudioManager
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.SearchRecentSuggestions
@@ -172,7 +171,7 @@ class NavigationActivity : ScopeActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val dest: String = try {
                 resources.getResourceName(destination.id)
-            } catch (ignored: Resources.NotFoundException) {
+            } catch (_: Resources.NotFoundException) {
                 destination.id.toString()
             }
             Timber.d("Navigated to $dest")
@@ -227,7 +226,7 @@ class NavigationActivity : ScopeActivity() {
 
         // Setup app shortcuts on supported devices, but not on first start, when the server
         // is not configured yet.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && !UApp.instance!!.isFirstRun) {
+        if (!UApp.instance!!.isFirstRun) {
             ShortcutUtil.registerShortcuts(this)
         }
 
@@ -255,7 +254,7 @@ class NavigationActivity : ScopeActivity() {
 
     fun setupSearchField(menu: Menu) {
         Timber.i("Recreating search field")
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchManager = getSystemService(SEARCH_SERVICE) as SearchManager
         val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem.actionView as SearchView
         val searchableInfo = searchManager.getSearchableInfo(this.componentName)
@@ -333,8 +332,7 @@ class NavigationActivity : ScopeActivity() {
     }
 
     private fun updateNavigationHeaderForServer() {
-        // Only show the vector graphic on Android 11 or earlier
-        val showVectorBackground = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
+        val showVectorBackground = false
 
         val activeServer = activeServerProvider.getActiveServer()
 

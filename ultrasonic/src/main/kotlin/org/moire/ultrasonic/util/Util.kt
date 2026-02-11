@@ -38,6 +38,7 @@ import androidx.annotation.AnyRes
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -200,9 +201,9 @@ object Util {
         }
     }
 
-    @Suppress("SuspiciousEqualsCombination")
+    @Deprecated("Use Kotlin standard == operator instead", ReplaceWith("object1 == object2"))
     fun equals(object1: Any?, object2: Any?): Boolean {
-        return object1 === object2 || !(object1 == null || object2 == null) && object1 == object2
+        return object1 == object2
     }
 
     /**
@@ -299,16 +300,14 @@ object Util {
 
     private fun isNetworkMetered(): Boolean {
         val connManager = connectivityManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val capabilities = connManager.getNetworkCapabilities(
-                connManager.activeNetwork
-            )
-            if (capabilities != null &&
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) &&
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
-            ) {
-                return false
-            }
+        val capabilities = connManager.getNetworkCapabilities(
+            connManager.activeNetwork
+        )
+        if (capabilities != null &&
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) &&
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+        ) {
+            return false
         }
         return connManager.isActiveNetworkMetered
     }
@@ -316,21 +315,13 @@ object Util {
     @Suppress("DEPRECATION")
     private fun isNetworkCellular(): Boolean {
         val connManager = connectivityManager
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network = connManager.activeNetwork
-                ?: return false // Nothing connected
-            connManager.getNetworkInfo(network)
-                ?: return true // Better be safe than sorry
-            val capabilities = connManager.getNetworkCapabilities(network)
-                ?: return true // Better be safe than sorry
-            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
-        } else {
-            // if the default network is a VPN,
-            // this method will return the NetworkInfo for one of its underlying networks
-            val info = connManager.activeNetworkInfo
-                ?: return false // Nothing connected
-            info.type == ConnectivityManager.TYPE_MOBILE
-        }
+        val network = connManager.activeNetwork
+            ?: return false // Nothing connected
+        connManager.getNetworkInfo(network)
+            ?: return true // Better be safe than sorry
+        val capabilities = connManager.getNetworkCapabilities(network)
+            ?: return true // Better be safe than sorry
+        return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
     }
 
     @JvmStatic
@@ -415,11 +406,6 @@ object Util {
         }
     }
 
-    fun getMinDisplayMetric(): Int {
-        val metrics = appContext().resources.displayMetrics
-        return min(metrics.widthPixels, metrics.heightPixels)
-    }
-
     fun getMaxDisplayMetric(): Int {
         val metrics = appContext().resources.displayMetrics
         return max(metrics.widthPixels, metrics.heightPixels)
@@ -498,20 +484,18 @@ object Util {
         importance: Int? = null,
         notificationManager: NotificationManagerCompat
     ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // The suggested importance of a startForeground service notification is IMPORTANCE_LOW
-            val channel = NotificationChannel(
-                id,
-                name,
-                importance ?: NotificationManager.IMPORTANCE_DEFAULT
-            )
+        // The suggested importance of a startForeground service notification is IMPORTANCE_LOW
+        val channel = NotificationChannel(
+            id,
+            name,
+            importance ?: NotificationManager.IMPORTANCE_DEFAULT
+        )
 
-            channel.lightColor = android.R.color.holo_blue_dark
-            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            channel.setShowBadge(false)
+        channel.lightColor = android.R.color.holo_blue_dark
+        channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        channel.setShowBadge(false)
 
-            notificationManager.createNotificationChannel(channel)
-        }
+        notificationManager.createNotificationChannel(channel)
     }
 
     fun ensurePermissionToPostNotification(
@@ -563,7 +547,7 @@ object Util {
             val packageName = context.packageName
             try {
                 versionName = pm.getPackageInfo(packageName, 0).versionName
-            } catch (ignored: PackageManager.NameNotFoundException) {
+            } catch (_: PackageManager.NameNotFoundException) {
             }
         }
         return versionName
@@ -577,7 +561,7 @@ object Util {
             val packageName = context.packageName
             try {
                 versionCode = pm.getPackageInfo(packageName, 0).versionCode
-            } catch (ignored: PackageManager.NameNotFoundException) {
+            } catch (_: PackageManager.NameNotFoundException) {
             }
         }
         return versionCode
@@ -614,12 +598,12 @@ object Util {
     }
 
     fun getUriToDrawable(context: Context, @AnyRes drawableId: Int): Uri {
-        return Uri.parse(
+        return (
             ContentResolver.SCHEME_ANDROID_RESOURCE +
                 "://" + context.resources.getResourcePackageName(drawableId) +
                 '/' + context.resources.getResourceTypeName(drawableId) +
                 '/' + context.resources.getResourceEntryName(drawableId)
-        )
+            ).toUri()
     }
 
     data class ReadableEntryDescription(
@@ -768,11 +752,7 @@ object Util {
     fun getPendingIntentToShowPlayer(context: Context): PendingIntent {
         val intent = Intent(context, NavigationActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        var flags = PendingIntent.FLAG_UPDATE_CURRENT
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // needed starting Android 12 (S = 31)
-            flags = flags or PendingIntent.FLAG_IMMUTABLE
-        }
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         intent.putExtra(Constants.INTENT_SHOW_PLAYER, true)
         return PendingIntent.getActivity(context, 0, intent, flags)
     }
@@ -805,12 +785,7 @@ object Util {
     }
 
     fun Service.stopForegroundRemoveNotification() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        }
+        stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
     fun dumpSettingsToLog() {

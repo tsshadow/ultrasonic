@@ -535,6 +535,8 @@
     <string name="result_count">Result count</string>
     <string name="reset">Reset</string>
     <string name="add">add</string>
+    <string name="tsshadow_add_format">+ %1$s</string>
+    <string name="tsshadow_select_format">Select %1$s</string>
     <string name="select_items">select items</string>
     <string name="lineup_default">Lineup</string>
     <string name="festival_lineup">Lineup</string>

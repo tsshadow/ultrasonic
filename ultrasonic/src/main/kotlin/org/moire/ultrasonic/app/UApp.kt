@@ -1,7 +1,6 @@
 package org.moire.ultrasonic.app
 
 import android.content.Context
-import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
@@ -11,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
 import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.di.appPermanentStorage
 import org.moire.ultrasonic.di.applicationModule
@@ -94,11 +92,6 @@ class UApp : MultiDexApplication() {
         }
     }
 
-    internal fun shutdownKoin() {
-        stopKoin()
-        initiated = false
-    }
-
     companion object {
         var instance: UApp? = null
 
@@ -114,16 +107,9 @@ private fun VmPolicy.Builder.detectAllExceptSocket(): VmPolicy.Builder {
     detectLeakedClosableObjects()
     detectLeakedRegistrationObjects()
     detectFileUriExposure()
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        detectContentUriWithoutPermission()
-    }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        detectCredentialProtectedWhileLocked()
-    }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        detectUnsafeIntentLaunch()
-        detectIncorrectContextUse()
-    }
+    detectContentUriWithoutPermission()
+    detectCredentialProtectedWhileLocked()
+    detectUnsafeIntentLaunch()
+    detectIncorrectContextUse()
     return this
 }

@@ -15,7 +15,6 @@ import java.util.Locale
 import org.moire.ultrasonic.api.subsonic.models.MusicDirectory as APIMusicDirectory
 import org.moire.ultrasonic.api.subsonic.models.MusicDirectoryChild
 import org.moire.ultrasonic.api.subsonic.models.genreNames
-import timber.log.Timber
 
 /*
  * Converts MusicDirectory entity from [org.moire.ultrasonic.api.subsonic.SubsonicAPIClient]
