@@ -11,11 +11,17 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MIXED
 import androidx.media3.common.Player
+import androidx.media3.session.LibraryResult
+import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
+import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.buildMediaItem
 import timber.log.Timber
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.collect.ImmutableList
 
 /**
  * @class MediaLibraryBase
@@ -33,7 +39,15 @@ import timber.log.Timber
  * @note This class should be extended by other media-related classes to ensure consistency
  * in handling media identifiers and playback operations.
  */
-abstract class MediaLibraryBase {
+abstract class MediaLibraryBase protected constructor() {
+    protected val activeServerProvider: ActiveServerProvider by inject(ActiveServerProvider::class.java)
+    protected val musicFolderId get() = activeServerProvider.getActiveServer().musicFolderId
+
+    protected fun emptyResult(reason: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        Timber.w("loadChildren(): %s", reason)
+        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.of<MediaItem>(), null))
+    }
+
     companion object {
         fun <T> callWithErrorHandling(function: () -> T): T? {
             // TODO Implement better error handling
@@ -44,6 +58,24 @@ abstract class MediaLibraryBase {
                 null
             }
         }
+
+        internal const val MAX_PAGE_SIZE = 500
+        internal const val DEFAULT_PAGE_SIZE = 50
+
+        internal const val INDEX_ID = 1
+        internal const val INDEX_NAME = 2
+        internal const val INDEX_SONG_ID = 3
+        internal const val INDEX_ALBUM_ID = 1
+        internal const val INDEX_ALBUM_NAME = 2
+        internal const val INDEX_PLAYLIST_ID = 1
+        internal const val INDEX_PLAYLIST_NAME = 2
+        internal const val INDEX_LENGTH = 1
+        internal const val INDEX_GENRE = 2
+        internal const val INDEX_YEAR = 3
+        internal const val INDEX_SORT_METHOD = 4
+        internal const val INDEX_FESTIVAL_LINEUP = 5
+        internal const val INDEX_RATING_MIN = 6
+        internal const val INDEX_RATING_MAX = 7
 
         // Media item extensions
         fun MutableList<MediaItem>.addPlayAllItem(mediaId: String) {

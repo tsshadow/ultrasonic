@@ -322,7 +322,7 @@ class MediaLibrarySessionCallback :
                 session.notifySearchResultChanged(browser, query, items.size, params)
 
                 LibraryResult.ofVoid()
-            } catch (e: Exception) {
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                 Timber.e(e, "Error during search")
                 LibraryResult.ofError(SessionError.ERROR_BAD_VALUE)
             }

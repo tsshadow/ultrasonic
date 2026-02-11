@@ -49,6 +49,7 @@ object FileUtil {
     const val SUFFIX_LARGE = ".jpeg"
     const val SUFFIX_SMALL = ".jpeg-small"
     private const val UNNAMED = "unnamed"
+    private const val HASH_LENGTH = 8
 
     fun getSongFile(track: Track): String {
         val dir = getAlbumDirectory(track)
@@ -80,7 +81,7 @@ object FileUtil {
             !sanitizedPath.contains(sanitizedArtist)
 
         if (needsUniqueSuffix) {
-            val hash = Util.md5Hex("${track.serverId}_${track.id}")?.substring(0, 8)
+            val hash = Util.md5Hex("${track.serverId}_${track.id}")?.substring(0, HASH_LENGTH)
             fileName.append('-').append(hash)
         }
 

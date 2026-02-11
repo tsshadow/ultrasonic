@@ -66,9 +66,6 @@ class MediaLibraryBrowser(
 ) : MediaLibraryBase() {
     lateinit var dataProvider: MediaLibraryDataProvider
 
-    private val activeServerProvider: ActiveServerProvider by inject(ActiveServerProvider::class.java)
-    private val musicFolderId get() = activeServerProvider.getActiveServer().musicFolderId
-
     /**
      * Called when a {@link MediaBrowser} requests the root {@link MediaItem} by {@link
      * MediaBrowser#getLibraryRoot(LibraryParams)}.
@@ -159,7 +156,7 @@ class MediaLibraryBrowser(
                     )
                 }
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -188,7 +185,7 @@ class MediaLibraryBrowser(
                     )
                 }
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -204,6 +201,7 @@ class MediaLibraryBrowser(
         return loadChildren(parentId, page, pageSize)
     }
 
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun loadChildren(
         parentId: String,
         page: Int,
@@ -212,7 +210,7 @@ class MediaLibraryBrowser(
         Timber.d("AutoMediaBrowserService onLoadChildren called. ParentId: %s", parentId)
         // ✅ Cap and sanitize page/pageSize
         val safePage = if (page < 0) 0 else page
-        val safePageSize = if (pageSize <= 0 || pageSize > 500) 50 else pageSize
+        val safePageSize = if (pageSize <= 0 || pageSize > MAX_PAGE_SIZE) DEFAULT_PAGE_SIZE else pageSize
 
         val parts = parentId.split('|')
         val action =
@@ -225,14 +223,14 @@ class MediaLibraryBrowser(
             MEDIA_LIVESETS_ID -> getLivesetsLibrary(UApp.applicationContext())
             MEDIA_ARTIST_ID -> getArtists()
             MEDIA_ARTIST_SECTION -> {
-                val section = parts.getOrNull(1)
+                val section = parts.getOrNull(INDEX_ID)
                 if (section != null) getArtists(section) else emptyResult("Missing section in $parentId")
             }
 
             MEDIA_ALBUM_ID -> getAlbums(AlbumListType.SORTED_BY_NAME)
             MEDIA_ALBUM_PAGE_ID -> {
-                val listType = parts.getOrNull(1)?.let { AlbumListType.fromName(it) }
-                val lPage = parts.getOrNull(2)?.toIntOrNull()
+                val listType = parts.getOrNull(INDEX_ID)?.let { AlbumListType.fromName(it) }
+                val lPage = parts.getOrNull(INDEX_NAME)?.toIntOrNull()
                 if (listType != null && lPage != null) getAlbums(listType, lPage)
                 else emptyResult("Invalid album page params in $parentId")
             }
@@ -245,33 +243,33 @@ class MediaLibraryBrowser(
             MEDIA_ALBUM_STARRED_ID -> getAlbums(AlbumListType.STARRED)
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
             MEDIA_SONG_RANDOM_ID -> {
-                val length = parts.getOrNull(1)
+                val length = parts.getOrNull(INDEX_LENGTH)
                 if (length != null) getSongs(length = length, sortMethod = "Random")
                 else emptyResult("Missing length in $parentId")
             }
 
             MEDIA_SONG_RECENT -> {
-                val length = parts.getOrNull(1)
+                val length = parts.getOrNull(INDEX_LENGTH)
                 if (length != null) getSongs(length = length, sortMethod = "AddedDesc")
                 else emptyResult("Missing length in $parentId")
             }
 
             MEDIA_GET_GENRES -> {
-                val length = parts.getOrNull(1)
+                val length = parts.getOrNull(INDEX_LENGTH)
                 if (length != null) getGenres(length) else emptyResult("Missing length in $parentId")
             }
 
             MEDIA_GET_YEARS -> {
-                val length = parts.getOrNull(1)
-                val genre = parts.getOrNull(2)
+                val length = parts.getOrNull(INDEX_LENGTH)
+                val genre = parts.getOrNull(INDEX_GENRE)
                 if (length != null && genre != null) getYears(length, genre)
                 else emptyResult("Missing length or genre in $parentId")
             }
 
             MEDIA_GET_SORT_METHOD -> {
-                val length = parts.getOrNull(1)
-                val genre = parts.getOrNull(2)
-                val year = parts.getOrNull(3)
+                val length = parts.getOrNull(INDEX_LENGTH)
+                val genre = parts.getOrNull(INDEX_GENRE)
+                val year = parts.getOrNull(INDEX_YEAR)
                 if (length != null && genre != null && year != null) getSortMethod(
                     length,
                     genre,
@@ -281,22 +279,22 @@ class MediaLibraryBrowser(
             }
 
             MEDIA_GET_SONGS_BY_GENRE -> {
-                val length = parts.getOrNull(1)
-                val genreList = parts.getOrNull(2)
+                val length = parts.getOrNull(INDEX_LENGTH)
+                val genreList = parts.getOrNull(INDEX_GENRE)
                     ?.takeIf { it.isNotBlank() }
                     ?.split(",")
                     ?: emptyList()
 
-                val yearList = parts.getOrNull(3)
+                val yearList = parts.getOrNull(INDEX_YEAR)
                     ?.takeIf { it.isNotBlank() }
                     ?.split(",")
                     ?.mapNotNull { it.toIntOrNull() }
                     ?: emptyList()
 
-                val sortMethod = parts.getOrNull(4)
-                val festivalLineup = parts.getOrNull(5)
-                val ratingMin = parts.getOrNull(6)?.toIntOrNull() ?: 0
-                val ratingMax = parts.getOrNull(7)?.toIntOrNull() ?: 5
+                val sortMethod = parts.getOrNull(INDEX_SORT_METHOD)
+                val festivalLineup = parts.getOrNull(INDEX_FESTIVAL_LINEUP)
+                val ratingMin = parts.getOrNull(INDEX_RATING_MIN)?.toIntOrNull() ?: 0
+                val ratingMax = parts.getOrNull(INDEX_RATING_MAX)?.toIntOrNull() ?: 5
 
                 if (length != null && sortMethod != null) {
                     getGenre(
@@ -306,7 +304,7 @@ class MediaLibraryBrowser(
                         sortMethod = sortMethod,
                         page = safePage,
                         pageSize = safePageSize,
-                        festivalLineup = festivalLineup ,
+                        festivalLineup = festivalLineup,
                         ratingMin = ratingMin,
                         ratingMax = ratingMax,
                     )
@@ -319,34 +317,34 @@ class MediaLibraryBrowser(
             MEDIA_BOOKMARK_ID -> getBookmarks()
             MEDIA_PODCAST_ID -> getPodcasts()
             MEDIA_PLAYLIST_ITEM -> {
-                val playlistId = parts.getOrNull(1)
-                val name = parts.getOrNull(2)
+                val playlistId = parts.getOrNull(INDEX_ID)
+                val name = parts.getOrNull(INDEX_NAME)
                 if (playlistId != null && name != null) getPlaylist(playlistId, name)
                 else emptyResult("Invalid playlist item in $parentId")
             }
 
             MEDIA_ARTIST_ITEM -> {
-                val artistId = parts.getOrNull(1)
-                val artistName = parts.getOrNull(2)
+                val artistId = parts.getOrNull(INDEX_ID)
+                val artistName = parts.getOrNull(INDEX_NAME)
                 if (artistId != null && artistName != null) getAlbumsForArtist(artistId, artistName)
                 else emptyResult("Invalid artist item in $parentId")
             }
 
             MEDIA_ALBUM_ITEM -> {
-                val albumId = parts.getOrNull(1)
-                val albumName = parts.getOrNull(2)
+                val albumId = parts.getOrNull(INDEX_ID)
+                val albumName = parts.getOrNull(INDEX_NAME)
                 if (albumId != null && albumName != null) getSongsForAlbum(albumId, albumName)
                 else emptyResult("Invalid album item in $parentId")
             }
 
             MEDIA_SHARE_ITEM -> {
-                val shareId = parts.getOrNull(1)
+                val shareId = parts.getOrNull(INDEX_ID)
                 if (shareId != null) getSongsForShare(shareId)
                 else emptyResult("Missing shareId in $parentId")
             }
 
             MEDIA_PODCAST_ITEM -> {
-                val podcastId = parts.getOrNull(1)
+                val podcastId = parts.getOrNull(INDEX_ID)
                 if (podcastId != null) getPodcastEpisodes(podcastId)
                 else emptyResult("Missing podcastId in $parentId")
             }
@@ -354,12 +352,6 @@ class MediaLibraryBrowser(
             else -> emptyResult("Unknown action in $parentId")
         }
     }
-
-    private fun emptyResult(reason: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.w("loadChildren(): %s", reason)
-        return Futures.immediateFuture(LibraryResult.ofItemList(listOf(), null))
-    }
-
 
     private fun getRootItems(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
@@ -400,7 +392,7 @@ class MediaLibraryBrowser(
             icon = R.drawable.ic_menu_playlists
         )
 
-        return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems, null))
+        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
     }
 
     private fun getLibrary(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
@@ -416,7 +408,7 @@ class MediaLibraryBrowser(
 
         presets.mapTo(mediaItems) { it.toMediaItem() }
 
-        return Futures.immediateFuture(LibraryResult.ofItemList(mediaItems, null))
+        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
     }
 
     private fun getSongsLibrary(context: Context): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
@@ -521,7 +513,7 @@ class MediaLibraryBrowser(
                     }
                 }
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -550,7 +542,7 @@ class MediaLibraryBrowser(
                         .joinToString("|")
                 )
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -606,7 +598,7 @@ class MediaLibraryBrowser(
                 }
             }
 
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -658,7 +650,7 @@ class MediaLibraryBrowser(
                 )
             }
 
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -679,7 +671,7 @@ class MediaLibraryBrowser(
                     mediaType = MEDIA_TYPE_PLAYLIST
                 )
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -717,7 +709,7 @@ class MediaLibraryBrowser(
                     )
                 }
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -762,7 +754,7 @@ class MediaLibraryBrowser(
                     )
                 }
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -791,7 +783,7 @@ class MediaLibraryBrowser(
                     mediaType = MEDIA_TYPE_PLAYLIST
                 )
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -833,7 +825,7 @@ class MediaLibraryBrowser(
                 )
 
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -864,7 +856,7 @@ class MediaLibraryBrowser(
                 )
             }
 
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -928,7 +920,7 @@ class MediaLibraryBrowser(
                 }
             }
 
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -958,7 +950,7 @@ class MediaLibraryBrowser(
                     )
                 }
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -986,7 +978,7 @@ class MediaLibraryBrowser(
                     )
                 }
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -1006,7 +998,7 @@ class MediaLibraryBrowser(
                     mediaType = MEDIA_TYPE_FOLDER_MIXED
                 )
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -1034,7 +1026,7 @@ class MediaLibraryBrowser(
                     mediaType = MEDIA_TYPE_FOLDER_MIXED
                 )
             }
-            return@future LibraryResult.ofItemList(mediaItems, null)
+            return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
 
@@ -1068,4 +1060,19 @@ class MediaLibraryBrowser(
         )
     }
 
+    companion object {
+        private const val MAX_PAGE_SIZE = 500
+        private const val DEFAULT_PAGE_SIZE = 50
+
+        private const val INDEX_LENGTH = 1
+        private const val INDEX_GENRE = 2
+        private const val INDEX_YEAR = 3
+        private const val INDEX_SORT_METHOD = 4
+        private const val INDEX_FESTIVAL_LINEUP = 5
+        private const val INDEX_RATING_MIN = 6
+        private const val INDEX_RATING_MAX = 7
+
+        private const val INDEX_ID = 1
+        private const val INDEX_NAME = 2
+    }
 }

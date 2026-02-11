@@ -5,8 +5,10 @@ import FilterState
 import TileInfo
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -209,7 +211,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
                 tiles = defaultTileSet()
                 TileStorage.saveTiles(requireContext(), tiles, pageKey)
             }
-        } catch (e: Exception) {
+        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Timber.e(e, "Failed to load saved tiles, falling back to defaults.")
             tiles = defaultTileSet()
             TileStorage.saveTiles(requireContext(), tiles, pageKey)
@@ -268,8 +270,7 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
     private fun calculateSpanCount(): Int {
         val displayMetrics = resources.displayMetrics
         val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
-        val desiredTileWidthDp = 120 + 12
-        return (screenWidthDp / desiredTileWidthDp).toInt().coerceAtLeast(2)
+        return (screenWidthDp / DESIRED_TILE_WIDTH_DP).toInt().coerceAtLeast(MIN_SPAN_COUNT)
     }
 
     private fun updateGridLayoutManager() {
@@ -280,5 +281,10 @@ abstract class SelectFragment : Fragment(), RefreshableFragment, TileAdapterCall
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         updateGridLayoutManager()
+    }
+
+    companion object {
+        private const val DESIRED_TILE_WIDTH_DP = 132
+        private const val MIN_SPAN_COUNT = 2
     }
 }

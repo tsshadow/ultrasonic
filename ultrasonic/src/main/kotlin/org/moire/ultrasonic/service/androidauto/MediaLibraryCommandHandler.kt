@@ -255,7 +255,7 @@ class MediaLibraryCommandHandler {
         Timber.d("shuffleCurrentPlaylist")
 
         // 3 was chosen because that leaves at least two other songs to be shuffled around
-        if (player.mediaItemCount < 3) {
+        if (player.mediaItemCount < MIN_ITEMS_TO_SHUFFLE) {
             return
         }
 
@@ -293,5 +293,9 @@ class MediaLibraryCommandHandler {
 
     fun canShuffleWrapper(session: MediaSession): Boolean {
         return session.canShuffle()
+    }
+
+    companion object {
+        private const val MIN_ITEMS_TO_SHUFFLE = 3
     }
 }

@@ -52,7 +52,7 @@ class TileAdapter(
             val gradient = GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
                 intArrayOf(tileInfoColors[index % tileInfoColors.size], Color.BLACK)
-            ).apply { cornerRadius = 24f }
+            ).apply { cornerRadius = TILE_CORNER_RADIUS }
             tileCard.background = gradient
         }
 
@@ -80,5 +80,9 @@ class TileAdapter(
         tiles.add(tile)
         saveTiles(context, tiles, pageKey)
         notifyItemInserted(tiles.size - 1)
+    }
+
+    companion object {
+        private const val TILE_CORNER_RADIUS = 24f
     }
 }

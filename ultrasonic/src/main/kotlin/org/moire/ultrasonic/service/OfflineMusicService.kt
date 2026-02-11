@@ -459,8 +459,8 @@ class OfflineMusicService : MusicService, KoinComponent {
                 "LENGTH" -> {
                     val value = filter.value.toString().lowercase(Locale.ROOT)
                     list = when (value) {
-                        "long" -> list.filter { (it.duration ?: 0) >= 600 }
-                        "short" -> list.filter { (it.duration ?: 0) < 600 }
+                        "long" -> list.filter { (it.duration ?: 0) >= LONG_SONG_THRESHOLD_SECONDS }
+                        "short" -> list.filter { (it.duration ?: 0) < LONG_SONG_THRESHOLD_SECONDS }
                         else -> list
                     }
                 }
@@ -1013,5 +1013,6 @@ class OfflineMusicService : MusicService, KoinComponent {
 
     companion object {
         private val COMPILE = Pattern.compile(" ")
+        private const val LONG_SONG_THRESHOLD_SECONDS = 600
     }
 }

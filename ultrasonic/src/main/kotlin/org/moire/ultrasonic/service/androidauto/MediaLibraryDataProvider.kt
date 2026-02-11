@@ -52,34 +52,34 @@ class MediaLibraryDataProvider(
 
         // TODO Media Artist item is missing!!!
         return when (mediaIdParts.first()) {
-            MEDIA_PLAYLIST_ITEM -> playbackController.playPlaylist(mediaIdParts[1], mediaIdParts[2])
+            MEDIA_PLAYLIST_ITEM -> playbackController.playPlaylist(mediaIdParts[INDEX_ID], mediaIdParts[INDEX_NAME])
             MEDIA_PLAYLIST_SONG_ITEM -> playbackController.playPlaylistSong(
-                mediaIdParts[1],
-                mediaIdParts[2],
-                mediaIdParts[3]
+                mediaIdParts[INDEX_ID],
+                mediaIdParts[INDEX_NAME],
+                mediaIdParts[INDEX_SONG_ID]
             )
 
-            MEDIA_ALBUM_ITEM -> playbackController.playAlbum(mediaIdParts[1], mediaIdParts[2])
+            MEDIA_ALBUM_ITEM -> playbackController.playAlbum(mediaIdParts[INDEX_ID], mediaIdParts[INDEX_NAME])
             MEDIA_ALBUM_SONG_ITEM -> playbackController.playAlbumSong(
-                mediaIdParts[1],
-                mediaIdParts[2],
-                mediaIdParts[3]
+                mediaIdParts[INDEX_ID],
+                mediaIdParts[INDEX_NAME],
+                mediaIdParts[INDEX_SONG_ID]
             )
 
             MEDIA_SONG_STARRED_ID -> playbackController.playStarredSongs()
-            MEDIA_SONG_STARRED_ITEM -> playbackController.playStarredSong(mediaIdParts[1])
+            MEDIA_SONG_STARRED_ITEM -> playbackController.playStarredSong(mediaIdParts[INDEX_ID])
             MEDIA_SONG_RANDOM_ID -> playbackController.playRandomSongs()
-            MEDIA_SONG_RANDOM_ITEM -> playbackController.playRandomSong(mediaIdParts[1])
-            MEDIA_SHARE_ITEM -> playbackController.playShare(mediaIdParts[1])
-            MEDIA_SHARE_SONG_ITEM -> playbackController.playShareSong(mediaIdParts[1], mediaIdParts[2])
-            MEDIA_BOOKMARK_ITEM -> playbackController.playBookmark(mediaIdParts[1])
-            MEDIA_PODCAST_ITEM -> playbackController.playPodcast(mediaIdParts[1])
+            MEDIA_SONG_RANDOM_ITEM -> playbackController.playRandomSong(mediaIdParts[INDEX_ID])
+            MEDIA_SHARE_ITEM -> playbackController.playShare(mediaIdParts[INDEX_ID])
+            MEDIA_SHARE_SONG_ITEM -> playbackController.playShareSong(mediaIdParts[INDEX_ID], mediaIdParts[INDEX_NAME])
+            MEDIA_BOOKMARK_ITEM -> playbackController.playBookmark(mediaIdParts[INDEX_ID])
+            MEDIA_PODCAST_ITEM -> playbackController.playPodcast(mediaIdParts[INDEX_ID])
             MEDIA_PODCAST_EPISODE_ITEM -> playbackController.playPodcastEpisode(
-                mediaIdParts[1],
-                mediaIdParts[2]
+                mediaIdParts[INDEX_ID],
+                mediaIdParts[INDEX_NAME]
             )
 
-            MEDIA_SEARCH_SONG_ITEM -> playbackController.playSearch(mediaIdParts[1])
+            MEDIA_SEARCH_SONG_ITEM -> playbackController.playSearch(mediaIdParts[INDEX_ID])
             else -> {
                 listOf()
             }

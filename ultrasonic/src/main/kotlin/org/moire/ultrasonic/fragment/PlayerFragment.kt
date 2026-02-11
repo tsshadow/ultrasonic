@@ -194,7 +194,6 @@ class PlayerFragment :
         _binding = null
         super.onDestroyView()
     }
-    private val binding get() = _binding!!
 
     private val viewAdapter: BaseAdapter<Identifiable> by lazy {
         BaseAdapter(allowDuplicateEntries = true)
@@ -257,18 +256,9 @@ class PlayerFragment :
         val width: Int
         val height: Int
 
-        @Suppress("DEPRECATION")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val bounds = windowManager.currentWindowMetrics.bounds
-            width = bounds.width()
-            height = bounds.height()
-        } else {
-            val display = windowManager.defaultDisplay
-            val size = Point()
-            display.getSize(size)
-            width = size.x
-            height = size.y
-        }
+        val bounds = windowManager.currentWindowMetrics.bounds
+        width = bounds.width()
+        height = bounds.height()
 
         // Register our options menu
         (requireActivity() as MenuHost).addMenuProvider(
@@ -1098,74 +1088,82 @@ class PlayerFragment :
         currentSong = mediaPlayerManager.currentMediaItem?.toTrack()
 
         scrollToCurrent()
+        updateSongMetadata()
+        updateMediaButtonActivationState()
+    }
+
+    private fun updateSongMetadata() {
         val totalDuration = mediaPlayerManager.playListDuration
         val totalSongs = mediaPlayerManager.playlistSize
         val currentSongIndex = mediaPlayerManager.currentMediaItemIndex + 1
         val duration = Util.formatTotalDuration(totalDuration)
         val trackFormat =
             String.format(Locale.getDefault(), "%d / %d", currentSongIndex, totalSongs)
+
         if (currentSong != null) {
             songTitleTextView.text = currentSong!!.title
             artistTextView.text = currentSong!!.artist
             albumTextView.text = currentSong!!.album
 
-
-            if (Settings.showNowPlayingDetails) {
-                val genres = currentSong?.genres
-                val genreString = if (!genres.isNullOrEmpty()) {
-                    genres.joinToString(", ")
-                } else {
-                    currentSong?.genre ?: ""
-                }
-                genreTextView.text = genreString
-                genreTextView.isVisible =
-                    (currentSong!!.genre != null && currentSong!!.genre!!.isNotBlank())
-                val dateText = currentSong!!.date ?: currentSong!!.year?.toString() ?: ""
-                releaseDateView.text = dateText
-                releaseDateView.isVisible = dateText.isNotBlank()
-                var bitRate = ""
-                if (currentSong!!.bitRate != null && currentSong!!.bitRate!! > 0) {
-                    bitRate = String.format(
-                        Util.appContext().getString(R.string.song_details_kbps),
-                        currentSong!!.bitRate
-                    )
-                }
-                bitrateFormatTextView.text = String.format(
-                    Locale.ROOT, "%s %s",
-                    bitRate, currentSong!!.suffix
-                )
-                bitrateFormatTextView.isVisible = true
-            } else {
-                genreTextView.isVisible = false
-                releaseDateView.isVisible = false
-                bitrateFormatTextView.isVisible = false
-            }
+            updateSongDetails()
 
             downloadTrackTextView.text = trackFormat
             downloadTotalDurationTextView.text = duration
             imageLoaderProvider.executeOn {
                 it.loadImage(albumArtImageView, currentSong, true, 0)
             }
-
-            updateSongRatingDisplay()
         } else {
-            currentSong = null
-            songTitleTextView.text = null
-            artistTextView.text = null
-            albumTextView.text = null
-            genreTextView.text = null
-            releaseDateView.isVisible = false
-            bitrateFormatTextView.text = null
-            downloadTrackTextView.text = null
-            downloadTotalDurationTextView.text = null
-            imageLoaderProvider.executeOn {
-                it.loadImage(albumArtImageView, null, true, 0)
-            }
+            clearSongMetadata()
         }
 
         updateSongRatingDisplay()
+    }
 
-        updateMediaButtonActivationState()
+    private fun updateSongDetails() {
+        if (Settings.showNowPlayingDetails) {
+            val genres = currentSong?.genres
+            val genreString = if (!genres.isNullOrEmpty()) {
+                genres.joinToString(", ")
+            } else {
+                currentSong?.genre ?: ""
+            }
+            genreTextView.text = genreString
+            genreTextView.isVisible =
+                (currentSong!!.genre != null && currentSong!!.genre!!.isNotBlank())
+            val dateText = currentSong!!.date ?: currentSong!!.year?.toString() ?: ""
+            releaseDateView.text = dateText
+            releaseDateView.isVisible = dateText.isNotBlank()
+            var bitRate = ""
+            if (currentSong!!.bitRate != null && currentSong!!.bitRate!! > 0) {
+                bitRate = String.format(
+                    Util.appContext().getString(R.string.song_details_kbps),
+                    currentSong!!.bitRate
+                )
+            }
+            bitrateFormatTextView.text = String.format(
+                Locale.ROOT, "%s %s",
+                bitRate, currentSong!!.suffix
+            )
+            bitrateFormatTextView.isVisible = true
+        } else {
+            genreTextView.isVisible = false
+            releaseDateView.isVisible = false
+            bitrateFormatTextView.isVisible = false
+        }
+    }
+
+    private fun clearSongMetadata() {
+        songTitleTextView.text = null
+        artistTextView.text = null
+        albumTextView.text = null
+        genreTextView.text = null
+        releaseDateView.isVisible = false
+        bitrateFormatTextView.text = null
+        downloadTrackTextView.text = null
+        downloadTotalDurationTextView.text = null
+        imageLoaderProvider.executeOn {
+            it.loadImage(albumArtImageView, null, true, 0)
+        }
     }
 
     private fun updateMediaButtonActivationState() {
