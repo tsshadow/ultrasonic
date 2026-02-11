@@ -1,10 +1,10 @@
 
 
 plugins {
-    id("com.google.devtools.ksp") version "2.1.21-2.0.1"
+    alias libs.plugins.ksp
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
+    alias(libs.plugins.kotlinSerialization)
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
 }
@@ -179,6 +179,7 @@ dependencies {
     implementation libs.rxAndroid
     implementation libs.multiType
     implementation libs.gridlayout
+    implementation libs.documentFile
 
     ksp libs.room
 
