@@ -8,10 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * A flexible filter model supporting both single and multi-value entries,
  * for use in Ultrasonic's REST API requests.
  */
-class Filter(
-    @JsonProperty("name") val name: String,
-    @JsonProperty("value") val value: Any
-) {
+class Filter(@JsonProperty("name") val name: String, @JsonProperty("value") val value: Any) {
     override fun toString(): String {
         val valueStr = when (value) {
             is String -> "\"$value\""
@@ -38,12 +35,10 @@ class Filters {
         add(filter)
     }
 
-    override fun toString(): String {
-        return if (filterItems.isNotEmpty()) {
-            filterItems.joinToString(prefix = "[", postfix = "]") { it.toString() }
-        } else {
-            ""
-        }
+    override fun toString(): String = if (filterItems.isNotEmpty()) {
+        filterItems.joinToString(prefix = "[", postfix = "]") { it.toString() }
+    } else {
+        ""
     }
 
     fun add(filter: Filter) {
@@ -56,14 +51,12 @@ class Filters {
 
     fun getAll(): List<Filter> = filterItems.toList()
 
-    fun sanitized(): Filters {
-        return Filters().apply {
-            for (filter in this) {
-                if (filter.value is String && filter.value.isNotBlank()) {
-                    add(filter)
-                } else if (filter.value is Collection<*> && filter.value.isNotEmpty()) {
-                    add(filter)
-                }
+    fun sanitized(): Filters = Filters().apply {
+        for (filter in this) {
+            if (filter.value is String && filter.value.isNotBlank()) {
+                add(filter)
+            } else if (filter.value is Collection<*> && filter.value.isNotEmpty()) {
+                add(filter)
             }
         }
     }

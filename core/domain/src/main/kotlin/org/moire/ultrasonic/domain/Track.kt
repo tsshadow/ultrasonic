@@ -49,26 +49,18 @@ data class Track(
     var userRating: Int? = null,
     var averageRating: Float? = null,
     override var name: String? = null
-) : Serializable, MusicDirectory.Child() {
-    fun setDuration(duration: Long) {
-        this.duration = duration.toInt()
-    }
+) : MusicDirectory.Child(),
+    Serializable {
 
-    companion object {
-        private const val serialVersionUID = -3339106650010798108L
-    }
-
-    fun compareTo(other: Track): Int {
-        return when {
-            this.closeness == other.closeness -> {
-                0
-            }
-            this.closeness > other.closeness -> {
-                -1
-            }
-            else -> {
-                1
-            }
+    fun compareTo(other: Track): Int = when {
+        this.closeness == other.closeness -> {
+            0
+        }
+        this.closeness > other.closeness -> {
+            -1
+        }
+        else -> {
+            1
         }
     }
 

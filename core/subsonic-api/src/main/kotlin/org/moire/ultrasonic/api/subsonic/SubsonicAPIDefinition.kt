@@ -16,9 +16,9 @@ import org.moire.ultrasonic.api.subsonic.response.GenresResponse
 import org.moire.ultrasonic.api.subsonic.response.GetAlbumList2Response
 import org.moire.ultrasonic.api.subsonic.response.GetAlbumListResponse
 import org.moire.ultrasonic.api.subsonic.response.GetAlbumResponse
+import org.moire.ultrasonic.api.subsonic.response.GetArtistInfo2Response
 import org.moire.ultrasonic.api.subsonic.response.GetArtistResponse
 import org.moire.ultrasonic.api.subsonic.response.GetArtistsResponse
-import org.moire.ultrasonic.api.subsonic.response.GetArtistInfo2Response
 import org.moire.ultrasonic.api.subsonic.response.GetIndexesResponse
 import org.moire.ultrasonic.api.subsonic.response.GetLyricsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetMusicDirectoryResponse

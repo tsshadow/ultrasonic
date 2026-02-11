@@ -5,11 +5,8 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions
 import org.moire.ultrasonic.api.subsonic.SubsonicError
 import org.moire.ultrasonic.api.subsonic.models.MusicDirectoryChild
 
-class GetSongsByYearResponse(
-    status: Status,
-    version: SubsonicAPIVersions,
-    error: SubsonicError?
-) : SubsonicResponse(status, version, error) {
+class GetSongsByYearResponse(status: Status, version: SubsonicAPIVersions, error: SubsonicError?) :
+    SubsonicResponse(status, version, error) {
     @JsonProperty("songsByYear")
     private val songsByYearList = SongsByYearWrapper()
 
