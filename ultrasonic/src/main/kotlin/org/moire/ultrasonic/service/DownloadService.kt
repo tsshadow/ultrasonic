@@ -60,7 +60,9 @@ private const val CHECK_INTERVAL = 5000L
  * actively aware of and isn’t a candidate for the system to kill when low on memory."
  *
  */
-class DownloadService : Service(), KoinComponent {
+class DownloadService :
+    Service(),
+    KoinComponent {
     private var scope: CoroutineScope? = null
     private val storageMonitor: ExternalStorageMonitor by inject()
     private val cacheCleaner: CacheCleaner by inject()
@@ -71,9 +73,7 @@ class DownloadService : Service(), KoinComponent {
     private var isShuttingDown = false
     private var retrying = false
 
-    override fun onBind(intent: Intent): IBinder {
-        return binder
-    }
+    override fun onBind(intent: Intent): IBinder = binder
 
     override fun onCreate() {
         super.onCreate()
@@ -306,21 +306,19 @@ class DownloadService : Service(), KoinComponent {
             }
         }
 
-        private fun removeDownloadedTracksFromList(tracks: List<Track>): List<Track> {
-            return tracks.filter { track ->
-                val pinnedFile = Storage.getFromPath(track.getPinnedFile())
-                val completeFile = Storage.getFromPath(track.getCompleteFile())
+        private fun removeDownloadedTracksFromList(tracks: List<Track>): List<Track> = tracks.filter { track ->
+            val pinnedFile = Storage.getFromPath(track.getPinnedFile())
+            val completeFile = Storage.getFromPath(track.getCompleteFile())
 
-                completeFile?.let {
-                    postState(track, DownloadState.DONE)
-                    false
-                }
-                pinnedFile?.let {
-                    postState(track, DownloadState.PINNED)
-                    false
-                }
-                true
+            completeFile?.let {
+                postState(track, DownloadState.DONE)
+                false
             }
+            pinnedFile?.let {
+                postState(track, DownloadState.PINNED)
+                false
+            }
+            true
         }
 
         private fun updateLiveData() {
@@ -526,9 +524,7 @@ class DownloadService : Service(), KoinComponent {
             return null
         }
 
-        fun PriorityBlockingQueue<DownloadableTrack>.contains(id: String): Boolean {
-            return (this.get(id) != null)
-        }
+        fun PriorityBlockingQueue<DownloadableTrack>.contains(id: String): Boolean = (this.get(id) != null)
     }
 }
 

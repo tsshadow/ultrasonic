@@ -18,17 +18,16 @@ import org.moire.ultrasonic.util.Util.ifNotNull
 
 internal val playlistDateFormat by lazy(NONE) { SimpleDateFormat.getInstance() }
 
-fun APIPlaylist.toMusicDirectoryDomainEntity(serverId: Int): MusicDirectory =
-    MusicDirectory().apply {
-        name = this@toMusicDirectoryDomainEntity.name
-        addAll(
-            this@toMusicDirectoryDomainEntity.entriesList.map {
-                val item = it.toTrackEntity(serverId)
-                item.serverId = serverId
-                item
-            }
-        )
-    }
+fun APIPlaylist.toMusicDirectoryDomainEntity(serverId: Int): MusicDirectory = MusicDirectory().apply {
+    name = this@toMusicDirectoryDomainEntity.name
+    addAll(
+        this@toMusicDirectoryDomainEntity.entriesList.map {
+            val item = it.toTrackEntity(serverId)
+            item.serverId = serverId
+            item
+        }
+    )
+}
 
 fun APIPlaylist.toDomainEntity(): Playlist = Playlist(
     this.id,

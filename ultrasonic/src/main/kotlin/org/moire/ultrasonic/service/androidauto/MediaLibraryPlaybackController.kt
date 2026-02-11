@@ -44,7 +44,6 @@ class MediaLibraryPlaybackController(
 ) : MediaLibraryBase() {
     lateinit var dataProvider: MediaLibraryDataProvider
 
-
     fun playRandomSongs(): List<Track>? {
         if (dataProvider.randomSongsCache == null) {
             // This can only happen if Android Auto cached items, but Ultrasonic has forgot them
@@ -88,7 +87,6 @@ class MediaLibraryPlaybackController(
         return null
     }
 
-
     fun playSearch(id: String): List<Track>? {
         // If there is no cache, we can't play the selected song.
         if (dataProvider.searchSongsCache != null) {
@@ -97,7 +95,6 @@ class MediaLibraryPlaybackController(
         }
         return null
     }
-
 
     fun playPlaylist(id: String, name: String): List<Track>? {
         Timber.d("playPlaylist")
@@ -141,7 +138,6 @@ class MediaLibraryPlaybackController(
         if (song != null) return listOf(song)
         return null
     }
-
 
     fun onAddLegacyAutoItems(
         mediaItems: MutableList<MediaItem>
@@ -196,7 +192,6 @@ class MediaLibraryPlaybackController(
             }
             ?: Futures.immediateFuture(mediaItems)
     }
-
 
     fun playFromSearch(query: String): ListenableFuture<List<MediaItem>> {
         Timber.w("App state: %s", UApp.instance != null)
@@ -299,7 +294,6 @@ class MediaLibraryPlaybackController(
         return null
     }
 
-
     fun playBookmark(id: String): List<Track>? {
         Timber.d("playBookmark")
         val bookmarks = serviceScope.future {
@@ -312,7 +306,6 @@ class MediaLibraryPlaybackController(
         }
         return null
     }
-
 
     fun playShare(id: String): List<Track>? {
         Timber.d("playShare")
@@ -338,5 +331,4 @@ class MediaLibraryPlaybackController(
         }
         return null
     }
-
 }

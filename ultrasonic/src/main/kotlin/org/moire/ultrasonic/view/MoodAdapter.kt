@@ -18,7 +18,8 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Mood
 
 class MoodAdapter(context: Context, moods: List<Mood>) :
-    ArrayAdapter<Mood?>(context, R.layout.list_item_generic, moods), SectionIndexer {
+    ArrayAdapter<Mood?>(context, R.layout.list_item_generic, moods),
+    SectionIndexer {
     private val layoutInflater: LayoutInflater
 
     // Both arrays are indexed by section ID.
@@ -46,17 +47,14 @@ class MoodAdapter(context: Context, moods: List<Mood>) :
         if (rowView == null) {
             rowView = layoutInflater.inflate(R.layout.list_item_generic, parent, false)
         }
-        (rowView as TextView?)!!.text = getItem(position)!!.name + " " + getItem(position)!!.songCount
+        (rowView as TextView?)!!.text =
+            getItem(position)!!.name + " " + getItem(position)!!.songCount
         return rowView!!
     }
 
-    override fun getSections(): Array<Any> {
-        return sections
-    }
+    override fun getSections(): Array<Any> = sections
 
-    override fun getPositionForSection(section: Int): Int {
-        return positions[section]
-    }
+    override fun getPositionForSection(section: Int): Int = positions[section]
 
     override fun getSectionForPosition(pos: Int): Int {
         for (i in 0 until sections.size - 1) {

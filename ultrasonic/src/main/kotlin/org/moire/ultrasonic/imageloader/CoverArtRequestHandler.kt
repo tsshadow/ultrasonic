@@ -20,11 +20,9 @@ import timber.log.Timber
  * Loads cover arts from subsonic api.
  */
 class CoverArtRequestHandler(private val client: SubsonicAPIClient) : RequestHandler() {
-    override fun canHandleRequest(data: Request): Boolean {
-        return with(data.uri) {
-            scheme == SCHEME &&
-                path == "/$COVER_ART_PATH"
-        }
+    override fun canHandleRequest(data: Request): Boolean = with(data.uri) {
+        scheme == SCHEME &&
+            path == "/$COVER_ART_PATH"
     }
 
     override fun load(request: Request, networkPolicy: Int): Result {

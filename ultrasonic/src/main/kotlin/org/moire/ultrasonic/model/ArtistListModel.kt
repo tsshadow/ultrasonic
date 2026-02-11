@@ -10,11 +10,11 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import java.text.Collator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.Collator
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.ArtistOrIndex
 import org.moire.ultrasonic.service.MusicService
@@ -42,7 +42,7 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
         isOffline: Boolean,
         useId3Tags: Boolean,
         musicService: MusicService,
-        refresh: Boolean,
+        refresh: Boolean
     ) {
         super.load(isOffline, useId3Tags, musicService, refresh)
 
@@ -77,7 +77,6 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
                 musicService.getIndexes(musicFolderId, refresh).drop(offset).take(count)
             }
 
-
             val sorted = result.sortedWith(comparator)
 
             val current = artists.value ?: emptyList()
@@ -89,11 +88,7 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
         }
     }
 
-
-
-    override fun showSelectFolderHeader(): Boolean {
-        return true
-    }
+    override fun showSelectFolderHeader(): Boolean = true
 
     companion object {
         val comparator: Comparator<ArtistOrIndex> =

@@ -14,19 +14,18 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_PLAYLIST
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
-import androidx.media3.common.util.UnstableApi
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.guava.future
-import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.api.subsonic.models.Filter
@@ -115,9 +114,7 @@ class MediaLibraryBrowser(
         )
     }
 
-    fun getItem(
-        mediaId: String
-    ): ListenableFuture<LibraryResult<MediaItem>> {
+    fun getItem(mediaId: String): ListenableFuture<LibraryResult<MediaItem>> {
         Timber.i("onGetItem")
 
         val tracks = dataProvider.tracksFromMediaId(mediaId)
@@ -210,7 +207,13 @@ class MediaLibraryBrowser(
         Timber.d("AutoMediaBrowserService onLoadChildren called. ParentId: %s", parentId)
         // ✅ Cap and sanitize page/pageSize
         val safePage = if (page < 0) 0 else page
-        val safePageSize = if (pageSize <= 0 || pageSize > MAX_PAGE_SIZE) DEFAULT_PAGE_SIZE else pageSize
+        val safePageSize = if (pageSize <= 0 ||
+            pageSize > MAX_PAGE_SIZE
+        ) {
+            DEFAULT_PAGE_SIZE
+        } else {
+            pageSize
+        }
 
         val parts = parentId.split('|')
         val action =
@@ -224,15 +227,24 @@ class MediaLibraryBrowser(
             MEDIA_ARTIST_ID -> getArtists()
             MEDIA_ARTIST_SECTION -> {
                 val section = parts.getOrNull(INDEX_ID)
-                if (section != null) getArtists(section) else emptyResult("Missing section in $parentId")
+                if (section !=
+                    null
+                ) {
+                    getArtists(section)
+                } else {
+                    emptyResult("Missing section in $parentId")
+                }
             }
 
             MEDIA_ALBUM_ID -> getAlbums(AlbumListType.SORTED_BY_NAME)
             MEDIA_ALBUM_PAGE_ID -> {
                 val listType = parts.getOrNull(INDEX_ID)?.let { AlbumListType.fromName(it) }
                 val lPage = parts.getOrNull(INDEX_NAME)?.toIntOrNull()
-                if (listType != null && lPage != null) getAlbums(listType, lPage)
-                else emptyResult("Invalid album page params in $parentId")
+                if (listType != null && lPage != null) {
+                    getAlbums(listType, lPage)
+                } else {
+                    emptyResult("Invalid album page params in $parentId")
+                }
             }
 
             MEDIA_PLAYLIST_ID -> getPlaylists()
@@ -244,38 +256,56 @@ class MediaLibraryBrowser(
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
             MEDIA_SONG_RANDOM_ID -> {
                 val length = parts.getOrNull(INDEX_LENGTH)
-                if (length != null) getSongs(length = length, sortMethod = "Random")
-                else emptyResult("Missing length in $parentId")
+                if (length != null) {
+                    getSongs(length = length, sortMethod = "Random")
+                } else {
+                    emptyResult("Missing length in $parentId")
+                }
             }
 
             MEDIA_SONG_RECENT -> {
                 val length = parts.getOrNull(INDEX_LENGTH)
-                if (length != null) getSongs(length = length, sortMethod = "AddedDesc")
-                else emptyResult("Missing length in $parentId")
+                if (length != null) {
+                    getSongs(length = length, sortMethod = "AddedDesc")
+                } else {
+                    emptyResult("Missing length in $parentId")
+                }
             }
 
             MEDIA_GET_GENRES -> {
                 val length = parts.getOrNull(INDEX_LENGTH)
-                if (length != null) getGenres(length) else emptyResult("Missing length in $parentId")
+                if (length !=
+                    null
+                ) {
+                    getGenres(length)
+                } else {
+                    emptyResult("Missing length in $parentId")
+                }
             }
 
             MEDIA_GET_YEARS -> {
                 val length = parts.getOrNull(INDEX_LENGTH)
                 val genre = parts.getOrNull(INDEX_GENRE)
-                if (length != null && genre != null) getYears(length, genre)
-                else emptyResult("Missing length or genre in $parentId")
+                if (length != null && genre != null) {
+                    getYears(length, genre)
+                } else {
+                    emptyResult("Missing length or genre in $parentId")
+                }
             }
 
             MEDIA_GET_SORT_METHOD -> {
                 val length = parts.getOrNull(INDEX_LENGTH)
                 val genre = parts.getOrNull(INDEX_GENRE)
                 val year = parts.getOrNull(INDEX_YEAR)
-                if (length != null && genre != null && year != null) getSortMethod(
-                    length,
-                    genre,
-                    year
-                )
-                else emptyResult("Missing sort params in $parentId")
+                if (length != null && genre != null && year != null) {
+                    getSortMethod(
+                        length,
+                        genre,
+                        year
+                    )
+                } else {
+                    emptyResult("Missing sort params in $parentId")
+                }
             }
 
             MEDIA_GET_SONGS_BY_GENRE -> {
@@ -306,7 +336,7 @@ class MediaLibraryBrowser(
                         pageSize = safePageSize,
                         festivalLineup = festivalLineup,
                         ratingMin = ratingMin,
-                        ratingMax = ratingMax,
+                        ratingMax = ratingMax
                     )
                 } else {
                     emptyResult("Invalid genre/song filter in $parentId")
@@ -319,34 +349,49 @@ class MediaLibraryBrowser(
             MEDIA_PLAYLIST_ITEM -> {
                 val playlistId = parts.getOrNull(INDEX_ID)
                 val name = parts.getOrNull(INDEX_NAME)
-                if (playlistId != null && name != null) getPlaylist(playlistId, name)
-                else emptyResult("Invalid playlist item in $parentId")
+                if (playlistId != null && name != null) {
+                    getPlaylist(playlistId, name)
+                } else {
+                    emptyResult("Invalid playlist item in $parentId")
+                }
             }
 
             MEDIA_ARTIST_ITEM -> {
                 val artistId = parts.getOrNull(INDEX_ID)
                 val artistName = parts.getOrNull(INDEX_NAME)
-                if (artistId != null && artistName != null) getAlbumsForArtist(artistId, artistName)
-                else emptyResult("Invalid artist item in $parentId")
+                if (artistId != null && artistName != null) {
+                    getAlbumsForArtist(artistId, artistName)
+                } else {
+                    emptyResult("Invalid artist item in $parentId")
+                }
             }
 
             MEDIA_ALBUM_ITEM -> {
                 val albumId = parts.getOrNull(INDEX_ID)
                 val albumName = parts.getOrNull(INDEX_NAME)
-                if (albumId != null && albumName != null) getSongsForAlbum(albumId, albumName)
-                else emptyResult("Invalid album item in $parentId")
+                if (albumId != null && albumName != null) {
+                    getSongsForAlbum(albumId, albumName)
+                } else {
+                    emptyResult("Invalid album item in $parentId")
+                }
             }
 
             MEDIA_SHARE_ITEM -> {
                 val shareId = parts.getOrNull(INDEX_ID)
-                if (shareId != null) getSongsForShare(shareId)
-                else emptyResult("Missing shareId in $parentId")
+                if (shareId != null) {
+                    getSongsForShare(shareId)
+                } else {
+                    emptyResult("Missing shareId in $parentId")
+                }
             }
 
             MEDIA_PODCAST_ITEM -> {
                 val podcastId = parts.getOrNull(INDEX_ID)
-                if (podcastId != null) getPodcastEpisodes(podcastId)
-                else emptyResult("Missing podcastId in $parentId")
+                if (podcastId != null) {
+                    getPodcastEpisodes(podcastId)
+                } else {
+                    emptyResult("Missing podcastId in $parentId")
+                }
             }
 
             else -> emptyResult("Unknown action in $parentId")
@@ -392,7 +437,9 @@ class MediaLibraryBrowser(
             icon = R.drawable.ic_menu_playlists
         )
 
-        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
+        return Futures.immediateFuture(
+            LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
+        )
     }
 
     private fun getLibrary(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
@@ -408,10 +455,14 @@ class MediaLibraryBrowser(
 
         presets.mapTo(mediaItems) { it.toMediaItem() }
 
-        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
+        return Futures.immediateFuture(
+            LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
+        )
     }
 
-    private fun getSongsLibrary(context: Context): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+    private fun getSongsLibrary(
+        context: Context
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("getSongsLibrary")
 
         val mediaItems: MutableList<MediaItem> = ArrayList()
@@ -420,7 +471,7 @@ class MediaLibraryBrowser(
             TileInfo("Search"),
             TileInfo("Recent"),
             TileInfo("Random", sortMethod = "Random"),
-            TileInfo("Starred", ratingMin = 5),
+            TileInfo("Starred", ratingMin = 5)
         )
 
         // Add hardcoded presets
@@ -433,10 +484,14 @@ class MediaLibraryBrowser(
         // Add favorite user-defined tiles
         savedFavoriteTiles.mapTo(mediaItems) { it.toMediaItem() }
 
-        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
+        return Futures.immediateFuture(
+            LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
+        )
     }
 
-    private fun getLivesetsLibrary(context: Context): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+    private fun getLivesetsLibrary(
+        context: Context
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("getSongsLibrary")
 
         val mediaItems: MutableList<MediaItem> = ArrayList()
@@ -445,7 +500,7 @@ class MediaLibraryBrowser(
             TileInfo("Search", length = "long"),
             TileInfo("Recent", length = "long"),
             TileInfo("Random", sortMethod = "Random", length = "long"),
-            TileInfo("Starred", ratingMin = 5, length = "long"),
+            TileInfo("Starred", ratingMin = 5, length = "long")
         )
 
         // Add hardcoded presets
@@ -458,7 +513,9 @@ class MediaLibraryBrowser(
         // Add favorite user-defined tiles
         savedFavoriteTiles.mapTo(mediaItems) { it.toMediaItem() }
 
-        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
+        return Futures.immediateFuture(
+            LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
+        )
     }
 
     private fun getArtists(
@@ -769,7 +826,6 @@ class MediaLibraryBrowser(
                 callWithErrorHandling { musicService.getGenres(true, null, length) }
             }.await()
 
-
             if (genres != null) {
                 genres = genres.sortedByDescending { genre -> genre.songCount }
             }
@@ -798,7 +854,8 @@ class MediaLibraryBrowser(
             var years = serviceScope.future {
                 callWithErrorHandling {
                     musicService.getTags(
-                        true, "YEAR",
+                        true,
+                        "YEAR",
                         year = null,
                         length = length
                     )
@@ -823,7 +880,6 @@ class MediaLibraryBrowser(
                     isBrowsable = true,
                     mediaType = MEDIA_TYPE_PLAYLIST
                 )
-
             }
             return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
@@ -832,13 +888,12 @@ class MediaLibraryBrowser(
     private fun getSortMethod(
         length: String?,
         genre: String?,
-        year: String?,
+        year: String?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         Timber.i("getSortMethod: genre=$genre length=$length year=$year")
         return mainScope.future {
-
             val sortMethods = mapOf(
                 "Willekeurig" to "Random",
                 "Release datum" to "DateDescAndRelease",
@@ -872,7 +927,9 @@ class MediaLibraryBrowser(
         ratingMax: Int? = 5
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
-        Timber.i("getGenre: genres=$genres years=$years length=$length page=$page pageSize=$pageSize")
+        Timber.i(
+            "getGenre: genres=$genres years=$years length=$length page=$page pageSize=$pageSize"
+        )
 
         return mainScope.future {
             val songs = serviceScope.future {
@@ -923,8 +980,6 @@ class MediaLibraryBrowser(
             return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         }
     }
-
-
 
     private fun getStarredSongs(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
@@ -1008,7 +1063,6 @@ class MediaLibraryBrowser(
         return section.toString()
     }
 
-
     private fun getShares(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.d("getShares")
         val mediaItems: MutableList<MediaItem> = ArrayList()
@@ -1046,8 +1100,11 @@ class MediaLibraryBrowser(
         }
 
         val groupName = context.getString(
-            if (length == "long") R.string.main_livesets_title
-            else R.string.main_songs_title
+            if (length == "long") {
+                R.string.main_livesets_title
+            } else {
+                R.string.main_songs_title
+            }
         )
 
         return buildMediaItem(

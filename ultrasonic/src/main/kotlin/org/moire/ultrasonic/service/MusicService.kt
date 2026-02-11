@@ -6,6 +6,7 @@
  */
 package org.moire.ultrasonic.service
 
+import java.io.InputStream
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.domain.Album
@@ -29,7 +30,6 @@ import org.moire.ultrasonic.domain.Tag
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.domain.UserInfo
 import org.moire.ultrasonic.domain.Year
-import java.io.InputStream
 
 @Suppress("TooManyFunctions")
 interface MusicService {

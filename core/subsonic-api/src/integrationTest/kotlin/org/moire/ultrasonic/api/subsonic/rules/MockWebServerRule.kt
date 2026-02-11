@@ -11,15 +11,14 @@ import org.junit.runners.model.Statement
 class MockWebServerRule : TestRule {
     val mockWebServer = MockWebServer()
 
-    override fun apply(base: Statement?, description: Description?): Statement =
-        object : Statement() {
-            override fun evaluate() {
-                try {
-                    mockWebServer.start()
-                    base?.evaluate()
-                } finally {
-                    mockWebServer.shutdown()
-                }
+    override fun apply(base: Statement?, description: Description?): Statement = object : Statement() {
+        override fun evaluate() {
+            try {
+                mockWebServer.start()
+                base?.evaluate()
+            } finally {
+                mockWebServer.shutdown()
             }
         }
+    }
 }

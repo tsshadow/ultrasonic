@@ -38,8 +38,6 @@ fun APIArtist.toMusicDirectoryDomainEntity(serverId: Int): MusicDirectory = Musi
     )
 }
 
-fun APIArtist.toDomainEntityList(serverId: Int): List<Album> {
-    return this.albumsList
-        .filter { it.id != "no_album" || it.songCount > 0 }
-        .map { it.toDomainEntity(serverId) }
-}
+fun APIArtist.toDomainEntityList(serverId: Int): List<Album> = this.albumsList
+    .filter { it.id != "no_album" || it.songCount > 0 }
+    .map { it.toDomainEntity(serverId) }

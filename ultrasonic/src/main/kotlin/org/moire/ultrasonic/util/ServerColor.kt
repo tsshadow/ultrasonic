@@ -22,12 +22,10 @@ private const val LUMINANCE_CORRECTION = -0.25
 object ServerColor {
 
     @ColorInt
-    fun getBackgroundColor(context: Context, serverColor: Int?): Int {
-        return if (serverColor != null) {
-            MaterialColors.harmonizeWithPrimary(context, serverColor)
-        } else {
-            MaterialColors.getColor(context, android.R.attr.colorPrimary, "")
-        }
+    fun getBackgroundColor(context: Context, serverColor: Int?): Int = if (serverColor != null) {
+        MaterialColors.harmonizeWithPrimary(context, serverColor)
+    } else {
+        MaterialColors.getColor(context, android.R.attr.colorPrimary, "")
     }
 
     @ColorInt

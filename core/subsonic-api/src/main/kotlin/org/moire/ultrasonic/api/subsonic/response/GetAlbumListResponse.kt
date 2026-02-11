@@ -5,8 +5,7 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions
 import org.moire.ultrasonic.api.subsonic.SubsonicError
 import org.moire.ultrasonic.api.subsonic.models.Album
 
-class GetAlbumListResponse(status: Status, version: SubsonicAPIVersions, error: SubsonicError?) :
-    SubsonicResponse(status, version, error) {
+class GetAlbumListResponse(status: Status, version: SubsonicAPIVersions, error: SubsonicError?) : SubsonicResponse(status, version, error) {
     @JsonProperty("albumList")
     private val albumWrapper = AlbumWrapper()
 

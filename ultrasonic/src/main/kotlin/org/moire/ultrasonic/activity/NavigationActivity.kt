@@ -247,9 +247,7 @@ class NavigationActivity : ScopeActivity() {
             inflater.inflate(R.menu.search_view_menu, menu)
         }
 
-        override fun onMenuItemSelected(item: MenuItem): Boolean {
-            return false
-        }
+        override fun onMenuItemSelected(item: MenuItem): Boolean = false
     }
 
     fun setupSearchField(menu: Menu) {
@@ -443,15 +441,11 @@ class NavigationActivity : ScopeActivity() {
         return retValue
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return item.onNavDestinationSelected(findNavController(R.id.nav_host_fragment)) ||
-            super.onOptionsItemSelected(item)
-    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = item.onNavDestinationSelected(findNavController(R.id.nav_host_fragment)) ||
+        super.onOptionsItemSelected(item)
 
     // TODO: Why is this needed? Shouldn't it just work by default?
-    override fun onSupportNavigateUp(): Boolean {
-        return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
-    }
+    override fun onSupportNavigateUp(): Boolean = findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)

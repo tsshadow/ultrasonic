@@ -11,10 +11,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color.argb
-import android.graphics.Point
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -94,9 +92,9 @@ import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.fragment.PlayerFragmentDirections
+import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.MediaPlayerManager
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
-import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
@@ -183,6 +181,8 @@ class PlayerFragment :
     private lateinit var fullStarDrawable: Drawable
 
     private var _binding: CurrentPlayingBinding? = null
+    private val binding: CurrentPlayingBinding
+        get() = _binding!!
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -210,7 +210,7 @@ class PlayerFragment :
         savedInstanceState: Bundle?
     ): View {
         _binding = CurrentPlayingBinding.inflate(inflater, container, false)
-        return _binding!!.root
+        return binding.root
     }
 
     // TODO: Switch them all over to use the view binding
@@ -516,9 +516,7 @@ class PlayerFragment :
             menuInflater.inflate(R.menu.nowplaying, menu)
         }
 
-        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-            return menuItemSelected(menuItem.itemId, currentSong)
-        }
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean = menuItemSelected(menuItem.itemId, currentSong)
     }
 
     @Suppress("ComplexMethod", "LongMethod", "NestedBlockDepth")
@@ -999,9 +997,7 @@ class PlayerFragment :
                 viewHolder.itemView.alpha = 1.0f
             }
 
-            override fun isLongPressDragEnabled(): Boolean {
-                return false
-            }
+            override fun isLongPressDragEnabled(): Boolean = false
 
             override fun onChildDraw(
                 canvas: Canvas,
@@ -1141,8 +1137,10 @@ class PlayerFragment :
                 )
             }
             bitrateFormatTextView.text = String.format(
-                Locale.ROOT, "%s %s",
-                bitRate, currentSong!!.suffix
+                Locale.ROOT,
+                "%s %s",
+                bitRate,
+                currentSong!!.suffix
             )
             bitrateFormatTextView.isVisible = true
         } else {
@@ -1259,9 +1257,7 @@ class PlayerFragment :
         }
     }
 
-    override fun onDown(me: MotionEvent): Boolean {
-        return false
-    }
+    override fun onDown(me: MotionEvent): Boolean = false
 
     @Suppress("ReturnCount")
     override fun onFling(
@@ -1313,14 +1309,10 @@ class PlayerFragment :
         e2: MotionEvent,
         distanceX: Float,
         distanceY: Float
-    ): Boolean {
-        return false
-    }
+    ): Boolean = false
 
     override fun onShowPress(e: MotionEvent) {}
-    override fun onSingleTapUp(e: MotionEvent): Boolean {
-        return false
-    }
+    override fun onSingleTapUp(e: MotionEvent): Boolean = false
 
     private fun updateSongRatingDisplay() {
         val rating = currentSong?.userRating ?: 0
@@ -1332,9 +1324,7 @@ class PlayerFragment :
         fiveStar5ImageView.setImageDrawable(getStarForRating(rating, 4))
     }
 
-    private fun getStarForRating(rating: Int, position: Int): Drawable {
-        return if (rating > position) fullStarDrawable else hollowStarDrawable
-    }
+    private fun getStarForRating(rating: Int, position: Int): Drawable = if (rating > position) fullStarDrawable else hollowStarDrawable
 
     private fun setLayerDrawableColors(drawable: LayerDrawable) {
         drawable.apply {

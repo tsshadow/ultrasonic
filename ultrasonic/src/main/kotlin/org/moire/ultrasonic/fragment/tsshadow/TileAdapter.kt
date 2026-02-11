@@ -1,6 +1,7 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
 import TileInfo
+import TileStorage.saveTiles
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -11,11 +12,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
-import org.moire.ultrasonic.R
-import TileStorage.saveTiles
 import genreIconMap
-import tileInfoColors
 import navigateToGenre
+import org.moire.ultrasonic.R
+import tileInfoColors
 
 interface TileAdapterCallback {
     fun onEditTile(tile: TileInfo, position: Int)
@@ -57,7 +57,8 @@ class TileAdapter(
         }
 
         private fun setupIconAndText(tile: TileInfo) {
-            val iconRes = genreIconMap[tile.genre?.firstOrNull()] ?: R.drawable.baseline_music_note_24
+            val iconRes =
+                genreIconMap[tile.genre?.firstOrNull()] ?: R.drawable.baseline_music_note_24
             tileIcon.setImageResource(iconRes)
             tileIcon.contentDescription = tile.genre?.firstOrNull() ?: tile.title
             tileText.text = tile.title

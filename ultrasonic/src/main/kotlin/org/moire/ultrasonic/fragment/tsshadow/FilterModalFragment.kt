@@ -5,22 +5,22 @@ import FilterState
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.BundleCompat
+import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.setFragmentResult
-import androidx.core.os.BundleCompat
-import androidx.core.os.bundleOf
 import com.google.android.material.chip.Chip
 import com.google.android.material.slider.Slider
-import org.moire.ultrasonic.databinding.TsshadowFiltersBinding
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.databinding.TsshadowFiltersBinding
 
 enum class FilterModalType { SONG, LIVESET }
 
@@ -73,25 +73,29 @@ class FilterModalFragment : BottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.UltrasonicFilterDialogTheme)
-        modalType = BundleCompat.getSerializable(requireArguments(), ARG_TYPE, FilterModalType::class.java)!!
+        modalType =
+            BundleCompat.getSerializable(
+                requireArguments(),
+                ARG_TYPE,
+                FilterModalType::class.java
+            )!!
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?) =
-        BottomSheetDialog(requireContext(), theme).apply {
-            setOnShowListener {
-                val dialog = this
-                val bottomSheet = dialog.findViewById<View>(
-                    com.google.android.material.R.id.design_bottom_sheet
-                )
-                bottomSheet?.let {
-                    val behavior = BottomSheetBehavior.from(it)
-                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    behavior.peekHeight = resources.displayMetrics.heightPixels
-                    it.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                    it.requestLayout()
-                }
+    override fun onCreateDialog(savedInstanceState: Bundle?) = BottomSheetDialog(requireContext(), theme).apply {
+        setOnShowListener {
+            val dialog = this
+            val bottomSheet = dialog.findViewById<View>(
+                com.google.android.material.R.id.design_bottom_sheet
+            )
+            bottomSheet?.let {
+                val behavior = BottomSheetBehavior.from(it)
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                behavior.peekHeight = resources.displayMetrics.heightPixels
+                it.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                it.requestLayout()
             }
         }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -164,14 +168,13 @@ class FilterModalFragment : BottomSheetDialogFragment() {
                 favoriteButton.setImageResource(iconRes)
             }
         }
-
-
     }
 
     private fun sendResult(action: String) {
         val filters = collectFilterState()
         setFragmentResult(
-            "filters_result", bundleOf(
+            "filters_result",
+            bundleOf(
                 "filters" to filters,
                 "action" to action
             )
@@ -299,10 +302,16 @@ class FilterModalFragment : BottomSheetDialogFragment() {
             } else if (lineups != null) {
                 val addChip =
                     layoutInflater.inflate(R.layout.tsshadow_chip_add, group, false) as Chip
-                addChip.text = getString(R.string.tsshadow_add_format, getString(R.string.festival_lineup))
+                addChip.text =
+                    getString(R.string.tsshadow_add_format, getString(R.string.festival_lineup))
                 addChip.setOnClickListener {
                     AlertDialog.Builder(requireContext())
-                        .setTitle(getString(R.string.tsshadow_select_format, getString(R.string.festival_lineup)))
+                        .setTitle(
+                            getString(
+                                R.string.tsshadow_select_format,
+                                getString(R.string.festival_lineup)
+                            )
+                        )
                         .setItems(lineups.toTypedArray()) { _, which ->
                             selectedFestivalLineup = lineups[which]
                             redrawAllChips(genres, years, labels, lineups, festivals)
@@ -319,7 +328,13 @@ class FilterModalFragment : BottomSheetDialogFragment() {
     }
 
     private fun applyInitialFilters() {
-        val filters = BundleCompat.getParcelable(requireArguments(), ARG_INITIAL_FILTERS, FilterState::class.java) ?: return
+        val filters =
+            BundleCompat.getParcelable(
+                requireArguments(),
+                ARG_INITIAL_FILTERS,
+                FilterState::class.java
+            )
+                ?: return
         binding.selectTitle.setText(filters.title)
         selectedGenres.addAll(filters.genres)
         selectedYears.addAll(filters.years)
@@ -339,7 +354,6 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         sortOptions.indexOfFirst { it.second == filters.sortMethod }
             .takeIf { it >= 0 }
             ?.let { binding.selectSortMethod.setSelection(it) }
-
 
         val isEdit = arguments?.getBoolean(ARG_EDIT_MODE)!!
         binding.save.visibility = if (isEdit) GONE else VISIBLE

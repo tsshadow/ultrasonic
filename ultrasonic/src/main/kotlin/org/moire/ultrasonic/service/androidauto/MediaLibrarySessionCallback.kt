@@ -77,7 +77,6 @@ class MediaLibrarySessionCallback :
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val mainScope = CoroutineScope(Dispatchers.Main)
 
-
     private val musicService get() = MusicServiceFactory.getMusicService()
     private var dataProvider: MediaLibraryDataProvider =
         MediaLibraryDataProvider(serviceScope = serviceScope, musicService = musicService)
@@ -96,7 +95,6 @@ class MediaLibrarySessionCallback :
         mediaLibrarBrowser.dataProvider = dataProvider
         commandHandler.initialize()
     }
-
 
     @OptIn(UnstableApi::class)
     override fun onPlaybackResumption(
@@ -131,7 +129,6 @@ class MediaLibrarySessionCallback :
             }
         }
     }
-
 
     override fun onCustomCommand(
         session: MediaSession,
@@ -277,11 +274,11 @@ class MediaLibrarySessionCallback :
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,
         params: MediaLibraryService.LibraryParams?
-    ): ListenableFuture<LibraryResult<MediaItem>> {
-        return this.mediaLibrarBrowser.getLibraryRoot(
-            session, browser, params
-        )
-    }
+    ): ListenableFuture<LibraryResult<MediaItem>> = this.mediaLibrarBrowser.getLibraryRoot(
+        session,
+        browser,
+        params
+    )
 
     @OptIn(UnstableApi::class)
     override fun onGetChildren(
@@ -291,19 +288,14 @@ class MediaLibrarySessionCallback :
         page: Int,
         pageSize: Int,
         params: MediaLibraryService.LibraryParams?
-    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        return mediaLibrarBrowser.getChildren(session, browser, parentId, page, pageSize, params)
-    }
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> = mediaLibrarBrowser.getChildren(session, browser, parentId, page, pageSize, params)
 
     @OptIn(UnstableApi::class)
     override fun onGetItem(
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,
         mediaId: String
-    ): ListenableFuture<LibraryResult<MediaItem>> {
-        return mediaLibrarBrowser.getItem(mediaId)
-    }
-
+    ): ListenableFuture<LibraryResult<MediaItem>> = mediaLibrarBrowser.getItem(mediaId)
 
     @OptIn(UnstableApi::class)
     override fun onSearch(
@@ -346,10 +338,16 @@ class MediaLibrarySessionCallback :
             val to = if (pageSize > 0) (from + pageSize).coerceAtMost(all.size) else all.size
             val pageItems = if (from < to) all.subList(from, to) else emptyList()
 
-            Timber.d("onGetSearchResult: total=%d from=%d to=%d returning=%d",
-                all.size, from, to, pageItems.size)
+            Timber.d(
+                "onGetSearchResult: total=%d from=%d to=%d returning=%d",
+                all.size,
+                from,
+                to,
+                pageItems.size
+            )
             pageItems.forEachIndexed { i, item ->
-                Timber.d("result[%d]: id=%s title=%s browsable=%s playable=%s mediaType=%s",
+                Timber.d(
+                    "result[%d]: id=%s title=%s browsable=%s playable=%s mediaType=%s",
                     i,
                     item.mediaId,
                     item.mediaMetadata.title,
@@ -377,7 +375,11 @@ class MediaLibrarySessionCallback :
                 mediaItems.add(
                     buildFolderItem(
                         title = artist.name ?: "",
-                        mediaId = listOf(MEDIA_ARTIST_ITEM, artist.id, artist.name).joinToString("|"),
+                        mediaId = listOf(
+                            MEDIA_ARTIST_ITEM,
+                            artist.id,
+                            artist.name
+                        ).joinToString("|"),
                         folderMixed = true
                     )
                 )
@@ -388,7 +390,11 @@ class MediaLibrarySessionCallback :
                 mediaItems.add(
                     buildFolderItem(
                         title = album.title ?: (album.name ?: ""),
-                        mediaId = listOf(MEDIA_ALBUM_ITEM, album.id, album.name ?: album.title ?: "").joinToString("|"),
+                        mediaId = listOf(
+                            MEDIA_ALBUM_ITEM,
+                            album.id,
+                            album.name ?: album.title ?: ""
+                        ).joinToString("|"),
                         folderMixed = false
                     )
                 )
@@ -408,11 +414,7 @@ class MediaLibrarySessionCallback :
         return mediaItems
     }
 
-    private fun buildFolderItem(
-        title: String,
-        mediaId: String,
-        folderMixed: Boolean
-    ): MediaItem {
+    private fun buildFolderItem(title: String, mediaId: String, folderMixed: Boolean): MediaItem {
         val metadata = MediaMetadata.Builder()
             .setTitle(title)
             .setIsBrowsable(true)
@@ -429,9 +431,7 @@ class MediaLibrarySessionCallback :
             .build()
     }
 
-    fun getCommandHelper(): MediaLibraryCommandHandler {
-        return commandHandler
-    }
+    fun getCommandHelper(): MediaLibraryCommandHandler = commandHandler
 
     override fun onConnect(
         session: MediaSession,

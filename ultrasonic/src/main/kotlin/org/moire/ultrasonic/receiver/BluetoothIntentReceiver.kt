@@ -104,19 +104,18 @@ class BluetoothIntentReceiver : BroadcastReceiver() {
     private fun BluetoothDevice?.getNameSafely(): String? {
         val hasPermission = (
             ActivityCompat.checkSelfPermission(
-                UApp.applicationContext(), Manifest.permission.BLUETOOTH_CONNECT
+                UApp.applicationContext(),
+                Manifest.permission.BLUETOOTH_CONNECT
             ) == PackageManager.PERMISSION_GRANTED
             )
 
         return if (hasPermission) this?.name else "Unknown"
     }
 
-    private fun Intent.getBluetoothDevice(): BluetoothDevice? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-        }
+    private fun Intent.getBluetoothDevice(): BluetoothDevice? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+    } else {
+        @Suppress("DEPRECATION")
+        getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
     }
 }

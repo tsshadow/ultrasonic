@@ -95,9 +95,7 @@ class UApp : MultiDexApplication() {
     companion object {
         var instance: UApp? = null
 
-        fun applicationContext(): Context {
-            return instance!!.applicationContext
-        }
+        fun applicationContext(): Context = instance!!.applicationContext
     }
 }
 

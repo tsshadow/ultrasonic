@@ -1,5 +1,5 @@
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
 class FilterOptionsViewModel : ViewModel() {
     val genres = MutableLiveData<List<String>>()

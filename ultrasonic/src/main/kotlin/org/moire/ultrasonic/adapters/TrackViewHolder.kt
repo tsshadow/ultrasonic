@@ -331,9 +331,7 @@ class TrackViewHolder(val view: View) :
         updateBackground()
     }
 
-    override fun isChecked(): Boolean {
-        return isCheckedInternal
-    }
+    override fun isChecked(): Boolean = isCheckedInternal
 
     override fun toggle() {
         setChecked(!isCheckedInternal)

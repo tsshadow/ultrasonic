@@ -12,6 +12,9 @@ import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MIXED
 import androidx.media3.common.Player
 import androidx.media3.session.LibraryResult
+import com.google.common.collect.ImmutableList
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
 import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
@@ -19,9 +22,6 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.buildMediaItem
 import timber.log.Timber
-import com.google.common.util.concurrent.Futures
-import com.google.common.util.concurrent.ListenableFuture
-import com.google.common.collect.ImmutableList
 
 /**
  * @class MediaLibraryBase
@@ -40,12 +40,18 @@ import com.google.common.collect.ImmutableList
  * in handling media identifiers and playback operations.
  */
 abstract class MediaLibraryBase protected constructor() {
-    protected val activeServerProvider: ActiveServerProvider by inject(ActiveServerProvider::class.java)
+    protected val activeServerProvider: ActiveServerProvider by inject(
+        ActiveServerProvider::class.java
+    )
     protected val musicFolderId get() = activeServerProvider.getActiveServer().musicFolderId
 
-    protected fun emptyResult(reason: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+    protected fun emptyResult(
+        reason: String
+    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         Timber.w("loadChildren(): %s", reason)
-        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.of<MediaItem>(), null))
+        return Futures.immediateFuture(
+            LibraryResult.ofItemList(ImmutableList.of<MediaItem>(), null)
+        )
     }
 
     companion object {
@@ -87,7 +93,6 @@ abstract class MediaLibraryBase protected constructor() {
                 icon = R.drawable.media_start
             )
         }
-
 
         fun MutableList<MediaItem>.add(
             resId: String,
@@ -167,7 +172,6 @@ abstract class MediaLibraryBase protected constructor() {
 
             this.add(mediaItem)
         }
-
 
         fun Player.setNextRepeatMode() {
             repeatMode =

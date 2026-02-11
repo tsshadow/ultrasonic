@@ -5,8 +5,7 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIVersions
 import org.moire.ultrasonic.api.subsonic.SubsonicError
 import org.moire.ultrasonic.api.subsonic.models.Year
 
-class YearsResponse(status: Status, version: SubsonicAPIVersions, error: SubsonicError?) :
-    SubsonicResponse(status, version, error) {
+class YearsResponse(status: Status, version: SubsonicAPIVersions, error: SubsonicError?) : SubsonicResponse(status, version, error) {
     @JsonProperty("year")
     private val yearsWrapper = YearsWrapper()
     val yearsList: List<Year> get() = yearsWrapper.yearsList

@@ -56,7 +56,10 @@ import org.moire.ultrasonic.util.toastingExceptionHandler
  * TODO: This file has been converted from Java, but not modernized yet.
  */
 @Suppress("InstanceOfCheckForException")
-class PlaylistsFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragment {
+class PlaylistsFragment :
+    ScopeFragment(),
+    KoinScopeComponent,
+    RefreshableFragment {
     override var swipeRefresh: SwipeRefreshLayout? = null
     private var playlistsListView: ListView? = null
     private var emptyTextView: View? = null
@@ -71,9 +74,7 @@ class PlaylistsFragment : ScopeFragment(), KoinScopeComponent, RefreshableFragme
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.select_playlist, container, false)
-    }
+    ): View? = inflater.inflate(R.layout.select_playlist, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         swipeRefresh = view.findViewById(R.id.select_playlist_refresh)

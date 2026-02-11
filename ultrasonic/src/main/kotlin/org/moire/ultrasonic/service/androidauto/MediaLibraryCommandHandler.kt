@@ -92,47 +92,43 @@ class MediaLibraryCommandHandler {
         .setEnabled(false)
         .build()
 
-    private fun getRepeatModeButton(sessionCommand: SessionCommand, repeatMode: Int) =
-        CommandButton.Builder()
-            .setDisplayName(
-                when (repeatMode) {
-                    Player.REPEAT_MODE_ONE -> "Repeat One"
-                    Player.REPEAT_MODE_ALL -> "Repeat All"
-                    else -> "Repeat None"
-                }
-            )
-            .setIconResId(
-                when (repeatMode) {
-                    Player.REPEAT_MODE_ONE -> R.drawable.media_repeat_one
-                    Player.REPEAT_MODE_ALL -> R.drawable.media_repeat_all
-                    else -> R.drawable.media_repeat_off
-                }
-            )
-            .setSessionCommand(sessionCommand)
-            .setEnabled(true)
-            .build()
+    private fun getRepeatModeButton(sessionCommand: SessionCommand, repeatMode: Int) = CommandButton.Builder()
+        .setDisplayName(
+            when (repeatMode) {
+                Player.REPEAT_MODE_ONE -> "Repeat One"
+                Player.REPEAT_MODE_ALL -> "Repeat All"
+                else -> "Repeat None"
+            }
+        )
+        .setIconResId(
+            when (repeatMode) {
+                Player.REPEAT_MODE_ONE -> R.drawable.media_repeat_one
+                Player.REPEAT_MODE_ALL -> R.drawable.media_repeat_all
+                else -> R.drawable.media_repeat_off
+            }
+        )
+        .setSessionCommand(sessionCommand)
+        .setEnabled(true)
+        .build()
 
-    private fun getHeartCommandButton(sessionCommand: SessionCommand, willHeart: Boolean) =
-        CommandButton.Builder()
-            .setDisplayName(
-                if (willHeart) {
-                    "Love"
-                } else {
-                    "Dislike"
-                }
-            )
-            .setIconResId(
-                if (willHeart) {
-                    R.drawable.ic_star_hollow
-                } else {
-                    R.drawable.ic_star_full
-                }
-            )
-            .setSessionCommand(sessionCommand)
-            .setEnabled(true)
-            .build()
-
-
+    private fun getHeartCommandButton(sessionCommand: SessionCommand, willHeart: Boolean) = CommandButton.Builder()
+        .setDisplayName(
+            if (willHeart) {
+                "Love"
+            } else {
+                "Dislike"
+            }
+        )
+        .setIconResId(
+            if (willHeart) {
+                R.drawable.ic_star_hollow
+            } else {
+                R.drawable.ic_star_full
+            }
+        )
+        .setSessionCommand(sessionCommand)
+        .setEnabled(true)
+        .build()
 
     fun initialize() {
         val shuffleCommand = SessionCommand(PlaybackService.CUSTOM_COMMAND_SHUFFLE, Bundle.EMPTY)
@@ -154,7 +150,6 @@ class MediaLibraryCommandHandler {
 
         defaultCustomCommands = listOf(shuffleButton, repeatOffButton)
     }
-
 
     fun configureRepeatMode(player: Player) {
         Timber.d("Car app library available, observing CarConnection")
@@ -189,8 +184,6 @@ class MediaLibraryCommandHandler {
             }
         }
     }
-
-
 
     fun updateCustomHeartButton(session: MediaSession, isHeart: Boolean) {
         with(session) {
@@ -287,13 +280,12 @@ class MediaLibraryCommandHandler {
         )
     }
 
-    fun buildCustomCommands(session: MediaSession,  canShuffle: Boolean): ImmutableList<CommandButton> {
-        return session.buildCustomCommands(canShuffle)
-    }
+    fun buildCustomCommands(
+        session: MediaSession,
+        canShuffle: Boolean
+    ): ImmutableList<CommandButton> = session.buildCustomCommands(canShuffle)
 
-    fun canShuffleWrapper(session: MediaSession): Boolean {
-        return session.canShuffle()
-    }
+    fun canShuffleWrapper(session: MediaSession): Boolean = session.canShuffle()
 
     companion object {
         private const val MIN_ITEMS_TO_SHUFFLE = 3

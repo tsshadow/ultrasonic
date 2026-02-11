@@ -85,9 +85,7 @@ object Util {
         charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
 
     // Retrieves an instance of the application Context
-    fun appContext(): Context {
-        return applicationContext()
-    }
+    fun appContext(): Context = applicationContext()
 
     @JvmStatic
     fun applyTheme(context: Context?) {
@@ -99,29 +97,25 @@ object Util {
         context.setTheme(R.style.UltrasonicTheme_Base)
     }
 
-    private fun getStyleFromSettings(context: Context): Int {
-        return when (Settings.theme.lowercase()) {
-            context.getString(R.string.setting_key_theme_dark) -> {
-                R.style.UltrasonicTheme_Dark
-            }
+    private fun getStyleFromSettings(context: Context): Int = when (Settings.theme.lowercase()) {
+        context.getString(R.string.setting_key_theme_dark) -> {
+            R.style.UltrasonicTheme_Dark
+        }
 
-            context.getString(R.string.setting_key_theme_black) -> {
-                R.style.UltrasonicTheme_Black
-            }
+        context.getString(R.string.setting_key_theme_black) -> {
+            R.style.UltrasonicTheme_Black
+        }
 
-            context.getString(R.string.setting_key_theme_light) -> {
-                R.style.UltrasonicTheme_Light
-            }
+        context.getString(R.string.setting_key_theme_light) -> {
+            R.style.UltrasonicTheme_Light
+        }
 
-            else -> {
-                R.style.UltrasonicTheme_DayNight
-            }
+        else -> {
+            R.style.UltrasonicTheme_DayNight
         }
     }
 
-    fun getString(@StringRes resId: Int): String {
-        return applicationContext().resources.getString(resId)
-    }
+    fun getString(@StringRes resId: Int): String = applicationContext().resources.getString(resId)
 
     @JvmStatic
     @JvmOverloads
@@ -202,9 +196,7 @@ object Util {
     }
 
     @Deprecated("Use Kotlin standard == operator instead", ReplaceWith("object1 == object2"))
-    fun equals(object1: Any?, object2: Any?): Boolean {
-        return object1 == object2
-    }
+    fun equals(object1: Any?, object2: Any?): Boolean = object1 == object2
 
     /**
      * Encodes the given string by using the hexadecimal representation of its UTF-8 bytes.
@@ -256,17 +248,15 @@ object Util {
      */
     @JvmStatic
     @Suppress("TooGenericExceptionThrown")
-    fun md5Hex(s: String?): String? {
-        return if (s == null) {
-            null
-        } else {
-            try {
-                val md5 = MessageDigest.getInstance("MD5")
-                hexEncode(md5.digest(s.toByteArray(charset(Constants.UTF_8))))
-            } catch (all: Exception) {
-                // TODO: Why is it needed to change the exception type here?
-                throw RuntimeException(all.message, all)
-            }
+    fun md5Hex(s: String?): String? = if (s == null) {
+        null
+    } else {
+        try {
+            val md5 = MessageDigest.getInstance("MD5")
+            hexEncode(md5.digest(s.toByteArray(charset(Constants.UTF_8))))
+        } catch (all: Exception) {
+            // TODO: Why is it needed to change the exception type here?
+            throw RuntimeException(all.message, all)
         }
     }
 
@@ -294,9 +284,7 @@ object Util {
         return (!wifiRequired || isUnmetered)
     }
 
-    fun isNetworkRestricted(): Boolean {
-        return isNetworkMetered() || isNetworkCellular()
-    }
+    fun isNetworkRestricted(): Boolean = isNetworkMetered() || isNetworkCellular()
 
     private fun isNetworkMetered(): Boolean {
         val connManager = connectivityManager
@@ -325,8 +313,7 @@ object Util {
     }
 
     @JvmStatic
-    fun isExternalStoragePresent(): Boolean =
-        Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
+    fun isExternalStoragePresent(): Boolean = Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
 
     @JvmStatic
     fun sleepQuietly(millis: Long) {
@@ -432,9 +419,7 @@ object Util {
     }
 
     @JvmStatic
-    fun isNullOrWhiteSpace(string: String?): Boolean {
-        return string.isNullOrEmpty() || string.trim { it <= ' ' }.isEmpty()
-    }
+    fun isNullOrWhiteSpace(string: String?): Boolean = string.isNullOrEmpty() || string.trim { it <= ' ' }.isEmpty()
 
     @JvmOverloads
     fun formatTotalDuration(totalDuration: Long?, inMilliseconds: Boolean = false): String {
@@ -597,14 +582,12 @@ object Util {
         }
     }
 
-    fun getUriToDrawable(context: Context, @AnyRes drawableId: Int): Uri {
-        return (
-            ContentResolver.SCHEME_ANDROID_RESOURCE +
-                "://" + context.resources.getResourcePackageName(drawableId) +
-                '/' + context.resources.getResourceTypeName(drawableId) +
-                '/' + context.resources.getResourceEntryName(drawableId)
-            ).toUri()
-    }
+    fun getUriToDrawable(context: Context, @AnyRes drawableId: Int): Uri = (
+        ContentResolver.SCHEME_ANDROID_RESOURCE +
+            "://" + context.resources.getResourcePackageName(drawableId) +
+            '/' + context.resources.getResourceTypeName(drawableId) +
+            '/' + context.resources.getResourceEntryName(drawableId)
+        ).toUri()
 
     data class ReadableEntryDescription(
         var artist: String,
@@ -625,7 +608,8 @@ object Util {
 
         if (song.bitRate != null && song.bitRate!! > 0) {
             bitRate = String.format(
-                appContext().getString(R.string.song_details_kbps), song.bitRate
+                appContext().getString(R.string.song_details_kbps),
+                song.bitRate
             )
         }
 
@@ -644,7 +628,8 @@ object Util {
         val artistName = song.artist
 
         if (artistName != null) {
-            if (Settings.shouldDisplayBitrateWithArtist && (
+            if (Settings.shouldDisplayBitrateWithArtist &&
+                (
                     !bitRate.isNullOrBlank() || !fileFormat.isNullOrBlank()
                     )
             ) {
@@ -757,10 +742,8 @@ object Util {
         return PendingIntent.getActivity(context, 0, intent, flags)
     }
 
-    fun dpToPx(dp: Int, activity: Activity): Int {
-        return (dp * (activity.resources.displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT))
-            .roundToInt()
-    }
+    fun dpToPx(dp: Int, activity: Activity): Int = (dp * (activity.resources.displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT))
+        .roundToInt()
 
     private val connectivityManager: ConnectivityManager
         get() = appContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -769,9 +752,7 @@ object Util {
      * Executes the given block if this is not null.
      * @return: the return of the block, or null if this is null
      */
-    fun <T : Any, R> T?.ifNotNull(block: (T) -> R): R? {
-        return this?.let(block)
-    }
+    fun <T : Any, R> T?.ifNotNull(block: (T) -> R): R? = this?.let(block)
 
     /**
      * Closes a Closeable while ignoring any errors.

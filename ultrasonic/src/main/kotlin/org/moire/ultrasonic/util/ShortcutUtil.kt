@@ -12,8 +12,6 @@ import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
-import android.os.Build
-import androidx.annotation.RequiresApi
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.activity.NavigationActivity
 

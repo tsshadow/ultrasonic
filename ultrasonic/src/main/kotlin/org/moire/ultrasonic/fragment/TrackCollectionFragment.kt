@@ -7,13 +7,11 @@
 
 package org.moire.ultrasonic.fragment
 
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -73,9 +71,9 @@ import timber.log.Timber
  * or using Offline mode, both in which Indexes instead of Artists are being used.
  */
 @Suppress("TooManyFunctions")
-open class TrackCollectionFragment(
-    initialOrder: SortOrder? = null
-) : MultiListFragment<MusicDirectory.Child>(), FilterableFragment {
+open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
+    MultiListFragment<MusicDirectory.Child>(),
+    FilterableFragment {
 
     private var albumButtons: View? = null
     private var selectButton: MaterialButton? = null
@@ -491,16 +489,12 @@ open class TrackCollectionFragment(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun getAllTracks(): List<Track> {
-        return viewAdapter.getCurrentList().filter {
-            it is Track && !it.isDirectory
-        } as List<Track>
-    }
+    private fun getAllTracks(): List<Track> = viewAdapter.getCurrentList().filter {
+        it is Track && !it.isDirectory
+    } as List<Track>
 
-    fun getSelectedOrAllTracks(): List<Track> {
-        return getSelectedTracks().ifEmpty {
-            getAllTracks()
-        }
+    fun getSelectedOrAllTracks(): List<Track> = getSelectedTracks().ifEmpty {
+        getAllTracks()
     }
 
     override fun setTitle(title: String?) {
@@ -632,7 +626,6 @@ open class TrackCollectionFragment(
                     effectiveSortMethod,
                     festivalLineup
                 )
-
             } else if (id == null || getRandomTracks) {
                 // There seems to be a bug in ViewPager when resuming the Activity that sub-fragments
                 // arguments are empty. If we have no id, just show some random tracks

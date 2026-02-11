@@ -65,32 +65,29 @@ class TileInfo(
     val ratingMin: Int = 0,
     val ratingMax: Int = 5,
     val sortMethod: String = "AddedDesc",
-    val favorite: Boolean = false,
+    val favorite: Boolean = false
 ) {
     init {
         if (title == "") title = createDefaultTitle()
     }
 
-    private fun createDefaultTitle(): String {
-        return buildString {
-            when (sortMethod) {
-                "AddedDesc" -> append("Recent ")
-                "DateDescAndRelease" -> append("Recent ")
-                "Random" -> append("Random ")
-                "LastWrittenDesc" -> append("Recent Modified ")
-            }
-
-            fun pick(value: List<String>?): String? =
-                value?.filter { it.isNotBlank() && it != "All" }
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.let { if (it.size == 1) it.first() else "Multiple" }
-
-            listOfNotNull(pick(festival), pick(label), pick(genre))
-                .joinToString(" ")
-                .let { if (it.isNotBlank()) append(it) }
-
-            pick(year)?.let { append(" ($it)") }
+    private fun createDefaultTitle(): String = buildString {
+        when (sortMethod) {
+            "AddedDesc" -> append("Recent ")
+            "DateDescAndRelease" -> append("Recent ")
+            "Random" -> append("Random ")
+            "LastWrittenDesc" -> append("Recent Modified ")
         }
+
+        fun pick(value: List<String>?): String? = value?.filter { it.isNotBlank() && it != "All" }
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { if (it.size == 1) it.first() else "Multiple" }
+
+        listOfNotNull(pick(festival), pick(label), pick(genre))
+            .joinToString(" ")
+            .let { if (it.isNotBlank()) append(it) }
+
+        pick(year)?.let { append(" ($it)") }
     }
 }
 

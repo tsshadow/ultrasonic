@@ -21,5 +21,4 @@ fun ApiBookmark.toDomainEntity(serverId: Int): Bookmark = Bookmark(
     track = this@toDomainEntity.entry.toTrackEntity(serverId)
 )
 
-fun List<ApiBookmark>.toDomainEntitiesList(serverId: Int): List<Bookmark> =
-    map { it.toDomainEntity(serverId) }
+fun List<ApiBookmark>.toDomainEntitiesList(serverId: Int): List<Bookmark> = map { it.toDomainEntity(serverId) }

@@ -11,13 +11,9 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.domain.Identifiable
 
 /** Binder for displaying artist information in the header section */
-class ArtistHeaderBinder(
-    private val onPlayAll: () -> Unit
-) : ItemViewBinder<ArtistHeaderBinder.ArtistHeader, ArtistHeaderBinder.ViewHolder>() {
+class ArtistHeaderBinder(private val onPlayAll: () -> Unit) : ItemViewBinder<ArtistHeaderBinder.ArtistHeader, ArtistHeaderBinder.ViewHolder>() {
 
-    override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
-        return ViewHolder(inflater.inflate(R.layout.list_header_artist_detail, parent, false))
-    }
+    override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder = ViewHolder(inflater.inflate(R.layout.list_header_artist_detail, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, item: ArtistHeader) {
         holder.title.text = item.name
@@ -33,11 +29,7 @@ class ArtistHeaderBinder(
         val playAll: Button = view.findViewById(R.id.artist_play_all)
     }
 
-    data class ArtistHeader(
-        val name: String,
-        val genres: String?,
-        val description: String?
-    ) : Identifiable {
+    data class ArtistHeader(val name: String, val genres: String?, val description: String?) : Identifiable {
         override val id: String = "artist_header"
     }
 }

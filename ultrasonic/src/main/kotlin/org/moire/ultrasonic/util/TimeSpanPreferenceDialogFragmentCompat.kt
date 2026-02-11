@@ -15,7 +15,9 @@ import androidx.preference.PreferenceDialogFragmentCompat
 import java.util.Locale
 import org.moire.ultrasonic.R
 
-class TimeSpanPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat(), TargetFragment {
+class TimeSpanPreferenceDialogFragmentCompat :
+    PreferenceDialogFragmentCompat(),
+    TargetFragment {
     var picker: TimeSpanPicker? = null
 
     override fun onCreateDialogView(context: Context): View? {
@@ -53,7 +55,5 @@ class TimeSpanPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat(),
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Preference?> findPreference(p0: CharSequence): T {
-        return preference as T
-    }
+    override fun <T : Preference?> findPreference(p0: CharSequence): T = preference as T
 }

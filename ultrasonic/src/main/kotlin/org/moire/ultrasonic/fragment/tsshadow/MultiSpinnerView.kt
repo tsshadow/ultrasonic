@@ -11,9 +11,7 @@ import android.widget.ListView
 import android.widget.TextView
 import org.moire.ultrasonic.R
 
-class MultiSpinnerView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
-) : LinearLayout(context, attrs) {
+class MultiSpinnerView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : LinearLayout(context, attrs) {
 
     private var selectedItems = mutableSetOf<Int>()
     private var items: List<String> = emptyList()
@@ -61,7 +59,6 @@ class MultiSpinnerView @JvmOverloads constructor(
             alertDialog.dismiss()
         }
 
-
         resetButton.setOnClickListener {
             for (i in 0 until listView.count) {
                 listView.setItemChecked(i, false)
@@ -92,7 +89,5 @@ class MultiSpinnerView @JvmOverloads constructor(
         updateLabel()
     }
 
-    fun getSelectedItems(): List<String> {
-        return selectedItems.map { items[it] }
-    }
+    fun getSelectedItems(): List<String> = selectedItems.map { items[it] }
 }

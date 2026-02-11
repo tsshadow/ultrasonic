@@ -23,8 +23,6 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.os.Build
-import androidx.annotation.RequiresApi
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -49,7 +47,9 @@ object MusicServiceFactory : KoinComponent {
     private val activeServerProvider: ActiveServerProvider by inject()
     private val connectivityManager: ConnectivityManager
         get() =
-            UApp.applicationContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            UApp.applicationContext().getSystemService(
+                Context.CONNECTIVITY_SERVICE
+            ) as ConnectivityManager
 
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var previousServerId: Int? = null
@@ -104,7 +104,10 @@ object MusicServiceFactory : KoinComponent {
             }
         }
 
-        if (Settings.autoSwitchOffline && previousServerId != null && ActiveServerProvider.isOffline()) {
+        if (Settings.autoSwitchOffline &&
+            previousServerId != null &&
+            ActiveServerProvider.isOffline()
+        ) {
             activeServerProvider.setActiveServerById(previousServerId!!)
             previousServerId = null
         }

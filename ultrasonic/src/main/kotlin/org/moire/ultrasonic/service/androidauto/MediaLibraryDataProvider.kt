@@ -32,14 +32,12 @@ import timber.log.Timber
 class MediaLibraryDataProvider(
     private val serviceScope: CoroutineScope,
     val musicService: MusicService
-):
-    MediaLibraryBase() {
+) : MediaLibraryBase() {
     lateinit var playbackController: MediaLibraryPlaybackController
     var playlistCache: List<Track>? = null
     var starredSongsCache: List<Track>? = null
     var randomSongsCache: List<Track>? = null
     var searchSongsCache: List<Track>? = null
-
 
     fun tracksFromMediaId(mediaId: String?): List<Track>? {
         Timber.d(
@@ -52,14 +50,20 @@ class MediaLibraryDataProvider(
 
         // TODO Media Artist item is missing!!!
         return when (mediaIdParts.first()) {
-            MEDIA_PLAYLIST_ITEM -> playbackController.playPlaylist(mediaIdParts[INDEX_ID], mediaIdParts[INDEX_NAME])
+            MEDIA_PLAYLIST_ITEM -> playbackController.playPlaylist(
+                mediaIdParts[INDEX_ID],
+                mediaIdParts[INDEX_NAME]
+            )
             MEDIA_PLAYLIST_SONG_ITEM -> playbackController.playPlaylistSong(
                 mediaIdParts[INDEX_ID],
                 mediaIdParts[INDEX_NAME],
                 mediaIdParts[INDEX_SONG_ID]
             )
 
-            MEDIA_ALBUM_ITEM -> playbackController.playAlbum(mediaIdParts[INDEX_ID], mediaIdParts[INDEX_NAME])
+            MEDIA_ALBUM_ITEM -> playbackController.playAlbum(
+                mediaIdParts[INDEX_ID],
+                mediaIdParts[INDEX_NAME]
+            )
             MEDIA_ALBUM_SONG_ITEM -> playbackController.playAlbumSong(
                 mediaIdParts[INDEX_ID],
                 mediaIdParts[INDEX_NAME],
@@ -71,7 +75,10 @@ class MediaLibraryDataProvider(
             MEDIA_SONG_RANDOM_ID -> playbackController.playRandomSongs()
             MEDIA_SONG_RANDOM_ITEM -> playbackController.playRandomSong(mediaIdParts[INDEX_ID])
             MEDIA_SHARE_ITEM -> playbackController.playShare(mediaIdParts[INDEX_ID])
-            MEDIA_SHARE_SONG_ITEM -> playbackController.playShareSong(mediaIdParts[INDEX_ID], mediaIdParts[INDEX_NAME])
+            MEDIA_SHARE_SONG_ITEM -> playbackController.playShareSong(
+                mediaIdParts[INDEX_ID],
+                mediaIdParts[INDEX_NAME]
+            )
             MEDIA_BOOKMARK_ITEM -> playbackController.playBookmark(mediaIdParts[INDEX_ID])
             MEDIA_PODCAST_ITEM -> playbackController.playPodcast(mediaIdParts[INDEX_ID])
             MEDIA_PODCAST_EPISODE_ITEM -> playbackController.playPodcastEpisode(
@@ -86,24 +93,19 @@ class MediaLibraryDataProvider(
         }
     }
 
+    fun listSongsInMusicService(id: String, name: String?): MusicDirectory? = serviceScope.future {
+        if (ActiveServerProvider.shouldUseId3Tags()) {
+            callWithErrorHandling { musicService.getAlbumAsDir(id, name, false) }
+        } else {
+            callWithErrorHandling { musicService.getMusicDirectory(id, name, false) }
+        }
+    }.get()
 
-    fun listSongsInMusicService(id: String, name: String?): MusicDirectory? {
-        return serviceScope.future {
-            if (ActiveServerProvider.shouldUseId3Tags()) {
-                callWithErrorHandling { musicService.getAlbumAsDir(id, name, false) }
-            } else {
-                callWithErrorHandling { musicService.getMusicDirectory(id, name, false) }
-            }
-        }.get()
-    }
-
-    fun listStarredSongsInMusicService(): SearchResult? {
-        return serviceScope.future {
-            if (ActiveServerProvider.shouldUseId3Tags()) {
-                callWithErrorHandling { musicService.getStarred2() }
-            } else {
-                callWithErrorHandling { musicService.getStarred() }
-            }
-        }.get()
-    }
+    fun listStarredSongsInMusicService(): SearchResult? = serviceScope.future {
+        if (ActiveServerProvider.shouldUseId3Tags()) {
+            callWithErrorHandling { musicService.getStarred2() }
+        } else {
+            callWithErrorHandling { musicService.getStarred() }
+        }
+    }.get()
 }

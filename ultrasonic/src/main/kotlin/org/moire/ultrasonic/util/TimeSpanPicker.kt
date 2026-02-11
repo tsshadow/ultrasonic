@@ -73,15 +73,13 @@ class TimeSpanPicker(private var mContext: Context, attrs: AttributeSet?, defSty
         timeSpanSpinner.isEnabled = enabled
     }
 
-    fun getTimeSpan(): Long {
-        return if (!timeSpanDisableCheckbox.isChecked) {
-            getTimeSpanFromDialog(
-                mContext,
-                dialog
-            )
-        } else {
-            -1L
-        }
+    fun getTimeSpan(): Long = if (!timeSpanDisableCheckbox.isChecked) {
+        getTimeSpanFromDialog(
+            mContext,
+            dialog
+        )
+    } else {
+        -1L
     }
 
     val timeSpanEnabled: Boolean

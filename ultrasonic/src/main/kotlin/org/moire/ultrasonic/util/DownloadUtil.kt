@@ -66,10 +66,8 @@ object DownloadUtil {
         isDirectory: Boolean,
         name: String?,
         isShare: Boolean
-    ): MutableList<Track> {
-        return withContext(Dispatchers.IO) {
-            getTracksFromServer(isArtist, id, isDirectory, name, isShare)
-        }
+    ): MutableList<Track> = withContext(Dispatchers.IO) {
+        getTracksFromServer(isArtist, id, isDirectory, name, isShare)
     }
 
     fun getTracksFromServer(
@@ -151,37 +149,35 @@ object DownloadUtil {
         action: DownloadAction,
         fragment: Fragment,
         tracksToDownload: List<Track>
-    ): String {
-        return when (action) {
-            DownloadAction.DOWNLOAD -> fragment.resources.getQuantityString(
-                R.plurals.n_songs_to_be_downloaded,
+    ): String = when (action) {
+        DownloadAction.DOWNLOAD -> fragment.resources.getQuantityString(
+            R.plurals.n_songs_to_be_downloaded,
+            tracksToDownload.size,
+            tracksToDownload.size
+        )
+
+        DownloadAction.UNPIN -> {
+            fragment.resources.getQuantityString(
+                R.plurals.n_songs_unpinned,
                 tracksToDownload.size,
                 tracksToDownload.size
             )
+        }
 
-            DownloadAction.UNPIN -> {
-                fragment.resources.getQuantityString(
-                    R.plurals.n_songs_unpinned,
-                    tracksToDownload.size,
-                    tracksToDownload.size
-                )
-            }
+        DownloadAction.PIN -> {
+            fragment.resources.getQuantityString(
+                R.plurals.n_songs_pinned,
+                tracksToDownload.size,
+                tracksToDownload.size
+            )
+        }
 
-            DownloadAction.PIN -> {
-                fragment.resources.getQuantityString(
-                    R.plurals.n_songs_pinned,
-                    tracksToDownload.size,
-                    tracksToDownload.size
-                )
-            }
-
-            DownloadAction.DELETE -> {
-                fragment.resources.getQuantityString(
-                    R.plurals.n_songs_deleted,
-                    tracksToDownload.size,
-                    tracksToDownload.size
-                )
-            }
+        DownloadAction.DELETE -> {
+            fragment.resources.getQuantityString(
+                R.plurals.n_songs_deleted,
+                tracksToDownload.size,
+                tracksToDownload.size
+            )
         }
     }
 }
