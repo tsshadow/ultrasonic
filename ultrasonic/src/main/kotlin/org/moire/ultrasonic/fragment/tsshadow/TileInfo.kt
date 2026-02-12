@@ -55,6 +55,7 @@ val genreIconMap: Map<String, Int> = mapOf(
 class TileInfo(
     var title: String = "",
     val genre: List<String>? = null,
+    val artists: List<String>? = null,
     val year: List<String>? = null,
     val size: Int = maxSongs,
     val festival: List<String>? = null,
@@ -83,7 +84,7 @@ class TileInfo(
             ?.takeIf { it.isNotEmpty() }
             ?.let { if (it.size == 1) it.first() else "Multiple" }
 
-        listOfNotNull(pick(festival), pick(label), pick(genre))
+        listOfNotNull(pick(artists), pick(festival), pick(label), pick(genre))
             .joinToString(" ")
             .let { if (it.isNotBlank()) append(it) }
 
@@ -99,6 +100,13 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
         ?.takeIf { it.isNotEmpty() }
         ?.let {
             filters.add(if (it.size == 1) Filter("GENRE", it[0]) else Filter("GENRE", it))
+        }
+
+    tile.artists
+        ?.filter { it.isNotBlank() && it != "All" }
+        ?.takeIf { it.isNotEmpty() }
+        ?.let {
+            filters.add(if (it.size == 1) Filter("ARTIST", it[0]) else Filter("ARTIST", it))
         }
 
     tile.year
