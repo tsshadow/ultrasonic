@@ -583,10 +583,15 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
                         if (!festival.isNullOrBlank()) append(festival)
                         if (!label.isNullOrBlank()) append(label)
                         if (artists.isNotEmpty()) {
-                            if (isNotEmpty()) append(" ")
+                            if (isNotEmpty()) {
+                                append(" ")
+                            }
                             append(
-                                if (artists.size == 1) artists.first()
-                                else getString(R.string.common_artist)
+                                if (artists.size == 1) {
+                                    artists.first()
+                                } else {
+                                    getString(R.string.common_artist)
+                                }
                             )
                         }
                         if (!genre.isNullOrBlank() && genre != "All") {
@@ -613,8 +618,11 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
                         }
                         if (artists.isNotEmpty()) {
                             add(
-                                if (artists.size == 1) Filter("ARTIST", artists.first())
-                                else Filter("ARTIST", artists)
+                                if (artists.size == 1) {
+                                    Filter("ARTIST", artists.first())
+                                } else {
+                                    Filter("ARTIST", artists)
+                                }
                             )
                         }
                         festival?.takeIf { it != "All" && it.isNotBlank() }?.let {

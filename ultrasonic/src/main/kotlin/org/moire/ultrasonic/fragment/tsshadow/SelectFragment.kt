@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.gson.Gson
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,7 +32,6 @@ import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.toastingExceptionHandler
-import java.util.Locale
 import timber.log.Timber
 
 abstract class SelectFragment :
