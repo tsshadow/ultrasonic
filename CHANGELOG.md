@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Standardized deployment variable names for cross-project compatibility.
 
 ### Fixed
+- Fixed empty webpage in `apk-hoster` by bundling the `dist` directory into the Docker image.
 - Fixed APK files downloading as ZIP by registering correct MIME types in `apk-hoster`.
 - Fixed local.properties loading logic to skip invalid bash identifiers.
 - Fixed non-interactive session hangs in `publish.sh`.

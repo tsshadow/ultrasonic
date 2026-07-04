@@ -10,7 +10,7 @@ FROM alpine:latest
 
 WORKDIR /app
 COPY --from=builder /app/apk-hoster .
-# Note: dist folder should be mounted as a volume at /app/dist
+COPY dist ./dist
 
 EXPOSE 8275
 CMD ["./apk-hoster"]
