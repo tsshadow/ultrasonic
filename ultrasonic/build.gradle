@@ -16,6 +16,11 @@ apply from: "${project.rootDir}/gradle_scripts/code_quality.gradle"
 
 android {
     def signingProperties = new Properties()
+    def envFile = rootProject.file(".env")
+    if (envFile.exists()) {
+        envFile.withInputStream { signingProperties.load(it) }
+    }
+    // Fallback to local.properties if it still exists (e.g. created by IDE)
     def localPropsFile = rootProject.file("local.properties")
     if (localPropsFile.exists()) {
         localPropsFile.withInputStream { signingProperties.load(it) }
@@ -29,8 +34,8 @@ android {
 
     defaultConfig {
         applicationId "org.moire.ultrasonic"
-        versionCode 133
-        versionName "5.1.0"
+        versionCode 134
+        versionName "5.1.1"
 
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()

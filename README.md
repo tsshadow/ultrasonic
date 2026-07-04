@@ -20,7 +20,7 @@ artifacts are interchangeable.
 
 ### Local development
 
-Create or update `local.properties` (this file must never be committed) with the
+Create or update `.env` (this file must never be committed) with the
 location of your keystore and its credentials:
 
 ```
@@ -57,23 +57,35 @@ manual run.
 ## Building and Deployment
 If you are modifying the code and need to rebuild and redeploy the system:
 
-1.  **Install dependencies**: `./install.sh`
-2.  **Build app**: `./build.sh`
-3.  **Publish app & hoster**: `./publish.sh`
-4.  **Deploy to remote**: `./deploy.sh`
-5.  **Full pipeline (Build + Publish + Deploy)**: `./build_and_publish.sh`
+1.  **Install dependencies**: `./scripts/install.sh`
+2.  **Build app**: `./scripts/build.sh [debug|release]` (defaults to debug)
+3.  **Publish app & hoster**: `./scripts/publish.sh [debug|release]` (defaults to debug)
+4.  **Deploy to remote**: `./scripts/deploy.sh [debug|release]` (defaults to debug)
+5.  **Full pipeline (Build + Publish + Deploy)**: `./bup [debug|release]` (defaults to debug)
+
+### APK Hoster
+The `apk-hoster` service is managed in its own repository: [tsshadow/apk-hoster](https://github.com/tsshadow/apk-hoster).
+Builds from this project are automatically synced to the hoster's storage if configured in `.env`.
 
 #### Distribution and Custom Paths
 You can configure where builds are saved and how they are served:
 - `DIST_DIR`: Local path where APKs and `index.html` are saved (e.g., `/mnt/teun/ultrasonic-builds`).
-- `REMOTE_DIST_PATH`: Path on the remote server where builds are located (used for Docker volume mounting).
+- `REMOTE_DIST_PATH`: Path on the remote server where builds are located.
 
 #### Remote Deployment Options
-You can configure deployment in `local.properties`:
-1.  **Portainer Webhook**: Set `PORTAINER_WEBHOOK_URL`. This will trigger a webhook to update the `apk-hoster` service. *Note: Webhooks only trigger a redeploy/pull; they do not update environment variables. Manage variables directly in the Portainer Stack UI.*
-2.  **SSH**: Set `REMOTE_HOST`, `REMOTE_USER`, etc. The script will automatically discover your Docker Compose configuration (even if managed by Portainer), transfer it securely, and redeploy the stack. If the stack does not exist yet, it will be created using the local template. This method is highly recommended for multi-host setups and Community Edition users.
+You can configure deployment in `.env`:
+1.  **Portainer Webhook**: Set `PORTAINER_WEBHOOK_URL`. This can be used to notify other services of a new build.
+2.  **SSH**: Set `REMOTE_HOST`, `REMOTE_USER`, etc. The script will automatically sync your APKs to the remote server using `scp`.
 
-**Tip**: Use `DEPLOY_TARGET_NAME` in `local.properties` to give your deployment target a friendly name which will be displayed during the deployment process. The system now uses this to automatically manage stack naming and discovery across different repositories.
+#### APK Hoster API
+The `apk-hoster` service provides the following endpoints:
+- `GET /api/version?apk=ultrasonic`: Returns JSON with the latest version info.
+- `POST /api/add-apk`: Upload a new APK file.
+    - Fields: `apk` (file), `release_notes` (text, optional), `password` (text, optional).
+    - Headers: `X-Upload-Password` (optional alternative to `password` field).
+    - Configuration: Set `UPLOAD_PASSWORD` and `ALLOWED_IPS` (comma-separated) in `.env` to secure this endpoint.
+
+**Tip**: Use `DEPLOY_TARGET_NAME` in `.env` to give your deployment target a friendly name which will be displayed during the deployment process. The system now uses this to automatically manage stack naming and discovery across different repositories.
 
 [subsonic]: http://www.subsonic.org/
 [subapi]: http://www.subsonic.org/pages/api.jsp

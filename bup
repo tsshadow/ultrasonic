@@ -1,1 +1,2 @@
-build_and_publish.sh
+#!/bin/bash
+exec "$(dirname "$0")/scripts/build-and-publish.sh" "$@"

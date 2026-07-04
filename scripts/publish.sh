@@ -1,12 +1,15 @@
 #!/bin/bash
 set -e
 
+cd "$(dirname "$0")/.."
+ROOT_DIR=$(pwd)
+
 # Configuration
 APP_NAME="ultrasonic"
 MODULE="ultrasonic"
 
-# Load optional configuration from local.properties
-if [ -f "local.properties" ]; then
+# Load optional configuration from .env
+if [ -f ".env" ]; then
     while IFS='=' read -r key value; do
         if [[ ! $key =~ ^# && -n $key ]]; then
             key=$(echo "$key" | xargs)
@@ -16,14 +19,20 @@ if [ -f "local.properties" ]; then
                 export "$key=$value"
             fi
         fi
-    done < local.properties
+    done < .env
 fi
 
-# Ensure DOCKER_IMAGE and DIST_DIR are set
-DOCKER_IMAGE="${DOCKER_IMAGE}"
+# Build type (release or debug)
+BUILD_TYPE=$(echo "${1:-debug}" | tr '[:upper:]' '[:lower:]')
+if [[ "$BUILD_TYPE" != "release" && "$BUILD_TYPE" != "debug" ]]; then
+    echo "Invalid build type: $BUILD_TYPE. Use 'release' or 'debug'."
+    exit 1
+fi
+
+# Ensure DIST_DIR is set
 DIST_DIR="${DIST_DIR:-dist}"
 
-echo "--- Starting publish of $APP_NAME ---"
+echo "--- Starting $BUILD_TYPE publish of $APP_NAME ---"
 
 # 1. Extract Version Info from build.gradle
 echo "--- Extracting version info ---"
@@ -34,20 +43,37 @@ VERSION_CODE=$(grep "versionCode" $MODULE/build.gradle | head -n 1 | sed 's/[^0-
 echo "--- Publishing Artifacts to $DIST_DIR ---"
 mkdir -p "$DIST_DIR"
 
-APK_PATH="$MODULE/build/outputs/apk/release/$MODULE-release.apk"
-UNSIGNED_APK_PATH="$MODULE/build/outputs/apk/release/$MODULE-release-unsigned.apk"
+# Extract Release Notes for current version
+echo "--- Extracting release notes for v$VERSION_NAME ---"
+# awk extracts the block, sed trims empty lines at start/end
+NOTES=$(awk -v ver="$VERSION_NAME" '$0 ~ "^## \\[" ver "\\]" {flag=1; next} /^## \[/ {flag=0} flag' RELEASE_NOTES.md | sed '/./,$!d' | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+
+APK_PATH="$MODULE/build/outputs/apk/$BUILD_TYPE/$MODULE-$BUILD_TYPE.apk"
+UNSIGNED_APK_PATH="$MODULE/build/outputs/apk/$BUILD_TYPE/$MODULE-$BUILD_TYPE-unsigned.apk"
 
 if [ -f "$APK_PATH" ]; then
-    DEST="$DIST_DIR/$APP_NAME-v$VERSION_NAME-$VERSION_CODE.apk"
+    SUFFIX=""
+    [ "$BUILD_TYPE" == "debug" ] && SUFFIX="-debug"
+    DEST="$DIST_DIR/$APP_NAME-v$VERSION_NAME-$VERSION_CODE$SUFFIX.apk"
     cp "$APK_PATH" "$DEST"
     echo "Successfully published: $DEST"
+    # Save notes if found
+    if [ -n "$NOTES" ]; then
+        echo "$NOTES" > "${DEST%.apk}.txt"
+    fi
 elif [ -f "$UNSIGNED_APK_PATH" ]; then
-    DEST="$DIST_DIR/$APP_NAME-v$VERSION_NAME-$VERSION_CODE-unsigned.apk"
+    SUFFIX="-unsigned"
+    [ "$BUILD_TYPE" == "debug" ] && SUFFIX="-debug-unsigned"
+    DEST="$DIST_DIR/$APP_NAME-v$VERSION_NAME-$VERSION_CODE$SUFFIX.apk"
     cp "$UNSIGNED_APK_PATH" "$DEST"
     echo "Successfully published (UNSIGNED): $DEST"
-    echo "Note: Configure signing in local.properties to produce signed release builds."
+    echo "Note: Configure signing in .env to produce signed builds."
+    # Save notes if found
+    if [ -n "$NOTES" ]; then
+        echo "$NOTES" > "${DEST%.apk}.txt"
+    fi
 else
-    echo "ERROR: Could not find resulting APK artifact. Did you run build.sh first?"
+    echo "ERROR: Could not find resulting APK artifact at $APK_PATH. Did you run build.sh first?"
     exit 1
 fi
 
@@ -79,9 +105,10 @@ EOF
 # Use ls -t to sort by time, and loop through files
 IS_FIRST=true
 # Use a temporary file to avoid globbing issues in for loop if filenames have spaces
-ls -t "$DIST_DIR"/*.apk > /tmp/apk_list.txt
+# We use || true to prevent script from exiting if no APKs are found
+ls -t "$DIST_DIR"/*.apk > /tmp/apk_list.txt 2>/dev/null || touch /tmp/apk_list.txt
 while IFS= read -r apk; do
-    [ -z "$apk" ] && continue
+    [ -z "$apk" ] || [ ! -f "$apk" ] && continue
     filename=$(basename "$apk")
     filedate=$(date -r "$apk" "+%Y-%m-%d %H:%M")
     
@@ -91,6 +118,28 @@ while IFS= read -r apk; do
         IS_FIRST=false
     fi
     
+    # Try to find release notes
+    NOTES_CONTENT=""
+    notes_file="${apk%.apk}.txt"
+    if [ -f "$notes_file" ]; then
+        NOTES_CONTENT=$(cat "$notes_file")
+    else
+        # Extract version from filename like ultrasonic-v5.1.1-134.apk
+        v=$(echo "$filename" | sed -n 's/.*-v\([0-9.]*\)-.*/\1/p')
+        if [ -n "$v" ] && [ -f "RELEASE_NOTES.md" ]; then
+            NOTES_CONTENT=$(awk -v ver="$v" '$0 ~ "^## \\[" ver "\\]" {flag=1; next} /^## \[/ {flag=0} flag' RELEASE_NOTES.md | sed '/./,$!d' | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+        fi
+    fi
+
+    RELEASE_NOTES_HTML=""
+    if [ -n "$NOTES_CONTENT" ]; then
+        # Simple formatting: escape HTML chars and handle Markdown-ish list/headers
+        ESCAPED_NOTES=$(echo "$NOTES_CONTENT" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+        FORMATTED_NOTES=$(echo "$ESCAPED_NOTES" | sed 's/^### \(.*\)/<h4 style="margin: 10px 0 5px 0;">\1<\/h4>/g' | sed 's/^- \(.*\)/<li style="margin-left: 20px;">\1<\/li>/g')
+        
+        RELEASE_NOTES_HTML="<details style='margin-top: 10px; font-size: 0.9em; color: #444;'><summary style='cursor: pointer; color: #3498db;'>Release Notes</summary><div style='margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px;'>$FORMATTED_NOTES</div></details>"
+    fi
+
     cat >> "$DIST_DIR/index.html" <<EOF
         <li class="apk-item">
             <a class="apk-link" href="$filename" download>$filename $LATEST_TAG</a>
@@ -98,6 +147,7 @@ while IFS= read -r apk; do
                 <span>Built: $filedate</span>
                 <span class="tag">APK</span>
             </div>
+            $RELEASE_NOTES_HTML
         </li>
 EOF
 done < /tmp/apk_list.txt
@@ -110,55 +160,6 @@ cat >> "$DIST_DIR/index.html" <<EOF
 </body>
 </html>
 EOF
-
-# 4. Docker Publish (Optional)
-if [ -n "$DOCKER_IMAGE" ] && command -v docker >/dev/null 2>&1; then
-    # Check for docker permissions
-    if ! docker info >/dev/null 2>&1; then
-        if [ -z "$DOCKER_GROUP_RETRY" ] && getent group docker | grep -q "\b$USER\b"; then
-            export DOCKER_GROUP_RETRY=1
-            echo "Detected 'docker' group membership but it's not active in this session."
-            echo "Re-executing with 'sg docker'..."
-            CMD=$(printf "%q " "$0" "$@")
-            exec sg docker -c "$CMD"
-        fi
-        echo "ERROR: Permission denied while trying to connect to the Docker daemon."
-        echo "Please ensure your user ($USER) is in the 'docker' group."
-        echo "You can add yourself with: sudo usermod -aG docker \$USER"
-        echo "Then log out and log back in, or run: newgrp docker"
-        exit 1
-    fi
-
-    # Check for docker registry authentication
-    if ! docker info | grep -q "Username:"; then
-        echo "WARNING: You don't seem to be logged into Docker Hub."
-        echo "Pushing images to 'tsshadow/' will likely fail."
-        echo "Please run: docker login"
-        echo ""
-        if [ -t 0 ]; then
-            read -p "Do you want to continue anyway? (y/N) " -n 1 -r
-            echo ""
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                exit 1
-            fi
-        else
-            echo "Non-interactive session detected, continuing anyway..."
-        fi
-    fi
-
-    echo "--- Building Docker Image: $DOCKER_IMAGE ---"
-    # Ensure a local dist directory exists for Docker build context if needed
-    if [ "$DIST_DIR" != "dist" ] && [ ! -d "dist" ]; then
-        mkdir -p dist
-    fi
-    docker build -t "$DOCKER_IMAGE:latest" -t "$DOCKER_IMAGE:$VERSION_NAME" -f apk-hoster/Dockerfile .
-    
-    echo "--- Pushing Docker Image: $DOCKER_IMAGE ---"
-    docker push "$DOCKER_IMAGE:latest"
-    docker push "$DOCKER_IMAGE:$VERSION_NAME"
-else
-    echo "Warning: docker command not found, skipping Docker build."
-fi
 
 echo "--- All publishes completed ---"
 echo ""

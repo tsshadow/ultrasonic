@@ -1,14 +1,15 @@
 #!/bin/bash
 set -e
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
+ROOT_DIR=$(pwd)
 
 # Configuration
 APP_NAME="ultrasonic"
 
-# Load optional remote publish path from local.properties if exists
-if [ -f "local.properties" ]; then
-    # Parse local.properties
+# Load optional remote publish path from .env if exists
+if [ -f ".env" ]; then
+    # Parse .env
     while IFS='=' read -r key value; do
         if [[ ! $key =~ ^# && -n $key ]]; then
             # Trim whitespace
@@ -19,42 +20,50 @@ if [ -f "local.properties" ]; then
                 export "$key=$value"
             fi
         fi
-    done < local.properties
+    done < .env
     
     PUBLISH_REMOTE_PATH="${PUBLISH_REMOTE_PATH}"
 fi
 
+# Build type (release or debug) - only relevant for deployment if we filter what to sync
+BUILD_TYPE=$(echo "${1:-debug}" | tr '[:upper:]' '[:lower:]')
+
 # Configuration for deployment logic
 DIST_DIR="${DIST_DIR:-dist}"
 TARGET="${DEPLOY_TARGET_NAME:-Ultrasonic}"
-DOCKER_COMPOSE_FILE="${REMOTE_STACK_PATH}"
-DOCKER_IMAGE="${DOCKER_IMAGE:-tsshadow/apk-hoster}"
 REMOTE_DIST_PATH="${REMOTE_DIST_PATH:-/mnt/teun/ultrasonic-builds}"
 
-# Try to extract path from PUBLISH_REMOTE_PATH if REMOTE_DIST_PATH is not set
-if [ -z "$REMOTE_DIST_PATH" ] && [ -n "$PUBLISH_REMOTE_PATH" ]; then
-    if [[ "$PUBLISH_REMOTE_PATH" == *":"* ]]; then
-        REMOTE_DIST_PATH=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f2-)
-    else
-        REMOTE_DIST_PATH="$PUBLISH_REMOTE_PATH"
-    fi
+# Try to construct PUBLISH_REMOTE_PATH if not set but we have remote info
+if [ -z "$PUBLISH_REMOTE_PATH" ] && [ -n "$REMOTE_HOST" ] && [ -n "$REMOTE_DIST_PATH" ]; then
+    USER_PART="${REMOTE_USER:-root}"
+    PUBLISH_REMOTE_PATH="${USER_PART}@${REMOTE_HOST}:${REMOTE_DIST_PATH}"
+    echo "Note: PUBLISH_REMOTE_PATH not set, inferred: $PUBLISH_REMOTE_PATH"
 fi
 
-echo "--- Starting deployment of $APP_NAME ---"
+echo "--- Starting $BUILD_TYPE deployment of $APP_NAME ---"
 
 # 1. Remote Publish (Optional)
 if [ -n "$PUBLISH_REMOTE_PATH" ]; then
     echo "--- Syncing to remote server: $PUBLISH_REMOTE_PATH ---"
+    
+    # Create the remote directory if it doesn't exist
+    REMOTE_HOST_ONLY=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f1)
+    REMOTE_PATH_ONLY=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f2-)
+    
+    echo "Ensuring remote directory exists: $REMOTE_PATH_ONLY"
     if [ -z "${REMOTE_PASS}" ]; then
-        scp "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+        ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
+        scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
     elif command -v sshpass >/dev/null 2>&1; then
-        sshpass -p "${REMOTE_PASS}" scp "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+        sshpass -p "${REMOTE_PASS}" ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
+        sshpass -p "${REMOTE_PASS}" scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
     else
-        scp "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+        ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
+        scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
     fi
 fi
 
-# 2. Remote Deployment (Optional)
+# 2. Remote Notification/Webhook (Optional)
 if [ -n "${PORTAINER_WEBHOOK_URL}" ]; then
     echo "--- Triggering Portainer Webhook for: $TARGET ---"
     if command -v curl >/dev/null 2>&1; then
@@ -81,29 +90,9 @@ if [ -n "${PORTAINER_WEBHOOK_URL}" ]; then
         exit 1
     fi
 elif [ -n "$REMOTE_HOST" ]; then
-    echo "--- Starting remote deployment for stack: $TARGET ---"
-    
-    # Create temporary .env from local.properties for deployment if it exists
-    TEMP_ENV=$(mktemp)
-    # Start with defaults for essential variables
-    echo "DOCKER_IMAGE=${DOCKER_IMAGE}" > "$TEMP_ENV"
-    echo "REMOTE_DIST_PATH=${REMOTE_DIST_PATH}" >> "$TEMP_ENV"
-    
-    if [ -f "local.properties" ]; then
-        grep -v '^#' local.properties | sed 's/ *= */=/g' >> "$TEMP_ENV"
-    fi
-    export LOCAL_ENV_FILE="$TEMP_ENV"
-    
-    # Use the generalized deployment script
-    export SEARCH_STRING="apk-hoster"
-    export LOCAL_COMPOSE_FILE="docker-compose.yml"
-    
-    ./scripts/deploy-stack.sh
-    
-    rm -f "$TEMP_ENV"
-    echo "--- Deployment completed successfully ---"
+    echo "--- Remote file sync completed ---"
 else
-    echo "Note: Neither PORTAINER_WEBHOOK_URL nor REMOTE_HOST set, skipping remote deployment."
+    echo "Note: Neither PORTAINER_WEBHOOK_URL nor REMOTE_HOST set, skipping remote publish."
 fi
 
 echo "--- Deployment completed ---"

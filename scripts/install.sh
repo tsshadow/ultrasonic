@@ -9,6 +9,9 @@ INSTALL_DIR="$HOME/.local"
 JDK_DIR="$INSTALL_DIR/jdk-21"
 ANDROID_HOME="$HOME/Android/Sdk"
 
+cd "$(dirname "$0")/.."
+ROOT_DIR=$(pwd)
+
 echo "=== Ultrasonic Dependency Installer ==="
 
 mkdir -p "$INSTALL_DIR"
@@ -17,13 +20,6 @@ mkdir -p "$INSTALL_DIR"
 if ! command -v sshpass >/dev/null 2>&1; then
     echo "--- Installing sshpass ---"
     sudo apt-get update -y && sudo apt-get install -y sshpass
-fi
-
-# Add current user to docker group
-if ! groups $USER | grep -q "\bdocker\b"; then
-    echo "Adding $USER to docker group..."
-    sudo usermod -aG docker $USER
-    echo "User added to docker group. You may need to restart your session or run 'newgrp docker'."
 fi
 
 # 2. Install JDK 21
@@ -66,15 +62,15 @@ yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses > /dev/null
 
 sdkmanager --sdk_root="$ANDROID_HOME" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-# 4. Setup local.properties
+# 4. Setup .env
 echo "--- Configuring project ---"
-cat > local.properties <<EOF
+cat > .env <<EOF
 sdk.dir=$ANDROID_HOME
-SIGNING_STORE_FILE=$(pwd)/keystore.jks
+SIGNING_STORE_FILE=$ROOT_DIR/keystore.jks
 SIGNING_STORE_PASSWORD=changeit
 SIGNING_KEY_ALIAS=upload
 SIGNING_KEY_PASSWORD=changeit
-# Optional: Remote publish path for build_and_publish.sh
+# Optional: Remote publish path for build scripts
 # PUBLISH_REMOTE_PATH=user@nas:/var/www/html/ultrasonic
 
 # Remote Deployment Configuration
@@ -91,8 +87,6 @@ SIGNING_KEY_PASSWORD=changeit
 # REMOTE_USER=root
 # REMOTE_PASS=changeit
 # REMOTE_DIST_PATH=/var/www/html/ultrasonic
-# Path to docker-compose.yml or its directory on the remote host
-# REMOTE_STACK_PATH=
 
 # Default Server Configurations for APK pre-configuration
 # SERVER_1_NAME=LMS
@@ -104,23 +98,17 @@ SIGNING_KEY_PASSWORD=changeit
 # SERVER_2_USER=guest
 # SERVER_2_PASS=your_uuid_here
 EOF
-echo "local.properties updated"
+echo ".env updated"
 
 # 5. Environment check
 echo "--- Verification ---"
 java -version
 sdkmanager --version
 
-# Apply group membership check
-if ! groups | grep -q "\bdocker\b"; then
-    echo "NOTE: The build scripts now automatically handle Docker permissions if you've just been added to the group."
-    echo "If you want to use Docker manually in this session, run: newgrp docker"
-fi
-
 echo ""
 echo "=== Installation Successful ==="
 echo "You can now run: ./gradlew assembleDebug"
-echo "Or build a release APK with: ./build_and_publish.sh"
+echo "Or build a release APK with: ./bup"
 echo ""
 echo "To make these changes permanent, add the following to your ~/.bashrc:"
 echo "export JAVA_HOME=\"$JDK_DIR\""

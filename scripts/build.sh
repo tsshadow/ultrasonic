@@ -5,9 +5,12 @@ set -e
 APP_NAME="ultrasonic"
 MODULE="ultrasonic"
 
+cd "$(dirname "$0")/.."
+ROOT_DIR=$(pwd)
+
 # Try to find JAVA_HOME and ANDROID_HOME if not set
 if [ -z "$JAVA_HOME" ] || [ -z "$ANDROID_HOME" ]; then
-    echo "Note: Environment variables not set, attempting to load defaults from install.sh..."
+    echo "Note: Environment variables not set, attempting to load defaults..."
     [ -d "$HOME/.local/jdk-21" ] && export JAVA_HOME="$HOME/.local/jdk-21"
     [ -d "$HOME/Android/Sdk" ] && export ANDROID_HOME="$HOME/Android/Sdk"
     
@@ -19,7 +22,14 @@ if [ -z "$JAVA_HOME" ] || [ -z "$ANDROID_HOME" ]; then
     fi
 fi
 
-echo "--- Starting build of $APP_NAME ---"
+# Build type (release or debug)
+BUILD_TYPE=$(echo "${1:-debug}" | tr '[:upper:]' '[:lower:]')
+if [[ "$BUILD_TYPE" != "release" && "$BUILD_TYPE" != "debug" ]]; then
+    echo "Invalid build type: $BUILD_TYPE. Use 'release' or 'debug'."
+    exit 1
+fi
+
+echo "--- Starting $BUILD_TYPE build of $APP_NAME ---"
 
 # Ensure keystore exists
 if [ ! -f "keystore.jks" ] && [ -z "$SIGNING_STORE_FILE" ]; then
@@ -27,8 +37,8 @@ if [ ! -f "keystore.jks" ] && [ -z "$SIGNING_STORE_FILE" ]; then
     ./gradlew generateKeystore
 fi
 
-# Load optional configuration from local.properties
-if [ -f "local.properties" ]; then
+# Load optional configuration from .env
+if [ -f ".env" ]; then
     while IFS='=' read -r key value; do
         if [[ ! $key =~ ^# && -n $key ]]; then
             key=$(echo "$key" | xargs)
@@ -38,7 +48,7 @@ if [ -f "local.properties" ]; then
                 export "$key=$value"
             fi
         fi
-    done < local.properties
+    done < .env
 fi
 
 # Set signing environment variables from config
@@ -47,6 +57,13 @@ export SIGNING_STORE_PASSWORD="${SIGNING_STORE_PASSWORD}"
 export SIGNING_KEY_ALIAS="${SIGNING_KEY_ALIAS}"
 export SIGNING_KEY_PASSWORD="${SIGNING_KEY_PASSWORD}"
 
-./gradlew clean :$MODULE:assembleRelease
+GRADLE_TASK="assembleRelease"
+if [ "$BUILD_TYPE" == "debug" ]; then
+    GRADLE_TASK="assembleDebug"
+fi
+
+./gradlew clean :$MODULE:$GRADLE_TASK
+
+echo "--- $BUILD_TYPE Build completed successfully ---"
 
 echo "--- Build completed successfully ---"
