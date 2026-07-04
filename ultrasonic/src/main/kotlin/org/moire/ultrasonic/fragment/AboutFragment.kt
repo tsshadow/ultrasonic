@@ -16,8 +16,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import java.util.Locale
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.util.UpdateChecker
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.Util.getVersionName
 
@@ -28,6 +31,7 @@ class AboutFragment : Fragment() {
     private var titleText: TextView? = null
     private var webPageButton: Button? = null
     private var reportBugButton: Button? = null
+    private var updateButton: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         applyTheme(this.context)
@@ -44,6 +48,7 @@ class AboutFragment : Fragment() {
         titleText = view.findViewById(R.id.help_title)
         webPageButton = view.findViewById(R.id.help_webpage)
         reportBugButton = view.findViewById(R.id.help_report)
+        updateButton = view.findViewById(R.id.help_update)
 
         val versionName = getVersionName(requireContext())
         val title = String.format(
@@ -66,6 +71,12 @@ class AboutFragment : Fragment() {
             startActivity(
                 Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.about_report_url)))
             )
+        }
+
+        updateButton?.setOnClickListener {
+            lifecycleScope.launch {
+                UpdateChecker.checkForUpdates(requireContext(), manual = true)
+            }
         }
     }
 }

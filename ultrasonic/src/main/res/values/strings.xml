@@ -541,4 +541,7 @@
     <string name="lineup_default">Lineup</string>
     <string name="festival_lineup">Lineup</string>
     <string name="favorite">Favorite</string>
+    <string name="update_check">Check for Updates</string>
+    <string name="update_no_new_version">You are using the latest version.</string>
+    <string name="update_check_failed">Failed to check for updates. Please try again later.</string>
 </resources>

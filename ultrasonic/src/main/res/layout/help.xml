@@ -7,7 +7,7 @@
         a:id="@+id/SCROLLER_ID"
         a:layout_width="fill_parent"
         a:layout_height="wrap_content"
-        a:layout_above="@+id/help_webpage"
+        a:layout_above="@+id/help_update"
         a:layout_alignParentTop="true"
         a:fillViewport="true"
         a:layout_marginBottom="10dp"
@@ -40,6 +40,16 @@
 
     </ScrollView>
 
+
+    <Button
+        a:id="@+id/help_update"
+        a:layout_width="match_parent"
+        a:layout_height="wrap_content"
+        a:layout_above="@+id/help_webpage"
+        a:layout_marginLeft="10dp"
+        a:layout_marginRight="10dp"
+        a:text="@string/update_check"
+         />
 
     <Button
         a:id="@+id/help_webpage"

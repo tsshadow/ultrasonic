@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import org.moire.ultrasonic.BuildConfig
+import org.moire.ultrasonic.R
 import timber.log.Timber
 
 /**
@@ -21,8 +23,9 @@ object UpdateChecker {
     /**
      * Checks for updates and shows a dialog if a new version is available.
      * Should be called from a coroutine scope.
+     * @param manual If true, shows a message if no update is found.
      */
-    suspend fun checkForUpdates(context: Context) {
+    suspend fun checkForUpdates(context: Context, manual: Boolean = false) {
         Timber.d("Checking for updates at $UPDATE_URL")
         try {
             val latestVersion = fetchLatestVersion()
@@ -44,10 +47,24 @@ object UpdateChecker {
                     }
                 } else {
                     Timber.d("App is up to date.")
+                    if (manual) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, R.string.update_no_new_version, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            } else if (manual) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, R.string.update_check_failed, Toast.LENGTH_SHORT).show()
                 }
             }
         } catch (e: Exception) {
             Timber.e(e, "Failed to check for updates")
+            if (manual) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, R.string.update_check_failed, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
