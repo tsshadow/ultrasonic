@@ -63,10 +63,15 @@ If you are modifying the code and need to rebuild and redeploy the system:
 4.  **Deploy to remote**: `./deploy.sh`
 5.  **Full pipeline (Build + Publish + Deploy)**: `./build_and_publish.sh`
 
+#### Distribution and Custom Paths
+You can configure where builds are saved and how they are served:
+- `DIST_DIR`: Local path where APKs and `index.html` are saved (e.g., `/mnt/teun/ultrasonic-builds`).
+- `REMOTE_DIST_PATH`: Path on the remote server where builds are located (used for Docker volume mounting).
+
 #### Remote Deployment Options
 You can configure deployment in `local.properties`:
-1.  **Portainer Webhook**: Set `PORTAINER_WEBHOOK_URL`. This will trigger a webhook to update the `apk-hoster` service (or whatever service you have linked to the webhook).
-2.  **SSH**: Set `REMOTE_HOST`, `REMOTE_USER`, etc. The script will SSH into the host, stop the old `apk-hoster` container, and start a new one.
+1.  **Portainer Webhook**: Set `PORTAINER_WEBHOOK_URL`. This will trigger a webhook to update the `apk-hoster` service. *Note: Webhooks only trigger a redeploy/pull; they do not update environment variables. Manage variables directly in the Portainer Stack UI.*
+2.  **SSH**: Set `REMOTE_HOST`, `REMOTE_USER`, etc. The script will SSH into the host, stop the old `apk-hoster` container, and start a new one. This method is better if you want to manage everything via files on the server.
 
 **Tip**: Use `DEPLOY_TARGET_NAME` in `local.properties` to give your deployment target a friendly name which will be displayed during the deployment process.
 
