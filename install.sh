@@ -89,6 +89,8 @@ SIGNING_KEY_PASSWORD=changeit
 # REMOTE_USER=root
 # REMOTE_PASS=changeit
 # REMOTE_DIST_PATH=/var/www/html/ultrasonic
+# Path to docker-compose.yml or its directory on the remote host
+# REMOTE_STACK_PATH=
 
 # Default Server Configurations for APK pre-configuration
 # SERVER_1_NAME=LMS

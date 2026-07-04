@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+cd "$(dirname "$0")"
+
 # Configuration
 APP_NAME="ultrasonic"
 DIST_DIR="dist"
@@ -8,18 +10,22 @@ DOCKER_IMAGE="tsshadow/apk-hoster"
 
 # Load optional remote publish path from local.properties if exists
 if [ -f "local.properties" ]; then
-    PROP_PATH=$(grep "^PUBLISH_REMOTE_PATH=" local.properties | cut -d'=' -f2-)
-    if [ -n "$PROP_PATH" ]; then
-        PUBLISH_REMOTE_PATH="${PUBLISH_REMOTE_PATH:-$PROP_PATH}"
-    fi
-    # Remote host configuration for Docker deployment
-    REMOTE_HOST="${REMOTE_HOST:-$(grep "^REMOTE_HOST=" local.properties | cut -d'=' -f2-)}"
-    REMOTE_USER="${REMOTE_USER:-$(grep "^REMOTE_USER=" local.properties | cut -d'=' -f2-)}"
-    REMOTE_PASS="${REMOTE_PASS:-$(grep "^REMOTE_PASS=" local.properties | cut -d'=' -f2-)}"
-    REMOTE_DIST_PATH="${REMOTE_DIST_PATH:-$(grep "^REMOTE_DIST_PATH=" local.properties | cut -d'=' -f2-)}"
-    PORTAINER_WEBHOOK_URL="${PORTAINER_WEBHOOK_URL:-$(grep "^PORTAINER_WEBHOOK_URL=" local.properties | cut -d'=' -f2-)}"
-    DEPLOY_TARGET_NAME="${DEPLOY_TARGET_NAME:-$(grep "^DEPLOY_TARGET_NAME=" local.properties | cut -d'=' -f2-)}"
+    # Parse local.properties
+    while IFS='=' read -r key value; do
+        if [[ ! $key =~ ^# && -n $key ]]; then
+            # Trim whitespace
+            key=$(echo "$key" | xargs)
+            value=$(echo "$value" | xargs)
+            export "$key=$value"
+        fi
+    done < local.properties
+    
+    PUBLISH_REMOTE_PATH="${PUBLISH_REMOTE_PATH}"
 fi
+
+# Configuration for deployment logic
+TARGET="${DEPLOY_TARGET_NAME:-APK Hoster Stack}"
+DOCKER_COMPOSE_FILE="${REMOTE_STACK_PATH:-docker-compose.yml}"
 
 # Try to extract path from PUBLISH_REMOTE_PATH if REMOTE_DIST_PATH is not set
 if [ -z "$REMOTE_DIST_PATH" ] && [ -n "$PUBLISH_REMOTE_PATH" ]; then
@@ -35,12 +41,17 @@ echo "--- Starting deployment of $APP_NAME ---"
 # 1. Remote Publish (Optional)
 if [ -n "$PUBLISH_REMOTE_PATH" ]; then
     echo "--- Syncing to remote server: $PUBLISH_REMOTE_PATH ---"
-    scp "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+    if [ -z "${REMOTE_PASS}" ]; then
+        scp "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+    elif command -v sshpass >/dev/null 2>&1; then
+        sshpass -p "${REMOTE_PASS}" scp "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+    else
+        scp "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+    fi
 fi
 
 # 2. Remote Deployment (Optional)
 if [ -n "${PORTAINER_WEBHOOK_URL}" ]; then
-    TARGET="${DEPLOY_TARGET_NAME:-Portainer Stack}"
     echo "--- Triggering Portainer Webhook for: $TARGET ---"
     if command -v curl >/dev/null 2>&1; then
         curl -X POST "${PORTAINER_WEBHOOK_URL}"
@@ -50,7 +61,6 @@ if [ -n "${PORTAINER_WEBHOOK_URL}" ]; then
         exit 1
     fi
 elif [ -n "$REMOTE_HOST" ]; then
-    TARGET="${DEPLOY_TARGET_NAME:-APK Hoster}"
     echo "--- Updating remote server $REMOTE_HOST for: $TARGET ---"
     REMOTE_USER="${REMOTE_USER:-root}"
     
@@ -62,15 +72,28 @@ elif [ -n "$REMOTE_HOST" ]; then
 
     REMOTE_COMMAND="
     set -e
-    echo \"Updating container 'apk-hoster' for '$TARGET'...\"
-    docker pull $DOCKER_IMAGE
-    docker stop apk-hoster || true
-    docker rm apk-hoster || true
-    docker run -d --name apk-hoster \
-        -p 8275:8275 \
-        $VOLUME_ARG \
-        --restart always \
-        $DOCKER_IMAGE
+    # Try to find docker-compose file
+    if [ -f \"${DOCKER_COMPOSE_FILE}\" ]; then
+        echo \"Updating stack '$TARGET' via docker-compose using ${DOCKER_COMPOSE_FILE}...\"
+        docker-compose -f \"${DOCKER_COMPOSE_FILE}\" pull || docker compose -f \"${DOCKER_COMPOSE_FILE}\" pull
+        docker-compose -f \"${DOCKER_COMPOSE_FILE}\" up -d || docker compose -f \"${DOCKER_COMPOSE_FILE}\" up -d
+    elif [ -d \"${DOCKER_COMPOSE_FILE}\" ] && [ -f \"${DOCKER_COMPOSE_FILE}/docker-compose.yml\" ]; then
+        echo \"Updating stack '$TARGET' in directory ${DOCKER_COMPOSE_FILE}...\"
+        cd \"${DOCKER_COMPOSE_FILE}\"
+        docker-compose pull || docker compose pull
+        docker-compose up -d || docker compose up -d
+    else
+        echo \"Warning: Docker compose configuration not found at '${DOCKER_COMPOSE_FILE}' on remote host.\"
+        echo \"Updating individual container 'apk-hoster' for '$TARGET'...\"
+        docker pull $DOCKER_IMAGE
+        docker stop apk-hoster || true
+        docker rm apk-hoster || true
+        docker run -d --name apk-hoster \
+            -p 8275:8275 \
+            $VOLUME_ARG \
+            --restart always \
+            $DOCKER_IMAGE
+    fi
     "
     
     if [ -z "${REMOTE_PASS}" ]; then
