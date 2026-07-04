@@ -1,75 +1,17 @@
-## [6.1.1-155] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.1.1-154] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.1.1-153] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.1.1-152] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.1.1-151] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.1.1] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.1.0-149] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.1.0-148] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.1.0-147] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.1.0-146] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.1.0] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.0.0-144] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.0.0-143] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.0.0-142] - 2026-07-04
-### Changed
-- Version bump.
-
-## [6.0.0-141] - 2026-07-04
-### Changed
-- Version bump.
+## [6.2.0] - 2026-07-04
+### Added
+- **Spotify-style UI**: Integrated dynamic "Songs" (Green) and "Sets" (Blue) branding throughout the app.
+- **Merged Views**: "Songs" and "Livesets" tabs merged into a single view with a brand-aware toggle switch.
+- **OLED Black Theme**: Implemented a pure black (#000000) background for OLED displays and removed the light theme.
+- **Brand Consistency**: Dynamic accent color updates for switches, sliders, chips, and scrollbars across all fragments.
+- **Tooling Upgrade**: Modernized build pipeline with Gradle 9.6.0 and updated core dependencies.
+- **Improved About Screen**: Detailed information on `tsshadow/lms` integration and technical build details.
+- **Update System**: Enhanced auto-update checker with authentication and version tracking.
 
 ## [6.0.0-140] - 2026-07-04
 ### Added
 - Integrated full changelog support for debug builds in the distribution pipeline.
 - Added direct link to `changelog.md` in the download portal.
-
-## [6.0.0] - 2026-07-04
-### Changed
-- Version bump.
-
-## [5.2.2] - 2026-07-04
-### Changed
-- Version bump.
 
 ## [5.2.1] - 2026-07-04
 ### Added

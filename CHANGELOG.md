@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.2.0] - 2026-07-04
+
 ### Added
 - **Spotify-style UI**: Integrated dynamic "Songs" (Green) and "Sets" (Blue) branding throughout the app.
 - **Merged Views**: "Songs" and "Livesets" tabs merged into a single view with a brand-aware toggle switch.
