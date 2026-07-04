@@ -63,6 +63,10 @@ SIGNING_KEY_ALIAS=upload
 SIGNING_KEY_PASSWORD=changeit
 # Optional: Remote publish path for build_and_publish.sh
 # PUBLISH_REMOTE_PATH=user@nas:/var/www/html/ultrasonic
+# Optional: Remote Docker host for build_and_publish.sh
+# REMOTE_HOST=192.168.1.27
+# REMOTE_USER=root
+# REMOTE_PASS=changeit
 EOF
 echo "local.properties updated"
 
@@ -71,6 +75,11 @@ echo "--- Verification ---"
 java -version
 sdkmanager --version
 
+# Apply group membership to the current session
+if ! groups | grep -q "\bdocker\b"; then
+    echo "Applying docker group membership to the current session via 'newgrp docker'..."
+    newgrp docker
+fi
 echo ""
 echo "=== Installation Successful ==="
 echo "You can now run: ./gradlew assembleDebug"

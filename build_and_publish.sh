@@ -26,6 +26,10 @@ if [ -f "local.properties" ]; then
     if [ -n "$PROP_PATH" ]; then
         PUBLISH_REMOTE_PATH="${PUBLISH_REMOTE_PATH:-$PROP_PATH}"
     fi
+    # Remote host configuration for Docker deployment
+    REMOTE_HOST="${REMOTE_HOST:-$(grep "^REMOTE_HOST=" local.properties | cut -d'=' -f2-)}"
+    REMOTE_USER="${REMOTE_USER:-$(grep "^REMOTE_USER=" local.properties | cut -d'=' -f2-)}"
+    REMOTE_PASS="${REMOTE_PASS:-$(grep "^REMOTE_PASS=" local.properties | cut -d'=' -f2-)}"
 fi
 
 echo "--- Starting build and publish of $APP_NAME ---"
@@ -138,6 +142,47 @@ EOF
 if [ -n "$PUBLISH_REMOTE_PATH" ]; then
     echo "--- Syncing to remote server: $PUBLISH_REMOTE_PATH ---"
     scp "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+fi
+
+# 6. Docker Publish (Optional)
+DOCKER_IMAGE="tsshadow/apk-hoster"
+if command -v docker >/dev/null 2>&1; then
+    echo "--- Building Docker Image: $DOCKER_IMAGE ---"
+    # Ensure we have the latest main.go and Dockerfile in the context
+    docker build -t "$DOCKER_IMAGE" -f apk-hoster/Dockerfile .
+    
+    echo "--- Pushing Docker Image: $DOCKER_IMAGE ---"
+    docker push "$DOCKER_IMAGE"
+    
+    if [ -n "$REMOTE_HOST" ]; then
+        echo "--- Updating remote server $REMOTE_HOST ---"
+        REMOTE_USER="${REMOTE_USER:-root}"
+        
+        REMOTE_COMMAND="
+        set -e
+        docker pull $DOCKER_IMAGE
+        docker stop apk-hoster || true
+        docker rm apk-hoster || true
+        docker run -d --name apk-hoster \
+            -p 80:80 \
+            --restart always \
+            $DOCKER_IMAGE
+        "
+        
+        if [ -z "${REMOTE_PASS}" ]; then
+            ssh -o StrictHostKeyChecking=no "${REMOTE_USER}@${REMOTE_HOST}" "${REMOTE_COMMAND}"
+        elif command -v sshpass >/dev/null 2>&1; then
+            sshpass -p "${REMOTE_PASS}" ssh -o StrictHostKeyChecking=no "${REMOTE_USER}@${REMOTE_HOST}" "${REMOTE_COMMAND}"
+        else
+            echo "Error: sshpass not found. Install it or unset REMOTE_PASS and enter password manually."
+        fi
+    else
+        echo "Note: REMOTE_HOST not set, skipping remote deployment."
+        echo "To restart the container manually, run:"
+        echo "docker pull $DOCKER_IMAGE && docker stop apk-hoster || true && docker rm apk-hoster || true && docker run -d --name apk-hoster -p 80:80 --restart always $DOCKER_IMAGE"
+    fi
+else
+    echo "Warning: docker command not found, skipping Docker build."
 fi
 
 echo "--- All builds and publishes completed ---"
