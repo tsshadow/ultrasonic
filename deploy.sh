@@ -15,7 +15,10 @@ if [ -f "local.properties" ]; then
             # Trim whitespace
             key=$(echo "$key" | xargs)
             value=$(echo "$value" | xargs)
-            export "$key=$value"
+            # Only export valid bash identifiers (skip keys with dots like sdk.dir)
+            if [[ "$key" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
+                export "$key=$value"
+            fi
         fi
     done < local.properties
     
