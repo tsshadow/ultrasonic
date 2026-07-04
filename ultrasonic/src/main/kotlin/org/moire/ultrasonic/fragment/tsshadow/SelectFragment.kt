@@ -1,8 +1,5 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
-import FilterOptionsViewModel
-import FilterState
-import TileInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -42,9 +39,9 @@ abstract class SelectFragment :
     private lateinit var recyclerView: RecyclerView
     private lateinit var tileAdapter: TileAdapter
 
-    protected abstract val pageKey: String
-    protected abstract val defaultLength: String
-    protected abstract val filterModalType: FilterModalType
+    open var pageKey: String = ""
+    open var defaultLength: String = ""
+    open var filterModalType: FilterModalType = FilterModalType.SONG
 
     override var swipeRefresh: SwipeRefreshLayout? = null
 
@@ -124,7 +121,9 @@ abstract class SelectFragment :
                         length = defaultLength,
                         ratingMin = filterState.ratingMin,
                         ratingMax = filterState.ratingMax,
-                        sortMethod = filterState.sortMethod
+                        sortMethod = filterState.sortMethod,
+                        minDuration = filterState.minDuration ?: -1,
+                        maxDuration = filterState.maxDuration ?: -1
                     )
 
                     findNavController().navigate(navAction)
@@ -168,6 +167,8 @@ abstract class SelectFragment :
         length = defaultLength,
         ratingMin = state.ratingMin,
         ratingMax = state.ratingMax,
+        minDuration = state.minDuration,
+        maxDuration = state.maxDuration,
         size = state.count,
         festivalLineup = state.festivalLineup,
         favorite = state.favorite
@@ -186,6 +187,9 @@ abstract class SelectFragment :
             sortMethod = tile.sortMethod,
             ratingMin = tile.ratingMin,
             ratingMax = tile.ratingMax,
+            minDuration = tile.minDuration,
+            maxDuration = tile.maxDuration,
+            modalType = filterModalType,
             count = tile.size,
             favorite = tile.favorite
         )
@@ -193,13 +197,13 @@ abstract class SelectFragment :
         modal.show(childFragmentManager, "FilterModal")
     }
 
-    open fun initializeViews(view: View) {
+    protected open fun initializeViews(view: View) {
         recyclerView = view.findViewById(R.id.tileRecyclerView)
         toggleFiltersButton = view.findViewById(R.id.show_filters)
         swipeRefresh = view.findViewById(R.id.swipeRefresh)
     }
 
-    private fun populateTiles() {
+    protected fun populateTiles() {
         val spanCount = calculateSpanCount()
         recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
 

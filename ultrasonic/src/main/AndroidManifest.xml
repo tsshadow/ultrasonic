@@ -35,7 +35,7 @@
         android:preserveLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
-        android:theme="@style/Theme.Material3.DynamicColors.Dark"
+        android:theme="@style/UltrasonicTheme.Dark"
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute"
         tools:targetApi="q">

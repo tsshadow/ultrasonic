@@ -2,15 +2,17 @@
 <resources>
 
     <style name="CleanSearchStyle" parent="Widget.AppCompat.SearchView">
-        <item name="queryBackground">@null</item>
+        <item name="queryBackground">@drawable/pill_background</item>
         <item name="submitBackground">@null</item>
+        <item name="android:paddingHorizontal">4dp</item>
     </style>
 
     <!-- Here we define some basic attributes that are the same for each theme -->
     <style name="UltrasonicTheme.Base" parent="">
         <item name="searchViewStyle">@style/CleanSearchStyle</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@color/spotify_black</item>
+        <item name="android:navigationBarColor">@color/spotify_black</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -22,20 +24,31 @@
     </style>
 
     <style name="UltrasonicTheme.Black" parent="Theme.Material3.Dark">
-        <item name="colorPrimaryDark">?attr/backgroundColor</item>
-        <item name="android:colorBackground">@color/background_color_black</item>
-        <item name="colorControlNormal">?attr/colorOnSurface</item>
+        <item name="colorPrimary">@color/spotify_green</item>
+        <item name="colorPrimaryDark">@color/spotify_black</item>
+        <item name="colorAccent">@color/spotify_green</item>
+        <item name="android:colorBackground">@color/spotify_black</item>
+        <item name="colorSurface">@color/spotify_dark</item>
+        <item name="colorSurfaceVariant">@color/spotify_card</item>
+        <item name="colorControlNormal">@color/spotify_text_secondary</item>
+        <item name="android:textColorPrimary">@color/spotify_text_primary</item>
+        <item name="android:textColorSecondary">@color/spotify_text_secondary</item>
     </style>
 
-    <style name="UltrasonicTheme.Dark" parent="Theme.Material3.DynamicColors.Dark">
-        <item name="colorPrimaryDark">?attr/colorSurface</item>
-        <item name="colorControlNormal">?attr/colorOnSurface</item>
-        <item name="colorControlHighlight">?attr/colorSecondary</item>
+    <style name="UltrasonicTheme.Dark" parent="Theme.Material3.Dark">
+        <item name="colorPrimary">@color/spotify_green</item>
+        <item name="colorPrimaryDark">@color/spotify_black</item>
+        <item name="colorAccent">@color/spotify_green</item>
+        <item name="android:colorBackground">@color/spotify_black</item>
+        <item name="colorSurface">@color/spotify_dark</item>
+        <item name="colorSurfaceVariant">@color/spotify_card</item>
+        <item name="colorControlNormal">@color/spotify_text_secondary</item>
+        <item name="android:textColorPrimary">@color/spotify_text_primary</item>
+        <item name="android:textColorSecondary">@color/spotify_text_secondary</item>
     </style>
 
-    <style name="UltrasonicTheme.Light" parent="Theme.Material3.DynamicColors.Light">
-        <item name="colorControlNormal">?attr/colorOnSurface</item>
-        <item name="colorControlHighlight">?attr/colorSecondary</item>
+    <style name="UltrasonicTheme.Light" parent="UltrasonicTheme.Dark">
+        <!-- Force dark mode for Light theme too, as per Style Guide -->
     </style>
 
 </resources>

@@ -603,7 +603,9 @@ open class RESTMusicService(
         count: Int,
         offset: Int,
         sortMethod: String?,
-        festivalLineup: String?
+        festivalLineup: String?,
+        minDuration: Int?,
+        maxDuration: Int?
     ): MusicDirectory {
         Timber.d(filters.toString())
 
@@ -619,7 +621,9 @@ open class RESTMusicService(
             offset,
             null,
             sortMethod,
-            festivalLineup
+            festivalLineup,
+            minDuration,
+            maxDuration
         ).execute().throwOnFailure()
 
         val result = MusicDirectory()

@@ -17,9 +17,11 @@ import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.google.android.material.chip.Chip
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputLayout
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.util.LayoutType
+import org.moire.ultrasonic.util.Settings
 import timber.log.Timber
 
 /**
@@ -32,8 +34,10 @@ class FilterButtonBar : ConstraintLayout {
     private var layoutTypeChangedListener: ((LayoutType) -> Unit)? = null
     private var layoutType: LayoutType = LayoutType.LIST
     private var viewTypeToggle: Chip? = null
+    private var setsToggle: MaterialSwitch? = null
     private var sortOrderMenu: TextInputLayout? = null
     private var sortOrderOptions: AppCompatAutoCompleteTextView? = null
+    private var setsToggleListener: ((Boolean) -> Unit)? = null
 
     constructor(context: Context) : super(context) {
         setup()
@@ -53,6 +57,10 @@ class FilterButtonBar : ConstraintLayout {
      */
     fun configureWithCapabilities(caps: ViewCapabilities) {
         viewTypeToggle!!.isVisible = caps.supportsGrid
+        setsToggle?.isVisible = caps.supportsSetsToggle
+        if (caps.supportsSetsToggle) {
+            setsToggle?.isChecked = Settings.isSetsMode
+        }
         sortOrderMenu!!.isVisible = caps.supportedSortOrders.isNotEmpty()
 
         if (caps.supportedSortOrders.isNotEmpty()) {
@@ -96,18 +104,33 @@ class FilterButtonBar : ConstraintLayout {
     }
 
     /**
+     * This listener is called when the user has toggled the sets mode.
+     * Register a callback from the linked fragment here.
+     *
+     * @param callback
+     */
+    fun setOnSetsToggleListener(callback: (Boolean) -> Unit) {
+        setsToggleListener = callback
+    }
+
+    /**
      * Setup the necessary bindings
      */
 
     fun setup() {
         // Link layout toggle Chip
         viewTypeToggle = findViewById(R.id.chip_view_toggle)
+        setsToggle = findViewById(R.id.switch_sets)
         sortOrderMenu = findViewById(R.id.sort_order_menu)
         sortOrderOptions = findViewById(R.id.sort_order_menu_options)
 
         viewTypeToggle!!.setOnClickListener {
             val newType = setLayoutType()
             layoutTypeChangedListener?.let { it(newType) }
+        }
+
+        setsToggle?.setOnCheckedChangeListener { _, isChecked ->
+            setsToggleListener?.invoke(isChecked)
         }
 
         @SuppressLint("PrivateResource")
@@ -203,10 +226,12 @@ data class TranslatedSortOrder(val sortOrder: SortOrder, val string: String) {
  */
 data class ViewCapabilities(
     val supportsGrid: Boolean = false,
+    val supportsSetsToggle: Boolean = false,
     val supportedSortOrders: List<SortOrder>
 )
 
 val EMPTY_CAPABILITIES = ViewCapabilities(
     supportsGrid = false,
+    supportsSetsToggle = false,
     supportedSortOrders = listOf()
 )

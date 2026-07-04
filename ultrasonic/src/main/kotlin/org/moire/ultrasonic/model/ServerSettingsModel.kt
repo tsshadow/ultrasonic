@@ -16,6 +16,7 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
 import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.data.ServerSettingDao
+import org.moire.ultrasonic.util.Settings
 import timber.log.Timber
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -41,8 +42,10 @@ class ServerSettingsModel(
     fun getServerList(): LiveData<List<ServerSetting>> {
         // This check should run before returning any result
         runBlocking {
-            if (repository.count() == 0) {
+            val count = repository.count() ?: 0
+            if (count == 0 || Settings.lastSyncedVersion < BuildConfig.VERSION_CODE) {
                 addConfiguredServers()
+                Settings.lastSyncedVersion = BuildConfig.VERSION_CODE
             }
             if (areIndexesMissing()) {
                 reindexSettings()
@@ -151,29 +154,49 @@ class ServerSettingsModel(
             val typeRef = object : TypeReference<List<Map<String, Any>>>() {}
             val servers: List<Map<String, Any>> = mapper.readValue(BuildConfig.DEFAULT_SERVERS_JSON, typeRef)
             servers.forEach { serverMap ->
-                val server = ServerSetting(
-                    index = (repository.count() ?: 0) + 1,
-                    name = serverMap["name"] as String,
-                    url = serverMap["url"] as String,
-                    userName = serverMap["userName"] as? String ?: "",
-                    password = serverMap["password"] as? String ?: "",
-                    apiKey = serverMap["apiKey"] as? String,
-                    jukeboxByDefault = false,
-                    allowSelfSignedCertificate = true,
-                    forcePlainTextPassword = true,
-                    musicFolderId = null,
-                    minimumApiVersion = "1.13.0",
-                    chatSupport = false,
-                    bookmarkSupport = false,
-                    shareSupport = true,
-                    podcastSupport = false
-                )
-                repository.insert(server)
+                val name = serverMap["name"] as String
+                val url = serverMap["url"] as String
+                val existingServer = repository.findByNameAndUrl(name, url)
+
+                if (existingServer != null) {
+                    val newApiKey = serverMap["apiKey"] as? String
+                    if (newApiKey != null && existingServer.apiKey != newApiKey) {
+                        existingServer.apiKey = newApiKey
+                        repository.update(existingServer)
+                        Timber.d("Updated apiKey for server: $name")
+                    }
+                } else {
+                    val server = ServerSetting(
+                        index = (repository.count() ?: 0) + 1,
+                        name = name,
+                        url = url,
+                        userName = serverMap["userName"] as? String ?: "",
+                        password = serverMap["password"] as? String ?: "",
+                        apiKey = serverMap["apiKey"] as? String,
+                        jukeboxByDefault = false,
+                        allowSelfSignedCertificate = true,
+                        forcePlainTextPassword = true,
+                        musicFolderId = null,
+                        minimumApiVersion = "1.13.0",
+                        chatSupport = false,
+                        bookmarkSupport = false,
+                        shareSupport = true,
+                        podcastSupport = false
+                    )
+                    repository.insert(server)
+                    Timber.d("Added configured server: $name")
+                }
             }
         } catch (e: Exception) {
             Timber.e(e, "Failed to parse default servers JSON")
         }
-        addDemoServer()
+
+        // Only add demo server if it's missing
+        val demoName = DEMO_SERVER_CONFIG.name
+        val demoUrl = DEMO_SERVER_CONFIG.url
+        if (repository.findByNameAndUrl(demoName, demoUrl) == null) {
+            addDemoServer()
+        }
     }
 
     /**

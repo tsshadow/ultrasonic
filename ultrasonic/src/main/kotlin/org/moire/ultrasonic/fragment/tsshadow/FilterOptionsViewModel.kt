@@ -1,3 +1,5 @@
+package org.moire.ultrasonic.fragment.tsshadow
+
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 

@@ -8,10 +8,11 @@
     a:minHeight="?android:attr/listPreferredItemHeight"
     a:orientation="horizontal"
     a:background="@drawable/song_card_background"
-    a:padding="8dp"
-    a:layout_marginVertical="4dp"
-    a:layout_marginHorizontal="4dp"
-    a:elevation="2dp">
+    a:paddingVertical="8dp"
+    a:paddingHorizontal="16dp"
+    a:layout_marginVertical="2dp"
+    a:layout_marginHorizontal="8dp"
+    a:elevation="0dp">
     <ImageView
         a:id="@+id/song_drag"
         a:layout_width="38dp"

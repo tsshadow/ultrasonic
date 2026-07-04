@@ -1,7 +1,5 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
-import FilterOptionsViewModel
-import FilterState
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -157,6 +155,27 @@ class FilterModalFragment : BottomSheetDialogFragment() {
                     getString(R.string.result_count_format, selectedResultCount)
             }
         }
+
+        binding.durationSlider.addOnChangeListener { _, value, _ ->
+            val minutes = value.toInt() / 60
+            binding.durationValueText.text = "$minutes min"
+        }
+
+        binding.chipSongs.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                modalType = FilterModalType.SONG
+                updateDurationLabel()
+                observeFilterOptions() // Redraw chips
+            }
+        }
+        binding.chipSets.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                modalType = FilterModalType.LIVESET
+                updateDurationLabel()
+                observeFilterOptions() // Redraw chips
+            }
+        }
+
         with(binding) {
             search.setOnClickListener { sendResult("search") }
             save.setOnClickListener { sendResult("save") }
@@ -168,6 +187,16 @@ class FilterModalFragment : BottomSheetDialogFragment() {
                     if (favoriteButton.isSelected) R.drawable.ic_star_full else R.drawable.ic_star_hollow
                 favoriteButton.setImageResource(iconRes)
             }
+        }
+    }
+
+    private fun updateDurationLabel() {
+        if (modalType == FilterModalType.LIVESET) {
+            binding.durationLabel.text = "Min Duration"
+            binding.chipSets.isChecked = true
+        } else {
+            binding.durationLabel.text = "Max Duration"
+            binding.chipSongs.isChecked = true
         }
     }
 
@@ -330,6 +359,12 @@ class FilterModalFragment : BottomSheetDialogFragment() {
             .takeIf { it >= 0 }
             ?.let { binding.selectSortMethod.setSelection(it) }
 
+        modalType = filters.modalType
+        updateDurationLabel()
+        val durationValue = (if (modalType == FilterModalType.LIVESET) filters.minDuration else filters.maxDuration) ?: 0
+        binding.durationSlider.value = durationValue.toFloat()
+        binding.durationValueText.text = "${durationValue / 60} min"
+
         val isEdit = arguments?.getBoolean(ARG_EDIT_MODE)!!
         binding.save.visibility = if (isEdit) GONE else VISIBLE
         binding.search.visibility = if (isEdit) GONE else VISIBLE
@@ -337,18 +372,24 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         binding.delete.visibility = if (isEdit) VISIBLE else GONE
     }
 
-    private fun collectFilterState(): FilterState = FilterState(
-        title = binding.selectTitle.text.toString().trim(),
-        genres = selectedGenres,
-        artists = selectedArtists,
-        years = selectedYears,
-        count = selectedResultCount,
-        ratingMin = binding.selectRatingMin.selectedItem as Int,
-        ratingMax = binding.selectRatingMax.selectedItem as Int,
-        sortMethod = sortOptions[binding.selectSortMethod.selectedItemPosition].second,
-        label = selectedLabels,
-        festival = selectedFestivals,
-        festivalLineup = selectedFestivalLineup,
-        favorite = binding.favoriteButton.isSelected
-    )
+    private fun collectFilterState(): FilterState {
+        val durationValue = binding.durationSlider.value.toInt()
+        return FilterState(
+            title = binding.selectTitle.text.toString().trim(),
+            genres = selectedGenres,
+            artists = selectedArtists,
+            years = selectedYears,
+            count = selectedResultCount,
+            ratingMin = binding.selectRatingMin.selectedItem as Int,
+            ratingMax = binding.selectRatingMax.selectedItem as Int,
+            sortMethod = sortOptions[binding.selectSortMethod.selectedItemPosition].second,
+            minDuration = if (modalType == FilterModalType.LIVESET) durationValue else null,
+            maxDuration = if (modalType == FilterModalType.SONG) durationValue else null,
+            modalType = modalType,
+            label = selectedLabels,
+            festival = selectedFestivals,
+            festivalLineup = selectedFestivalLineup,
+            favorite = binding.favoriteButton.isSelected
+        )
+    }
 }

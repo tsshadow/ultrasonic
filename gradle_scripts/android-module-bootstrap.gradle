@@ -3,7 +3,7 @@
  */
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'kotlin-kapt'
+apply plugin: 'org.jetbrains.kotlin.kapt'
 apply from: "${project.rootDir}/gradle_scripts/code_quality.gradle"
 apply plugin: 'com.google.devtools.ksp'
 

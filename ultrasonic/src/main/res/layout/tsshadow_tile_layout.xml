@@ -7,62 +7,82 @@
   ~ Distributed under terms of the GNU GPLv3 license.
 -->
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/spotify_card"
     android:foreground="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
 
-    <!-- ConstraintLayout now has fixed size so it renders correctly -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/tile_card"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:background="@drawable/tile_background_gradient"
-        android:padding="8dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
 
-        <View
-            android:id="@+id/tile_background"
+        <!-- Cover Art Placeholder / Icon Container -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/tile_icon_container"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="0dp"
+            android:background="@color/spotify_light"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            app:layout_constraintRight_toRightOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.MediumComponent" />
 
         <!-- Material Icon -->
-        <com.google.android.material.imageview.ShapeableImageView
+        <ImageView
             android:id="@+id/tile_icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:tint="@android:color/white"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/tile_text"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:srcCompat="@drawable/baseline_bolt_24" />
+            android:alpha="0.8"
+            app:layout_constraintTop_toTopOf="@id/tile_icon_container"
+            app:layout_constraintBottom_toBottomOf="@id/tile_icon_container"
+            app:layout_constraintLeft_toLeftOf="@id/tile_icon_container"
+            app:layout_constraintRight_toRightOf="@id/tile_icon_container"
+            app:srcCompat="@drawable/baseline_music_note_24"
+            app:tint="@android:color/white" />
 
         <!-- Tile Text -->
         <TextView
             android:id="@+id/tile_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Tile"
+            android:layout_marginTop="12dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:minLines="2"
             android:textColor="@android:color/white"
-            android:textSize="10sp"
+            android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/tile_icon"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tile_icon_container"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            tools:text="Hardstyle" />
+            tools:text="Hardstyle Classics" />
+
+        <!-- Subtext -->
+        <TextView
+            android:id="@+id/tile_subtext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:minLines="1"
+            android:text="Playlist"
+            android:textColor="@color/spotify_text_secondary"
+            android:textSize="11sp"
+            app:layout_constraintTop_toBottomOf="@id/tile_text"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

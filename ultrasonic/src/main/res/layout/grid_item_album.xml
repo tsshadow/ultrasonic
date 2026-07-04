@@ -6,6 +6,9 @@
     a:layout_width="match_parent"
     a:layout_height="wrap_content"
     a:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/spotify_card"
     style="?attr/materialCardViewFilledStyle">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,16 +19,18 @@
         a:clickable="true"
         a:focusable="true">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             a:id="@+id/cover_art"
             a:layout_width="match_parent"
             a:layout_height="0dp"
             a:layout_gravity="center_horizontal|center_vertical"
             a:adjustViewBounds="true"
-            a:scaleType="fitCenter"
+            a:scaleType="centerCrop"
             a:src="@drawable/unknown_album"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.SmallComponent"
             a:contentDescription="@string/albumArt" />
 
         <LinearLayout
@@ -34,8 +39,7 @@
             a:layout_height="wrap_content"
             a:gravity="center_vertical"
             a:orientation="vertical"
-            a:padding="11dp"
-            a:paddingTop="0dp"
+            a:padding="12dp"
             app:layout_constraintEnd_toEndOf="@+id/cover_art"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cover_art">
@@ -44,8 +48,10 @@
                 a:id="@+id/album_title"
                 a:layout_width="match_parent"
                 a:layout_height="wrap_content"
-                a:ellipsize="marquee"
+                a:ellipsize="end"
+                a:maxLines="1"
                 a:singleLine="true"
+                a:textColor="#FFFFFF"
                 a:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                 tools:text="Title" />
 
@@ -54,6 +60,7 @@
                 a:layout_width="match_parent"
                 a:layout_height="wrap_content"
                 a:singleLine="true"
+                a:textColor="@color/spotify_text_secondary"
                 a:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                 tools:text="Artist" />
 

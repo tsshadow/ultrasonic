@@ -1,3 +1,5 @@
+package org.moire.ultrasonic.fragment.tsshadow
+
 import android.content.Context
 import androidx.core.content.edit
 import androidx.core.graphics.toColorInt
@@ -38,17 +40,17 @@ val genreIconMap: Map<String, Int> = mapOf(
     "Random Songs" to R.drawable.baseline_music_note_24,
     "Recent Livesets" to R.drawable.baseline_music_note_24,
     "Random Livesets" to R.drawable.baseline_music_note_24,
-    "Euphoric Hardstyle" to R.drawable.baseline_emoji_emotions_24,
-    "Hardstyle" to R.drawable.baseline_mood_24,
-    "Mainstream Hardstyle" to R.drawable.baseline_mood_24,
-    "Hardstyle Classics" to R.drawable.baseline_headset_24,
+    "Euphoric Hardstyle" to R.drawable.baseline_headset_24,
+    "Hardstyle" to R.drawable.baseline_music_note_24,
+    "Mainstream Hardstyle" to R.drawable.baseline_music_note_24,
+    "Hardstyle Classics" to R.drawable.baseline_music_note_24,
     "Raw Hardstyle" to R.drawable.baseline_local_fire_department_24,
     "Mainstream Hardcore" to R.drawable.baseline_thunderstorm_24,
     "Hardcore" to R.drawable.baseline_bolt_24,
     "Millennium Hardcore" to R.drawable.baseline_headset_24,
     "Industrial Hardcore" to R.drawable.baseline_local_fire_department_24,
     "Uptempo Hardcore" to R.drawable.baseline_thunderstorm_24,
-    "Bouncy Uptempo" to R.drawable.baseline_emoji_emotions_24,
+    "Bouncy Uptempo" to R.drawable.baseline_bolt_24,
     "Zaagtempo" to R.drawable.baseline_bolt_24
 )
 
@@ -66,6 +68,8 @@ class TileInfo(
     val ratingMin: Int = 0,
     val ratingMax: Int = 5,
     val sortMethod: String = "AddedDesc",
+    val minDuration: Int? = null,
+    val maxDuration: Int? = null,
     val favorite: Boolean = false
 ) {
     init {
@@ -143,6 +147,8 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
         ratingMin = tile.ratingMin,
         ratingMax = tile.ratingMax,
         sortMethod = tile.sortMethod,
-        festivalLineup = tile.festivalLineup
+        festivalLineup = tile.festivalLineup,
+        minDuration = tile.minDuration ?: -1,
+        maxDuration = tile.maxDuration ?: -1
     )
 }

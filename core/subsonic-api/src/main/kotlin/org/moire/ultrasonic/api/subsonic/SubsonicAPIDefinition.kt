@@ -351,7 +351,9 @@ interface SubsonicAPIDefinition {
         @Query("offset") offset: Int = 0,
         @Query("musicFolderId") musicFolderId: String? = null,
         @Query("sortMethod") sortMethod: String? = null,
-        @Query("festivalLineup") festivalLineup: String? = null
+        @Query("festivalLineup") festivalLineup: String? = null,
+        @Query("minDuration") minDuration: Int? = null,
+        @Query("maxDuration") maxDuration: Int? = null
     ): Call<GetSongsResponse>
 
     @GET("getSongsByMood.view")

@@ -12,5 +12,7 @@ class FilterParams(
     val festival: List<String> = emptyList(),
     val festivalLineup: String? = null,
     val bpmMin: Int? = null,
-    val mood: String? = null
+    val mood: String? = null,
+    val minDuration: Int? = null,
+    val maxDuration: Int? = null
 )

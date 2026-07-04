@@ -18,7 +18,32 @@ import timber.log.Timber
  * Utility to check for updates from the custom APK hoster.
  */
 object UpdateChecker {
-    private const val UPDATE_URL = "https://apk.teunschriks.nl/api/version?apk=ultrasonic"
+    private fun getUpdateUrl(): String {
+        val apkName = if (BuildConfig.DEBUG) "ultrasonic-debug" else "ultrasonic"
+        return "${BuildConfig.APK_HOST_URL}/api/version?apk=$apkName&user=${BuildConfig.APK_HOST_USER}"
+    }
+
+    /**
+     * Opens the update website in a browser.
+     */
+    fun openUpdateSite(context: Context) {
+        val baseUrl = BuildConfig.APK_HOST_URL
+        val versionName = BuildConfig.VERSION_NAME
+        val versionCode = BuildConfig.VERSION_CODE
+        val uri = Uri.parse(baseUrl).buildUpon()
+            .appendQueryParameter("v", versionName)
+            .appendQueryParameter("c", versionCode.toString())
+            .build()
+        
+        Timber.d("Opening update site: $uri")
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to open update site")
+            Toast.makeText(context, "Could not open browser", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     /**
      * Checks for updates and shows a dialog if a new version is available.
@@ -26,7 +51,8 @@ object UpdateChecker {
      * @param manual If true, shows a message if no update is found.
      */
     suspend fun checkForUpdates(context: Context, manual: Boolean = false) {
-        Timber.d("Checking for updates at $UPDATE_URL")
+        val url = getUpdateUrl()
+        Timber.d("Checking for updates at $url")
         try {
             val latestVersion = fetchLatestVersion()
             if (latestVersion != null) {
@@ -70,9 +96,11 @@ object UpdateChecker {
 
     private suspend fun fetchLatestVersion(): JSONObject? = withContext(Dispatchers.IO) {
         val client = OkHttpClient()
+        val url = getUpdateUrl()
         val request = Request.Builder()
-            .url(UPDATE_URL)
+            .url(url)
             .header("User-Agent", "Ultrasonic/${BuildConfig.VERSION_NAME}")
+            .header("X-Upload-Password", BuildConfig.APK_HOST_PASSWORD)
             .build()
         
         try {
@@ -85,7 +113,7 @@ object UpdateChecker {
                 return@withContext JSONObject(body)
             }
         } catch (e: Exception) {
-            Timber.e(e, "Error fetching version info from $UPDATE_URL")
+            Timber.e(e, "Error fetching version info from $url")
             null
         }
     }

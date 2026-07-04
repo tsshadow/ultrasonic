@@ -8,6 +8,7 @@
 package org.moire.ultrasonic.fragment
 
 import android.os.Bundle
+import android.graphics.Color
 import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
@@ -128,6 +129,11 @@ class SearchFragment :
     }
 
     private fun search(query: String, autoplay: Boolean) {
+        if (query.equals("sets", ignoreCase = true)) {
+            view?.setBackgroundColor(requireContext().getColor(R.color.spotify_blue))
+        } else {
+            view?.setBackgroundColor(Color.TRANSPARENT)
+        }
         listModel.viewModelScope.launch(
             toastingExceptionHandler()
         ) {

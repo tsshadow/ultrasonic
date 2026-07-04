@@ -76,10 +76,17 @@ class AboutFragment : Fragment() {
             )
         }
 
+        var lastClickTime: Long = 0
         updateButton?.setOnClickListener {
-            lifecycleScope.launch {
-                UpdateChecker.checkForUpdates(requireContext(), manual = true)
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastClickTime < 500) {
+                UpdateChecker.openUpdateSite(requireContext())
+            } else {
+                lifecycleScope.launch {
+                    UpdateChecker.checkForUpdates(requireContext(), manual = true)
+                }
             }
+            lastClickTime = currentTime
         }
 
         changelogButton?.setOnClickListener {

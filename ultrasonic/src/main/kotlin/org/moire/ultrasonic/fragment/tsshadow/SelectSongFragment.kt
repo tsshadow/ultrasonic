@@ -1,21 +1,82 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
-import TileInfo
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
+import org.moire.ultrasonic.fragment.FilterableFragment
+import org.moire.ultrasonic.view.ViewCapabilities
+import org.moire.ultrasonic.view.SortOrder
+import org.moire.ultrasonic.util.Settings
+import android.graphics.Color
+import android.os.Bundle
+import android.view.View
+import timber.log.Timber
 
 /**
- * Fragment for selecting or saving tile presets for regular songs.
+ * Fragment for selecting or saving tile presets for regular songs and livesets.
  * Allows filtering by genre, year, rating, sort method, and optionally label.
  * Search results or saved tiles navigate to a TrackCollection.
  */
-class SelectSongFragment : SelectFragment() {
-    override val pageKey = "song"
-    override val defaultLength = "short"
-    override val filterModalType = FilterModalType.SONG
+class SelectSongFragment : SelectFragment(), FilterableFragment {
+    override var pageKey = "song"
+    override var defaultLength = "short"
+    override var filterModalType = FilterModalType.SONG
+
+    override var viewCapabilities: ViewCapabilities = ViewCapabilities(
+        supportsGrid = true,
+        supportsSetsToggle = true,
+        supportedSortOrders = listOf(
+            SortOrder.RANDOM,
+            SortOrder.NEWEST,
+            SortOrder.STARRED
+        )
+    )
+
+    override fun setOnSetsToggle(isSets: Boolean) {
+        if (isSets && pageKey == "liveset") return
+        if (!isSets && pageKey == "song") return
+
+        Settings.isSetsMode = isSets
+        if (isSets) {
+            pageKey = "liveset"
+            defaultLength = "long"
+            filterModalType = FilterModalType.LIVESET
+            view?.setBackgroundColor(requireContext().getColor(R.color.spotify_blue))
+            setTitle(this, R.string.main_livesets_title)
+        } else {
+            pageKey = "song"
+            defaultLength = "short"
+            filterModalType = FilterModalType.SONG
+            view?.setBackgroundColor(Color.TRANSPARENT)
+            setTitle(this, R.string.main_songs_title)
+        }
+        // Reload tiles and refresh UI
+        loadTilesOrDefaults()
+        populateTiles()
+        load(false)
+    }
+
+    override fun setOrderType(newOrder: SortOrder) {
+        // Tiles have their own sort methods, so we don't need to do anything here
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if (Settings.isSetsMode) {
+            pageKey = "liveset"
+            defaultLength = "long"
+            filterModalType = FilterModalType.LIVESET
+        }
+        super.onViewCreated(view, savedInstanceState)
+        if (Settings.isSetsMode) {
+            view.setBackgroundColor(requireContext().getColor(R.color.spotify_blue))
+        }
+    }
 
     override fun setTitle() {
-        setTitle(this, R.string.main_songs_title)
+        if (pageKey == "song") {
+            setTitle(this, R.string.main_songs_title)
+        } else {
+            setTitle(this, R.string.main_livesets_title)
+        }
     }
 
     override fun defaultTileSet(): MutableList<TileInfo> = mutableListOf(

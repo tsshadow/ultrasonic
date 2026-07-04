@@ -155,7 +155,9 @@ interface MusicService {
         count: Int,
         offset: Int,
         sortMethod: String?,
-        festivalLineup: String? = null
+        festivalLineup: String? = null,
+        minDuration: Int? = null,
+        maxDuration: Int? = null
     ): MusicDirectory
 
     @Throws(Exception::class)

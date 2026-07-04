@@ -1,3 +1,5 @@
+package org.moire.ultrasonic.fragment.tsshadow
+
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
@@ -11,6 +13,9 @@ data class FilterState(
     val ratingMin: Int = 0,
     val ratingMax: Int = 5,
     val sortMethod: String = "None",
+    val minDuration: Int? = null,
+    val maxDuration: Int? = null,
+    val modalType: FilterModalType = FilterModalType.SONG,
     val label: List<String> = emptyList(),
     val festival: List<String> = emptyList(),
     val festivalLineup: String? = null,

@@ -531,6 +531,8 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
         val ratingMin = navArgs.ratingMin
         val festivalLineup = navArgs.festivalLineup
         val ratingMax = navArgs.ratingMax
+        val minDuration = if (navArgs.minDuration < 0) null else navArgs.minDuration
+        val maxDuration = if (navArgs.maxDuration < 0) null else navArgs.maxDuration
 
         val getStarredTracks = displayStarred()
         val getVideos = navArgs.getVideos
@@ -646,7 +648,9 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
                     offset,
                     append,
                     effectiveSortMethod,
-                    festivalLineup
+                    festivalLineup,
+                    minDuration,
+                    maxDuration
                 )
             } else if (id == null || getRandomTracks) {
                 // There seems to be a bug in ViewPager when resuming the Activity that sub-fragments

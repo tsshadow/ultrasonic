@@ -1,3 +1,24 @@
+## [6.0.0-144] - 2026-07-04
+### Changed
+- Version bump.
+
+## [6.0.0-143] - 2026-07-04
+### Changed
+- Version bump.
+
+## [6.0.0-142] - 2026-07-04
+### Changed
+- Version bump.
+
+## [6.0.0-141] - 2026-07-04
+### Changed
+- Version bump.
+
+## [6.0.0-140] - 2026-07-04
+### Added
+- Integrated full changelog support for debug builds in the distribution pipeline.
+- Added direct link to `changelog.md` in the download portal.
+
 ## [6.0.0] - 2026-07-04
 ### Changed
 - Version bump.

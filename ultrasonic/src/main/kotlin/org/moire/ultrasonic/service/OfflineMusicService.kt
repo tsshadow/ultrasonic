@@ -394,7 +394,7 @@ class OfflineMusicService :
             year?.let { add(org.moire.ultrasonic.api.subsonic.models.Filter("YEAR", it)) }
             length?.let { add(org.moire.ultrasonic.api.subsonic.models.Filter("LENGTH", it)) }
         }
-        return getSongs(filters, ratingMin, ratingMax, count, offset, null, null)
+        return getSongs(filters, ratingMin, ratingMax, count, offset, null, null, null, null)
     }
 
     @Throws(Exception::class)
@@ -405,7 +405,9 @@ class OfflineMusicService :
         count: Int,
         offset: Int,
         sortMethod: String?,
-        festivalLineup: String?
+        festivalLineup: String?,
+        minDuration: Int?,
+        maxDuration: Int?
     ): MusicDirectory {
         var list = getAllTracks()
 
@@ -462,6 +464,13 @@ class OfflineMusicService :
             list = list.filter { (it.userRating ?: it.averageRating?.toInt() ?: 0) <= max }
         }
 
+        minDuration?.let { min ->
+            list = list.filter { (it.duration ?: 0) >= min }
+        }
+        maxDuration?.let { max ->
+            list = list.filter { (it.duration ?: 0) <= max }
+        }
+
         list = when (sortMethod) {
             "Random" -> list.shuffled()
             "AddedDesc" -> list.sortedByDescending { it.created }
@@ -494,7 +503,7 @@ class OfflineMusicService :
             year?.let { add(org.moire.ultrasonic.api.subsonic.models.Filter("YEAR", it)) }
             length?.let { add(org.moire.ultrasonic.api.subsonic.models.Filter("LENGTH", it)) }
         }
-        return getSongs(filters, ratingMin, ratingMax, count, offset, null, null)
+        return getSongs(filters, ratingMin, ratingMax, count, offset, null, null, null, null)
     }
 
     @Throws(Exception::class)
@@ -510,7 +519,7 @@ class OfflineMusicService :
             add(org.moire.ultrasonic.api.subsonic.models.Filter("YEAR", year))
             length?.let { add(org.moire.ultrasonic.api.subsonic.models.Filter("LENGTH", it)) }
         }
-        return getSongs(filters, ratingMin, ratingMax, count, offset, null, null)
+        return getSongs(filters, ratingMin, ratingMax, count, offset, null, null, null, null)
     }
 
     @Throws(Exception::class)

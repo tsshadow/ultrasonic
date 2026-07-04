@@ -46,8 +46,10 @@ class NowPlayingFragment : ScopeFragment() {
     private var nowPlayingAlbumArtImage: ImageView? = null
     private var nowPlayingTrack: TextView? = null
     private var nowPlayingArtist: TextView? = null
+    private var nowPlayingProgress: com.google.android.material.progressindicator.LinearProgressIndicator? = null
 
     private var rxBusSubscription: Disposable? = null
+    private var progressUpdateSubscription: Disposable? = null
     private val mediaPlayerManager: MediaPlayerManager by inject()
     private val imageLoaderProvider: ImageLoaderProvider by inject()
 
@@ -67,22 +69,60 @@ class NowPlayingFragment : ScopeFragment() {
         nowPlayingAlbumArtImage = view.findViewById(R.id.now_playing_image)
         nowPlayingTrack = view.findViewById(R.id.now_playing_title)
         nowPlayingArtist = view.findViewById(R.id.now_playing_artist)
+        nowPlayingProgress = view.findViewById(R.id.now_playing_progress)
         rxBusSubscription = RxBus.playerStateObservable.subscribe { update() }
     }
 
     override fun onResume() {
         super.onResume()
         update()
+        startProgressUpdate()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopProgressUpdate()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        rxBusSubscription!!.dispose()
+        rxBusSubscription?.dispose()
+        stopProgressUpdate()
+    }
+
+    private fun startProgressUpdate() {
+        stopProgressUpdate()
+        progressUpdateSubscription = io.reactivex.rxjava3.core.Observable.interval(500, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
+            .subscribe { updateProgress() }
+    }
+
+    private fun stopProgressUpdate() {
+        progressUpdateSubscription?.dispose()
+        progressUpdateSubscription = null
+    }
+
+    private fun updateProgress() {
+        val duration = mediaPlayerManager.playerDuration
+        val position = mediaPlayerManager.playerPosition
+        if (duration > 0) {
+            nowPlayingProgress?.max = duration
+            nowPlayingProgress?.progress = position
+        } else {
+            nowPlayingProgress?.progress = 0
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun update() {
         try {
+            val brandColor = if (Settings.isSetsMode) {
+                requireContext().getColor(R.color.spotify_blue)
+            } else {
+                requireContext().getColor(R.color.spotify_green)
+            }
+            nowPlayingProgress?.setIndicatorColor(brandColor)
+
             if (mediaPlayerManager.isPlaying) {
                 playButton!!.setIconResource(R.drawable.media_pause)
             } else {

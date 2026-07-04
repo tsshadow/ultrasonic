@@ -26,9 +26,6 @@
         android:id="@+id/toSongList"
         app:destination="@id/selectSongFragment" />
     <action
-        android:id="@+id/toLivestList"
-        app:destination="@id/selectLivesetFragment" />
-    <action
         android:id="@+id/toSearchFragment"
         app:destination="@id/searchFragment" />
     <action
@@ -230,6 +227,14 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="minDuration"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="maxDuration"
+            android:defaultValue="-1"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/albumListFragment"
@@ -330,9 +335,6 @@
     <fragment
         android:id="@+id/selectSongFragment"
         android:name="org.moire.ultrasonic.fragment.tsshadow.SelectSongFragment"/>
-    <fragment
-        android:id="@+id/selectLivesetFragment"
-        android:name="org.moire.ultrasonic.fragment.tsshadow.SelectLivesetFragment"/>
     <fragment
         android:id="@+id/playerFragment"
         android:name="org.moire.ultrasonic.fragment.PlayerFragment">

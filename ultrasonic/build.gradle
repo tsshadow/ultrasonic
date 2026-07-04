@@ -4,12 +4,12 @@ import com.android.build.api.dsl.ManagedVirtualDevice
 
 plugins {
     alias libs.plugins.ksp
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    alias(libs.plugins.kotlinSerialization)
-    id("kotlin-parcelize")
-    id("kotlin-kapt")
-    id("androidx.navigation.safeargs.kotlin")
+    alias libs.plugins.androidApplication
+    alias libs.plugins.kotlinAndroid
+    alias libs.plugins.kotlinSerialization
+    alias libs.plugins.kotlinParcelize
+    alias libs.plugins.kotlinKapt
+    alias libs.plugins.navigationSafeArgs
 }
 
 apply from: "${project.rootDir}/gradle_scripts/code_quality.gradle"
@@ -33,26 +33,35 @@ android {
     compileSdk libs.versions.appCompileSdk.get().toInteger()
 
     defaultConfig {
-        applicationId "org.moire.ultrasonic"
-        versionCode 138
+        applicationId 'nl.teunschriks.mumamobile'
+        versionCode 144
         versionName "6.0.0"
 
         minSdk libs.versions.appMinSdk.get().toInteger()
         targetSdk libs.versions.appTargetSdk.get().toInteger()
         resourceConfigurations += ['cs', 'de', 'en', 'es', 'fr', 'gl', 'hu', 'it', 'ja', 'nb-rNO', 'nl', 'pl', 'pt', 'pt-rBR', 'ru', 'zh-rCN', 'zh-rTW']
 
-        // Inject Default Servers from JSON file if it exists
-        def serverEnvFile = rootProject.file(".server-env.json")
-        def serversJson = "[]"
-        if (serverEnvFile.exists()) {
-            serversJson = serverEnvFile.text
-                .replaceAll('\r?\n', '')
-                .replaceAll('\\s+', ' ')
-                .replaceAll('"', '\\\\"')
-        }
-        buildConfigField "String", "DEFAULT_SERVERS_JSON", "\"${serversJson}\""
+        buildConfigField "String", "APK_HOST_URL", "\"${envOrProp('APK_HOSTER_URL', 'https://apk.teunschriks.nl')}\""
+        buildConfigField "String", "APK_HOST_USER", "\"${envOrProp('APK_HOSTER_USER', 'ultrasonic')}\""
+        buildConfigField "String", "APK_HOST_PASSWORD", "\"${envOrProp('APK_HOSTER_PASSWORD', '')}\""
+    }
 
-        buildConfigField "String", "APK_HOST_URL", "\"https://apk.teunschriks.nl\""
+    def getServerJson = { boolean includePassword ->
+        def serverEnvFile = rootProject.file(".server-env.json")
+        if (!serverEnvFile.exists()) return "[]"
+        
+        def content = serverEnvFile.text
+        if (!includePassword) {
+            // Remove password field from JSON
+            content = content.replaceAll(/"password"\s*:\s*"[^"]*"\s*,?/, '')
+            // Clean up trailing commas if any
+            content = content.replaceAll(/,\s*\}/, '}')
+        }
+        
+        return content
+            .replaceAll('\r?\n', '')
+            .replaceAll('\\s+', ' ')
+            .replaceAll('"', '\\\\"')
     }
 
     bundle {
@@ -101,6 +110,8 @@ android {
                     'minify/proguard-jackson.pro',
                     'minify/proguard-kotlin-reflect.pro',
                     'minify/proguard-kotlin.pro'
+
+            buildConfigField "String", "DEFAULT_SERVERS_JSON", "\"${getServerJson(false)}\""
         }
         debug {
             signingConfig signingConfigs.debug
@@ -109,6 +120,8 @@ android {
             enableUnitTestCoverage true
             enableAndroidTestCoverage true
             matchingFallbacks = ['release']
+
+            buildConfigField "String", "DEFAULT_SERVERS_JSON", "\"${getServerJson(true)}\""
         }
     }
 
@@ -162,6 +175,7 @@ android {
         checkDependencies true
     }
 
+    /*
     testOptions {
         managedDevices {
             devices {
@@ -173,6 +187,7 @@ android {
             }
         }
     }
+    */
     namespace 'org.moire.ultrasonic'
 
 }

@@ -5,11 +5,52 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     a:orientation="vertical">
 
-    <com.google.android.material.tabs.TabLayout
-        a:id="@+id/tab_layout"
-        app:tabMode="scrollable"
+    <HorizontalScrollView
         a:layout_width="match_parent"
-        a:layout_height="wrap_content" />
+        a:layout_height="wrap_content"
+        a:scrollbars="none"
+        a:background="@color/spotify_black">
+
+        <com.google.android.material.chip.ChipGroup
+            a:id="@+id/main_type_toggle_group"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:padding="8dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <com.google.android.material.chip.Chip
+                a:id="@+id/chip_songs"
+                style="@style/Widget.Material3.Chip.Filter"
+                a:layout_width="wrap_content"
+                a:layout_height="wrap_content"
+                a:text="@string/main.songs_title"
+                app:chipBackgroundColor="@color/chip_background_selector"
+                app:chipStrokeWidth="0dp"
+                a:textColor="@color/chip_text_selector" />
+
+
+            <com.google.android.material.chip.Chip
+                a:id="@+id/chip_albums"
+                style="@style/Widget.Material3.Chip.Filter"
+                a:layout_width="wrap_content"
+                a:layout_height="wrap_content"
+                a:text="@string/main.albums_title"
+                app:chipBackgroundColor="@color/chip_background_selector"
+                app:chipStrokeWidth="0dp"
+                a:textColor="@color/chip_text_selector" />
+
+            <com.google.android.material.chip.Chip
+                a:id="@+id/chip_artists"
+                style="@style/Widget.Material3.Chip.Filter"
+                a:layout_width="wrap_content"
+                a:layout_height="wrap_content"
+                a:text="@string/main.artists_title"
+                app:chipBackgroundColor="@color/chip_background_selector"
+                app:chipStrokeWidth="0dp"
+                a:textColor="@color/chip_text_selector" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
 
     <org.moire.ultrasonic.view.FilterButtonBar
         a:id="@+id/filter_button_bar"

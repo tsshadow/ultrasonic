@@ -94,8 +94,8 @@ object Util {
         val style = getStyleFromSettings(context)
         // First set the theme (light, dark, etc.)
         context.setTheme(style)
-        // Then set an overlay controlling the status bar behaviour etc.
-        context.setTheme(R.style.UltrasonicTheme_Base)
+        // Then apply an overlay controlling the status bar behaviour etc.
+        context.theme.applyStyle(R.style.UltrasonicTheme_Base, true)
     }
 
     private fun getStyleFromSettings(context: Context): Int = when (Settings.theme.lowercase()) {
@@ -112,7 +112,7 @@ object Util {
         }
 
         else -> {
-            R.style.UltrasonicTheme_DayNight
+            R.style.UltrasonicTheme_Dark
         }
     }
 

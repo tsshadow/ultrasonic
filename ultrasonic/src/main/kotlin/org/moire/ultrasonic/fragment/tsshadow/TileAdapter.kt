@@ -1,7 +1,5 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
-import TileInfo
-import TileStorage.saveTiles
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -12,10 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
-import genreIconMap
-import navigateToGenre
 import org.moire.ultrasonic.R
-import tileInfoColors
 
 interface TileAdapterCallback {
     fun onEditTile(tile: TileInfo, position: Int)
@@ -30,9 +25,10 @@ class TileAdapter(
 ) : RecyclerView.Adapter<TileAdapter.TileViewHolder>() {
 
     inner class TileViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val tileCard: View = view.findViewById(R.id.tile_card)
+        private val iconContainer: View = view.findViewById(R.id.tile_icon_container)
         private val tileIcon: ImageView = view.findViewById(R.id.tile_icon)
         private val tileText: TextView = view.findViewById(R.id.tile_text)
+        private val subtext: TextView = view.findViewById(R.id.tile_subtext)
 
         fun bind(tile: TileInfo, index: Int) {
             setupBackground(index)
@@ -49,19 +45,29 @@ class TileAdapter(
         }
 
         private fun setupBackground(index: Int) {
-            val gradient = GradientDrawable(
-                GradientDrawable.Orientation.TL_BR,
-                intArrayOf(tileInfoColors[index % tileInfoColors.size], Color.BLACK)
-            ).apply { cornerRadius = TILE_CORNER_RADIUS }
-            tileCard.background = gradient
+            val color = tileInfoColors[index % tileInfoColors.size]
+            iconContainer.setBackgroundColor(color)
         }
 
         private fun setupIconAndText(tile: TileInfo) {
-            val iconRes =
-                genreIconMap[tile.genre?.firstOrNull()] ?: R.drawable.baseline_music_note_24
+            val firstGenre = tile.genre?.firstOrNull { it.isNotBlank() && it != "All" }
+            val iconRes = genreIconMap[firstGenre] ?: R.drawable.baseline_music_note_24
+            
             tileIcon.setImageResource(iconRes)
-            tileIcon.contentDescription = tile.genre?.firstOrNull() ?: tile.title
+            tileIcon.contentDescription = firstGenre ?: tile.title
             tileText.text = tile.title
+            
+            subtext.text = when {
+                !tile.artists.isNullOrEmpty() -> {
+                    val list = tile.artists
+                    if (list.size > 2) "${list[0]}, ${list[1]}..." else list.joinToString(", ")
+                }
+                !tile.genre.isNullOrEmpty() -> {
+                    val list = tile.genre.filter { it != "All" }
+                    if (list.size > 2) "${list[0]}, ${list[1]}..." else list.joinToString(", ")
+                }
+                else -> "Dynamic Playlist"
+            }
         }
     }
 
@@ -79,11 +85,7 @@ class TileAdapter(
 
     fun addTile(tile: TileInfo) {
         tiles.add(tile)
-        saveTiles(context, tiles, pageKey)
+        TileStorage.saveTiles(context, tiles, pageKey)
         notifyItemInserted(tiles.size - 1)
-    }
-
-    companion object {
-        private const val TILE_CORNER_RADIUS = 24f
     }
 }

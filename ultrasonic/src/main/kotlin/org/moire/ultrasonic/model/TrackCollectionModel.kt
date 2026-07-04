@@ -60,7 +60,9 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
         offset: Int,
         append: Boolean,
         sortMethod: String,
-        festivalLineup: String?
+        festivalLineup: String?,
+        minDuration: Int? = null,
+        maxDuration: Int? = null
     ) {
         Timber.d(
             """
@@ -72,6 +74,8 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
             - offset: $offset
             - sortMethod: $sortMethod
             - festivalLineup: $festivalLineup
+            - minDuration: $minDuration
+            - maxDuration: $maxDuration
             """.trimIndent()
         )
         // Handle the logic for endless scrolling:
@@ -87,7 +91,9 @@ class TrackCollectionModel(application: Application) : GenericListModel(applicat
                 count,
                 newOffset,
                 sortMethod,
-                festivalLineup
+                festivalLineup,
+                minDuration,
+                maxDuration
             )
             currentListIsSortable = false
             updateList(musicDirectory, append)

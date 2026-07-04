@@ -3,65 +3,86 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     a:id="@+id/now_playing"
-    a:layout_width="fill_parent"
+    a:layout_width="match_parent"
     a:layout_height="wrap_content"
-    a:background="?attr/colorSecondaryContainer"
+    a:layout_margin="8dp"
+    a:background="@drawable/song_card_background"
+    a:orientation="vertical"
+    a:elevation="8dp"
     tools:ignore="Overdraw">
 
-    <ImageView
-        a:id="@+id/now_playing_image"
-        a:layout_width="72.0dip"
-        a:layout_height="72.0dip"
-        a:layout_marginStart="0dp"
-        a:elevation="4dp"
-        a:focusable="true"
-        a:gravity="center"
-        a:importantForAccessibility="no" />
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        a:id="@+id/now_playing_progress"
+        a:layout_width="match_parent"
+        a:layout_height="wrap_content"
+        a:layout_marginHorizontal="0dp"
+        a:layout_marginTop="0dp"
+        app:indicatorColor="@color/spotify_green"
+        app:trackColor="@color/spotify_light"
+        app:trackThickness="2dp"
+        a:progress="30" />
 
     <LinearLayout
-        a:layout_width="0.0dp"
+        a:layout_width="match_parent"
         a:layout_height="wrap_content"
-        a:layout_gravity="center_vertical"
-        a:layout_weight="1.0"
-        a:orientation="vertical"
-        a:paddingStart="11.0dip">
+        a:orientation="horizontal"
+        a:padding="4dp">
 
-        <TextView
-            a:id="@+id/now_playing_title"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:layout_gravity="start"
-            a:ellipsize="marquee"
-            a:singleLine="true"
-            a:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-            a:textSize="20sp"
-            tools:text="Title" />
+        <com.google.android.material.imageview.ShapeableImageView
+            a:id="@+id/now_playing_image"
+            a:layout_width="56.0dip"
+            a:layout_height="56.0dip"
+            a:layout_marginStart="4dp"
+            a:layout_gravity="center_vertical"
+            a:focusable="true"
+            a:gravity="center"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.SmallComponent"
+            a:importantForAccessibility="no" />
 
-        <TextView
-            a:id="@+id/now_playing_artist"
-            a:layout_width="wrap_content"
+        <LinearLayout
+            a:layout_width="0.0dp"
             a:layout_height="wrap_content"
-            a:layout_gravity="start"
-            a:ellipsize="end"
-            a:scrollHorizontally="true"
-            a:singleLine="true"
-            tools:text="Artist"
-            a:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+            a:layout_gravity="center_vertical"
+            a:layout_weight="1.0"
+            a:orientation="vertical"
+            a:paddingStart="12.0dip">
+
+            <TextView
+                a:id="@+id/now_playing_title"
+                a:layout_width="wrap_content"
+                a:layout_height="wrap_content"
+                a:layout_gravity="start"
+                a:ellipsize="marquee"
+                a:singleLine="true"
+                a:textSize="15sp"
+                a:textColor="@color/spotify_text_primary"
+                a:textStyle="bold"
+                tools:text="Title" />
+
+            <TextView
+                a:id="@+id/now_playing_artist"
+                a:layout_width="wrap_content"
+                a:layout_height="wrap_content"
+                a:layout_gravity="start"
+                a:ellipsize="end"
+                a:scrollHorizontally="true"
+                a:singleLine="true"
+                a:textColor="@color/spotify_text_secondary"
+                a:textSize="13sp"
+                tools:text="Artist" />
+        </LinearLayout>
+
+        <Button
+            a:id="@+id/now_playing_control_play"
+            style="@style/Widget.Material3.Button.IconButton"
+            a:layout_width="48dp"
+            a:layout_height="48dp"
+            a:layout_gravity="center"
+            a:layout_marginEnd="8dip"
+            a:contentDescription="@string/buttons.play"
+            a:focusable="false"
+            app:icon="@drawable/media_pause"
+            app:iconTint="#FFFFFF"
+            app:iconSize="32dp" />
     </LinearLayout>
-
-    <Button
-        a:id="@+id/now_playing_control_play"
-        style="@style/Widget.Material3.Button.IconButton"
-        a:layout_width="48dp"
-        a:layout_height="48dp"
-        a:layout_gravity="center|end"
-        a:layout_marginEnd="16dip"
-        a:layout_weight="0.0"
-        a:contentDescription="@string/buttons.play"
-        a:focusable="false"
-        a:scaleType="fitCenter"
-        app:icon="@drawable/media_pause"
-        app:iconGravity="textEnd"
-        app:iconSize="42dp" />
-
 </LinearLayout>

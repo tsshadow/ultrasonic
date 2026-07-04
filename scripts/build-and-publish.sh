@@ -39,6 +39,7 @@ case "$ARG1" in
         ;;
     debug)
         BUILD_TYPE="debug"
+        INCREMENT_TYPE="build"
         ;;
     *)
         echo "Usage: ./bup [debug|release|patch|minor|major]"
@@ -61,18 +62,27 @@ increment_version() {
         major) major=$((major + 1)); minor=0; patch=0 ;;
         minor) minor=$((minor + 1)); patch=0 ;;
         patch) patch=$((patch + 1)) ;;
+        build) ;; # No change to versionName
     esac
     
     local new_name="$major.$minor.$patch"
     local new_code=$((current_code + 1))
     
+    local version_to_update="$new_name"
+    if [ "$type" == "build" ]; then
+        version_to_update="$new_name-$new_code"
+    fi
+
     echo "--- Incrementing version ($type): $current_name ($current_code) -> $new_name ($new_code) ---"
     
     sed -i "s/versionCode .*/versionCode $new_code/" "$file"
-    sed -i "s/versionName .*/versionName \"$new_name\"/" "$file"
     
+    if [ "$type" != "build" ]; then
+        sed -i "s/versionName .*/versionName \"$new_name\"/" "$file"
+    fi
+
     # Update CHANGELOG.md and RELEASE_NOTES.md using python helper
-    python3 update-version.py "$new_name"
+    python3 update-version.py "$version_to_update"
 }
 
 if [ -n "$INCREMENT_TYPE" ]; then

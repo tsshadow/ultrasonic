@@ -17,7 +17,8 @@
         <com.google.android.material.appbar.MaterialToolbar
             a:id="@+id/toolbar"
             a:layout_width="match_parent"
-            a:layout_height="?attr/actionBarSize" />
+            a:layout_height="?attr/actionBarSize"
+            a:background="@color/spotify_black" />
 
         <androidx.fragment.app.FragmentContainerView
             a:id="@+id/nav_host_fragment"

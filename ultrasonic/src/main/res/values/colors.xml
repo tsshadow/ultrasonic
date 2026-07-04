@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background_color_black">#000000</color>
-    <color name="selected_menu_dark">#F3F3F3</color>
-    <color name="selected_menu_light">#000000</color>
+    <color name="background_color_black">#121212</color>
+    <color name="selected_menu_dark">#FFFFFF</color>
+    <color name="selected_menu_light">#191414</color>
+
+    <!-- Spotify branding -->
+    <color name="spotify_green">#1db954</color>
+    <color name="spotify_blue">#2d5afc</color>
+    <color name="spotify_black">#191414</color>
+    <color name="spotify_dark">#121212</color>
+    <color name="spotify_light">#282828</color>
+    <color name="spotify_card">#181818</color>
+    <color name="spotify_hover_light">#3e3e3e</color>
+    <color name="spotify_text_primary">#ffffff</color>
+    <color name="spotify_text_secondary">#b3b3b3</color>
 </resources>

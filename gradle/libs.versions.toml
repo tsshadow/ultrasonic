@@ -10,7 +10,7 @@ kotlinxSerializationJson = "1.8.0"
 lifecycleLivedataKtx   = "2.8.7"
 media                  = "1.7.1"
 navigation             = "2.9.6"
-gradlePlugin           = "9.2.1"
+gradlePlugin           = "8.7.2"
 androidxcar            = "1.4.0"
 androidxcore           = "1.15.0"
 ktlintGradle           = "12.1.1"
@@ -22,8 +22,8 @@ media3                 = "1.5.1"
 materialDesign         = "1.12.0"
 constraintLayout       = "2.2.0"
 room                   = "2.6.1"
-kotlin                 = "2.2.10"
-ksp                    = "2.3.2"
+kotlin                 = "2.0.21"
+ksp                    = "2.0.21-1.0.25"
 kotlinxCoroutines      = "1.10.1"
 transition             = "1.7.0"
 viewModelKtx           = "2.8.7"
@@ -116,3 +116,8 @@ documentFile            = { module = "androidx.documentfile:documentfile", versi
 ksp                     = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinSerialization     = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinAndroid           = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+androidApplication      = { id = "com.android.application", version.ref = "gradlePlugin" }
+androidLibrary          = { id = "com.android.library", version.ref = "gradlePlugin" }
+navigationSafeArgs      = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
+kotlinKapt              = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlinParcelize         = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }

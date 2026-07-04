@@ -8,6 +8,7 @@
 package org.moire.ultrasonic.fragment
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +30,6 @@ import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.fragment.tsshadow.SelectLivesetFragment
 import org.moire.ultrasonic.fragment.tsshadow.SelectSongFragment
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
@@ -82,15 +82,37 @@ class MainFragment :
             updateSortOrderOnCurrentFragment(it)
         }
 
+        filterButtonBar!!.setOnSetsToggleListener {
+            updateSetsToggleOnCurrentFragment(it)
+            updateBrandColors()
+        }
+
         // Set layout toggle Chip to correct state
         filterButtonBar!!.setLayoutType(layoutType)
 
+        updateBrandColors()
+
         // Listen to changes in the current page (=fragment)
+        val chipGroup: com.google.android.material.chip.ChipGroup = binding!!.findViewById(R.id.main_type_toggle_group)
+        val chipIds = listOf(R.id.chip_songs, R.id.chip_albums, R.id.chip_artists)
+
+        chipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
+            val position = chipIds.indexOf(checkedId)
+            if (position != -1 && viewPager.currentItem != position) {
+                viewPager.setCurrentItem(position, true)
+            }
+        }
+
         viewPager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
 
                 Timber.i("On Page changed $position")
+
+                if (position < chipIds.size) {
+                    chipGroup.check(chipIds[position])
+                }
 
                 // This is a bit tricky. We need to configure the FilterButtonBar based on the
                 // fragments capabilities. But this function can be called before the fragment has
@@ -106,11 +128,6 @@ class MainFragment :
             }
         })
 
-        // The TabLayoutMediator manages the names of the Tabs (Albums, Artists, etc)
-        val tabLayout: TabLayout = binding!!.findViewById(R.id.tab_layout)
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = musicCollectionAdapter.getTitleForFragment(position, requireContext())
-        }.attach()
     }
 
     private fun updateLayoutTypeOnCurrentFragment(it: LayoutType) {
@@ -128,6 +145,32 @@ class MainFragment :
 
         if (curFrag is FilterableFragment) {
             curFrag.setOrderType(it)
+        }
+    }
+
+    private fun updateBrandColors() {
+        val brandColor = if (Settings.isSetsMode) {
+            requireContext().getColor(R.color.spotify_blue)
+        } else {
+            requireContext().getColor(R.color.spotify_green)
+        }
+
+        val chipGroup: com.google.android.material.chip.ChipGroup = binding!!.findViewById(R.id.main_type_toggle_group)
+        val chipIds = listOf(R.id.chip_songs, R.id.chip_albums, R.id.chip_artists)
+
+        for (id in chipIds) {
+            val chip = chipGroup.findViewById<com.google.android.material.chip.Chip>(id)
+            chip.chipBackgroundColor = ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                intArrayOf(brandColor, requireContext().getColor(R.color.spotify_card))
+            )
+        }
+    }
+
+    private fun updateSetsToggleOnCurrentFragment(it: Boolean) {
+        val curFrag = findCurrentFragment()
+        if (curFrag is FilterableFragment) {
+            curFrag.setOnSetsToggle(it)
         }
     }
 
@@ -164,7 +207,8 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
     override fun getItemCount(): Int {
         // Hide Genre tab when offline
-        return if (ActiveServerProvider.isOffline()) 3 else 4
+        // We merged Songs and Livesets, so we have one less tab
+        return if (ActiveServerProvider.isOffline()) 2 else 3
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -172,20 +216,18 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
         val action = when (position) {
             0 -> NavigationGraphDirections.toSongList()
-            1 -> NavigationGraphDirections.toLivestList()
-            2 -> NavigationGraphDirections.toAlbumList(
+            1 -> NavigationGraphDirections.toAlbumList(
                 AlbumListType.NEWEST,
                 size = Settings.maxAlbums
             )
-            3 -> NavigationGraphDirections.toArtistList()
+            2 -> NavigationGraphDirections.toArtistList()
             else -> NavigationGraphDirections.toSongList()
         }
 
         val fragment = when (position) {
             0 -> SelectSongFragment()
-            1 -> SelectLivesetFragment()
-            2 -> AlbumListFragment(layoutType)
-            3 -> ArtistListFragment()
+            1 -> AlbumListFragment(layoutType)
+            2 -> ArtistListFragment()
             else -> SelectSongFragment()
         }
 
@@ -204,9 +246,8 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 
     fun getTitleForFragment(pos: Int, context: Context): String = when (pos) {
         0 -> context.getString(R.string.main_songs_title)
-        1 -> context.getString(R.string.main_livesets_title)
-        2 -> context.getString(R.string.main_albums_title)
-        3 -> context.getString(R.string.main_artists_title)
+        1 -> context.getString(R.string.main_albums_title)
+        2 -> context.getString(R.string.main_artists_title)
         else -> "Unknown"
     }
 }
@@ -214,5 +255,6 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
 interface FilterableFragment {
     fun setLayoutType(newType: LayoutType) {}
     fun setOrderType(newOrder: SortOrder)
+    fun setOnSetsToggle(isSets: Boolean) {}
     var viewCapabilities: ViewCapabilities
 }

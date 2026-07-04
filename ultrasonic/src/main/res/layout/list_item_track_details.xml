@@ -39,9 +39,9 @@
             a:ellipsize="end"
             a:maxLines="1"
             a:text="Song Title"
-            a:textAppearance="?android:attr/textAppearanceMedium"
+            a:textSize="15sp"
             a:textStyle="bold"
-            a:textColor="?attr/colorAccent"
+            a:textColor="@color/spotify_text_primary"
             tools:ignore="HardcodedText" />
 
         <!-- Status icons -->
@@ -67,7 +67,7 @@
             app:trackColor="?attr/colorSurfaceVariant" />
     </LinearLayout>
 
-    <!-- Artiest + Duur -->
+    <!-- Artiest + Album + Duur -->
     <LinearLayout
         a:layout_width="match_parent"
         a:layout_height="wrap_content"
@@ -76,32 +76,23 @@
 
         <TextView
             a:id="@+id/song_artist"
-            a:layout_width="0dp"
+            a:layout_width="wrap_content"
             a:layout_height="wrap_content"
-            a:layout_weight="1"
             a:ellipsize="end"
             a:maxLines="1"
             a:text="Artist name"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            a:textColor="?android:textColorSecondary"
+            a:textSize="13sp"
+            a:textColor="@color/spotify_text_secondary"
             tools:ignore="HardcodedText" />
 
         <TextView
-            a:id="@+id/song_duration"
+            a:id="@+id/song_album_separator"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
-            a:text="2:42"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            a:textColor="?android:textColorSecondary"
+            a:text=" • "
+            a:textSize="13sp"
+            a:textColor="@color/spotify_text_secondary"
             tools:ignore="HardcodedText" />
-    </LinearLayout>
-
-    <!-- Album + Date -->
-    <LinearLayout
-        a:layout_width="match_parent"
-        a:layout_height="wrap_content"
-        a:layout_marginTop="2dp"
-        a:orientation="horizontal">
 
         <TextView
             a:id="@+id/song_album"
@@ -111,18 +102,17 @@
             a:ellipsize="end"
             a:maxLines="1"
             a:text="Album name"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            a:textColor="?android:textColorHint"
+            a:textSize="13sp"
+            a:textColor="@color/spotify_text_secondary"
             tools:ignore="HardcodedText" />
 
         <TextView
-            a:id="@+id/song_date"
+            a:id="@+id/song_duration"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"
-            a:layout_marginTop="1dp"
-            a:text="2025-06-14"
-            a:textAppearance="?android:attr/textAppearanceSmall"
-            a:textColor="?android:textColorHint"
+            a:text="2:42"
+            a:textSize="13sp"
+            a:textColor="@color/spotify_text_secondary"
             tools:ignore="HardcodedText" />
     </LinearLayout>
 </LinearLayout>

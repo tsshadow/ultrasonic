@@ -96,6 +96,7 @@ class NavigationActivity : ScopeActivity() {
     private var drawerLayout: DrawerLayout? = null
     private var host: NavHostFragment? = null
     private var selectServerButton: MaterialButton? = null
+    private var dropDownButton: ImageView? = null
     private var headerBackgroundImage: ImageView? = null
 
     // We store the last search string in this variable.
@@ -365,6 +366,7 @@ class NavigationActivity : ScopeActivity() {
 
         selectServerButton?.iconTint = ColorStateList.valueOf(foregroundColor)
         selectServerButton?.setTextColor(foregroundColor)
+        dropDownButton?.setColorFilter(foregroundColor)
         headerBackgroundImage?.setBackgroundColor(backgroundColor)
 
         // Hide the vector graphic on Android 12 or later
@@ -415,7 +417,7 @@ class NavigationActivity : ScopeActivity() {
 
         selectServerButton =
             navigationView?.getHeaderView(0)?.findViewById(R.id.header_select_server)
-        val dropDownButton: ImageView? =
+        dropDownButton =
             navigationView?.getHeaderView(0)?.findViewById(R.id.edit_server_button)
 
         val onClick: (View) -> Unit = {

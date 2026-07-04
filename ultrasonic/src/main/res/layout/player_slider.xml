@@ -11,7 +11,10 @@
     <SeekBar
         a:id="@+id/current_playing_progress_bar"
         a:layout_width="fill_parent"
-        a:layout_height="32dp"
+        a:layout_height="wrap_content"
+        a:progressTint="@color/spotify_green"
+        a:thumbTint="@color/spotify_green"
+        a:progressBackgroundTint="@color/spotify_light"
         a:indeterminate="false" />
 
     <RelativeLayout

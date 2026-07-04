@@ -74,4 +74,10 @@ interface ServerSettingDao {
      */
     @Query("SELECT MAX([index]) FROM serverSetting")
     suspend fun getMaxIndex(): Int?
+
+    /**
+     * Finds a Server Setting by its name and url
+     */
+    @Query("SELECT * FROM serverSetting WHERE name = :name AND url = :url")
+    suspend fun findByNameAndUrl(name: String, url: String): ServerSetting?
 }

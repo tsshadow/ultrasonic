@@ -26,7 +26,19 @@ object Settings {
     @JvmStatic
     var theme by StringSetting(
         getKey(R.string.setting_key_theme),
-        getKey(R.string.setting_key_theme_day_night)
+        getKey(R.string.setting_key_theme_dark)
+    )
+
+    @JvmStatic
+    var isSetsMode by BooleanSetting(
+        getKey(R.string.setting_key_is_sets_mode),
+        false
+    )
+
+    @JvmStatic
+    var lastSyncedVersion by IntSetting(
+        getKey(R.string.setting_key_last_synced_version),
+        0
     )
 
     @JvmStatic

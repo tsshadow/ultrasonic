@@ -7,8 +7,8 @@
 
 package org.moire.ultrasonic.service.androidauto
 
-import TileInfo
-import TileStorage
+import org.moire.ultrasonic.fragment.tsshadow.TileInfo
+import org.moire.ultrasonic.fragment.tsshadow.TileStorage
 import android.content.Context
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
@@ -790,7 +790,10 @@ class MediaLibraryBrowser(
                         null,
                         count = maxSongs,
                         0,
-                        sortMethod ?: "AddedDesc"
+                        sortMethod ?: "AddedDesc",
+                        null,
+                        null,
+                        null
                     )
                 }
             }.await()
@@ -955,7 +958,9 @@ class MediaLibraryBrowser(
                         count = pageSize,
                         offset = offset,
                         sortMethod = sortMethod,
-                        festivalLineup = festivalLineup
+                        festivalLineup = festivalLineup,
+                        minDuration = null,
+                        maxDuration = null
                     )
                 }
             }.await()

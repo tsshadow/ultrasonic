@@ -57,4 +57,6 @@
     <string name="setting_key.first_installed_version" translatable="false">firstInstalledVersion</string>
     <string name="setting_key.show_confirmation_dialog" translatable="false">showConfirmationDialog</string>
     <string name="setting_key.last_view_type" translatable="false">lastViewType</string>
+    <string name="setting_key.is_sets_mode" translatable="false">isSetsMode</string>
+    <string name="setting_key.last_synced_version" translatable="false">lastSyncedVersion</string>
 </resources>
