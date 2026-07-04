@@ -1,3 +1,7 @@
+## [6.1.1-155] - 2026-07-04
+### Changed
+- Version bump.
+
 ## [6.1.1-154] - 2026-07-04
 ### Changed
 - Version bump.
