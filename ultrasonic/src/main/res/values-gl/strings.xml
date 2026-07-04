@@ -42,7 +42,6 @@
     <string name="common.select_all">Seleccionar todo</string>
     <string name="common.unpin">Desancorar</string>
     <string name="common.unpin_selection_confirmation">¿Realmente queres desancorar a selección actual\?</string>
-    <string name="common.appname">Ultrasonic</string>
     <string name="common.title">Título</string>
     <string name="common.artist">Artista</string>
     <string name="common.cancel">Cancelar</string>

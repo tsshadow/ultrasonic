@@ -2,6 +2,7 @@ package org.moire.ultrasonic.app
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
@@ -9,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.di.appPermanentStorage
@@ -67,7 +69,9 @@ class UApp : Application() {
             isFirstRun = Util.isFirstRun()
         }
 
-        startKoin()
+        if (GlobalContext.getOrNull() == null) {
+            startKoin()
+        }
     }
 
     internal fun startKoin() {
@@ -105,9 +109,18 @@ private fun VmPolicy.Builder.detectAllExceptSocket(): VmPolicy.Builder {
     detectLeakedClosableObjects()
     detectLeakedRegistrationObjects()
     detectFileUriExposure()
-    detectContentUriWithoutPermission()
-    detectCredentialProtectedWhileLocked()
-    detectUnsafeIntentLaunch()
-    detectIncorrectContextUse()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        detectContentUriWithoutPermission()
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        detectCleartextNetwork()
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        detectCredentialProtectedWhileLocked()
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        detectUnsafeIntentLaunch()
+        detectIncorrectContextUse()
+    }
     return this
 }

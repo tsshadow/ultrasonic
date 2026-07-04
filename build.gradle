@@ -97,6 +97,6 @@ tasks.register("generateKeystore") {
 }
 
 wrapper {
-    gradleVersion(libs.versions.gradle.get())
-    distributionType("all")
+    gradleVersion = libs.versions.gradle.get()
+    distributionType = "all"
 }

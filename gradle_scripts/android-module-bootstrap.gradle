@@ -8,17 +8,17 @@ apply from: "${project.rootDir}/gradle_scripts/code_quality.gradle"
 apply plugin: 'com.google.devtools.ksp'
 
 android {
-    compileSdk libs.versions.appCompileSdk.get().toInteger()
+    compileSdk = libs.versions.appCompileSdk.get().toInteger()
 
     defaultConfig {
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        minSdk libs.versions.appMinSdk.get().toInteger()
-        targetSdk libs.versions.appTargetSdk.get().toInteger()
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        minSdk = libs.versions.appMinSdk.get().toInteger()
+        targetSdk = libs.versions.appTargetSdk.get().toInteger()
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     sourceSets {
@@ -30,18 +30,18 @@ android {
 
     buildTypes {
         debug {
-            minifyEnabled false
-            debuggable true
+            minifyEnabled = false
+            debuggable = true
         }
         release {
-            minifyEnabled false
+            minifyEnabled = false
         }
     }
 
     buildFeatures {
         buildConfig = false
-        viewBinding true
-        dataBinding true
+        viewBinding = true
+        dataBinding = true
     }
 }
 
@@ -55,6 +55,7 @@ dependencies {
 
     testImplementation libs.junit
     testRuntimeOnly libs.junitVintage
+    testRuntimeOnly libs.junitPlatformLauncher
 }
 
 

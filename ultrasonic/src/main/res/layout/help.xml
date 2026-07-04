@@ -23,7 +23,7 @@
                 a:layout_height="wrap_content"
                 a:gravity="center"
                 a:padding="18dp"
-                a:text="@string/common.appname"
+                a:text="@string/common_appname"
                 a:textSize="25sp" />
 
             <TextView

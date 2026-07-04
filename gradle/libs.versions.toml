@@ -1,29 +1,29 @@
 [versions]
-gradle                 = "8.12.1"
+gradle                 = "9.4.1"
 
 appMinSdk = "33"
 appTargetSdk = "35"
 appCompileSdk = "35"
 
-gson                   = "2.11.0"
+gson                   = "2.12.1"
 kotlinxSerializationJson = "1.8.0"
 lifecycleLivedataKtx   = "2.8.7"
 media                  = "1.7.1"
 navigation             = "2.9.6"
-gradlePlugin           = "8.7.2"
+gradlePlugin           = "8.8.0"
 androidxcar            = "1.4.0"
 androidxcore           = "1.15.0"
-ktlintGradle           = "12.1.1"
-detekt                 = "1.23.7"
+ktlintGradle           = "12.1.2"
+detekt                 = "1.23.8"
 documentFile           = "1.1.0"
 preferences            = "1.2.1"
 media3                 = "1.5.1"
 
 materialDesign         = "1.12.0"
-constraintLayout       = "2.2.0"
+constraintLayout       = "2.2.1"
 room                   = "2.6.1"
-kotlin                 = "2.0.21"
-ksp                    = "2.0.21-1.0.25"
+kotlin                 = "2.1.0"
+ksp                    = "2.1.0-1.0.29"
 kotlinxCoroutines      = "1.10.1"
 transition             = "1.7.0"
 viewModelKtx           = "2.8.7"
@@ -32,11 +32,12 @@ swipeRefresh           = "1.2.0"
 retrofit               = "2.11.0"
 jackson                = "2.18.2"
 okhttp                 = "4.12.0"
-koin                   = "4.0.0"
+koin                   = "4.0.2"
 picasso               = "2.71828"
 
 junit4                 = "4.13.2"
 junit5                 = "5.11.3"
+junitPlatform          = "1.11.3"
 mockito                = "5.14.2"
 mockitoKotlin          = "5.4.0"
 kluent                 = "1.73"
@@ -102,6 +103,7 @@ multiType               = { module = "com.drakeet.multitype:multitype", version.
 
 junit                   = { module = "junit:junit", version.ref = "junit4" }
 junitVintage            = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "junit5" }
+junitPlatformLauncher   = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatform" }
 kotlinJunit             = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 mockitoKotlin           = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 mockito                 = { module = "org.mockito:mockito-core", version.ref = "mockito" }

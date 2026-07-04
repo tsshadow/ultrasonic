@@ -9,6 +9,8 @@ package org.moire.ultrasonic.fragment
 
 import android.content.Intent
 import android.net.Uri
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import java.util.Locale
+import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.util.UpdateChecker
 import org.moire.ultrasonic.util.Util.applyTheme
@@ -63,6 +66,17 @@ class AboutFragment : Fragment() {
 
         FragmentTitle.setTitle(this@AboutFragment, getString(R.string.menu_about))
         titleText?.text = title
+
+        if (BuildConfig.DEBUG) {
+            val helpText: TextView = view.findViewById(R.id.help_text)
+            val debugInfo = "\n\n--- DEBUG INFO ---\n" +
+                "Build Type: ${BuildConfig.BUILD_TYPE}\n" +
+                "Version Code: ${BuildConfig.VERSION_CODE}\n" +
+                "Device: ${Build.MANUFACTURER} ${Build.MODEL}\n" +
+                "Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})"
+            helpText.append(debugInfo)
+            titleText?.setTextColor(Color.YELLOW)
+        }
 
         webPageButton?.setOnClickListener {
             startActivity(

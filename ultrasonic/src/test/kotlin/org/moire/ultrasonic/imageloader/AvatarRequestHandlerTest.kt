@@ -12,7 +12,11 @@ import org.junit.runner.RunWith
 import org.mockito.Answers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.whenever
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Response
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.response.StreamResponse
 import org.moire.ultrasonic.api.subsonic.toStreamResponse
@@ -20,10 +24,20 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(manifest = Config.NONE)
+@Config(application = org.moire.ultrasonic.app.UApp::class, manifest = Config.NONE)
 class AvatarRequestHandlerTest {
-    private val mockApiClient: SubsonicAPIClient = mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
+    private val mockApiClient: SubsonicAPIClient = mock()
+    private val mockApi: org.moire.ultrasonic.api.subsonic.SubsonicAPIDefinition = mock()
+    private val mockCall: Call<ResponseBody> = mock()
+    private val mockResponse: Response<ResponseBody> = mock()
     private val handler = AvatarRequestHandler(mockApiClient)
+
+    @org.junit.Before
+    fun setUpMocks() {
+        doReturn(mockApi).whenever(mockApiClient).api
+        doReturn(mockCall).whenever(mockApi).getAvatar(any())
+        doReturn(mockResponse).whenever(mockCall).execute()
+    }
 
     @Test
     fun `Should accept only cover art request`() {

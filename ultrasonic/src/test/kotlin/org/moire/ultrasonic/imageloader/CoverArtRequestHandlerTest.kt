@@ -13,15 +13,33 @@ import org.junit.runner.RunWith
 import org.mockito.Answers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.whenever
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Response
 import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.response.StreamResponse
 import org.robolectric.RobolectricTestRunner
 
+import org.robolectric.annotation.Config
+
 @RunWith(RobolectricTestRunner::class)
+@Config(application = org.moire.ultrasonic.app.UApp::class)
 class CoverArtRequestHandlerTest {
-    private val mockApiClient: SubsonicAPIClient = mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
+    private val mockApiClient: SubsonicAPIClient = mock()
+    private val mockApi: org.moire.ultrasonic.api.subsonic.SubsonicAPIDefinition = mock()
+    private val mockCall: Call<ResponseBody> = mock()
+    private val mockResponse: Response<ResponseBody> = mock()
     private val handler = CoverArtRequestHandler(mockApiClient)
+
+    @org.junit.Before
+    fun setUpMocks() {
+        doReturn(mockApi).whenever(mockApiClient).api
+        doReturn(mockCall).whenever(mockApi).getCoverArt(any(), any())
+        doReturn(mockResponse).whenever(mockCall).execute()
+        whenever(mockApiClient.isOffline).thenReturn(false)
+    }
 
     @Test
     fun `Should accept only cover art request`() {

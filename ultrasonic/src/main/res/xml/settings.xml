@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:a="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    a:title="@string/common.appname">
+    a:title="@string/common_appname">
 
     <PreferenceCategory
         a:title="@string/settings.appearance_title"

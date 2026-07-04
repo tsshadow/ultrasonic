@@ -17,11 +17,11 @@ abstract class SubsonicAPIClientTest {
     @Before
     open fun setUp() {
         config = SubsonicClientConfiguration(
-            mockWebServerRule.mockWebServer.url("/").toString(),
-            USERNAME,
-            PASSWORD,
-            CLIENT_VERSION,
-            CLIENT_ID
+            baseUrl = mockWebServerRule.mockWebServer.url("/").toString(),
+            username = USERNAME,
+            password = PASSWORD,
+            minimalProtocolVersion = CLIENT_VERSION,
+            clientID = CLIENT_ID
         )
         client = SubsonicAPIClient(config)
     }

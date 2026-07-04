@@ -91,7 +91,7 @@ class ArtistListFragment : EntryListFragment<ArtistOrIndex>() {
                 id = item.id,
                 name = item.name,
                 parentId = item.id,
-                isArtist = (item is Artist),
+                isArtist = false,
                 artistId = item.id
             )
         } else {

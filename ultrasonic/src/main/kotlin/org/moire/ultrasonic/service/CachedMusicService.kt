@@ -353,7 +353,7 @@ class CachedMusicService(private val musicService: MusicService) :
     private fun checkSettingsChanged() {
         val newUrl = activeServerProvider.getRestUrl(null)
         val newFolderId = activeServerProvider.getActiveServer().musicFolderId
-        if (!Util.equals(newUrl, restUrl) || !Util.equals(cachedMusicFolderId, newFolderId)) {
+        if (newUrl != restUrl || cachedMusicFolderId != newFolderId) {
             // Switch database
             metaDatabase = activeServerProvider.getActiveMetaDatabase()
             cachedArtists = metaDatabase.artistDao()

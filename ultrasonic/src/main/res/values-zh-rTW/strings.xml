@@ -134,7 +134,6 @@
     <string name="download.jukebox_server_too_old">不支援遠端控制，請升級您的 Subsonic 伺服器。</string>
     <string name="podcasts.label">播客</string>
     <string name="common.unpin_selection_confirmation">您真的要取消固定目前選取的項目嗎？</string>
-    <string name="common.appname">Ultrasonic</string>
     <string name="background_task.ssl_error">SSL 連線異常。請檢查伺服器憑證。</string>
     <string name="common.pin">固定</string>
     <string name="chat.send_button">傳送</string>

@@ -17,6 +17,7 @@ dependencies {
 
     testImplementation libs.junit
     testRuntimeOnly libs.junitVintage
+    testRuntimeOnly libs.junitPlatformLauncher
 }
 
 tasks.named("test").configure {

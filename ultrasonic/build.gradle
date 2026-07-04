@@ -30,15 +30,15 @@ android {
         return System.getenv(key) ?: signingProperties.getProperty(key, defVal)
     }
 
-    compileSdk libs.versions.appCompileSdk.get().toInteger()
+    compileSdk = libs.versions.appCompileSdk.get().toInteger()
 
     defaultConfig {
-        applicationId 'nl.teunschriks.mumamobile'
-        versionCode 145
-        versionName "6.1.0"
+        applicationId = 'nl.teunschriks.mumamobile'
+        versionCode 149
+        versionName = "6.1.0"
 
-        minSdk libs.versions.appMinSdk.get().toInteger()
-        targetSdk libs.versions.appTargetSdk.get().toInteger()
+        minSdk = libs.versions.appMinSdk.get().toInteger()
+        targetSdk = libs.versions.appTargetSdk.get().toInteger()
         resourceConfigurations += ['cs', 'de', 'en', 'es', 'fr', 'gl', 'hu', 'it', 'ja', 'nb-rNO', 'nl', 'pl', 'pt', 'pt-rBR', 'ru', 'zh-rCN', 'zh-rTW']
 
         buildConfigField "String", "APK_HOST_URL", "\"${envOrProp('APK_HOSTER_URL', 'https://apk.teunschriks.nl')}\""
@@ -80,16 +80,16 @@ android {
     signingConfigs {
         release {
             if (resolvedStoreFile != null) {
-                storeFile resolvedStoreFile
+                storeFile = resolvedStoreFile
             }
-            storePassword envOrProp('SIGNING_STORE_PASSWORD')
-            keyAlias envOrProp('SIGNING_KEY_ALIAS')
-            keyPassword envOrProp('SIGNING_KEY_PASSWORD')
-            enableV1Signing true
-            enableV2Signing true
-            enableV3Signing true
+            storePassword = envOrProp('SIGNING_STORE_PASSWORD')
+            keyAlias = envOrProp('SIGNING_KEY_ALIAS')
+            keyPassword = envOrProp('SIGNING_KEY_PASSWORD')
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
             if (this.respondsTo('enableV4Signing')) {
-                enableV4Signing true
+                enableV4Signing = true
             }
         }
         debug {
@@ -101,8 +101,8 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
-            minifyEnabled true
+            signingConfig = signingConfigs.release
+            minifyEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'minify/proguard-main.pro',
                     'minify/proguard-okhttp.pro',
@@ -112,16 +112,18 @@ android {
                     'minify/proguard-kotlin.pro'
 
             buildConfigField "String", "DEFAULT_SERVERS_JSON", "\"${getServerJson(false)}\""
+            resValue "string", "common_appname", "Ultrasonic"
         }
         debug {
-            signingConfig signingConfigs.debug
-            minifyEnabled false
-            applicationIdSuffix '.debug'
-            enableUnitTestCoverage true
-            enableAndroidTestCoverage true
+            signingConfig = signingConfigs.debug
+            minifyEnabled = false
+            applicationIdSuffix = '.debug'
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
             matchingFallbacks = ['release']
 
             buildConfigField "String", "DEFAULT_SERVERS_JSON", "\"${getServerJson(true)}\""
+            resValue "string", "common_appname", "Ultrasonic Debug"
         }
     }
 
@@ -147,14 +149,14 @@ android {
 
 
     buildFeatures {
-        viewBinding true
-        dataBinding true
-        buildConfig true
+        viewBinding = true
+        dataBinding = true
+        buildConfig = true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     ksp {
@@ -163,9 +165,9 @@ android {
 
     lint {
         baseline = file("lint-baseline.xml")
-        checkReleaseBuilds false
-        abortOnError true
-        warningsAsErrors true
+        checkReleaseBuilds = false
+        abortOnError = true
+        warningsAsErrors = true
         warning 'ImpliedQuantity'
         disable 'MissingTranslation', 'UnusedQuantity', 'MissingQuantity'
         disable 'ObsoleteLintCustomCheck'
@@ -173,8 +175,8 @@ android {
         // We manage dependencies on Gitlab with RenovateBot
         disable 'GradleDependency'
         disable 'AndroidGradlePluginVersion'
-        textReport true
-        checkDependencies true
+        textReport = true
+        checkDependencies = true
     }
 
     /*
@@ -190,7 +192,7 @@ android {
         }
     }
     */
-    namespace 'org.moire.ultrasonic'
+    namespace = 'org.moire.ultrasonic'
 
 }
 
@@ -246,6 +248,7 @@ dependencies {
     testImplementation libs.kotlinReflect
     testImplementation libs.junit
     testRuntimeOnly libs.junitVintage
+    testRuntimeOnly libs.junitPlatformLauncher
     testImplementation libs.kotlinJunit
     testImplementation libs.kluent
     testImplementation libs.mockito

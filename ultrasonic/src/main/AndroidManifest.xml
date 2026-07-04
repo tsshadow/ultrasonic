@@ -30,7 +30,7 @@
         android:fullBackupContent="@xml/backup_descriptor"
         android:hasFragileUserData="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/common.appname"
+        android:label="@string/common_appname"
         android:networkSecurityConfig="@xml/network_security_config"
         android:preserveLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -77,7 +77,7 @@
 
         <!-- Needs to be exported: https://android.googlesource.com/platform/developers/build/+/4de32d4/prebuilts/gradle/MediaBrowserService/README.md -->
         <service android:name=".service.PlaybackService"
-            android:label="@string/common.appname"
+            android:label="@string/common_appname"
             android:foregroundServiceType="mediaPlayback"
             android:exported="true"
             tools:ignore="ExportedService">

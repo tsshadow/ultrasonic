@@ -27,7 +27,6 @@
     <string name="chat.send_button">Send</string>
     <string name="chat.user_avatar">Avatar image</string>
     <string name="common.album">Album</string>
-    <string name="common.appname">Ultrasonic</string>
     <string name="common.artist">Artist</string>
     <string name="common.cancel">Cancel</string>
     <string name="common.comment">Comment</string>
@@ -436,7 +435,7 @@
 
     <string name="about.webpage">Visit webpage</string>
     <string name="about.report">Report a bug</string>
-    <string name="about.text"><b>Ultrasonic</b> is a free and open-source music streaming Android client for Subsonic API (version 1.7.0 or higher) compatible servers.\n\nWith <b>Ultrasonic</b> you can easily stream or download music from your home computer to your Android phone using your Subsonic compatible media server. The Subsonic server software requires additional configuration separate from Ultrasonic.\n\nBy default, Ultrasonic is not configured. Once you\'ve set up your own server, please change the server configuration so that it connects to your own computer.</string>
+    <string name="about.text">This is a highly custom application, designed to work with the tsshadow/lms stack.\n\nBenefits of this stack include more control over your searches and automatic filters based on genre.</string>
     <string name="about.webpage.url" translatable="false">https://ultrasonic.gitlab.io/</string>
     <string name="about.report.url" translatable="false">https://gitlab.com/ultrasonic/ultrasonic/issues</string>
 
