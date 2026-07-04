@@ -61,7 +61,8 @@ If you are modifying the code and need to rebuild and redeploy the system:
 2.  **Build app**: `./scripts/build.sh [debug|release]` (defaults to debug)
 3.  **Publish app & hoster**: `./scripts/publish.sh [debug|release]` (defaults to debug)
 4.  **Deploy to remote**: `./scripts/deploy.sh [debug|release]` (defaults to debug)
-5.  **Full pipeline (Build + Publish + Deploy)**: `./bup [debug|release]` (defaults to debug)
+5.  **Full pipeline (Build + Publish + Deploy)**: `./install` or `./install.sh [debug|release]` (defaults to debug)
+    - Use `patch`, `minor`, or `major` as mode for version increments (e.g., `./install patch`).
 
 ### APK Hoster
 The `apk-hoster` service is managed in its own repository: [tsshadow/apk-hoster](https://github.com/tsshadow/apk-hoster).
