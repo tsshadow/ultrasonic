@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import android.content.res.ColorStateList
 import com.google.gson.Gson
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
@@ -76,7 +77,24 @@ abstract class SelectFragment :
         loadTilesOrDefaults()
         populateTiles()
         setTitle()
+        updateBrandColors()
         load(false)
+    }
+
+    /**
+     * Update the accent colors based on the current mode
+     */
+    fun updateBrandColors() {
+        if (!isAdded) return
+
+        val brandColor = if (org.moire.ultrasonic.util.Settings.isSetsMode) {
+            requireContext().getColor(R.color.spotify_blue)
+        } else {
+            requireContext().getColor(R.color.spotify_green)
+        }
+
+        swipeRefresh?.setColorSchemeColors(brandColor)
+        toggleFiltersButton.imageTintList = ColorStateList.valueOf(brandColor)
     }
 
     protected abstract fun setTitle()

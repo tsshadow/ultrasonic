@@ -1,6 +1,8 @@
 package org.moire.ultrasonic.fragment.tsshadow
 
 import android.os.Bundle
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -198,6 +200,33 @@ class FilterModalFragment : BottomSheetDialogFragment() {
             binding.durationLabel.text = "Max Duration"
             binding.chipSongs.isChecked = true
         }
+        updateBrandColors()
+    }
+
+    private fun updateBrandColors() {
+        val brandColor = if (modalType == FilterModalType.LIVESET) {
+            requireContext().getColor(R.color.spotify_blue)
+        } else {
+            requireContext().getColor(R.color.spotify_green)
+        }
+
+        binding.durationSlider.thumbTintList = ColorStateList.valueOf(brandColor)
+        binding.durationSlider.trackActiveTintList = ColorStateList.valueOf(brandColor)
+        binding.selectResultCountSlider.thumbTintList = ColorStateList.valueOf(brandColor)
+        binding.selectResultCountSlider.trackActiveTintList = ColorStateList.valueOf(brandColor)
+
+        binding.favoriteButton.imageTintList = ColorStateList.valueOf(brandColor)
+
+        val selectedColor = ColorStateList.valueOf(brandColor)
+        val unselectedColor = ColorStateList.valueOf(requireContext().getColor(R.color.spotify_card))
+
+        binding.chipSongs.chipBackgroundColor = if (modalType == FilterModalType.SONG) selectedColor else unselectedColor
+        binding.chipSets.chipBackgroundColor = if (modalType == FilterModalType.LIVESET) selectedColor else unselectedColor
+
+        binding.save.backgroundTintList = ColorStateList.valueOf(brandColor)
+        binding.search.backgroundTintList = ColorStateList.valueOf(brandColor)
+        binding.update.backgroundTintList = ColorStateList.valueOf(brandColor)
+        binding.delete.backgroundTintList = ColorStateList.valueOf(brandColor)
     }
 
     private fun sendResult(action: String) {
@@ -252,9 +281,18 @@ class FilterModalFragment : BottomSheetDialogFragment() {
             values: MutableList<String>,
             allOptions: List<String>?
         ) {
+            val brandColor = if (modalType == FilterModalType.LIVESET) {
+                requireContext().getColor(R.color.spotify_blue)
+            } else {
+                requireContext().getColor(R.color.spotify_green)
+            }
+
             values.forEach { value ->
                 val chip = layoutInflater.inflate(R.layout.tsshadow_chip, group, false) as Chip
                 chip.text = value
+                chip.chipBackgroundColor = ColorStateList.valueOf(brandColor)
+                chip.setTextColor(Color.WHITE)
+                chip.closeIconTint = ColorStateList.valueOf(Color.WHITE)
                 chip.setOnCloseIconClickListener {
                     values.remove(value)
                     redrawAllChips(genres, years, labels, lineups, festivals, artists)
@@ -265,6 +303,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
                 val addChip =
                     layoutInflater.inflate(R.layout.tsshadow_chip_add, group, false) as Chip
                 addChip.text = getString(R.string.tsshadow_add_format, title)
+                addChip.chipIconTint = ColorStateList.valueOf(brandColor)
                 addChip.setOnClickListener {
                     val checked = BooleanArray(allOptions.size)
                     AlertDialog.Builder(requireContext())

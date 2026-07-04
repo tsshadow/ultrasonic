@@ -40,16 +40,15 @@ class SelectSongFragment : SelectFragment(), FilterableFragment {
             pageKey = "liveset"
             defaultLength = "long"
             filterModalType = FilterModalType.LIVESET
-            view?.setBackgroundColor(requireContext().getColor(R.color.spotify_blue))
             setTitle(this, R.string.main_livesets_title)
         } else {
             pageKey = "song"
             defaultLength = "short"
             filterModalType = FilterModalType.SONG
-            view?.setBackgroundColor(Color.TRANSPARENT)
             setTitle(this, R.string.main_songs_title)
         }
         // Reload tiles and refresh UI
+        updateBrandColors()
         loadTilesOrDefaults()
         populateTiles()
         load(false)
@@ -66,9 +65,6 @@ class SelectSongFragment : SelectFragment(), FilterableFragment {
             filterModalType = FilterModalType.LIVESET
         }
         super.onViewCreated(view, savedInstanceState)
-        if (Settings.isSetsMode) {
-            view.setBackgroundColor(requireContext().getColor(R.color.spotify_blue))
-        }
     }
 
     override fun setTitle() {

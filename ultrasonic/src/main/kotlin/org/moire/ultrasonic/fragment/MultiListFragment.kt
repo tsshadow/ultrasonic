@@ -21,6 +21,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import org.koin.android.ext.android.inject
 import org.koin.androidx.scope.ScopeFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -143,6 +144,28 @@ abstract class MultiListFragment<T : Identifiable> :
             layoutManager = viewManager
             adapter = viewAdapter
         }
+
+        updateBrandColors()
+    }
+
+    /**
+     * Update the accent colors based on the current mode
+     */
+    fun updateBrandColors() {
+        if (!isAdded) return
+
+        val brandColor = if (org.moire.ultrasonic.util.Settings.isSetsMode) {
+            requireContext().getColor(R.color.spotify_blue)
+        } else {
+            requireContext().getColor(R.color.spotify_green)
+        }
+
+        (listView as? FastScrollRecyclerView)?.let {
+            it.setThumbColor(brandColor)
+            it.setPopupBgColor(brandColor)
+        }
+
+        swipeRefresh?.setColorSchemeColors(brandColor)
     }
 
     @Override

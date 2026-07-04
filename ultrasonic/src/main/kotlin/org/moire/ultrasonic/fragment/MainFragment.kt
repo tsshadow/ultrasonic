@@ -30,6 +30,7 @@ import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.fragment.tsshadow.SelectFragment
 import org.moire.ultrasonic.fragment.tsshadow.SelectSongFragment
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
@@ -165,6 +166,8 @@ class MainFragment :
                 intArrayOf(brandColor, requireContext().getColor(R.color.spotify_card))
             )
         }
+
+        filterButtonBar?.updateBrandColors()
     }
 
     private fun updateSetsToggleOnCurrentFragment(it: Boolean) {
@@ -172,6 +175,12 @@ class MainFragment :
         if (curFrag is FilterableFragment) {
             curFrag.setOnSetsToggle(it)
         }
+        if (curFrag is MultiListFragment<*>) {
+            curFrag.updateBrandColors()
+        } else if (curFrag is SelectFragment) {
+            curFrag.updateBrandColors()
+        }
+        updateBrandColors()
     }
 
     private fun findCurrentFragment(): Fragment? = findFragmentAtPosition(childFragmentManager, viewPager.currentItem)

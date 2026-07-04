@@ -9,6 +9,8 @@ package org.moire.ultrasonic.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ArrayAdapter
@@ -61,6 +63,7 @@ class FilterButtonBar : ConstraintLayout {
         if (caps.supportsSetsToggle) {
             setsToggle?.isChecked = Settings.isSetsMode
         }
+        updateBrandColors()
         sortOrderMenu!!.isVisible = caps.supportedSortOrders.isNotEmpty()
 
         if (caps.supportedSortOrders.isNotEmpty()) {
@@ -193,6 +196,34 @@ class FilterButtonBar : ConstraintLayout {
                 viewTypeToggle!!.text = context.getString(R.string.list_view)
             }
         }
+    }
+
+    /**
+     * Update the accent colors based on the current mode
+     */
+    fun updateBrandColors() {
+        val brandColor = if (Settings.isSetsMode) {
+            context.getColor(R.color.spotify_blue)
+        } else {
+            context.getColor(R.color.spotify_green)
+        }
+
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_checked),
+            intArrayOf(-android.R.attr.state_checked)
+        )
+        val thumbColors = intArrayOf(brandColor, Color.WHITE)
+        val trackColors = intArrayOf(brandColor.withAlpha(0x80), Color.DKGRAY)
+
+        setsToggle?.thumbTintList = ColorStateList(states, thumbColors)
+        setsToggle?.trackTintList = ColorStateList(states, trackColors)
+
+        // Update chips if they have green accents
+        viewTypeToggle?.chipIconTint = ColorStateList.valueOf(brandColor)
+    }
+
+    private fun Int.withAlpha(alpha: Int): Int {
+        return (this and 0x00FFFFFF) or (alpha shl 24)
     }
 
     private fun getStringForSortOrder(sortOrder: SortOrder): Int = when (sortOrder) {

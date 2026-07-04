@@ -9,6 +9,7 @@ package org.moire.ultrasonic.fragment
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.graphics.Color.argb
 import android.graphics.drawable.Drawable
@@ -55,6 +56,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_IDLE
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.google.android.material.R as RM
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -1086,6 +1088,25 @@ class PlayerFragment :
         scrollToCurrent()
         updateSongMetadata()
         updateMediaButtonActivationState()
+        updateBrandColors()
+    }
+
+    private fun updateBrandColors() {
+        val brandColor = if (Settings.isSetsMode) {
+            requireContext().getColor(R.color.spotify_blue)
+        } else {
+            requireContext().getColor(R.color.spotify_green)
+        }
+
+        progressBar.progressTintList = ColorStateList.valueOf(brandColor)
+        progressBar.thumbTintList = ColorStateList.valueOf(brandColor)
+
+        (playlistView as? FastScrollRecyclerView)?.let {
+            it.setThumbColor(brandColor)
+            it.setPopupBgColor(brandColor)
+        }
+
+        progressIndicator.setIndicatorColor(brandColor)
     }
 
     private fun updateSongMetadata() {

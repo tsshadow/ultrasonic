@@ -129,11 +129,6 @@ class SearchFragment :
     }
 
     private fun search(query: String, autoplay: Boolean) {
-        if (query.equals("sets", ignoreCase = true)) {
-            view?.setBackgroundColor(requireContext().getColor(R.color.spotify_blue))
-        } else {
-            view?.setBackgroundColor(Color.TRANSPARENT)
-        }
         listModel.viewModelScope.launch(
             toastingExceptionHandler()
         ) {
