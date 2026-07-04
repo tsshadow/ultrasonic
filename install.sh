@@ -25,11 +25,13 @@ show_help() {
     echo "Modes:"
     echo "  debug           Build in debug mode (default)"
     echo "  release         Build in release mode"
+    echo "  install         Build and install on connected device (debug)"
     echo "  patch           Increment patch version and build release"
     echo "  minor           Increment minor version and build release"
     echo "  major           Increment major version and build release"
     echo ""
     echo "Examples:"
+    echo "  ./install.sh install"
     echo "  ./install.sh patch"
 }
 
@@ -56,7 +58,7 @@ for i in "$@"; do
         --app=*)
             # Only one app, but ignore the flag value
             ;;
-        debug|release|patch|minor|major)
+        debug|release|patch|minor|major|install)
             MODE="$i"
             ;;
     esac
@@ -66,4 +68,9 @@ if [ -z "$MODE" ]; then
     MODE="debug"
 fi
 
-./scripts/build-and-publish.sh "$MODE"
+if [ "$MODE" == "install" ]; then
+    echo "--- Building and Installing $PROJECT_NAME on device ---"
+    ./gradlew :$DEFAULT_APP:installDebug
+else
+    ./scripts/build-and-publish.sh "$MODE"
+fi
