@@ -22,20 +22,18 @@ class SelectSongFragment : SelectFragment(), FilterableFragment {
     override var filterModalType = FilterModalType.SONG
 
     override var viewCapabilities: ViewCapabilities = ViewCapabilities(
-        supportsGrid = true,
+        supportsGrid = false,
         supportsSetsToggle = true,
-        supportedSortOrders = listOf(
-            SortOrder.RANDOM,
-            SortOrder.NEWEST,
-            SortOrder.STARRED
-        )
+        supportedSortOrders = emptyList()
     )
+
+    override val isSetsMode: Boolean get() = Settings.isSetsModeTiles
 
     override fun setOnSetsToggle(isSets: Boolean) {
         if (isSets && pageKey == "liveset") return
         if (!isSets && pageKey == "song") return
 
-        Settings.isSetsMode = isSets
+        Settings.isSetsModeTiles = isSets
         if (isSets) {
             pageKey = "liveset"
             defaultLength = "long"
@@ -59,7 +57,7 @@ class SelectSongFragment : SelectFragment(), FilterableFragment {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if (Settings.isSetsMode) {
+        if (Settings.isSetsModeTiles) {
             pageKey = "liveset"
             defaultLength = "long"
             filterModalType = FilterModalType.LIVESET

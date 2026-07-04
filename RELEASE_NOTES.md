@@ -1,3 +1,7 @@
+## [6.2.0-157] - 2026-07-05
+### Changed
+- Version bump.
+
 ## [6.2.0] - 2026-07-04
 ### Added
 - **Spotify-style UI**: Integrated dynamic "Songs" (Green) and "Sets" (Blue) branding throughout the app.

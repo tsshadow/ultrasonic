@@ -150,7 +150,9 @@ class MainFragment :
     }
 
     private fun updateBrandColors() {
-        val brandColor = if (Settings.isSetsMode) {
+        val curFrag = findCurrentFragment()
+        val isSets = if (curFrag is FilterableFragment) curFrag.isSetsMode else Settings.isSetsMode
+        val brandColor = if (isSets) {
             requireContext().getColor(R.color.spotify_blue)
         } else {
             requireContext().getColor(R.color.spotify_green)
@@ -167,7 +169,7 @@ class MainFragment :
             )
         }
 
-        filterButtonBar?.updateBrandColors()
+        filterButtonBar?.updateBrandColors(isSets)
     }
 
     private fun updateSetsToggleOnCurrentFragment(it: Boolean) {
@@ -196,10 +198,10 @@ class MainFragment :
 private fun FilterButtonBar.configureWithCapabilitiesFromFragment(frag: Fragment?) {
     if (frag is FilterableFragment) {
         Timber.w("Setting kapas: ${frag.viewCapabilities}")
-        this.configureWithCapabilities(frag.viewCapabilities)
+        this.configureWithCapabilities(frag.viewCapabilities, frag.isSetsMode)
     } else {
         Timber.w("Setting kapas: $EMPTY_CAPABILITIES")
-        this.configureWithCapabilities(EMPTY_CAPABILITIES)
+        this.configureWithCapabilities(EMPTY_CAPABILITIES, Settings.isSetsMode)
     }
 }
 
@@ -265,5 +267,6 @@ interface FilterableFragment {
     fun setLayoutType(newType: LayoutType) {}
     fun setOrderType(newOrder: SortOrder)
     fun setOnSetsToggle(isSets: Boolean) {}
+    val isSetsMode: Boolean get() = Settings.isSetsMode
     var viewCapabilities: ViewCapabilities
 }

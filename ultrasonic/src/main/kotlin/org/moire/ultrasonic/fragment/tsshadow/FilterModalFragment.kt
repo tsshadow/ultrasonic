@@ -31,6 +31,9 @@ class FilterModalFragment : BottomSheetDialogFragment() {
 
     private val filterOptionsViewModel: FilterOptionsViewModel by activityViewModels()
 
+    private var songState = FilterState(modalType = FilterModalType.SONG)
+    private var livesetState = FilterState(modalType = FilterModalType.LIVESET)
+
     private val selectedGenres = mutableListOf<String>()
     private val selectedArtists = mutableListOf<String>()
     private val selectedYears = mutableListOf<String>()
@@ -74,12 +77,26 @@ class FilterModalFragment : BottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.UltrasonicFilterDialogTheme)
-        modalType =
-            BundleCompat.getSerializable(
-                requireArguments(),
-                ARG_TYPE,
-                FilterModalType::class.java
-            )!!
+
+        val initialType = BundleCompat.getSerializable(
+            requireArguments(),
+            ARG_TYPE,
+            FilterModalType::class.java
+        )!!
+        val initialFilters = BundleCompat.getParcelable(
+            requireArguments(),
+            ARG_INITIAL_FILTERS,
+            FilterState::class.java
+        )
+
+        if (initialFilters != null) {
+            if (initialFilters.modalType == FilterModalType.SONG) {
+                songState = initialFilters
+            } else {
+                livesetState = initialFilters
+            }
+        }
+        modalType = initialFilters?.modalType ?: initialType
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?) = BottomSheetDialog(requireContext(), theme).apply {
@@ -117,7 +134,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
 
         setupAdapters()
         setupListeners()
-        applyInitialFilters()
+        applyStateToUI(if (modalType == FilterModalType.SONG) songState else livesetState)
         observeFilterOptions()
 
         binding.closeButton.setOnClickListener {
@@ -164,17 +181,13 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         }
 
         binding.chipSongs.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                modalType = FilterModalType.SONG
-                updateDurationLabel()
-                observeFilterOptions() // Redraw chips
+            if (isChecked && modalType != FilterModalType.SONG) {
+                switchType(FilterModalType.SONG)
             }
         }
         binding.chipSets.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                modalType = FilterModalType.LIVESET
-                updateDurationLabel()
-                observeFilterOptions() // Redraw chips
+            if (isChecked && modalType != FilterModalType.LIVESET) {
+                switchType(FilterModalType.LIVESET)
             }
         }
 
@@ -369,38 +382,60 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun applyInitialFilters() {
-        val filters =
-            BundleCompat.getParcelable(
-                requireArguments(),
-                ARG_INITIAL_FILTERS,
-                FilterState::class.java
-            )
-                ?: return
-        binding.selectTitle.setText(filters.title)
-        selectedGenres.addAll(filters.genres)
-        selectedArtists.addAll(filters.artists)
-        selectedYears.addAll(filters.years)
-        selectedLabels.addAll(filters.label)
-        selectedFestivalLineup = filters.festivalLineup
-        selectedFestivals.addAll(filters.festival)
-        selectedResultCount = filters.count
+    private fun switchType(newType: FilterModalType) {
+        if (modalType == FilterModalType.SONG) {
+            songState = collectFilterState()
+        } else {
+            livesetState = collectFilterState()
+        }
+
+        modalType = newType
+        applyStateToUI(if (modalType == FilterModalType.SONG) songState else livesetState)
+
+        updateDurationLabel()
+        redrawAllChips(
+            filterOptionsViewModel.genres.value,
+            filterOptionsViewModel.years.value,
+            filterOptionsViewModel.labels.value,
+            filterOptionsViewModel.lineups.value,
+            filterOptionsViewModel.festivals.value,
+            filterOptionsViewModel.artists.value
+        )
+    }
+
+    private fun applyStateToUI(state: FilterState) {
+        binding.selectTitle.setText(state.title)
+        selectedGenres.clear()
+        selectedGenres.addAll(state.genres)
+        selectedArtists.clear()
+        selectedArtists.addAll(state.artists)
+        selectedYears.clear()
+        selectedYears.addAll(state.years)
+        selectedLabels.clear()
+        selectedLabels.addAll(state.label)
+        selectedFestivalLineup = state.festivalLineup
+        selectedFestivals.clear()
+        selectedFestivals.addAll(state.festival)
+
+        selectedResultCount = state.count
         binding.selectResultCountSlider.value =
-            resultCountSteps.indexOf(filters.count).toFloat()
+            resultCountSteps.indexOf(state.count).toFloat()
         binding.selectResultCountLabel.text =
             getString(R.string.result_count_format, selectedResultCount)
-        binding.selectRatingMin.setSelection(filters.ratingMin)
-        binding.selectRatingMax.setSelection(filters.ratingMax)
-        binding.favoriteButton.isSelected = filters.favorite
-        val iconRes = if (filters.favorite) R.drawable.ic_star_full else R.drawable.ic_star_hollow
+        binding.selectRatingMin.setSelection(state.ratingMin)
+        binding.selectRatingMax.setSelection(state.ratingMax)
+        binding.favoriteButton.isSelected = state.favorite
+        val iconRes = if (state.favorite) R.drawable.ic_star_full else R.drawable.ic_star_hollow
         binding.favoriteButton.setImageResource(iconRes)
-        sortOptions.indexOfFirst { it.second == filters.sortMethod }
+        sortOptions.indexOfFirst { it.second == state.sortMethod }
             .takeIf { it >= 0 }
             ?.let { binding.selectSortMethod.setSelection(it) }
 
-        modalType = filters.modalType
+        modalType = state.modalType
         updateDurationLabel()
-        val durationValue = (if (modalType == FilterModalType.LIVESET) filters.minDuration else filters.maxDuration) ?: 0
+        val durationValue =
+            (if (modalType == FilterModalType.LIVESET) state.minDuration else state.maxDuration)
+                ?: 0
         binding.durationSlider.value = durationValue.toFloat()
         binding.durationValueText.text = "${durationValue / 60} min"
 

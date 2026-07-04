@@ -57,13 +57,13 @@ class FilterButtonBar : ConstraintLayout {
      *
      * @param caps
      */
-    fun configureWithCapabilities(caps: ViewCapabilities) {
+    fun configureWithCapabilities(caps: ViewCapabilities, isSetsChecked: Boolean = Settings.isSetsMode) {
         viewTypeToggle!!.isVisible = caps.supportsGrid
         setsToggle?.isVisible = caps.supportsSetsToggle
         if (caps.supportsSetsToggle) {
-            setsToggle?.isChecked = Settings.isSetsMode
+            setsToggle?.isChecked = isSetsChecked
         }
-        updateBrandColors()
+        updateBrandColors(isSetsChecked)
         sortOrderMenu!!.isVisible = caps.supportedSortOrders.isNotEmpty()
 
         if (caps.supportedSortOrders.isNotEmpty()) {
@@ -201,8 +201,8 @@ class FilterButtonBar : ConstraintLayout {
     /**
      * Update the accent colors based on the current mode
      */
-    fun updateBrandColors() {
-        val brandColor = if (Settings.isSetsMode) {
+    fun updateBrandColors(isSetsChecked: Boolean = Settings.isSetsMode) {
+        val brandColor = if (isSetsChecked) {
             context.getColor(R.color.spotify_blue)
         } else {
             context.getColor(R.color.spotify_green)
