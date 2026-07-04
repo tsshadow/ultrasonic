@@ -147,10 +147,11 @@ if [ -n "$DOCKER_IMAGE" ] && command -v docker >/dev/null 2>&1; then
     fi
 
     echo "--- Building Docker Image: $DOCKER_IMAGE ---"
-    docker build -t "$DOCKER_IMAGE" -f apk-hoster/Dockerfile .
+    docker build -t "$DOCKER_IMAGE:latest" -t "$DOCKER_IMAGE:$VERSION_NAME" -f apk-hoster/Dockerfile .
     
     echo "--- Pushing Docker Image: $DOCKER_IMAGE ---"
-    docker push "$DOCKER_IMAGE"
+    docker push "$DOCKER_IMAGE:latest"
+    docker push "$DOCKER_IMAGE:$VERSION_NAME"
 else
     echo "Warning: docker command not found, skipping Docker build."
 fi
