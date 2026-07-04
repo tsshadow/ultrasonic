@@ -35,6 +35,19 @@ android {
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
         resourceConfigurations += ['cs', 'de', 'en', 'es', 'fr', 'gl', 'hu', 'it', 'ja', 'nb-rNO', 'nl', 'pl', 'pt', 'pt-rBR', 'ru', 'zh-rCN', 'zh-rTW']
+
+        // Inject Default Servers
+        buildConfigField "String", "DEFAULT_SERVER_1_NAME", "\"${envOrProp('SERVER_1_NAME', '')}\""
+        buildConfigField "String", "DEFAULT_SERVER_1_URL", "\"${envOrProp('SERVER_1_URL', '')}\""
+        buildConfigField "String", "DEFAULT_SERVER_1_USER", "\"${envOrProp('SERVER_1_USER', '')}\""
+        buildConfigField "String", "DEFAULT_SERVER_1_PASS", "\"${envOrProp('SERVER_1_PASS', '')}\""
+
+        buildConfigField "String", "DEFAULT_SERVER_2_NAME", "\"${envOrProp('SERVER_2_NAME', '')}\""
+        buildConfigField "String", "DEFAULT_SERVER_2_URL", "\"${envOrProp('SERVER_2_URL', '')}\""
+        buildConfigField "String", "DEFAULT_SERVER_2_USER", "\"${envOrProp('SERVER_2_USER', '')}\""
+        buildConfigField "String", "DEFAULT_SERVER_2_PASS", "\"${envOrProp('SERVER_2_PASS', '')}\""
+
+        buildConfigField "String", "APK_HOST_URL", "\"https://apk.teunschriks.nl\""
     }
 
     bundle {

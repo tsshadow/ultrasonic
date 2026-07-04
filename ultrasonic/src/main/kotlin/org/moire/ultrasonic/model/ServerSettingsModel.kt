@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
@@ -231,10 +232,10 @@ class ServerSettingsModel(
         private val LMS_CONFIG = ServerSetting(
             id = 0,
             index = 0,
-            name = UApp.applicationContext().getString(R.string.server_menu_lms),
-            url = "https://lms.teunschriks.nl",
-            userName = "teun",
-            password = "******",
+            name = if (BuildConfig.DEFAULT_SERVER_1_NAME.isNotEmpty()) BuildConfig.DEFAULT_SERVER_1_NAME else UApp.applicationContext().getString(R.string.server_menu_lms),
+            url = if (BuildConfig.DEFAULT_SERVER_1_URL.isNotEmpty()) BuildConfig.DEFAULT_SERVER_1_URL else "https://lms.teunschriks.nl",
+            userName = if (BuildConfig.DEFAULT_SERVER_1_USER.isNotEmpty()) BuildConfig.DEFAULT_SERVER_1_USER else "teun",
+            password = if (BuildConfig.DEFAULT_SERVER_1_PASS.isNotEmpty()) BuildConfig.DEFAULT_SERVER_1_PASS else "******",
             jukeboxByDefault = false,
             allowSelfSignedCertificate = true,
             forcePlainTextPassword = true,
@@ -249,10 +250,10 @@ class ServerSettingsModel(
         private val LMS_ALPHA_CONFIG = ServerSetting(
             id = 0,
             index = 0,
-            name = UApp.applicationContext().getString(R.string.server_menu_lmsalpha),
-            url = "https://lms-alpha.teunschriks.nl",
-            userName = "teun",
-            password = "******",
+            name = if (BuildConfig.DEFAULT_SERVER_2_NAME.isNotEmpty()) BuildConfig.DEFAULT_SERVER_2_NAME else UApp.applicationContext().getString(R.string.server_menu_lmsalpha),
+            url = if (BuildConfig.DEFAULT_SERVER_2_URL.isNotEmpty()) BuildConfig.DEFAULT_SERVER_2_URL else "https://lms-alpha.teunschriks.nl",
+            userName = if (BuildConfig.DEFAULT_SERVER_2_USER.isNotEmpty()) BuildConfig.DEFAULT_SERVER_2_USER else "teun",
+            password = if (BuildConfig.DEFAULT_SERVER_2_PASS.isNotEmpty()) BuildConfig.DEFAULT_SERVER_2_PASS else "******",
             jukeboxByDefault = false,
             allowSelfSignedCertificate = true,
             forcePlainTextPassword = true,

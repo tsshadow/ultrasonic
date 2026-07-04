@@ -19,6 +19,13 @@ if ! command -v sshpass >/dev/null 2>&1; then
     sudo apt-get update -y && sudo apt-get install -y sshpass
 fi
 
+# Add current user to docker group
+if ! groups $USER | grep -q "\bdocker\b"; then
+    echo "Adding $USER to docker group..."
+    sudo usermod -aG docker $USER
+    echo "User added to docker group. You may need to restart your session or run 'newgrp docker'."
+fi
+
 # 2. Install JDK 21
 if [ ! -d "$JDK_DIR" ] || [ ! -f "$JDK_DIR/bin/java" ]; then
     echo "--- Installing JDK 21 ---"
@@ -69,10 +76,29 @@ SIGNING_KEY_ALIAS=upload
 SIGNING_KEY_PASSWORD=changeit
 # Optional: Remote publish path for build_and_publish.sh
 # PUBLISH_REMOTE_PATH=user@nas:/var/www/html/ultrasonic
-# Optional: Remote Docker host for build_and_publish.sh
+
+# Remote Deployment Configuration
+# Descriptive name for the deployment target
+# DEPLOY_TARGET_NAME=APK Hoster
+
+# Option 1: Portainer Webhook
+# PORTAINER_WEBHOOK_URL=https://portainer.example.com/api/webhooks/...
+
+# Option 2: SSH-based deployment
 # REMOTE_HOST=192.168.1.27
 # REMOTE_USER=root
 # REMOTE_PASS=changeit
+# REMOTE_DIST_PATH=/var/www/html/ultrasonic
+
+# Default Server Configurations for APK pre-configuration
+# SERVER_1_NAME=LMS
+# SERVER_1_URL=https://lms.teunschriks.nl
+# SERVER_1_USER=guest
+# SERVER_1_PASS=your_uuid_here
+# SERVER_2_NAME=Spotify
+# SERVER_2_URL=https://spotify.teunschriks.nl
+# SERVER_2_USER=guest
+# SERVER_2_PASS=your_uuid_here
 EOF
 echo "local.properties updated"
 

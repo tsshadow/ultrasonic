@@ -97,6 +97,28 @@ EOF
 # 4. Docker Publish (Optional)
 DOCKER_IMAGE="tsshadow/apk-hoster"
 if command -v docker >/dev/null 2>&1; then
+    # Check for docker permissions
+    if ! docker info >/dev/null 2>&1; then
+        echo "ERROR: Permission denied while trying to connect to the Docker daemon."
+        echo "Please ensure your user ($USER) is in the 'docker' group."
+        echo "You can add yourself with: sudo usermod -aG docker \$USER"
+        echo "Then log out and log back in, or run: newgrp docker"
+        exit 1
+    fi
+
+    # Check for docker registry authentication
+    if ! docker info | grep -q "Username:"; then
+        echo "WARNING: You don't seem to be logged into Docker Hub."
+        echo "Pushing images to 'tsshadow/' will likely fail."
+        echo "Please run: docker login"
+        echo ""
+        read -p "Do you want to continue anyway? (y/N) " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    fi
+
     echo "--- Building Docker Image: $DOCKER_IMAGE ---"
     docker build -t "$DOCKER_IMAGE" -f apk-hoster/Dockerfile .
     

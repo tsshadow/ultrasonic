@@ -54,6 +54,22 @@ GitHub Actions will decode the keystore, reuse the same credentials as Android
 Studio, and publish signed APK/AAB artifacts for every push, pull request, or
 manual run.
 
+## Building and Deployment
+If you are modifying the code and need to rebuild and redeploy the system:
+
+1.  **Install dependencies**: `./install.sh`
+2.  **Build app**: `./build.sh`
+3.  **Publish app & hoster**: `./publish.sh`
+4.  **Deploy to remote**: `./deploy.sh`
+5.  **Full pipeline (Build + Publish + Deploy)**: `./build_and_publish.sh`
+
+#### Remote Deployment Options
+You can configure deployment in `local.properties`:
+1.  **Portainer Webhook**: Set `PORTAINER_WEBHOOK_URL`. This will trigger a webhook to update the `apk-hoster` service (or whatever service you have linked to the webhook).
+2.  **SSH**: Set `REMOTE_HOST`, `REMOTE_USER`, etc. The script will SSH into the host, stop the old `apk-hoster` container, and start a new one.
+
+**Tip**: Use `DEPLOY_TARGET_NAME` in `local.properties` to give your deployment target a friendly name which will be displayed during the deployment process.
+
 [subsonic]: http://www.subsonic.org/
 [subapi]: http://www.subsonic.org/pages/api.jsp
 [airsonic]: https://github.com/airsonic-advanced/airsonic-advanced
