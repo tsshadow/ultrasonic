@@ -6,6 +6,20 @@ APP_NAME="ultrasonic"
 DIST_DIR="dist"
 MODULE="ultrasonic"
 
+# Load optional configuration from local.properties
+if [ -f "local.properties" ]; then
+    while IFS='=' read -r key value; do
+        if [[ ! $key =~ ^# && -n $key ]]; then
+            key=$(echo "$key" | xargs)
+            value=$(echo "$value" | xargs)
+            export "$key=$value"
+        fi
+    done < local.properties
+fi
+
+# Ensure DOCKER_IMAGE is set
+DOCKER_IMAGE="${DOCKER_IMAGE}"
+
 echo "--- Starting publish of $APP_NAME ---"
 
 # 1. Extract Version Info from build.gradle
@@ -95,8 +109,7 @@ cat >> "$DIST_DIR/index.html" <<EOF
 EOF
 
 # 4. Docker Publish (Optional)
-DOCKER_IMAGE="tsshadow/apk-hoster"
-if command -v docker >/dev/null 2>&1; then
+if [ -n "$DOCKER_IMAGE" ] && command -v docker >/dev/null 2>&1; then
     # Check for docker permissions
     if ! docker info >/dev/null 2>&1; then
         echo "ERROR: Permission denied while trying to connect to the Docker daemon."

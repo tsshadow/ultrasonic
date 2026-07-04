@@ -27,11 +27,22 @@ if [ ! -f "keystore.jks" ] && [ -z "$SIGNING_STORE_FILE" ]; then
     ./gradlew generateKeystore
 fi
 
-# Set default signing environment variables if not already set
-export SIGNING_STORE_FILE="${SIGNING_STORE_FILE:-$PWD/keystore.jks}"
-export SIGNING_STORE_PASSWORD="${SIGNING_STORE_PASSWORD:-changeit}"
-export SIGNING_KEY_ALIAS="${SIGNING_KEY_ALIAS:-upload}"
-export SIGNING_KEY_PASSWORD="${SIGNING_KEY_PASSWORD:-$SIGNING_STORE_PASSWORD}"
+# Load optional configuration from local.properties
+if [ -f "local.properties" ]; then
+    while IFS='=' read -r key value; do
+        if [[ ! $key =~ ^# && -n $key ]]; then
+            key=$(echo "$key" | xargs)
+            value=$(echo "$value" | xargs)
+            export "$key=$value"
+        fi
+    done < local.properties
+fi
+
+# Set signing environment variables from config
+export SIGNING_STORE_FILE="${SIGNING_STORE_FILE}"
+export SIGNING_STORE_PASSWORD="${SIGNING_STORE_PASSWORD}"
+export SIGNING_KEY_ALIAS="${SIGNING_KEY_ALIAS}"
+export SIGNING_KEY_PASSWORD="${SIGNING_KEY_PASSWORD}"
 
 ./gradlew clean :$MODULE:assembleRelease
 

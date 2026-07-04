@@ -6,7 +6,6 @@ cd "$(dirname "$0")"
 # Configuration
 APP_NAME="ultrasonic"
 DIST_DIR="dist"
-DOCKER_IMAGE="tsshadow/apk-hoster"
 
 # Load optional remote publish path from local.properties if exists
 if [ -f "local.properties" ]; then
@@ -24,8 +23,9 @@ if [ -f "local.properties" ]; then
 fi
 
 # Configuration for deployment logic
-TARGET="${DEPLOY_TARGET_NAME:-APK Hoster Stack}"
-DOCKER_COMPOSE_FILE="${REMOTE_STACK_PATH:-docker-compose.yml}"
+TARGET="${DEPLOY_TARGET_NAME}"
+DOCKER_COMPOSE_FILE="${REMOTE_STACK_PATH}"
+DOCKER_IMAGE="${DOCKER_IMAGE}"
 
 # Try to extract path from PUBLISH_REMOTE_PATH if REMOTE_DIST_PATH is not set
 if [ -z "$REMOTE_DIST_PATH" ] && [ -n "$PUBLISH_REMOTE_PATH" ]; then
