@@ -76,7 +76,7 @@ while IFS= read -r apk; do
     
     cat >> "$DIST_DIR/index.html" <<EOF
         <li class="apk-item">
-            <a class="apk-link" href="$filename">$filename $LATEST_TAG</a>
+            <a class="apk-link" href="$filename" download>$filename $LATEST_TAG</a>
             <div class="apk-info">
                 <span>Built: $filedate</span>
                 <span class="tag">APK</span>

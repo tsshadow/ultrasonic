@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 	"regexp"
@@ -72,6 +73,9 @@ func getLatestVersion(apkName string, r *http.Request) (*VersionInfo, error) {
 }
 
 func main() {
+	// Register APK mime type to prevent browsers from downloading it as ZIP
+	mime.AddExtensionType(".apk", "application/vnd.android.package-archive")
+
 	distDir := "dist"
 	if _, err := os.Stat(distDir); os.IsNotExist(err) {
 		fmt.Println("Warning: dist directory does not exist, creating it.")
