@@ -70,8 +70,15 @@ DISCOVERY_CMD="
 COMPOSE_CONTENT=""
 SOURCE_HOST=""
 
-# 1. Try discovery on PORTAINER_HOST
-if [ -n "$PORTAINER_HOST" ]; then
+# 1. Use local compose file if provided (Source of truth for deployment)
+if [ -n "$LOCAL_COMPOSE_FILE" ] && [ -f "$LOCAL_COMPOSE_FILE" ]; then
+    echo "Using local configuration file: $LOCAL_COMPOSE_FILE"
+    COMPOSE_CONTENT=$(expand -t 4 "$LOCAL_COMPOSE_FILE")
+    SOURCE_HOST="local"
+fi
+
+# 2. Try discovery on PORTAINER_HOST if local not provided
+if [ -z "$COMPOSE_CONTENT" ] && [ -n "$PORTAINER_HOST" ]; then
     echo "Checking Portainer host $PORTAINER_HOST for stack template..."
     P_USER="${PORTAINER_HOST_USER:-$REMOTE_USER}"
     P_PASS="${PORTAINER_HOST_PASS:-$REMOTE_PASS}"
@@ -83,7 +90,7 @@ if [ -n "$PORTAINER_HOST" ]; then
     fi
 fi
 
-# 2. Try discovery on REMOTE_HOST if not found on Portainer host
+# 3. Try discovery on REMOTE_HOST if still not found
 if [ -z "$COMPOSE_CONTENT" ] && [ -n "$REMOTE_HOST" ]; then
     echo "Checking remote host $REMOTE_HOST for existing configuration..."
     RESULT=$(run_ssh "$REMOTE_HOST" "$REMOTE_USER" "$REMOTE_PASS" "REMOTE_STACK_PATH='$REMOTE_STACK_PATH' $DISCOVERY_CMD" 2>/dev/null || true)
@@ -92,13 +99,6 @@ if [ -z "$COMPOSE_CONTENT" ] && [ -n "$REMOTE_HOST" ]; then
         SOURCE_HOST="$REMOTE_HOST"
         echo "Found existing configuration on $REMOTE_HOST"
     fi
-fi
-
-# 3. Use local compose file if provided and discovery failed
-if [ -z "$COMPOSE_CONTENT" ] && [ -n "$LOCAL_COMPOSE_FILE" ] && [ -f "$LOCAL_COMPOSE_FILE" ]; then
-    echo "Using local configuration file: $LOCAL_COMPOSE_FILE"
-    COMPOSE_CONTENT=$(expand -t 4 "$LOCAL_COMPOSE_FILE")
-    SOURCE_HOST="local"
 fi
 
 if [ -z "$COMPOSE_CONTENT" ]; then
