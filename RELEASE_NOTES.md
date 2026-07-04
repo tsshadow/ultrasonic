@@ -1,3 +1,7 @@
+## [6.1.1] - 2026-07-04
+### Changed
+- Version bump.
+
 ## [6.1.0-149] - 2026-07-04
 ### Changed
 - Version bump.
