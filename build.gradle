@@ -58,8 +58,10 @@ allprojects {
 }
 
 tasks.register("generateKeystore") {
+    def keystoreFile = layout.projectDirectory.file("keystore.jks").asFile
+    outputs.file(keystoreFile)
+    
     doLast {
-        def keystoreFile = file("keystore.jks")
         if (keystoreFile.exists()) {
             println "keystore.jks bestaat al"
             return
