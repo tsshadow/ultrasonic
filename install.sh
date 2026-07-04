@@ -1,0 +1,69 @@
+#!/bin/bash
+set -e
+
+# MuMaFi Ultrasonic Install Script
+# Standardized interface for building, publishing, and deploying.
+
+# Get the project root
+ROOT_DIR="$(dirname "$(readlink -f "$0")")"
+cd "$ROOT_DIR"
+
+# Application-specific configuration
+PROJECT_NAME="Ultrasonic"
+AVAILABLE_APPS=("ultrasonic")
+DEFAULT_APP="ultrasonic"
+
+show_help() {
+    echo "MuMaFi $PROJECT_NAME Install Script"
+    echo "Usage: ./install.sh [options] [mode]"
+    echo ""
+    echo "Options:"
+    echo "  --help          Show this help message"
+    echo "  --app=<app>     Specify the application to install (default: $DEFAULT_APP)"
+    echo "  --list          List available applications"
+    echo ""
+    echo "Modes:"
+    echo "  debug           Build in debug mode (default)"
+    echo "  release         Build in release mode"
+    echo "  patch           Increment patch version and build release"
+    echo "  minor           Increment minor version and build release"
+    echo "  major           Increment major version and build release"
+    echo ""
+    echo "Examples:"
+    echo "  ./install.sh patch"
+}
+
+list_apps() {
+    for app in "${AVAILABLE_APPS[@]}"; do
+        echo "$app"
+    done
+}
+
+# Default values
+MODE=""
+
+# Parse arguments
+for i in "$@"; do
+    case $i in
+        --help)
+            show_help
+            exit 0
+            ;;
+        --list)
+            list_apps
+            exit 0
+            ;;
+        --app=*)
+            # Only one app, but ignore the flag value
+            ;;
+        debug|release|patch|minor|major)
+            MODE="$i"
+            ;;
+    esac
+done
+
+if [ -z "$MODE" ]; then
+    MODE="debug"
+fi
+
+./scripts/build-and-publish.sh "$MODE"
