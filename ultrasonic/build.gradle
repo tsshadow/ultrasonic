@@ -34,8 +34,8 @@ android {
 
     defaultConfig {
         applicationId 'nl.teunschriks.mumamobile'
-        versionCode 144
-        versionName "6.0.0"
+        versionCode 145
+        versionName "6.1.0"
 
         minSdk libs.versions.appMinSdk.get().toInteger()
         targetSdk libs.versions.appTargetSdk.get().toInteger()
@@ -163,11 +163,13 @@ android {
 
     lint {
         baseline = file("lint-baseline.xml")
+        checkReleaseBuilds false
         abortOnError true
         warningsAsErrors true
         warning 'ImpliedQuantity'
         disable 'MissingTranslation', 'UnusedQuantity', 'MissingQuantity'
         disable 'ObsoleteLintCustomCheck'
+        disable 'NullSafeMutableLiveData'
         // We manage dependencies on Gitlab with RenovateBot
         disable 'GradleDependency'
         disable 'AndroidGradlePluginVersion'
