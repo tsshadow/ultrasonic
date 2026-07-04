@@ -109,11 +109,12 @@ echo "--- Verification ---"
 java -version
 sdkmanager --version
 
-# Apply group membership to the current session
+# Apply group membership check
 if ! groups | grep -q "\bdocker\b"; then
-    echo "Applying docker group membership to the current session via 'newgrp docker'..."
-    newgrp docker
+    echo "NOTE: The build scripts now automatically handle Docker permissions if you've just been added to the group."
+    echo "If you want to use Docker manually in this session, run: newgrp docker"
 fi
+
 echo ""
 echo "=== Installation Successful ==="
 echo "You can now run: ./gradlew assembleDebug"
