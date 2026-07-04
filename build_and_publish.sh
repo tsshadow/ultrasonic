@@ -164,7 +164,7 @@ if command -v docker >/dev/null 2>&1; then
         docker stop apk-hoster || true
         docker rm apk-hoster || true
         docker run -d --name apk-hoster \
-            -p 80:80 \
+            -p 8275:8275 \
             --restart always \
             $DOCKER_IMAGE
         "
@@ -179,7 +179,7 @@ if command -v docker >/dev/null 2>&1; then
     else
         echo "Note: REMOTE_HOST not set, skipping remote deployment."
         echo "To restart the container manually, run:"
-        echo "docker pull $DOCKER_IMAGE && docker stop apk-hoster || true && docker rm apk-hoster || true && docker run -d --name apk-hoster -p 80:80 --restart always $DOCKER_IMAGE"
+        echo "docker pull $DOCKER_IMAGE && docker stop apk-hoster || true && docker rm apk-hoster || true && docker run -d --name apk-hoster -p 8275:8275 --restart always $DOCKER_IMAGE"
     fi
 else
     echo "Warning: docker command not found, skipping Docker build."

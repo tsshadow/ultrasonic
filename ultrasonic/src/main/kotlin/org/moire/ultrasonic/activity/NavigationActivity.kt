@@ -71,6 +71,7 @@ import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.ShortcutUtil
 import org.moire.ultrasonic.util.Storage
 import org.moire.ultrasonic.util.UncaughtExceptionHandler
+import org.moire.ultrasonic.util.UpdateChecker
 import org.moire.ultrasonic.util.Util
 import timber.log.Timber
 
@@ -236,6 +237,10 @@ class NavigationActivity : ScopeActivity() {
             this,
             Lifecycle.State.RESUMED
         )
+
+        lifecycleScope.launch {
+            UpdateChecker.checkForUpdates(this@NavigationActivity)
+        }
     }
 
     private val searchMenuProvider: MenuProvider = object : MenuProvider {
