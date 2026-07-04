@@ -7,6 +7,7 @@ data class SubsonicClientConfiguration(
     val baseUrl: String,
     val username: String,
     val password: String,
+    val apiKey: String? = null,
     val minimalProtocolVersion: SubsonicAPIVersions,
     val clientID: String,
     val allowSelfSignedCertificate: Boolean = false,

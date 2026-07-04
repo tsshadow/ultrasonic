@@ -41,11 +41,13 @@ android {
         buildConfigField "String", "DEFAULT_SERVER_1_URL", "\"${envOrProp('SERVER_1_URL', '')}\""
         buildConfigField "String", "DEFAULT_SERVER_1_USER", "\"${envOrProp('SERVER_1_USER', '')}\""
         buildConfigField "String", "DEFAULT_SERVER_1_PASS", "\"${envOrProp('SERVER_1_PASS', '')}\""
+        buildConfigField "String", "DEFAULT_SERVER_1_API_KEY", "\"${envOrProp('SERVER_1_API_KEY', '')}\""
 
         buildConfigField "String", "DEFAULT_SERVER_2_NAME", "\"${envOrProp('SERVER_2_NAME', '')}\""
         buildConfigField "String", "DEFAULT_SERVER_2_URL", "\"${envOrProp('SERVER_2_URL', '')}\""
         buildConfigField "String", "DEFAULT_SERVER_2_USER", "\"${envOrProp('SERVER_2_USER', '')}\""
         buildConfigField "String", "DEFAULT_SERVER_2_PASS", "\"${envOrProp('SERVER_2_PASS', '')}\""
+        buildConfigField "String", "DEFAULT_SERVER_2_API_KEY", "\"${envOrProp('SERVER_2_API_KEY', '')}\""
 
         buildConfigField "String", "APK_HOST_URL", "\"https://apk.teunschriks.nl\""
     }

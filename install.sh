@@ -82,6 +82,8 @@ SIGNING_KEY_PASSWORD=changeit
 # DEPLOY_TARGET_NAME=APK Hoster
 
 # Option 1: Portainer Webhook
+# NOTE: Stack Webhooks are a Business Edition feature. 
+# For Community Edition, use Service Webhooks or the SSH method below.
 # PORTAINER_WEBHOOK_URL=https://portainer.example.com/api/webhooks/...
 
 # Option 2: SSH-based deployment

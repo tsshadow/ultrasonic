@@ -1,0 +1,129 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 7,
+    "identityHash": "4db7db2933625efed8ab4cff3cc72b17",
+    "entities": [
+      {
+        "tableName": "ServerSetting",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `index` INTEGER NOT NULL, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `color` INTEGER, `userName` TEXT NOT NULL, `password` TEXT NOT NULL, `apiKey` TEXT, `jukeboxByDefault` INTEGER NOT NULL, `allowSelfSignedCertificate` INTEGER NOT NULL, `forcePlainTextPassword` INTEGER NOT NULL, `musicFolderId` TEXT, `minimumApiVersion` TEXT, `chatSupport` INTEGER, `bookmarkSupport` INTEGER, `shareSupport` INTEGER, `podcastSupport` INTEGER, `jukeboxSupport` INTEGER, `videoSupport` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index",
+            "columnName": "index",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "color",
+            "columnName": "color",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "userName",
+            "columnName": "userName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "password",
+            "columnName": "password",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "apiKey",
+            "columnName": "apiKey",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "jukeboxByDefault",
+            "columnName": "jukeboxByDefault",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "allowSelfSignedCertificate",
+            "columnName": "allowSelfSignedCertificate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "forcePlainTextPassword",
+            "columnName": "forcePlainTextPassword",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "musicFolderId",
+            "columnName": "musicFolderId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "minimumApiVersion",
+            "columnName": "minimumApiVersion",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "chatSupport",
+            "columnName": "chatSupport",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "bookmarkSupport",
+            "columnName": "bookmarkSupport",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "shareSupport",
+            "columnName": "shareSupport",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "podcastSupport",
+            "columnName": "podcastSupport",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "jukeboxSupport",
+            "columnName": "jukeboxSupport",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "videoSupport",
+            "columnName": "videoSupport",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4db7db2933625efed8ab4cff3cc72b17')"
+    ]
+  }
+}

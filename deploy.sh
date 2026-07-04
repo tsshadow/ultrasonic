@@ -5,7 +5,6 @@ cd "$(dirname "$0")"
 
 # Configuration
 APP_NAME="ultrasonic"
-DIST_DIR="dist"
 
 # Load optional remote publish path from local.properties if exists
 if [ -f "local.properties" ]; then
@@ -26,6 +25,7 @@ if [ -f "local.properties" ]; then
 fi
 
 # Configuration for deployment logic
+DIST_DIR="${DIST_DIR:-dist}"
 TARGET="${DEPLOY_TARGET_NAME}"
 DOCKER_COMPOSE_FILE="${REMOTE_STACK_PATH}"
 DOCKER_IMAGE="${DOCKER_IMAGE}"
@@ -57,8 +57,24 @@ fi
 if [ -n "${PORTAINER_WEBHOOK_URL}" ]; then
     echo "--- Triggering Portainer Webhook for: $TARGET ---"
     if command -v curl >/dev/null 2>&1; then
-        curl -X POST "${PORTAINER_WEBHOOK_URL}"
-        echo -e "\n--- Webhook triggered for $TARGET ---"
+        STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${PORTAINER_WEBHOOK_URL}")
+        if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 300 ]; then
+            echo "--- Webhook triggered successfully for $TARGET (Status: $STATUS_CODE) ---"
+        elif [ "$STATUS_CODE" -eq 404 ]; then
+            echo "Error: Portainer Webhook returned 404 Not Found."
+            echo "Note: Stack Webhooks are a Business Edition feature."
+            if [[ "${PORTAINER_WEBHOOK_URL}" == *"/stacks/"* ]]; then
+                echo "HINT: You are using a Stack Webhook URL, which requires Portainer Business Edition."
+                echo "If you have Community Edition, you can use 'Service Webhooks' (under each service) or the SSH method."
+            fi
+            if [[ "${PORTAINER_WEBHOOK_URL}" == *"ptr_"* ]]; then
+                echo "HINT: Your URL seems to contain an API Access Token (ptr_...). Webhooks use a different token."
+            fi
+            exit 1
+        else
+            echo "Error: Portainer Webhook failed with status code $STATUS_CODE"
+            exit 1
+        fi
     else
         echo "Error: curl not found. Cannot trigger Portainer Webhook."
         exit 1
@@ -73,6 +89,7 @@ elif [ -n "$REMOTE_HOST" ]; then
         VOLUME_ARG="-v \"$REMOTE_DIST_PATH:/app/dist\""
     fi
 
+    SERVICE_NAME="${SERVICE_NAME:-apk-hoster}"
     REMOTE_COMMAND="
     set -e
     # Try to find docker-compose file
@@ -87,11 +104,11 @@ elif [ -n "$REMOTE_HOST" ]; then
         docker-compose up -d || docker compose up -d
     else
         echo \"Warning: Docker compose configuration not found at '${DOCKER_COMPOSE_FILE}' on remote host.\"
-        echo \"Updating individual container 'apk-hoster' for '$TARGET'...\"
+        echo \"Updating individual container '${SERVICE_NAME}' for '$TARGET'...\"
         docker pull $DOCKER_IMAGE
-        docker stop apk-hoster || true
-        docker rm apk-hoster || true
-        docker run -d --name apk-hoster \
+        docker stop ${SERVICE_NAME} || true
+        docker rm ${SERVICE_NAME} || true
+        docker run -d --name ${SERVICE_NAME} \
             -p 8275:8275 \
             $VOLUME_ARG \
             --restart always \

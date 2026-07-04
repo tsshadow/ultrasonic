@@ -3,7 +3,6 @@ set -e
 
 # Configuration
 APP_NAME="ultrasonic"
-DIST_DIR="dist"
 MODULE="ultrasonic"
 
 # Load optional configuration from local.properties
@@ -20,8 +19,9 @@ if [ -f "local.properties" ]; then
     done < local.properties
 fi
 
-# Ensure DOCKER_IMAGE is set
+# Ensure DOCKER_IMAGE and DIST_DIR are set
 DOCKER_IMAGE="${DOCKER_IMAGE}"
+DIST_DIR="${DIST_DIR:-dist}"
 
 echo "--- Starting publish of $APP_NAME ---"
 
@@ -147,6 +147,10 @@ if [ -n "$DOCKER_IMAGE" ] && command -v docker >/dev/null 2>&1; then
     fi
 
     echo "--- Building Docker Image: $DOCKER_IMAGE ---"
+    # Ensure a local dist directory exists for Docker build context if needed
+    if [ "$DIST_DIR" != "dist" ] && [ ! -d "dist" ]; then
+        mkdir -p dist
+    fi
     docker build -t "$DOCKER_IMAGE:latest" -t "$DOCKER_IMAGE:$VERSION_NAME" -f apk-hoster/Dockerfile .
     
     echo "--- Pushing Docker Image: $DOCKER_IMAGE ---"

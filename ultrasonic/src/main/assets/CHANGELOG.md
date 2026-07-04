@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.1.0] - 2026-07-04
 ### Added
+- Persistent Build Directory: Configured the build system to use a shared folder (`/mnt/teun/ultrasonic-builds`) for all APKs and distribution files.
+- Generic Docker Image: The `apk-hoster` Docker image is now generic and uses volume mounts for content, avoiding the need to rebuild the image for every new build.
 - Auto-update system: Implemented `UpdateChecker` polling `apk-hoster` API on startup.
 - Integrated Changelog: Bundled `CHANGELOG.md` and `RELEASE_NOTES.md` into assets; added `Util.showChangelog` for in-app viewing.
 - Version Tracking: Added `last_seen_version` to `Settings` for automated update detection and release notes popup.
@@ -26,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Standardized deployment variable names for cross-project compatibility.
 
 ### Fixed
+- Fixed empty webpage in `apk-hoster` by bundling the `dist` directory into the Docker image.
 - Fixed APK files downloading as ZIP by registering correct MIME types in `apk-hoster`.
 - Fixed local.properties loading logic to skip invalid bash identifiers.
 - Fixed non-interactive session hangs in `publish.sh`.

@@ -70,11 +70,16 @@ class SubsonicAPIClient(
         .addInterceptor { chain ->
             // Adds default request params
             val originalRequest = chain.request()
-            val newUrl = originalRequest.url.newBuilder()
+            val newUrlBuilder = originalRequest.url.newBuilder()
                 .addQueryParameter("u", config.username)
                 .addQueryParameter("c", config.clientID)
                 .addQueryParameter("f", "json")
-                .build()
+
+            if (!config.apiKey.isNullOrEmpty()) {
+                newUrlBuilder.addQueryParameter("apiKey", config.apiKey)
+            }
+
+            val newUrl = newUrlBuilder.build()
             val newRequestBuilder = originalRequest.newBuilder().url(newUrl)
             if (originalRequest.url.username.isNotEmpty() &&
                 originalRequest.url.password.isNotEmpty()

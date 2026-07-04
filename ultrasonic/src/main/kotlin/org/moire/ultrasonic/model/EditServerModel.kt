@@ -102,6 +102,7 @@ class EditServerModel(val app: Application) :
             serverSetting.url,
             serverSetting.userName,
             serverSetting.password,
+            serverSetting.apiKey,
             SubsonicAPIVersions.getClosestKnownClientApiVersion(
                 Constants.REST_PROTOCOL_VERSION
             ),

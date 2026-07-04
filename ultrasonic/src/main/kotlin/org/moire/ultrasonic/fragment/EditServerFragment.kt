@@ -66,6 +66,7 @@ class EditServerFragment : Fragment() {
     private var serverColorImageView: ImageView? = null
     private var userNameEditText: TextInputLayout? = null
     private var passwordEditText: TextInputLayout? = null
+    private var apiKeyEditText: TextInputLayout? = null
     private var selfSignedSwitch: SwitchMaterial? = null
     private var plaintextSwitch: SwitchMaterial? = null
     private var jukeboxSwitch: SwitchMaterial? = null
@@ -106,6 +107,7 @@ class EditServerFragment : Fragment() {
         serverColorImageView = view.findViewById(R.id.edit_server_color_picker)
         userNameEditText = view.findViewById(R.id.edit_server_username)
         passwordEditText = view.findViewById(R.id.edit_server_password)
+        apiKeyEditText = view.findViewById(R.id.edit_server_apikey)
         selfSignedSwitch = view.findViewById(R.id.edit_self_signed)
         plaintextSwitch = view.findViewById(R.id.edit_plaintext)
         jukeboxSwitch = view.findViewById(R.id.edit_jukebox)
@@ -245,6 +247,10 @@ class EditServerFragment : Fragment() {
             ::passwordEditText.name,
             passwordEditText!!.editText?.text.toString()
         )
+        savedInstanceState.putString(
+            ::apiKeyEditText.name,
+            apiKeyEditText!!.editText?.text.toString()
+        )
         savedInstanceState.putBoolean(
             ::selfSignedSwitch.name,
             selfSignedSwitch!!.isChecked
@@ -292,6 +298,9 @@ class EditServerFragment : Fragment() {
         passwordEditText!!.editText?.setText(
             savedInstanceState.getString(::passwordEditText.name)
         )
+        apiKeyEditText!!.editText?.setText(
+            savedInstanceState.getString(::apiKeyEditText.name)
+        )
         selfSignedSwitch!!.isChecked = savedInstanceState.getBoolean(::selfSignedSwitch.name)
         plaintextSwitch!!.isChecked = savedInstanceState.getBoolean(::plaintextSwitch.name)
         jukeboxSwitch!!.isChecked = savedInstanceState.getBoolean(::jukeboxSwitch.name)
@@ -312,6 +321,7 @@ class EditServerFragment : Fragment() {
         serverAddressEditText!!.editText?.setText(currentServerSetting!!.url)
         userNameEditText!!.editText?.setText(currentServerSetting!!.userName)
         passwordEditText!!.editText?.setText(currentServerSetting!!.password)
+        apiKeyEditText!!.editText?.setText(currentServerSetting!!.apiKey)
         selfSignedSwitch!!.isChecked = currentServerSetting!!.allowSelfSignedCertificate
         plaintextSwitch!!.isChecked = currentServerSetting!!.forcePlainTextPassword
         jukeboxSwitch!!.isChecked = currentServerSetting!!.jukeboxByDefault
@@ -367,6 +377,7 @@ class EditServerFragment : Fragment() {
             currentServerSetting!!.color = selectedColor ?: currentColor
             currentServerSetting!!.userName = userNameEditText!!.editText?.text.toString()
             currentServerSetting!!.password = passwordEditText!!.editText?.text.toString()
+            currentServerSetting!!.apiKey = apiKeyEditText!!.editText?.text.toString()
             currentServerSetting!!.allowSelfSignedCertificate = selfSignedSwitch!!.isChecked
             currentServerSetting!!.forcePlainTextPassword = plaintextSwitch!!.isChecked
             currentServerSetting!!.jukeboxByDefault = jukeboxSwitch!!.isChecked
@@ -390,6 +401,7 @@ class EditServerFragment : Fragment() {
             currentServerSetting!!.url != serverAddressEditText!!.editText?.text.toString() ||
             currentServerSetting!!.userName != userNameEditText!!.editText?.text.toString() ||
             currentServerSetting!!.password != passwordEditText!!.editText?.text.toString() ||
+            currentServerSetting!!.apiKey != apiKeyEditText!!.editText?.text.toString() ||
             currentServerSetting!!.allowSelfSignedCertificate != selfSignedSwitch!!.isChecked ||
             currentServerSetting!!.forcePlainTextPassword != plaintextSwitch!!.isChecked ||
             currentServerSetting!!.jukeboxByDefault != jukeboxSwitch!!.isChecked

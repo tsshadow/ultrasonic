@@ -43,6 +43,7 @@ val musicServiceModule = module {
             baseUrl = server.url,
             username = server.userName,
             password = server.password,
+            apiKey = server.apiKey,
             minimalProtocolVersion = SubsonicAPIVersions.getClosestKnownClientApiVersion(
                 server.minimumApiVersion
                     ?: Constants.REST_PROTOCOL_VERSION

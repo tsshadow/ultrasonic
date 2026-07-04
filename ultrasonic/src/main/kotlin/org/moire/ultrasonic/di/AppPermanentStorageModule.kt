@@ -16,6 +16,7 @@ import org.moire.ultrasonic.data.MIGRATION_4_5
 import org.moire.ultrasonic.data.MIGRATION_5_4
 import org.moire.ultrasonic.data.MIGRATION_5_6
 import org.moire.ultrasonic.data.MIGRATION_6_5
+import org.moire.ultrasonic.data.MIGRATION_6_7
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.util.Settings
 
@@ -44,6 +45,7 @@ val appPermanentStorage = module {
             .addMigrations(MIGRATION_5_4)
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_5)
+            .addMigrations(MIGRATION_6_7)
             .build()
     }
 

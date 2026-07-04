@@ -327,6 +327,7 @@
     <string name="settings.server_address">Server Address</string>
     <string name="settings.server_name">Name</string>
     <string name="settings.server_password">Password</string>
+    <string name="settings.server_apikey">API Key</string>
     <string name="settings.server_scaling_summary">Download scaled images from the server instead of full size (saves bandwidth)</string>
     <string name="settings.server_scaling_title">Server-Side Album Art Scaling</string>
     <string name="settings.server_username">Username</string>

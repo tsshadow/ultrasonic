@@ -283,6 +283,7 @@
     <string name="settings.server_address">Serveradres</string>
     <string name="settings.server_name">Naam</string>
     <string name="settings.server_password">Wachtwoord</string>
+    <string name="settings.server_apikey">API-sleutel</string>
     <string name="settings.server_scaling_summary">Verkleinde afbeeldingen ophalen van server in plaats van volledige (bespaart bandbreedte)</string>
     <string name="settings.server_scaling_title">Verkleinde afbeeldingen ophalen van server</string>
     <string name="settings.server_username">Gebruikersnaam</string>

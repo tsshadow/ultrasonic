@@ -12,6 +12,7 @@ import androidx.room.PrimaryKey
  * @param url: The Url of the server
  * @param userName: The UserName that can be used to connect to the server
  * @param password: The Password of the User
+ * @param apiKey: The API Key of the Server
  * @param jukeboxByDefault: True if the JukeBox mode should be turned on for the server
  * @param allowSelfSignedCertificate: True if the server uses self-signed certificate
  * @param forcePlainTextPassword: True if the server authenticates the user using old Ldap-like way
@@ -28,6 +29,7 @@ data class ServerSetting(
     @ColumnInfo(name = "color") var color: Int? = null,
     @ColumnInfo(name = "userName") var userName: String,
     @ColumnInfo(name = "password") var password: String,
+    @ColumnInfo(name = "apiKey") var apiKey: String? = null,
     @ColumnInfo(name = "jukeboxByDefault") var jukeboxByDefault: Boolean,
     @ColumnInfo(name = "allowSelfSignedCertificate") var allowSelfSignedCertificate: Boolean,
     @ColumnInfo(name = "forcePlainTextPassword") var forcePlainTextPassword: Boolean,
@@ -42,6 +44,6 @@ data class ServerSetting(
 ) {
 
     constructor() : this (
-        0, 0, "", "", null, "", "", false, false, false, null, null
+        0, 0, "", "", null, "", "", null, false, false, false, null, null
     )
 }
