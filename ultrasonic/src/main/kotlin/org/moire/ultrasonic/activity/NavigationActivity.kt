@@ -129,6 +129,9 @@ class NavigationActivity : ScopeActivity() {
         setUncaughtExceptionHandler()
         Util.applyTheme(this)
 
+        // Ensure servers are configured early if none exist
+        serverSettingsModel.getServerList()
+
         super.onCreate(savedInstanceState)
 
         volumeControlStream = AudioManager.STREAM_MUSIC
@@ -549,12 +552,6 @@ class NavigationActivity : ScopeActivity() {
                 }
                 .setPositiveButton(R.string.common_ok) { dialog, _ ->
                     UApp.instance!!.setupDialogDisplayed = true
-                    // Add the demo server
-                    val activeServerProvider: ActiveServerProvider by inject()
-                    serverSettingsModel.addDemoServer()
-                    val lmsIndex = serverSettingsModel.addPersonalServer()
-                    serverSettingsModel.addPersonalAlphaServer()
-                    activeServerProvider.setActiveServerByIndex(lmsIndex)
                     findNavController(R.id.nav_host_fragment).navigate(R.id.mainFragment)
                     dialog.dismiss()
                 }.show()

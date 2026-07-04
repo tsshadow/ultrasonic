@@ -17,6 +17,9 @@ import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
 import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.data.ServerSettingDao
 import timber.log.Timber
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 
 /**
  * ViewModel to be used in Activities which will handle Server Settings
@@ -38,6 +41,9 @@ class ServerSettingsModel(
     fun getServerList(): LiveData<List<ServerSetting>> {
         // This check should run before returning any result
         runBlocking {
+            if (repository.count() == 0) {
+                addConfiguredServers()
+            }
             if (areIndexesMissing()) {
                 reindexSettings()
             }
@@ -135,6 +141,42 @@ class ServerSettingsModel(
     }
 
     /**
+     * Parses the DEFAULT_SERVERS_JSON from BuildConfig and adds them to the database.
+     * Also adds the demo server.
+     */
+    private suspend fun addConfiguredServers() {
+        val mapper = ObjectMapper()
+            .configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false)
+        try {
+            val typeRef = object : TypeReference<List<Map<String, Any>>>() {}
+            val servers: List<Map<String, Any>> = mapper.readValue(BuildConfig.DEFAULT_SERVERS_JSON, typeRef)
+            servers.forEach { serverMap ->
+                val server = ServerSetting(
+                    index = (repository.count() ?: 0) + 1,
+                    name = serverMap["name"] as String,
+                    url = serverMap["url"] as String,
+                    userName = serverMap["userName"] as? String ?: "",
+                    password = serverMap["password"] as? String ?: "",
+                    apiKey = serverMap["apiKey"] as? String,
+                    jukeboxByDefault = false,
+                    allowSelfSignedCertificate = true,
+                    forcePlainTextPassword = true,
+                    musicFolderId = null,
+                    minimumApiVersion = "1.13.0",
+                    chatSupport = false,
+                    bookmarkSupport = false,
+                    shareSupport = true,
+                    podcastSupport = false
+                )
+                repository.insert(server)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to parse default servers JSON")
+        }
+        addDemoServer()
+    }
+
+    /**
      * Inserts a new Setting into the database
      * @return The id of the demo server
      */
@@ -150,29 +192,6 @@ class ServerSettingsModel(
         return demo.index
     }
 
-    fun addPersonalServer(): Int {
-        val lms = LMS_CONFIG.copy()
-
-        runBlocking {
-            lms.index = (repository.count() ?: 0) + 1
-            repository.insert(lms)
-            Timber.d("Added LMS server")
-        }
-
-        return lms.index
-    }
-
-    fun addPersonalAlphaServer(): Int {
-        val lmsAlpha = LMS_ALPHA_CONFIG.copy()
-
-        runBlocking {
-            lmsAlpha.index = (repository.count() ?: 0) + 1
-            repository.insert(lmsAlpha)
-            Timber.d("Added LMS Alpha server")
-        }
-
-        return lmsAlpha.index
-    }
 
     /**
      * Checks if there are any missing indexes in the ServerSetting list
@@ -228,43 +247,6 @@ class ServerSettingsModel(
             bookmarkSupport = true,
             shareSupport = true,
             podcastSupport = true
-        )
-        private val LMS_CONFIG = ServerSetting(
-            id = 0,
-            index = 0,
-            name = if (BuildConfig.DEFAULT_SERVER_1_NAME.isNotEmpty()) BuildConfig.DEFAULT_SERVER_1_NAME else UApp.applicationContext().getString(R.string.server_menu_lms),
-            url = if (BuildConfig.DEFAULT_SERVER_1_URL.isNotEmpty()) BuildConfig.DEFAULT_SERVER_1_URL else "http://lms.teunschriks.nl",
-            userName = if (BuildConfig.DEFAULT_SERVER_1_USER.isNotEmpty()) BuildConfig.DEFAULT_SERVER_1_USER else "teun",
-            password = if (BuildConfig.DEFAULT_SERVER_1_PASS.isNotEmpty()) BuildConfig.DEFAULT_SERVER_1_PASS else "OersibakCkoud1884",
-            apiKey = BuildConfig.DEFAULT_SERVER_1_API_KEY,
-            jukeboxByDefault = false,
-            allowSelfSignedCertificate = true,
-            forcePlainTextPassword = true,
-            musicFolderId = null,
-            minimumApiVersion = "1.13.0",
-            chatSupport = false,
-            bookmarkSupport = false,
-            shareSupport = true,
-            podcastSupport = false
-        )
-
-        private val LMS_ALPHA_CONFIG = ServerSetting(
-            id = 0,
-            index = 0,
-            name = if (BuildConfig.DEFAULT_SERVER_2_NAME.isNotEmpty()) BuildConfig.DEFAULT_SERVER_2_NAME else UApp.applicationContext().getString(R.string.server_menu_lmsalpha),
-            url = if (BuildConfig.DEFAULT_SERVER_2_URL.isNotEmpty()) BuildConfig.DEFAULT_SERVER_2_URL else "http://lms-alpha.teunschriks.nl",
-            userName = if (BuildConfig.DEFAULT_SERVER_2_USER.isNotEmpty()) BuildConfig.DEFAULT_SERVER_2_USER else "teun",
-            password = if (BuildConfig.DEFAULT_SERVER_2_PASS.isNotEmpty()) BuildConfig.DEFAULT_SERVER_2_PASS else "OersibakCkoud1884",
-            apiKey = BuildConfig.DEFAULT_SERVER_2_API_KEY,
-            jukeboxByDefault = false,
-            allowSelfSignedCertificate = true,
-            forcePlainTextPassword = true,
-            musicFolderId = null,
-            minimumApiVersion = "1.13.0",
-            chatSupport = false,
-            bookmarkSupport = true,
-            shareSupport = false,
-            podcastSupport = false
         )
     }
 }
