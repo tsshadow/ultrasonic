@@ -23,7 +23,7 @@ if [ "$BUILD_TYPE" == "release" ]; then
     # Commit pending changes
     if [ -n "$(git status --porcelain ..)" ]; then
         echo "Committing pending changes for release $TAG..."
-        git add ..
+        git add -u ..
         git commit -m "Release $TAG" --trailer "Co-authored-by: Junie <junie@jetbrains.com>"
     fi
 
