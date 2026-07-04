@@ -1,3 +1,7 @@
+## [5.2.2] - 2026-07-04
+### Changed
+- Version bump.
+
 ## [5.2.1] - 2026-07-04
 ### Added
 - Automated version increment support to `bup` script (patch, minor, major).
