@@ -17,9 +17,6 @@ android {
         targetCompatibility JavaVersion.VERSION_21
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
-    }
 
     ksp {
         arg("ksp.jvmTarget", "21") // Ensure KSP targets JVM 21

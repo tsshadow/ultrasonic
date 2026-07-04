@@ -1,3 +1,9 @@
+## [5.2.0] - 2026-07-04
+### Added
+- Major dependency update: All packages and Gradle are now completely up to date.
+- Under the hood improvements with Gradle 8.12.1, AGP 8.7.3, and Kotlin 2.1.0.
+- Script and build pipeline reorganization.
+
 ## [5.1.1] - 2026-07-04
 ### Changed
 - Minor version bump.

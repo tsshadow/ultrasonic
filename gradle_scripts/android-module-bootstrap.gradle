@@ -3,16 +3,17 @@
  */
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'kotlin-kapt'
 apply from: "${project.rootDir}/gradle_scripts/code_quality.gradle"
 apply plugin: 'com.google.devtools.ksp'
 
 android {
-    compileSdk libs.versions.compileSdk.get().toInteger()
+    compileSdk libs.versions.appCompileSdk.get().toInteger()
 
     defaultConfig {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        minSdk libs.versions.minSdk.get().toInteger()
-        targetSdk libs.versions.targetSdk.get().toInteger()
+        minSdk libs.versions.appMinSdk.get().toInteger()
+        targetSdk libs.versions.appTargetSdk.get().toInteger()
     }
 
     compileOptions {

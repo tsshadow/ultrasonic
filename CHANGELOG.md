@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-07-04
+
 ### Added
+- Major dependency update: all libraries and Gradle updated to latest stable versions.
+- Gradle updated to 8.12.1.
+- Updated to AGP 8.7.3.
+- Updated to Kotlin 2.1.0.
 - Added `debug` and `release` build type support to the build pipeline.
 - Added automatic Git tagging for `release` builds in `bup`.
 - Added release notes extraction and metadata generation for APKs.

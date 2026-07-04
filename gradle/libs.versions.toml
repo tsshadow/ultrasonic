@@ -1,52 +1,51 @@
 [versions]
-gradle                 = "8.14.2"
+gradle                 = "8.12.1"
 
-minSdk = "32"
-targetSdk = "35"
-compileSdk = "35"
+appMinSdk = "33"
+appTargetSdk = "35"
+appCompileSdk = "35"
 
-gson                   = "2.13.2"
+gson                   = "2.11.0"
 kotlinxSerializationJson = "1.8.0"
-lifecycleLivedataKtx   = "2.10.0"
+lifecycleLivedataKtx   = "2.8.7"
 media                  = "1.7.1"
-navigation             = "2.9.7"
-gradlePlugin           = "8.9.3"
+navigation             = "2.8.5"
+gradlePlugin           = "8.7.3"
 androidxcar            = "1.4.0"
-androidxcore           = "1.16.0"
-ktlintGradle           = "14.0.1"
-detekt                 = "1.23.8"
+androidxcore           = "1.15.0"
+ktlintGradle           = "12.1.1"
+detekt                 = "1.23.7"
 documentFile           = "1.1.0"
 preferences            = "1.2.1"
 media3                 = "1.5.1"
 
 materialDesign         = "1.12.0"
-constraintLayout       = "2.2.1"
-multidex               = "2.0.1"
-room                   = "2.7.2"
+constraintLayout       = "2.2.0"
+room                   = "2.6.1"
 kotlin                 = "2.1.0"
 ksp                    = "2.1.0-1.0.29"
-kotlinxCoroutines      = "1.10.2"
+kotlinxCoroutines      = "1.10.1"
 transition             = "1.7.0"
-viewModelKtx           = "2.10.0"
+viewModelKtx           = "2.8.7"
 swipeRefresh           = "1.2.0"
 
-retrofit               = "3.0.0"
-jackson                = "2.21.0"
+retrofit               = "2.11.0"
+jackson                = "2.18.2"
 okhttp                 = "4.12.0"
-koin                   = "4.1.0"
+koin                   = "4.0.0"
 picasso               = "2.71828"
 
 junit4                 = "4.13.2"
-junit5                 = "5.13.1"
-mockito                = "5.21.0"
-mockitoKotlin          = "6.2.3"
+junit5                 = "5.11.3"
+mockito                = "5.14.2"
+mockitoKotlin          = "5.4.0"
 kluent                 = "1.73"
-apacheCodecs           = "1.21.0"
-robolectric            = "4.16.1"
+apacheCodecs           = "1.17.1"
+robolectric            = "4.14.1"
 timber                 = "5.0.1"
 fastScroll             = "2.0.1"
 colorPicker            = "2.3.0"
-rxJava                 = "3.1.12"
+rxJava                 = "3.1.10"
 rxAndroid              = "3.0.2"
 multiType              = "4.3.0"
 gridlayout             = "1.1.0"
@@ -62,15 +61,14 @@ detekt                  = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-
 car                     = { module = "androidx.car.app:app", version.ref = "androidxcar" }
 core                    = { module = "androidx.core:core-ktx", version.ref = "androidxcore" }
 design                  = { module = "com.google.android.material:material", version.ref = "materialDesign" }
-lifecycleLivedataKtx    = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
+lifecycleLivedataKtx    = { module = "androidx.lifecycle:lifecycle-livedata", version.ref = "lifecycleLivedataKtx" }
 media                   = { module = "androidx.media:media", version.ref = "media" }
-multidex                = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 constraintLayout        = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintLayout" }
 room                    = { module = "androidx.room:room-compiler", version.ref = "room" }
 roomRuntime             = { module = "androidx.room:room-runtime", version.ref = "room" }
 roomKtx                 = { module = "androidx.room:room-ktx", version.ref = "room" }
 transition              = { module = "androidx.transition:transition", version.ref = "transition" }
-viewModelKtx            = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "viewModelKtx" }
+viewModelKtx            = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "viewModelKtx" }
 navigationFragment      = { module = "androidx.navigation:navigation-fragment", version.ref = "navigation" }
 navigationUi            = { module = "androidx.navigation:navigation-ui", version.ref = "navigation" }
 navigationFragmentKtx   = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
@@ -117,3 +115,4 @@ documentFile            = { module = "androidx.documentfile:documentfile", versi
 [plugins]
 ksp                     = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinSerialization     = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinAndroid           = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

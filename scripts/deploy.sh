@@ -42,7 +42,49 @@ fi
 
 echo "--- Starting $BUILD_TYPE deployment of $APP_NAME ---"
 
-# 1. Remote Publish (Optional)
+# 1. API Publish to apk-hoster (Preferred)
+if [ -n "$APK_HOSTER_URL" ]; then
+    echo "--- Uploading to apk-hoster: $APK_HOSTER_URL ---"
+    
+    # Find the latest APK in DIST_DIR
+    LATEST_APK=$(ls -t "$DIST_DIR"/*.apk 2>/dev/null | head -n 1)
+    
+    if [ -n "$LATEST_APK" ]; then
+        filename=$(basename "$LATEST_APK")
+        notes_file="${LATEST_APK%.apk}.txt"
+        release_notes=""
+        if [ -f "$notes_file" ]; then
+            release_notes=$(cat "$notes_file")
+        fi
+        
+        echo "Uploading $filename..."
+        
+        # Use curl to upload
+        # -F "apk=@$LATEST_APK"
+        # -F "release_notes=$release_notes"
+        # -F "password=$APK_HOSTER_PASSWORD"
+        
+        RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$APK_HOSTER_URL/api/add-apk" \
+            -H "X-Upload-Password: $APK_HOSTER_PASSWORD" \
+            -F "apk=@$LATEST_APK" \
+            -F "release_notes=$release_notes")
+        
+        HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+        BODY=$(echo "$RESPONSE" | sed '$d')
+        
+        if [ "$HTTP_CODE" -eq 200 ]; then
+            echo "Successfully uploaded to apk-hoster: $BODY"
+        else
+            echo "Error: Upload to apk-hoster failed with status $HTTP_CODE"
+            echo "Response: $BODY"
+            # Fallback to SCP if API fails
+        fi
+    else
+        echo "Warning: No APK found in $DIST_DIR to upload via API."
+    fi
+fi
+
+# 2. Remote Publish via SCP (Backup/Fallback)
 if [ -n "$PUBLISH_REMOTE_PATH" ]; then
     echo "--- Syncing to remote server: $PUBLISH_REMOTE_PATH ---"
     

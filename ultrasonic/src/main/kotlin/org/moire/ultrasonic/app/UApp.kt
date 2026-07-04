@@ -1,10 +1,10 @@
 package org.moire.ultrasonic.app
 
+import android.app.Application
 import android.content.Context
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
-import androidx.multidex.MultiDexApplication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +29,7 @@ import timber.log.Timber.DebugTree
  * The Main class of the Application
  */
 
-class UApp : MultiDexApplication() {
+class UApp : Application() {
 
     private var ioScope = CoroutineScope(Dispatchers.IO)
 

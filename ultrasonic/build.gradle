@@ -30,15 +30,15 @@ android {
         return System.getenv(key) ?: signingProperties.getProperty(key, defVal)
     }
 
-    compileSdk libs.versions.compileSdk.get().toInteger()
+    compileSdk libs.versions.appCompileSdk.get().toInteger()
 
     defaultConfig {
         applicationId "org.moire.ultrasonic"
-        versionCode 134
-        versionName "5.1.1"
+        versionCode 135
+        versionName "5.2.0"
 
-        minSdk libs.versions.minSdk.get().toInteger()
-        targetSdk libs.versions.targetSdk.get().toInteger()
+        minSdk libs.versions.appMinSdk.get().toInteger()
+        targetSdk libs.versions.appTargetSdk.get().toInteger()
         resourceConfigurations += ['cs', 'de', 'en', 'es', 'fr', 'gl', 'hu', 'it', 'ja', 'nb-rNO', 'nl', 'pl', 'pt', 'pt-rBR', 'ru', 'zh-rCN', 'zh-rTW']
 
         // Inject Default Servers
@@ -107,10 +107,10 @@ android {
         debug {
             signingConfig signingConfigs.debug
             minifyEnabled false
-            multiDexEnabled true
             applicationIdSuffix '.debug'
             enableUnitTestCoverage true
             enableAndroidTestCoverage true
+            matchingFallbacks = ['release']
         }
     }
 
@@ -134,9 +134,6 @@ android {
         }
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
-    }
 
     buildFeatures {
         viewBinding true
@@ -167,17 +164,17 @@ android {
         checkDependencies true
     }
 
+    /*
     testOptions {
         managedDevices {
-            devices {
-                pixel10Pro (ManagedVirtualDevice) {
-                    device = "Pixel 10 Pro"
-                    apiLevel = 35
-                    systemImageSource = "aosp-atd"
-                }
+            pixel10Pro (ManagedVirtualDevice) {
+                device = "Pixel 10 Pro"
+                apiLevel = 35
+                systemImageSource = "aosp-atd"
             }
         }
     }
+    */
     namespace 'org.moire.ultrasonic'
 
 }
@@ -197,7 +194,6 @@ dependencies {
     implementation libs.car
     implementation libs.core
     implementation libs.design
-    implementation libs.multidex
     implementation libs.roomRuntime
     implementation libs.roomKtx
     implementation libs.viewModelKtx

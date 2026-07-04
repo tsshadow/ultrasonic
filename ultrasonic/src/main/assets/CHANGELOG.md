@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-07-04
+
+### Added
+- Major dependency update: all libraries and Gradle updated to latest stable versions.
+- Gradle updated to 8.12.1.
+- Updated to AGP 8.7.3.
+- Updated to Kotlin 2.1.0.
+- Added `debug` and `release` build type support to the build pipeline.
+- Added automatic Git tagging for `release` builds in `bup`.
+- Added release notes extraction and metadata generation for APKs.
+
+### Changed
+- **Project Structure**: Migrated `apk-hoster` to a standalone repository.
+- **Project Structure**: Moved all utility scripts to the `scripts/` directory.
+- **Configuration**: Replaced `local.properties` with `.env` for better environment management.
+- **Pipeline**: Refactored `bup` as a lightweight wrapper for `scripts/build-and-publish.sh`.
+- **Pipeline**: Default build type changed to `debug`.
+
+### Removed
+- Removed Docker orchestration logic and `docker-compose.yml` (now handled in `apk-hoster` repository).
+
 ## [5.1.1] - 2026-07-04
 ### Changed
 - Version bump and re-deployment.

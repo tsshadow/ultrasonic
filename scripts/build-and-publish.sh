@@ -20,13 +20,13 @@ if [ "$BUILD_TYPE" == "release" ]; then
     VERSION_NAME=$(grep "versionName" ../ultrasonic/build.gradle | head -n 1 | sed 's/.*"\(.*\)".*/\1/' || echo "unknown")
     TAG="v$VERSION_NAME"
 
-    # Verify release notes
-    if grep -q "## \[$VERSION_NAME\]" ../RELEASE_NOTES.md; then
-        echo "Found release notes for v$VERSION_NAME"
-    else
-        echo "WARNING: Release notes for v$VERSION_NAME not found in RELEASE_NOTES.md"
+    # Commit pending changes
+    if [ -n "$(git status --porcelain ..)" ]; then
+        echo "Committing pending changes for release $TAG..."
+        git add ..
+        git commit -m "Release $TAG" --trailer "Co-authored-by: Junie <junie@jetbrains.com>"
     fi
-    
+
     # Check if tag exists
     if git rev-parse "$TAG" >/dev/null 2>&1; then
         echo "Tag $TAG already exists."
@@ -34,7 +34,28 @@ if [ "$BUILD_TYPE" == "release" ]; then
         echo "Creating git tag: $TAG"
         git tag -a "$TAG" -m "Release $TAG"
         echo "Successfully created tag $TAG"
-        echo "Note: Don't forget to push tags: git push origin --tags"
+    fi
+
+    echo "Pushing changes and tags to origin..."
+    git push origin develop
+    git push origin "$TAG"
+
+    # Create GitHub Release
+    if command -v gh >/dev/null 2>&1; then
+        echo "Creating GitHub Release for $TAG..."
+        # Extract release notes for the current version
+        NOTES=$(awk -v ver="$VERSION_NAME" '$0 ~ "^## \\[" ver "\\]" {flag=1; next} /^## \[/ {flag=0} flag' ../RELEASE_NOTES.md | sed '/./,$!d' | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+        
+        if [ -n "$NOTES" ]; then
+            echo "$NOTES" > release_notes_tmp.txt
+            gh release create "$TAG" --title "Release $TAG" --notes-file release_notes_tmp.txt
+            rm release_notes_tmp.txt
+        else
+            gh release create "$TAG" --title "Release $TAG" --notes "Official release $TAG"
+        fi
+        echo "GitHub Release created successfully."
+    else
+        echo "Warning: gh CLI not found, skipping GitHub Release creation."
     fi
 fi
 
