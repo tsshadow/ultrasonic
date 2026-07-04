@@ -71,9 +71,9 @@ You can configure where builds are saved and how they are served:
 #### Remote Deployment Options
 You can configure deployment in `local.properties`:
 1.  **Portainer Webhook**: Set `PORTAINER_WEBHOOK_URL`. This will trigger a webhook to update the `apk-hoster` service. *Note: Webhooks only trigger a redeploy/pull; they do not update environment variables. Manage variables directly in the Portainer Stack UI.*
-2.  **SSH**: Set `REMOTE_HOST`, `REMOTE_USER`, etc. The script will SSH into the host, stop the old `apk-hoster` container, and start a new one. This method is better if you want to manage everything via files on the server.
+2.  **SSH**: Set `REMOTE_HOST`, `REMOTE_USER`, etc. The script will automatically discover your Docker Compose configuration (even if managed by Portainer), transfer it securely, and redeploy the stack. If the stack does not exist yet, it will be created using the local template. This method is highly recommended for multi-host setups and Community Edition users.
 
-**Tip**: Use `DEPLOY_TARGET_NAME` in `local.properties` to give your deployment target a friendly name which will be displayed during the deployment process.
+**Tip**: Use `DEPLOY_TARGET_NAME` in `local.properties` to give your deployment target a friendly name which will be displayed during the deployment process. The system now uses this to automatically manage stack naming and discovery across different repositories.
 
 [subsonic]: http://www.subsonic.org/
 [subapi]: http://www.subsonic.org/pages/api.jsp

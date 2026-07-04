@@ -26,9 +26,10 @@ fi
 
 # Configuration for deployment logic
 DIST_DIR="${DIST_DIR:-dist}"
-TARGET="${DEPLOY_TARGET_NAME}"
+TARGET="${DEPLOY_TARGET_NAME:-Ultrasonic}"
 DOCKER_COMPOSE_FILE="${REMOTE_STACK_PATH}"
-DOCKER_IMAGE="${DOCKER_IMAGE}"
+DOCKER_IMAGE="${DOCKER_IMAGE:-tsshadow/apk-hoster}"
+REMOTE_DIST_PATH="${REMOTE_DIST_PATH:-/mnt/teun/ultrasonic-builds}"
 
 # Try to extract path from PUBLISH_REMOTE_PATH if REMOTE_DIST_PATH is not set
 if [ -z "$REMOTE_DIST_PATH" ] && [ -n "$PUBLISH_REMOTE_PATH" ]; then
@@ -80,49 +81,27 @@ if [ -n "${PORTAINER_WEBHOOK_URL}" ]; then
         exit 1
     fi
 elif [ -n "$REMOTE_HOST" ]; then
-    echo "--- Updating remote server $REMOTE_HOST for: $TARGET ---"
-    REMOTE_USER="${REMOTE_USER:-root}"
+    echo "--- Starting remote deployment for stack: $TARGET ---"
     
-    # Prepare volume mount if remote path is known
-    VOLUME_ARG=""
-    if [ -n "$REMOTE_DIST_PATH" ]; then
-        VOLUME_ARG="-v \"$REMOTE_DIST_PATH:/app/dist\""
-    fi
-
-    SERVICE_NAME="${SERVICE_NAME:-apk-hoster}"
-    REMOTE_COMMAND="
-    set -e
-    # Try to find docker-compose file
-    if [ -f \"${DOCKER_COMPOSE_FILE}\" ]; then
-        echo \"Updating stack '$TARGET' via docker-compose using ${DOCKER_COMPOSE_FILE}...\"
-        docker-compose -f \"${DOCKER_COMPOSE_FILE}\" pull || docker compose -f \"${DOCKER_COMPOSE_FILE}\" pull
-        docker-compose -f \"${DOCKER_COMPOSE_FILE}\" up -d || docker compose -f \"${DOCKER_COMPOSE_FILE}\" up -d
-    elif [ -d \"${DOCKER_COMPOSE_FILE}\" ] && [ -f \"${DOCKER_COMPOSE_FILE}/docker-compose.yml\" ]; then
-        echo \"Updating stack '$TARGET' in directory ${DOCKER_COMPOSE_FILE}...\"
-        cd \"${DOCKER_COMPOSE_FILE}\"
-        docker-compose pull || docker compose pull
-        docker-compose up -d || docker compose up -d
-    else
-        echo \"Warning: Docker compose configuration not found at '${DOCKER_COMPOSE_FILE}' on remote host.\"
-        echo \"Updating individual container '${SERVICE_NAME}' for '$TARGET'...\"
-        docker pull $DOCKER_IMAGE
-        docker stop ${SERVICE_NAME} || true
-        docker rm ${SERVICE_NAME} || true
-        docker run -d --name ${SERVICE_NAME} \
-            -p 8275:8275 \
-            $VOLUME_ARG \
-            --restart always \
-            $DOCKER_IMAGE
-    fi
-    "
+    # Create temporary .env from local.properties for deployment if it exists
+    TEMP_ENV=$(mktemp)
+    # Start with defaults for essential variables
+    echo "DOCKER_IMAGE=${DOCKER_IMAGE}" > "$TEMP_ENV"
+    echo "REMOTE_DIST_PATH=${REMOTE_DIST_PATH}" >> "$TEMP_ENV"
     
-    if [ -z "${REMOTE_PASS}" ]; then
-        ssh -o StrictHostKeyChecking=no "${REMOTE_USER}@${REMOTE_HOST}" "${REMOTE_COMMAND}"
-    elif command -v sshpass >/dev/null 2>&1; then
-        sshpass -p "${REMOTE_PASS}" ssh -o StrictHostKeyChecking=no "${REMOTE_USER}@${REMOTE_HOST}" "${REMOTE_COMMAND}"
-    else
-        echo "Error: sshpass not found. Install it or unset REMOTE_PASS and enter password manually."
+    if [ -f "local.properties" ]; then
+        grep -v '^#' local.properties | sed 's/ *= */=/g' >> "$TEMP_ENV"
     fi
+    export LOCAL_ENV_FILE="$TEMP_ENV"
+    
+    # Use the generalized deployment script
+    export SEARCH_STRING="apk-hoster"
+    export LOCAL_COMPOSE_FILE="docker-compose.yml"
+    
+    ./scripts/deploy-stack.sh
+    
+    rm -f "$TEMP_ENV"
+    echo "--- Deployment completed successfully ---"
 else
     echo "Note: Neither PORTAINER_WEBHOOK_URL nor REMOTE_HOST set, skipping remote deployment."
 fi
