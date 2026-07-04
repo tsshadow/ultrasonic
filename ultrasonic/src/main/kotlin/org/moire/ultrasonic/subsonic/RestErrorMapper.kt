@@ -13,6 +13,8 @@ import org.moire.ultrasonic.api.subsonic.SubsonicError.TokenAuthNotSupportedForL
 import org.moire.ultrasonic.api.subsonic.SubsonicError.TrialPeriodIsOver
 import org.moire.ultrasonic.api.subsonic.SubsonicError.UserNotAuthorizedForOperation
 import org.moire.ultrasonic.api.subsonic.SubsonicError.WrongUsernameOrPassword
+import org.moire.ultrasonic.api.subsonic.SubsonicError.MultipleConflictingAuthenticationMechanismsProvided
+import org.moire.ultrasonic.api.subsonic.SubsonicError.Unknown
 import org.moire.ultrasonic.api.subsonic.SubsonicRESTException
 
 /**
@@ -42,4 +44,10 @@ fun SubsonicRESTException.getLocalizedErrorMessage(context: Context): String = w
     TrialPeriodIsOver -> context.getString(R.string.api_subsonic_trial_period_is_over)
     RequestedDataWasNotFound ->
         context.getString(R.string.api_subsonic_requested_data_was_not_found)
+    MultipleConflictingAuthenticationMechanismsProvided ->
+        context.getString(R.string.api_subsonic_multiple_auth)
+    is Unknown -> context.getString(
+        R.string.api_subsonic_unknown_error,
+        (error as Unknown).errorCode
+    )
 }

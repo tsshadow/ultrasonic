@@ -484,6 +484,8 @@
     <string name="api.subsonic.trial_period_is_over">Trial period is over.</string>
     <string name="api.subsonic.upgrade_client">Incompatible versions. Please upgrade Ultrasonic Android app.</string>
     <string name="api.subsonic.upgrade_server">Incompatible versions. Please upgrade Subsonic server.</string>
+    <string name="api.subsonic.multiple_auth">Conflicting authentication mechanisms (apiKey and password). Please use only one.</string>
+    <string name="api.subsonic.unknown_error">Unknown Subsonic error (code %1$d).</string>
 
     <!-- Subsonic features  -->
     <string name="settings.five_star_rating_title">Use five star rating for songs</string>

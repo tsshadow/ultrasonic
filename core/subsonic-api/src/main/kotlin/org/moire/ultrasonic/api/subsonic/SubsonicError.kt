@@ -22,6 +22,8 @@ sealed class SubsonicError(val code: Int) {
     object UserNotAuthorizedForOperation : SubsonicError(50)
     object TrialPeriodIsOver : SubsonicError(60)
     object RequestedDataWasNotFound : SubsonicError(70)
+    object MultipleConflictingAuthenticationMechanismsProvided : SubsonicError(43)
+    data class Unknown(val errorCode: Int) : SubsonicError(errorCode)
 
     companion object {
         fun getError(code: Int, message: String) = when (code) {
@@ -31,10 +33,11 @@ sealed class SubsonicError(val code: Int) {
             30 -> IncompatibleServerProtocolVersion
             40 -> WrongUsernameOrPassword
             41 -> TokenAuthNotSupportedForLDAP
+            43 -> MultipleConflictingAuthenticationMechanismsProvided
             50 -> UserNotAuthorizedForOperation
             60 -> TrialPeriodIsOver
             70 -> RequestedDataWasNotFound
-            else -> throw IllegalArgumentException("Unknown code $code")
+            else -> Unknown(code)
         }
 
         class SubsonicErrorDeserializer : JsonDeserializer<SubsonicError>() {
