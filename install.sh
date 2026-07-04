@@ -61,6 +61,8 @@ SIGNING_STORE_FILE=$(pwd)/keystore.jks
 SIGNING_STORE_PASSWORD=changeit
 SIGNING_KEY_ALIAS=upload
 SIGNING_KEY_PASSWORD=changeit
+# Optional: Remote publish path for build_and_publish.sh
+# PUBLISH_REMOTE_PATH=user@nas:/var/www/html/ultrasonic
 EOF
 echo "local.properties updated"
 
