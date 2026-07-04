@@ -1,3 +1,8 @@
+## [5.2.1] - 2026-07-04
+### Added
+- Automated version increment support to `bup` script (patch, minor, major).
+- Automatic synchronization of bundled assets during release.
+
 ## [5.2.0] - 2026-07-04
 ### Added
 - Major dependency update: All packages and Gradle are now completely up to date.

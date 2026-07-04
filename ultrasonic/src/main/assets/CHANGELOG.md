@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.1] - 2026-07-04
+
+### Added
+- Automated version increment support to `bup` script (patch, minor, major).
+- Automatic synchronization of bundled assets during release.
+
 ## [5.2.0] - 2026-07-04
 
 ### Added

@@ -3,11 +3,80 @@ set -e
 
 cd "$(dirname "$(readlink -f "$0")")"
 
-# Build type (release or debug)
-BUILD_TYPE=$(echo "${1:-debug}" | tr '[:upper:]' '[:lower:]')
-if [[ "$BUILD_TYPE" != "release" && "$BUILD_TYPE" != "debug" ]]; then
-    echo "Invalid build type: $BUILD_TYPE. Use 'release' or 'debug'."
-    exit 1
+# Handle arguments
+ARG1=$(echo "${1:-debug}" | tr '[:upper:]' '[:lower:]')
+INCREMENT_TYPE=""
+BUILD_TYPE="debug"
+
+case "$ARG1" in
+    patch|minor|major)
+        INCREMENT_TYPE="$ARG1"
+        BUILD_TYPE="release"
+        ;;
+    release)
+        BUILD_TYPE="release"
+        ARG2=$(echo "${2:-}" | tr '[:upper:]' '[:lower:]')
+        case "$ARG2" in
+            patch|minor|major)
+                INCREMENT_TYPE="$ARG2"
+                ;;
+            *)
+                if [ -t 0 ]; then
+                    echo "Release requested. Which version increment?"
+                    select opt in "patch" "minor" "major" "none"; do
+                        case $opt in
+                            patch|minor|major) INCREMENT_TYPE=$opt; break;;
+                            none) INCREMENT_TYPE=""; break;;
+                            *) echo "invalid option $REPLY";;
+                        esac
+                    done
+                else
+                    echo "Non-interactive session for 'release', skipping auto-increment."
+                    echo "Use './bup patch', './bup minor', or './bup major' for automatic increment."
+                fi
+                ;;
+        esac
+        ;;
+    debug)
+        BUILD_TYPE="debug"
+        ;;
+    *)
+        echo "Usage: ./bup [debug|release|patch|minor|major]"
+        echo "Example: ./bup patch   (Increments patch version and does release build)"
+        exit 1
+        ;;
+esac
+
+# Function to increment version
+increment_version() {
+    local type=$1
+    local file="../ultrasonic/build.gradle"
+    
+    local current_name=$(grep "versionName" "$file" | head -n 1 | sed 's/.*"\(.*\)".*/\1/')
+    local current_code=$(grep "versionCode" "$file" | head -n 1 | sed 's/[^0-9]*//g')
+    
+    IFS='.' read -r major minor patch <<< "$current_name"
+    
+    case "$type" in
+        major) major=$((major + 1)); minor=0; patch=0 ;;
+        minor) minor=$((minor + 1)); patch=0 ;;
+        patch) patch=$((patch + 1)) ;;
+    esac
+    
+    local new_name="$major.$minor.$patch"
+    local new_code=$((current_code + 1))
+    
+    echo "--- Incrementing version ($type): $current_name ($current_code) -> $new_name ($new_code) ---"
+    
+    sed -i "s/versionCode .*/versionCode $new_code/" "$file"
+    sed -i "s/versionName .*/versionName \"$new_name\"/" "$file"
+    
+    # Update CHANGELOG.md and RELEASE_NOTES.md using python helper
+    python3 update-version.py "$new_name"
+}
+
+if [ -n "$INCREMENT_TYPE" ]; then
+    increment_version "$INCREMENT_TYPE"
 fi
 
 ./build.sh "$BUILD_TYPE"
