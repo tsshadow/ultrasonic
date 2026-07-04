@@ -135,10 +135,14 @@ if [ -n "$DOCKER_IMAGE" ] && command -v docker >/dev/null 2>&1; then
         echo "Pushing images to 'tsshadow/' will likely fail."
         echo "Please run: docker login"
         echo ""
-        read -p "Do you want to continue anyway? (y/N) " -n 1 -r
-        echo ""
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
+        if [ -t 0 ]; then
+            read -p "Do you want to continue anyway? (y/N) " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                exit 1
+            fi
+        else
+            echo "Non-interactive session detected, continuing anyway..."
         fi
     fi
 

@@ -45,3 +45,6 @@ captures/
 
 # MacOS files
 .DS_Store
+
+# Kotlin
+.kotlin/
