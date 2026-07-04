@@ -34,7 +34,7 @@ android {
 
     defaultConfig {
         applicationId = 'nl.teunschriks.mumamobile'
-        versionCode 150
+        versionCode 154
         versionName "6.1.1"
 
         minSdk = libs.versions.appMinSdk.get().toInteger()
@@ -209,6 +209,9 @@ dependencies {
     }
     implementation libs.transition
     implementation libs.car
+    implementation libs.appcompat
+    implementation libs.activityKtx
+    implementation libs.fragmentKtx
     implementation libs.core
     implementation libs.design
     implementation libs.roomRuntime

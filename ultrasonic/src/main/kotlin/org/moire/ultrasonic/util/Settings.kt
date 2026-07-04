@@ -26,7 +26,7 @@ object Settings {
     @JvmStatic
     var theme by StringSetting(
         getKey(R.string.setting_key_theme),
-        getKey(R.string.setting_key_theme_dark)
+        getKey(R.string.setting_key_theme_black)
     )
 
     @JvmStatic

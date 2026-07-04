@@ -11,7 +11,10 @@ lifecycleLivedataKtx   = "2.8.7"
 media                  = "1.7.1"
 navigation             = "2.9.6"
 gradlePlugin           = "8.8.0"
-androidxcar            = "1.4.0"
+androidxcar            = "1.7.0"
+appcompat              = "1.7.0"
+activity               = "1.9.3"
+fragment               = "1.8.5"
 androidxcore           = "1.15.0"
 ktlintGradle           = "12.1.2"
 detekt                 = "1.23.8"
@@ -38,7 +41,7 @@ picasso               = "2.71828"
 junit4                 = "4.13.2"
 junit5                 = "5.11.3"
 junitPlatform          = "1.11.3"
-mockito                = "5.14.2"
+mockito                = "5.15.2"
 mockitoKotlin          = "5.4.0"
 kluent                 = "1.73"
 apacheCodecs           = "1.17.1"
@@ -60,6 +63,9 @@ ktlintGradle            = { module = "org.jlleitschuh.gradle:ktlint-gradle", ver
 detekt                  = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 
 car                     = { module = "androidx.car.app:app", version.ref = "androidxcar" }
+appcompat               = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+activityKtx            = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
+fragmentKtx            = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 core                    = { module = "androidx.core:core-ktx", version.ref = "androidxcore" }
 design                  = { module = "com.google.android.material:material", version.ref = "materialDesign" }
 lifecycleLivedataKtx    = { module = "androidx.lifecycle:lifecycle-livedata", version.ref = "lifecycleLivedataKtx" }

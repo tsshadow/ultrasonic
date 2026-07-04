@@ -99,20 +99,16 @@ object Util {
     }
 
     private fun getStyleFromSettings(context: Context): Int = when (Settings.theme.lowercase()) {
-        context.getString(R.string.setting_key_theme_dark) -> {
-            R.style.UltrasonicTheme_Dark
-        }
-
         context.getString(R.string.setting_key_theme_black) -> {
             R.style.UltrasonicTheme_Black
         }
 
-        context.getString(R.string.setting_key_theme_light) -> {
-            R.style.UltrasonicTheme_Light
+        context.getString(R.string.setting_key_theme_day_night) -> {
+            R.style.UltrasonicTheme_DayNight
         }
 
         else -> {
-            R.style.UltrasonicTheme_Dark
+            R.style.UltrasonicTheme_Black
         }
     }
 
