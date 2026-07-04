@@ -36,6 +36,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.AnyRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -568,6 +569,39 @@ object Util {
 
         Settings.firstRunExecuted = true
         return true
+    }
+
+    fun isVersionUpdate(context: Context): Boolean {
+        val currentVersion = getVersionCode(context)
+        val lastVersion = Settings.lastSeenVersion
+
+        // If it's the very first run, we don't want to show the changelog
+        if (lastVersion == 0) {
+            Settings.lastSeenVersion = currentVersion
+            return false
+        }
+
+        if (lastVersion < currentVersion) {
+            Settings.lastSeenVersion = currentVersion
+            return true
+        }
+        return false
+    }
+
+    @JvmStatic
+    fun showChangelog(context: Context) {
+        val changelog = try {
+            context.assets.open("CHANGELOG.md").bufferedReader().use { it.readText() }
+        } catch (e: Exception) {
+            Timber.e(e, "Could not read CHANGELOG.md from assets")
+            "Changelog not available."
+        }
+
+        AlertDialog.Builder(context)
+            .setTitle(R.string.changelog_title)
+            .setMessage(changelog)
+            .setPositiveButton(R.string.common_ok, null)
+            .show()
     }
 
     fun hideKeyboard(activity: Activity?) {

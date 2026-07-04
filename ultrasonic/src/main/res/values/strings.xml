@@ -544,4 +544,7 @@
     <string name="update_check">Check for Updates</string>
     <string name="update_no_new_version">You are using the latest version.</string>
     <string name="update_check_failed">Failed to check for updates. Please try again later.</string>
+    <string name="changelog_title">What\'s New</string>
+    <string name="changelog_button">Changelog</string>
+    <string name="setting_key_last_seen_version" translatable="false">last_seen_version</string>
 </resources>

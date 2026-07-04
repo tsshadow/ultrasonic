@@ -110,7 +110,15 @@ android {
     sourceSets {
         main.java.srcDirs += "${projectDir}/src/main/kotlin"
         test.java.srcDirs += "${projectDir}/src/test/kotlin"
+        main.assets.srcDirs += "${projectDir}/src/main/assets"
     }
+
+    task copyChangelog(type: Copy) {
+        from "${rootDir}/CHANGELOG.md"
+        into "${projectDir}/src/main/assets/"
+    }
+
+    preBuild.dependsOn copyChangelog
 
     packagingOptions {
         resources {

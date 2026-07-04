@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.1.0] - 2026-07-04
 ### Added
-- Integrated Changelog: The changelog is now bundled within the app and accessible from the About screen.
-- Automatic "What's New" popup: A dialog highlighting recent changes is automatically displayed after the app is updated.
 - Modular build system: `build.sh`, `publish.sh`, and `deploy.sh`.
 - Portainer Webhook support for automated Stack updates.
 - Automatic Docker group permission handling via `sg docker` re-execution.

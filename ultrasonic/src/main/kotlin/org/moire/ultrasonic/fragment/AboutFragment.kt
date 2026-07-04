@@ -23,6 +23,7 @@ import org.moire.ultrasonic.R
 import org.moire.ultrasonic.util.UpdateChecker
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.Util.getVersionName
+import org.moire.ultrasonic.util.Util.showChangelog
 
 /**
  * Displays the About page
@@ -32,6 +33,7 @@ class AboutFragment : Fragment() {
     private var webPageButton: Button? = null
     private var reportBugButton: Button? = null
     private var updateButton: Button? = null
+    private var changelogButton: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         applyTheme(this.context)
@@ -49,6 +51,7 @@ class AboutFragment : Fragment() {
         webPageButton = view.findViewById(R.id.help_webpage)
         reportBugButton = view.findViewById(R.id.help_report)
         updateButton = view.findViewById(R.id.help_update)
+        changelogButton = view.findViewById(R.id.help_changelog)
 
         val versionName = getVersionName(requireContext())
         val title = String.format(
@@ -77,6 +80,10 @@ class AboutFragment : Fragment() {
             lifecycleScope.launch {
                 UpdateChecker.checkForUpdates(requireContext(), manual = true)
             }
+        }
+
+        changelogButton?.setOnClickListener {
+            showChangelog(requireContext())
         }
     }
 }

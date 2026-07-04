@@ -276,6 +276,12 @@ object Settings {
         getKey(R.string.setting_key_last_view_type),
         0
     )
+    
+    @JvmStatic
+    var lastSeenVersion by IntSetting(
+        getKey(R.string.setting_key_last_seen_version),
+        0
+    )
 
     fun hasKey(key: String): Boolean = preferences.contains(key)
 

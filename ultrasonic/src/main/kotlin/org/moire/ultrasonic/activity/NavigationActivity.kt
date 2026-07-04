@@ -193,6 +193,8 @@ class NavigationActivity : ScopeActivity() {
         // We set the active server to the demo one and show the welcome dialog
         if (showWelcomeScreen) {
             showWelcomeDialog()
+        } else if (Util.isVersionUpdate(this)) {
+            Util.showChangelog(this)
         }
 
         // Ask for permission to send notifications
