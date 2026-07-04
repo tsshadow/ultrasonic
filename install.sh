@@ -13,7 +13,13 @@ echo "=== Ultrasonic Dependency Installer ==="
 
 mkdir -p "$INSTALL_DIR"
 
-# 1. Install JDK 21
+# 1. Install System Dependencies
+if ! command -v sshpass >/dev/null 2>&1; then
+    echo "--- Installing sshpass ---"
+    sudo apt-get update -y && sudo apt-get install -y sshpass
+fi
+
+# 2. Install JDK 21
 if [ ! -d "$JDK_DIR" ] || [ ! -f "$JDK_DIR/bin/java" ]; then
     echo "--- Installing JDK 21 ---"
     wget -q "$JDK_URL" -O jdk.tar.gz
