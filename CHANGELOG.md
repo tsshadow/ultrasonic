@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.1.0] - 2026-07-04
 ### Added
-- Integrated Changelog: The changelog is now bundled within the app and accessible from the About screen.
-- Automatic "What's New" popup: A dialog highlighting recent changes is automatically displayed after the app is updated.
+- Auto-update system: Implemented `UpdateChecker` polling `apk-hoster` API on startup.
+- Integrated Changelog: Bundled `CHANGELOG.md` and `RELEASE_NOTES.md` into assets; added `Util.showChangelog` for in-app viewing.
+- Version Tracking: Added `last_seen_version` to `Settings` for automated update detection and release notes popup.
 - Modular build system: `build.sh`, `publish.sh`, and `deploy.sh`.
 - Versioned Docker tagging: the `apk-hoster` image is now tagged with both `:latest` and the version name from Gradle (e.g., `:5.1.0`).
 - Portainer Webhook support for automated Stack updates.

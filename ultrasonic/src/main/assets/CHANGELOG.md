@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.1.0] - 2026-07-04
 ### Added
+- Auto-update system: Implemented `UpdateChecker` polling `apk-hoster` API on startup.
+- Integrated Changelog: Bundled `CHANGELOG.md` and `RELEASENOTES.md` into assets; added `Util.showChangelog` for in-app viewing.
+- Version Tracking: Added `last_seen_version` to `Settings` for automated update detection and release notes popup.
 - Modular build system: `build.sh`, `publish.sh`, and `deploy.sh`.
+- Versioned Docker tagging: the `apk-hoster` image is now tagged with both `:latest` and the version name from Gradle (e.g., `:5.1.0`).
 - Portainer Webhook support for automated Stack updates.
 - Automatic Docker group permission handling via `sg docker` re-execution.
 - Integrated `apk-hoster` deployment into the main pipeline.

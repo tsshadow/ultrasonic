@@ -115,6 +115,7 @@ android {
 
     task copyChangelog(type: Copy) {
         from "${rootDir}/CHANGELOG.md"
+        from "${rootDir}/RELEASE_NOTES.md"
         into "${projectDir}/src/main/assets/"
     }
 

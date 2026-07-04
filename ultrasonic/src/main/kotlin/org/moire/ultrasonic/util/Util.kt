@@ -589,16 +589,21 @@ object Util {
     }
 
     @JvmStatic
-    fun showChangelog(context: Context) {
+    fun showChangelog(context: Context, full: Boolean = true) {
+        val fileName = if (full) "CHANGELOG.md" else "RELEASE_NOTES.md"
         val changelog = try {
-            context.assets.open("CHANGELOG.md").bufferedReader().use { it.readText() }
+            context.assets.open(fileName).bufferedReader().use { it.readText() }
         } catch (e: Exception) {
-            Timber.e(e, "Could not read CHANGELOG.md from assets")
+            if (!full) {
+                // Fallback to full changelog
+                return showChangelog(context, true)
+            }
+            Timber.e(e, "Could not read $fileName from assets")
             "Changelog not available."
         }
 
         AlertDialog.Builder(context)
-            .setTitle(R.string.changelog_title)
+            .setTitle(if (full) R.string.changelog_button else R.string.changelog_title)
             .setMessage(changelog)
             .setPositiveButton(R.string.common_ok, null)
             .show()

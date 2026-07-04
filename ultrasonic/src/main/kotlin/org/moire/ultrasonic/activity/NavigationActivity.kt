@@ -194,7 +194,7 @@ class NavigationActivity : ScopeActivity() {
         if (showWelcomeScreen) {
             showWelcomeDialog()
         } else if (Util.isVersionUpdate(this)) {
-            Util.showChangelog(this)
+            Util.showChangelog(this, full = false)
         }
 
         // Ask for permission to send notifications
