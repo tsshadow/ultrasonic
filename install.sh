@@ -70,6 +70,20 @@ fi
 
 if [ "$MODE" == "install" ]; then
     echo "--- Building and Installing $PROJECT_NAME on device ---"
+    
+    # Try to find JAVA_HOME and ANDROID_HOME if not set (mirroring scripts/build.sh)
+    if [ -z "$JAVA_HOME" ] || [ -z "$ANDROID_HOME" ]; then
+        [ -d "$HOME/.local/jdk-21" ] && export JAVA_HOME="$HOME/.local/jdk-21"
+        [ -d "$HOME/Android/Sdk" ] && export ANDROID_HOME="$HOME/Android/Sdk"
+        
+        if [ -n "$JAVA_HOME" ]; then
+            export PATH="$JAVA_HOME/bin:$PATH"
+        fi
+        if [ -n "$ANDROID_HOME" ]; then
+            export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+        fi
+    fi
+    
     ./gradlew :$DEFAULT_APP:installDebug
 else
     ./scripts/build-and-publish.sh "$MODE"
