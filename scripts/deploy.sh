@@ -88,20 +88,32 @@ fi
 if [ -n "$PUBLISH_REMOTE_PATH" ]; then
     echo "--- Syncing to remote server: $PUBLISH_REMOTE_PATH ---"
     
-    # Create the remote directory if it doesn't exist
-    REMOTE_HOST_ONLY=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f1)
-    REMOTE_PATH_ONLY=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f2-)
-    
-    echo "Ensuring remote directory exists: $REMOTE_PATH_ONLY"
-    if [ -z "${REMOTE_PASS}" ]; then
-        ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
-        scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
-    elif command -v sshpass >/dev/null 2>&1; then
-        sshpass -p "${REMOTE_PASS}" ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
-        sshpass -p "${REMOTE_PASS}" scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+    # Check if PUBLISH_REMOTE_PATH is local or remote
+    if [[ "$PUBLISH_REMOTE_PATH" == *":"* ]]; then
+        # Remote path (user@host:path)
+        REMOTE_HOST_ONLY=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f1)
+        REMOTE_PATH_ONLY=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f2-)
+        
+        echo "Ensuring remote directory exists: $REMOTE_PATH_ONLY"
+        if [ -z "${REMOTE_PASS}" ]; then
+            ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
+            scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+        elif command -v sshpass >/dev/null 2>&1; then
+            sshpass -p "${REMOTE_PASS}" ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
+            sshpass -p "${REMOTE_PASS}" scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+        else
+            ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
+            scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+        fi
     else
-        ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
-        scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+        # Local path
+        if [ "$PUBLISH_REMOTE_PATH" != "$DIST_DIR" ]; then
+            echo "Copying to local path: $PUBLISH_REMOTE_PATH"
+            mkdir -p "$PUBLISH_REMOTE_PATH"
+            cp -r "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+        else
+            echo "Note: PUBLISH_REMOTE_PATH matches DIST_DIR, skipping local copy."
+        fi
     fi
 fi
 
