@@ -1,3 +1,7 @@
+## [5.1.1] - 2026-07-04
+### Changed
+- Minor version bump.
+
 ## [5.1.0] - 2026-07-04
 ### Added
 - Added auto update functionality that depends on an apk-hoster server. This will run on startup of the app or can be manually triggered via the "Check for Updates" button in the About screen.

@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.1] - 2026-07-04
+### Changed
+- Version bump and re-deployment.
+
 ## [5.1.0] - 2026-07-04
 ### Added
+- Created `scripts/deploy-stack.sh`, a generalized Docker stack deployment tool supporting Portainer discovery, SSH transfer, and intelligent fallbacks.
+- Support for initial stack creation: the deployment script now automatically creates the stack if it does not exist yet using a local template.
 - Persistent Build Directory: Configured the build system to use a shared folder (`/mnt/teun/ultrasonic-builds`) for all APKs and distribution files.
 - Generic Docker Image: The `apk-hoster` Docker image is now generic and uses volume mounts for content, avoiding the need to rebuild the image for every new build.
 - Auto-update system: Implemented `UpdateChecker` polling `apk-hoster` API on startup.
@@ -23,14 +29,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Registry authentication pre-checks for Docker Hub.
 
 ### Changed
+- **Deployment**: Refactored `deploy.sh` to use the new generalized `deploy-stack.sh` helper, simplifying per-project deployment scripts.
+- **Deployment**: Enhanced stack discovery to support `PORTAINER_HOST` for pulling master templates.
+- **Deployment**: Improved robustness with `base64` template transfer and automated tab-to-space conversion in compose files.
 - Migrated all build and deployment configurations to `local.properties`.
 - Updated `install.sh` for automated SDK and dependency management.
 - Standardized deployment variable names for cross-project compatibility.
 
 ### Fixed
+- Fixed deployment failure when no existing stack configuration is found on the remote host by providing a local `docker-compose.yml` fallback.
 - Fixed empty webpage in `apk-hoster` by bundling the `dist` directory into the Docker image.
 - Fixed APK files downloading as ZIP by registering correct MIME types in `apk-hoster`.
-- Fixed local.properties loading logic to skip invalid bash identifiers.
+- Fixed .env loading logic to skip invalid bash identifiers.
 - Fixed non-interactive session hangs in `publish.sh`.
 
 ## [5.0.1] - 2026-07-02
