@@ -34,7 +34,7 @@ android {
 
     defaultConfig {
         applicationId = 'nl.teunschriks.mumamobile'
-        versionCode 171
+        versionCode 172
         versionName "6.3.4"
 
         minSdk = libs.versions.appMinSdk.get().toInteger()
