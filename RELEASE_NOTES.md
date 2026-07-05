@@ -22,46 +22,6 @@
 - **Deployment**: Improved APK distribution with robust fallbacks.
 - **Default Settings**: 5-star rating system enabled by default.
 
-## [6.2.0-166] - 2026-07-05
-### Changed
-- Version bump.
-
-## [6.2.0-165] - 2026-07-05
-### Changed
-- Version bump.
-
-## [6.2.0-164] - 2026-07-05
-### Changed
-- Version bump.
-
-## [6.2.0-163] - 2026-07-05
-### Changed
-- Version bump.
-
-## [6.2.0-162] - 2026-07-05
-### Changed
-- Version bump.
-
-## [6.2.0-161] - 2026-07-05
-### Changed
-- Version bump.
-
-## [6.2.0-160] - 2026-07-05
-### Changed
-- Version bump.
-
-## [6.2.0-159] - 2026-07-05
-### Changed
-- Version bump.
-
-## [6.2.0-158] - 2026-07-05
-### Changed
-- Version bump.
-
-## [6.2.0-157] - 2026-07-05
-### Changed
-- Version bump.
-
 ## [6.2.0] - 2026-07-04
 ### Added
 - **Spotify-style UI**: Integrated dynamic "Songs" (Green) and "Sets" (Blue) branding throughout the app.
@@ -87,10 +47,6 @@
 - Major dependency update: All packages and Gradle are now completely up to date.
 - Under the hood improvements with Gradle 8.12.1, AGP 8.7.3, and Kotlin 2.1.0.
 - Script and build pipeline reorganization.
-
-## [5.1.1] - 2026-07-04
-### Changed
-- Minor version bump.
 
 ## [5.1.0] - 2026-07-04
 ### Added

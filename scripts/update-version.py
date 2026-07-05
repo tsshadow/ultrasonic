@@ -24,7 +24,7 @@ def update_docs(file_path, new_version, notes=None):
             trailing = match.group(3)
             
             if not found_notes:
-                found_notes = "### Changed\n- Version bump."
+                return None
             
             # Use provided notes if any, else use found notes
             effective_notes = notes if notes else found_notes
@@ -57,8 +57,9 @@ if __name__ == "__main__":
     
     # Root files
     notes = update_docs("../CHANGELOG.md", new_version)
-    update_docs("../RELEASE_NOTES.md", new_version, notes)
-    
-    # Asset files
-    update_docs("../ultrasonic/src/main/assets/CHANGELOG.md", new_version, notes)
-    update_docs("../ultrasonic/src/main/assets/RELEASE_NOTES.md", new_version, notes)
+    if notes:
+        update_docs("../RELEASE_NOTES.md", new_version, notes)
+        
+        # Asset files
+        update_docs("../ultrasonic/src/main/assets/CHANGELOG.md", new_version, notes)
+        update_docs("../ultrasonic/src/main/assets/RELEASE_NOTES.md", new_version, notes)

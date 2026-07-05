@@ -34,8 +34,8 @@ android {
 
     defaultConfig {
         applicationId = 'nl.teunschriks.mumamobile'
-        versionCode 170
-        versionName "6.3.3"
+        versionCode 171
+        versionName "6.3.4"
 
         minSdk = libs.versions.appMinSdk.get().toInteger()
         targetSdk = libs.versions.appTargetSdk.get().toInteger()
@@ -259,6 +259,7 @@ dependencies {
     testImplementation libs.robolectric
 
     implementation libs.timber
+    implementation libs.markwon
     implementation(libs.media)
     implementation libs.gson
 

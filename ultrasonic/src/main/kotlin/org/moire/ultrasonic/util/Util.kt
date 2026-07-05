@@ -64,6 +64,7 @@ import org.moire.ultrasonic.domain.Bookmark
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.SearchResult
 import org.moire.ultrasonic.domain.Track
+import io.noties.markwon.Markwon
 import timber.log.Timber
 
 private const val LINE_LENGTH = 60
@@ -598,9 +599,12 @@ object Util {
             "Changelog not available."
         }
 
+        val markwon = Markwon.create(context)
+        val markdown = markwon.toMarkdown(changelog)
+
         AlertDialog.Builder(context)
             .setTitle(if (full) R.string.changelog_button else R.string.changelog_title)
-            .setMessage(changelog)
+            .setMessage(markdown)
             .setPositiveButton(R.string.common_ok, null)
             .show()
     }

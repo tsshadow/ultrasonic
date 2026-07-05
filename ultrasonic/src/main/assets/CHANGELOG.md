@@ -34,56 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Deployment**: Improved APK distribution with robust fallbacks.
 - **Default Settings**: 5-star rating system enabled by default.
 
-## [6.2.0-166] - 2026-07-05
-
-### Changed
-- Version bump.
-
-## [6.2.0-165] - 2026-07-05
-
-### Changed
-- Version bump.
-
-## [6.2.0-164] - 2026-07-05
-
-### Changed
-- Version bump.
-
-## [6.2.0-163] - 2026-07-05
-
-### Changed
-- Version bump.
-
-## [6.2.0-162] - 2026-07-05
-
-### Changed
-- Version bump.
-
-## [6.2.0-161] - 2026-07-05
-
-### Changed
-- Version bump.
-
-## [6.2.0-160] - 2026-07-05
-
-### Changed
-- Version bump.
-
-## [6.2.0-159] - 2026-07-05
-
-### Changed
-- Version bump.
-
-## [6.2.0-158] - 2026-07-05
-
-### Changed
-- Version bump.
-
-## [6.2.0-157] - 2026-07-05
-
-### Changed
-- Version bump.
-
 ## [6.2.0] - 2026-07-04
 
 ### Added
@@ -127,10 +77,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Removed Docker orchestration logic and `docker-compose.yml` (now handled in `apk-hoster` repository).
-
-## [5.1.1] - 2026-07-04
-### Changed
-- Version bump and re-deployment.
 
 ## [5.1.0] - 2026-07-04
 ### Added

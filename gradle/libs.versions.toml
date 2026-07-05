@@ -1,5 +1,5 @@
 [versions]
-gradle                 = "9.4.1"
+gradle                 = "9.6.0"
 
 appMinSdk = "33"
 appTargetSdk = "35"
@@ -47,6 +47,7 @@ kluent                 = "1.73"
 apacheCodecs           = "1.17.1"
 robolectric            = "4.14.1"
 timber                 = "5.0.1"
+markwon                = "4.6.2"
 fastScroll             = "2.0.1"
 colorPicker            = "2.3.0"
 rxJava                 = "3.1.10"
@@ -100,6 +101,7 @@ okhttpLogging           = { module = "com.squareup.okhttp3:logging-interceptor",
 koinCore                = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koinAndroid             = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 picasso                 = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
+markwon                 = { module = "io.noties.markwon:core", version.ref = "markwon" }
 timber                  = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 fastScroll              = { module = "com.simplecityapps:recyclerview-fastscroll", version.ref = "fastScroll" }
 colorPickerView         = { module = "com.github.skydoves:colorpickerview", version.ref = "colorPicker" }
