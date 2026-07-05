@@ -472,4 +472,8 @@
     <string name="update_check_failed">Controleren op updates mislukt. Probeer het later opnieuw.</string>
     <string name="changelog_title">Wat is er nieuw</string>
     <string name="changelog_button">Changelog</string>
+    <string name="welcome_title">Welkom bij Ultrasonic</string>
+    <string name="welcome_login_info">Wat zijn je inloggegevens?</string>
+    <string name="welcome_username">Naam</string>
+    <string name="welcome_password">Wachtwoord</string>
 </resources>

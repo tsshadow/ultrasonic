@@ -14,5 +14,6 @@ data class Playlist(
     val created: Calendar? = null,
     val changed: Calendar? = null,
     val coverArt: String = "",
+    val smartParams: String = "",
     @JsonProperty("entry") val entriesList: List<MusicDirectoryChild> = emptyList()
 )

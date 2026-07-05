@@ -149,25 +149,63 @@ abstract class SelectFragment :
 
                 "save" -> {
                     val tile = tileInfoFromFilterState(filterState)
-                    tileAdapter.addTile(tile)
-                    TileStorage.saveTiles(requireContext(), tileAdapter.tiles, pageKey)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        try {
+                            val id = getMusicService().createDynamicPlaylist(tile.title, tile.toSmartParamsJson())
+                            tile.id = id
+                            withContext(Dispatchers.Main) {
+                                tileAdapter.addTile(tile)
+                                TileStorage.saveTiles(requireContext(), tileAdapter.tiles, pageKey)
+                            }
+                        } catch (e: Exception) {
+                            Timber.e(e, "Failed to save tile to server")
+                            // Fallback to local only for now if server fails
+                            withContext(Dispatchers.Main) {
+                                tileAdapter.addTile(tile)
+                                TileStorage.saveTiles(requireContext(), tileAdapter.tiles, pageKey)
+                            }
+                        }
+                    }
                 }
 
                 "update" -> {
-                    lastEditedTilePosition?.let {
-                        tiles[it] = tileInfoFromFilterState(filterState)
-                        tileAdapter.notifyItemChanged(it)
-                        TileStorage.saveTiles(requireContext(), tiles, pageKey)
-                        lastEditedTilePosition = null
+                    lastEditedTilePosition?.let { pos ->
+                        val tile = tileInfoFromFilterState(filterState)
+                        tile.id = tiles[pos].id
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            try {
+                                tile.id?.let { id ->
+                                    getMusicService().updateDynamicPlaylist(id, tile.title, tile.toSmartParamsJson())
+                                }
+                            } catch (e: Exception) {
+                                Timber.e(e, "Failed to update tile on server")
+                            }
+                            withContext(Dispatchers.Main) {
+                                tiles[pos] = tile
+                                tileAdapter.notifyItemChanged(pos)
+                                TileStorage.saveTiles(requireContext(), tiles, pageKey)
+                                lastEditedTilePosition = null
+                            }
+                        }
                     }
                 }
 
                 "delete" -> {
-                    lastEditedTilePosition?.let {
-                        tiles.removeAt(it)
-                        tileAdapter.notifyItemRemoved(it)
-                        TileStorage.saveTiles(requireContext(), tiles, pageKey)
-                        lastEditedTilePosition = null
+                    lastEditedTilePosition?.let { pos ->
+                        val tileId = tiles[pos].id
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            try {
+                                tileId?.let { getMusicService().deletePlaylist(it) }
+                            } catch (e: Exception) {
+                                Timber.e(e, "Failed to delete tile from server")
+                            }
+                            withContext(Dispatchers.Main) {
+                                tiles.removeAt(pos)
+                                tileAdapter.notifyItemRemoved(pos)
+                                TileStorage.saveTiles(requireContext(), tiles, pageKey)
+                                lastEditedTilePosition = null
+                            }
+                        }
                     }
                 }
             }
@@ -219,6 +257,35 @@ abstract class SelectFragment :
         recyclerView = view.findViewById(R.id.tileRecyclerView)
         toggleFiltersButton = view.findViewById(R.id.show_filters)
         swipeRefresh = view.findViewById(R.id.swipeRefresh)
+        swipeRefresh?.setOnRefreshListener {
+            loadTilesFromServer()
+        }
+    }
+
+    private fun loadTilesFromServer() {
+        swipeRefresh?.isRefreshing = true
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                if (!isOffline()) {
+                    val playlists = getMusicService().getPlaylists(true)
+                    val newTiles = playlists.mapNotNull { it.toTileInfo() }.toMutableList()
+                    if (newTiles.isNotEmpty()) {
+                        withContext(Dispatchers.Main) {
+                            tiles.clear()
+                            tiles.addAll(newTiles)
+                            TileStorage.saveTiles(requireContext(), tiles, pageKey)
+                            tileAdapter.notifyDataSetChanged()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to load tiles from server")
+            } finally {
+                withContext(Dispatchers.Main) {
+                    swipeRefresh?.isRefreshing = false
+                }
+            }
+        }
     }
 
     protected fun populateTiles() {

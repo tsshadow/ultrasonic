@@ -56,3 +56,4 @@ local.properties
 
 # Build logs
 build_log*.txt
+docs

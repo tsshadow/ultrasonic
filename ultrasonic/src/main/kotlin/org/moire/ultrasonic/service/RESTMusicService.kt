@@ -16,6 +16,7 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
+import org.moire.ultrasonic.api.subsonic.response.GetPlaylistResponse
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
 import org.moire.ultrasonic.api.subsonic.toStreamResponse
 import org.moire.ultrasonic.data.ActiveServerProvider
@@ -270,7 +271,7 @@ open class RESTMusicService(
             pSongIds.add(id1)
         }
 
-        API.createPlaylist(id, name, pSongIds.toList()).execute().throwOnFailure()
+        API.createPlaylist(id, name, null, pSongIds.toList()).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
@@ -280,8 +281,20 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun updatePlaylist(id: String, name: String?, comment: String?, pub: Boolean) {
-        API.updatePlaylist(id, name, comment, pub, null, null)
+        API.updatePlaylist(id, name, comment, pub, null, null, null)
             .execute().throwOnFailure()
+    }
+
+    @Throws(Exception::class)
+    override fun createDynamicPlaylist(name: String, smartParams: String): String {
+        val response = API.createDynamicPlaylist(name, smartParams).execute().throwOnFailure()
+        val getPlaylistResponse = response.body() as? GetPlaylistResponse
+        return getPlaylistResponse?.playlist?.id ?: ""
+    }
+
+    @Throws(Exception::class)
+    override fun updateDynamicPlaylist(id: String, name: String?, smartParams: String?) {
+        API.updateDynamicPlaylist(id, name, smartParams).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)

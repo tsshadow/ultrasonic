@@ -32,6 +32,7 @@ import org.moire.ultrasonic.api.subsonic.response.GetArtistInfo2Response
 import org.moire.ultrasonic.api.subsonic.response.GetArtistResponse
 import org.moire.ultrasonic.api.subsonic.response.GetArtistsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetLyricsResponse
+import org.moire.ultrasonic.api.subsonic.response.GetPlaylistResponse
 import org.moire.ultrasonic.api.subsonic.response.GetPlaylistsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetPodcastsResponse
 import org.moire.ultrasonic.api.subsonic.response.GetRandomSongsResponse
@@ -157,10 +158,11 @@ internal class ApiVersionCheckWrapper(
     override fun createPlaylist(
         id: String?,
         name: String?,
+        smartParams: String?,
         songIds: List<String>?
     ): Call<SubsonicResponse> {
         checkVersion(V1_2_0)
-        return api.createPlaylist(id, name, songIds)
+        return api.createPlaylist(id, name, smartParams, songIds)
     }
 
     override fun deletePlaylist(id: String): Call<SubsonicResponse> {
@@ -173,11 +175,21 @@ internal class ApiVersionCheckWrapper(
         name: String?,
         comment: String?,
         public: Boolean?,
+        smartParams: String?,
         songIdsToAdd: List<String>?,
         songIndexesToRemove: List<Int>?
     ): Call<SubsonicResponse> {
         checkVersion(V1_8_0)
-        return api.updatePlaylist(id, name, comment, public, songIdsToAdd, songIndexesToRemove)
+        return api.updatePlaylist(id, name, comment, public, smartParams, songIdsToAdd, songIndexesToRemove)
+    }
+
+    override fun createDynamicPlaylist(name: String, smartParams: String): Call<GetPlaylistResponse> {
+        // Dynamic playlists are a custom extension, no version check needed for standard Subsonic
+        return api.createDynamicPlaylist(name, smartParams)
+    }
+
+    override fun updateDynamicPlaylist(id: String, name: String?, smartParams: String?): Call<SubsonicResponse> {
+        return api.updateDynamicPlaylist(id, name, smartParams)
     }
 
     override fun getPodcasts(includeEpisodes: Boolean?, id: String?): Call<GetPodcastsResponse> {

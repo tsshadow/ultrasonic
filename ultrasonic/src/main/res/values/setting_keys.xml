@@ -59,4 +59,6 @@
     <string name="setting_key.last_view_type" translatable="false">lastViewType</string>
     <string name="setting_key.is_sets_mode" translatable="false">isSetsMode</string>
     <string name="setting_key.last_synced_version" translatable="false">lastSyncedVersion</string>
+    <string name="setting_key.muma_api_key" translatable="false">mumaApiKey</string>
+    <string name="setting_key.muma_user_id" translatable="false">mumaUserId</string>
 </resources>

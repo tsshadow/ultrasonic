@@ -36,7 +36,8 @@ fun APIPlaylist.toDomainEntity(): Playlist = Playlist(
     this.comment,
     this.songCount.toString(),
     this.created.ifNotNull { playlistDateFormat.format(it.time) } ?: "",
-    public
+    public,
+    smartParams
 )
 
 fun List<APIPlaylist>.toDomainEntitiesList(): List<Playlist> = this.map { it.toDomainEntity() }

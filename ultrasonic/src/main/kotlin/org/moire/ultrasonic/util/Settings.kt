@@ -301,6 +301,12 @@ object Settings {
         0
     )
 
+    @JvmStatic
+    var mumaApiKey by StringSetting(getKey(R.string.setting_key_muma_api_key), "")
+
+    @JvmStatic
+    var mumaUserId by IntSetting(getKey(R.string.setting_key_muma_user_id), -1)
+
     fun hasKey(key: String): Boolean = preferences.contains(key)
 
     private fun getKey(key: Int): String = appContext.getString(key)

@@ -9,7 +9,8 @@ data class Playlist @JvmOverloads constructor(
     val comment: String = "",
     val songCount: String = "",
     val created: String = "",
-    val public: Boolean? = null
+    val public: Boolean? = null,
+    val smartParams: String = ""
 ) : GenericEntry(),
     Serializable {
     override fun toString(): String = name

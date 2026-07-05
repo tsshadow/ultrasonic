@@ -163,6 +163,7 @@ interface SubsonicAPIDefinition {
     fun createPlaylist(
         @Query("playlistId") id: String? = null,
         @Query("name") name: String? = null,
+        @Query("smartParams") smartParams: String? = null,
         @Query("songId") songIds: List<String>? = null
     ): Call<SubsonicResponse>
 
@@ -175,8 +176,22 @@ interface SubsonicAPIDefinition {
         @Query("name") name: String? = null,
         @Query("comment") comment: String? = null,
         @Query("public") public: Boolean? = null,
+        @Query("smartParams") smartParams: String? = null,
         @Query("songIdToAdd") songIdsToAdd: List<String>? = null,
         @Query("songIndexToRemove") songIndexesToRemove: List<Int>? = null
+    ): Call<SubsonicResponse>
+
+    @GET("createDynamicPlaylist.view")
+    fun createDynamicPlaylist(
+        @Query("name") name: String,
+        @Query("smartParams") smartParams: String
+    ): Call<GetPlaylistResponse>
+
+    @GET("updateDynamicPlaylist.view")
+    fun updateDynamicPlaylist(
+        @Query("playlistId") id: String,
+        @Query("name") name: String? = null,
+        @Query("smartParams") smartParams: String? = null
     ): Call<SubsonicResponse>
 
     @GET("getPodcasts.view")

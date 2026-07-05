@@ -16,6 +16,7 @@ import android.media.AudioManager
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.SearchRecentSuggestions
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -44,17 +45,22 @@ import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.textfield.TextInputEditText
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.scope.ScopeActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.data.ServerSettingDao
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.provider.SearchSuggestionProvider
@@ -543,18 +549,62 @@ class NavigationActivity : ScopeActivity() {
         if (!UApp.instance!!.setupDialogDisplayed) {
             Settings.firstInstalledVersion = Util.getVersionCode(UApp.applicationContext())
 
-            InfoDialog.Builder(this)
-                .setTitle(R.string.main_welcome_title)
-                .setMessage(R.string.main_welcome_text_demo)
-                .setNegativeButton(R.string.main_welcome_cancel) { dialog, _ ->
-                    UApp.instance!!.setupDialogDisplayed = true
-                    // Go to the settings screen
-                    dialog.dismiss()
-                    findNavController(R.id.nav_host_fragment).navigate(R.id.serverSelectorFragment)
-                }
+            val view = LayoutInflater.from(this).inflate(R.layout.dialog_welcome, null)
+            val usernameField = view.findViewById<TextInputEditText>(R.id.welcome_username)
+            val passwordField = view.findViewById<TextInputEditText>(R.id.welcome_password)
+
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.welcome_title)
+                .setView(view)
+                .setCancelable(false)
                 .setPositiveButton(R.string.common_ok) { dialog, _ ->
+                    val username = usernameField.text.toString()
+                    val password = passwordField.text.toString()
+
                     UApp.instance!!.setupDialogDisplayed = true
-                    findNavController(R.id.nav_host_fragment).navigate(R.id.mainFragment)
+
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val servers = mutableListOf<ServerSetting>()
+
+                        // Always add stable
+                        val stableServer = ServerSetting().apply {
+                            name = "LMS (stable)"
+                            url = "http://lms.teunschriks.nl"
+                            userName = username
+                            this.password = password
+                        }
+                        servers.add(stableServer)
+
+                        if (BuildConfig.DEBUG) {
+                            val alphaServer = ServerSetting().apply {
+                                name = "LMS (Alpha)"
+                                url = "http://lms-alpha.teunschriks.nl"
+                                userName = username
+                                this.password = password
+                            }
+                            servers.add(alphaServer)
+                        }
+
+                        // Save servers
+                        val maxIndex = serverRepository.getMaxIndex() ?: -1
+                        servers.forEachIndexed { i, server ->
+                            server.index = maxIndex + 1 + i
+                        }
+                        serverRepository.insert(*servers.toTypedArray())
+
+                        // Connect to the preferred one (Alpha for debug, Stable for release)
+                        val targetServerName = if (BuildConfig.DEBUG) "LMS (Alpha)" else "LMS (stable)"
+                        val targetServerUrl =
+                            if (BuildConfig.DEBUG) "http://lms-alpha.teunschriks.nl" else "http://lms.teunschriks.nl"
+
+                        val activeServer =
+                            serverRepository.findByNameAndUrl(targetServerName, targetServerUrl)
+                        activeServer?.let {
+                            withContext(Dispatchers.Main) {
+                                activeServerProvider.setActiveServerById(it.id)
+                            }
+                        }
+                    }
                     dialog.dismiss()
                 }.show()
         }

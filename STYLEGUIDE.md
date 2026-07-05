@@ -1,6 +1,6 @@
 # Spotify UI Style Guide
 
-This document outlines the design principles, colors, typography, and component patterns used in the MuMaFi (Spotify-style) UI. The goal is to provide a reference for other implementations (e.g., Android) to ensure visual consistency.
+This document outlines the design principles, colors, typography, and component patterns used in the MuMa Spotify (Spotify-style) UI. The goal is to provide a reference for other implementations (e.g., Android) to ensure visual consistency.
 
 ## Core Principles
 
@@ -18,15 +18,15 @@ The UI uses a limited but high-contrast color palette.
 - **Active Selection**: `var(--color-brand)` - dynamically switches between Green and Blue based on the current view mode.
 
 ### Background Colors
-- **Main Background**: `#191414` (Body background - `bg-mumafi-black`)
-- **Section Background**: `#121212` (Main content area - `bg-mumafi-dark`)
+- **Main Background**: `#191414` (Body background - `bg-muma-spotify-black`)
+- **Section Background**: `#121212` (Main content area - `bg-muma-spotify-dark`)
 - **Panel/Card Background**: `#181818` (Sidebar, Track Cards, Filter Bar)
-- **Elevated/Hover Background**: `#282828` (Inputs, Hover states - `bg-mumafi-light`)
+- **Elevated/Hover Background**: `#282828` (Inputs, Hover states - `bg-muma-spotify-light`)
 - **Lighter Hover**: `#3e3e3e` (Active/Secondary hover states)
 
 ### Text Colors
 - **Primary Text**: `#ffffff` (Titles, active menu items, important labels)
-- **Secondary Text**: `#b3b3b3` (Artists, durations, inactive menu items - `text-mumafi-text`)
+- **Secondary Text**: `#b3b3b3` (Artists, durations, inactive menu items - `text-muma-spotify-text`)
 - **Accent Text**: Matches the Brand Color (used for active states or highlights)
 
 ## Typography
@@ -157,7 +157,7 @@ Implementations should listen to the `viewMode` state and update `--color-brand`
 To maintain consistency with the Web UI, other implementations should follow these data patterns.
 
 ### Authentication
-Use standard Subsonic API parameters: `u={user}&p={pass}&v=1.12.0&c=mumafi&f=json`.
+Use standard Subsonic API parameters: `u={user}&p={pass}&v=1.12.0&c=muma-spotify&f=json`.
 
 ### Extended Endpoints
 The UI relies on custom/extended endpoints for a better experience:
@@ -171,7 +171,7 @@ The UI relies on custom/extended endpoints for a better experience:
     - `offset`, `count`: For paginated listen history.
     - Returns grouped entries with `listenedAt` timestamps.
 
-### Deduplication Logic (MuMaFi Algorithm)
+### Deduplication Logic (MuMa Spotify Algorithm)
 To ensure a clean library, implementations should deduplicate tracks using the following rules:
 1. **Normalization**: Strip metadata in parentheses from titles (e.g., "(Radio Edit)") and normalize artist names (sort multiple artists alphabetically).
 2. **Ranking Score**:

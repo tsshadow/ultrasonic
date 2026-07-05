@@ -549,4 +549,8 @@
     <string name="changelog_title">What\'s New</string>
     <string name="changelog_button">Changelog</string>
     <string name="setting_key_last_seen_version" translatable="false">last_seen_version</string>
+    <string name="welcome_title">Welcome to Ultrasonic</string>
+    <string name="welcome_login_info">What is your login information?</string>
+    <string name="welcome_username">Name</string>
+    <string name="welcome_password">Password</string>
 </resources>

@@ -112,6 +112,12 @@ interface MusicService {
     fun updatePlaylist(id: String, name: String?, comment: String?, pub: Boolean)
 
     @Throws(Exception::class)
+    fun createDynamicPlaylist(name: String, smartParams: String): String
+
+    @Throws(Exception::class)
+    fun updateDynamicPlaylist(id: String, name: String? = null, smartParams: String? = null)
+
+    @Throws(Exception::class)
     fun getLyrics(artist: String, title: String): Lyrics?
 
     @Throws(Exception::class)

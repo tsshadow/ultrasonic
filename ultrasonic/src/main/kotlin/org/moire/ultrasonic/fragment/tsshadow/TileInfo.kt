@@ -55,6 +55,7 @@ val genreIconMap: Map<String, Int> = mapOf(
 )
 
 class TileInfo(
+    var id: String? = null,
     var title: String = "",
     val genre: List<String>? = null,
     val artists: List<String>? = null,
@@ -151,4 +152,34 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
         minDuration = tile.minDuration ?: -1,
         maxDuration = tile.maxDuration ?: -1
     )
+}
+
+fun TileInfo.toSmartParamsJson(): String {
+    val map = mutableMapOf<String, Any?>()
+    map["genre"] = genre
+    map["artists"] = artists
+    map["year"] = year
+    map["size"] = size
+    map["sortMethod"] = sortMethod
+    map["ratingMin"] = ratingMin
+    map["ratingMax"] = ratingMax
+    map["minDuration"] = minDuration
+    map["maxDuration"] = maxDuration
+    map["festival"] = festival
+    map["festivalLineup"] = festivalLineup
+    map["favorite"] = favorite
+    map["length"] = length
+    return Gson().toJson(map)
+}
+
+fun org.moire.ultrasonic.domain.Playlist.toTileInfo(): TileInfo? {
+    if (smartParams.isEmpty()) return null
+    return try {
+        Gson().fromJson(smartParams, TileInfo::class.java).apply {
+            this.id = this@toTileInfo.id
+            this.title = this@toTileInfo.name
+        }
+    } catch (e: Exception) {
+        null
+    }
 }

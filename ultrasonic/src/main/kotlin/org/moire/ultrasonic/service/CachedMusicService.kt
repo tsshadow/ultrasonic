@@ -283,6 +283,16 @@ class CachedMusicService(private val musicService: MusicService) :
     }
 
     @Throws(Exception::class)
+    override fun createDynamicPlaylist(name: String, smartParams: String): String {
+        return musicService.createDynamicPlaylist(name, smartParams)
+    }
+
+    @Throws(Exception::class)
+    override fun updateDynamicPlaylist(id: String, name: String?, smartParams: String?) {
+        musicService.updateDynamicPlaylist(id, name, smartParams)
+    }
+
+    @Throws(Exception::class)
     override fun getLyrics(artist: String, title: String): Lyrics? = musicService.getLyrics(artist, title)
 
     @Throws(Exception::class)
