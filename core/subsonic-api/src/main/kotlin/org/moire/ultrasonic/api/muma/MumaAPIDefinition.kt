@@ -1,12 +1,13 @@
 package org.moire.ultrasonic.api.muma
 
+import com.google.gson.annotations.SerializedName
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.Path
 
 interface MumaAPIDefinition {
     @POST("api/auth/login")
@@ -14,26 +15,30 @@ interface MumaAPIDefinition {
         @Body request: LoginRequest
     ): Call<LoginResponse>
 
-    @GET("tiles")
-    fun getTiles(): Call<List<MumaTile>>
+    @GET("api/users/{user_id}/dynamic-playlists")
+    fun getTiles(
+        @Path("user_id") userId: Int
+    ): Call<List<MumaTile>>
 
-    @POST("tiles")
+    @POST("api/users/{user_id}/dynamic-playlists")
     fun saveTile(
+        @Path("user_id") userId: Int,
         @Body tile: MumaTile
     ): Call<MumaSaveResponse>
 
-    @DELETE("tiles")
+    @DELETE("api/users/{user_id}/dynamic-playlists/{playlist_id}")
     fun deleteTile(
-        @Query("id") id: String
+        @Path("user_id") userId: Int,
+        @Path("playlist_id") playlistId: Int
     ): Call<ResponseBody>
 
-    @GET("users/{user_id}/settings/{app_id}")
+    @GET("api/users/{user_id}/settings/{app_id}")
     fun getSettings(
         @retrofit2.http.Path("user_id") userId: Int,
         @retrofit2.http.Path("app_id") appId: String
     ): Call<MumaSettingsResponse>
 
-    @POST("users/{user_id}/settings/{app_id}")
+    @POST("api/users/{user_id}/settings/{app_id}")
     fun saveSettings(
         @retrofit2.http.Path("user_id") userId: Int,
         @retrofit2.http.Path("app_id") appId: String,
@@ -42,9 +47,9 @@ interface MumaAPIDefinition {
 }
 
 data class MumaTile(
-    val id: String? = null,
-    val name: String,
-    val smartParams: String
+    @SerializedName("id") val id: Int? = null,
+    @SerializedName("name") val name: String,
+    @SerializedName("params") val smartParams: String
 )
 
 data class MumaSaveResponse(

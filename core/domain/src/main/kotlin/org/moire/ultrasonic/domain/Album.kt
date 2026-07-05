@@ -34,7 +34,7 @@ data class Album(
     override var starred: Boolean = false,
     override var path: String? = null,
     override var closeness: Int = 0
-) : MusicDirectory.Child() {
+) : MusicDirectoryEntry() {
     override var isDirectory = true
     override var isVideo = false
 }

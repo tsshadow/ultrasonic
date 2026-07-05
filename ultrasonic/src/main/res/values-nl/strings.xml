@@ -480,4 +480,26 @@
     <string name="welcome_password">Wachtwoord</string>
     <string name="welcome_fields_required">Gebruikersnaam en wachtwoord zijn verplicht</string>
     <string name="welcome_connection_failed">Kon geen verbinding maken met LMS. Controleer je gegevens.</string>
+    <string name="settings.muma_sync_title">Music Management Cloud Sync</string>
+    <string name="settings.save_to_muma_title">Instellingen opslaan naar Music Management</string>
+    <string name="settings.save_to_muma_summary">Maak een back-up van je huidige instellingen op de Music Management-server</string>
+    <string name="settings.load_from_muma_title">Instellingen laden van Music Management</string>
+    <string name="settings.load_from_muma_summary">Herstel instellingen van de Music Management-server</string>
+    <string name="settings.muma_sync_success">Instellingen succesvol gesynchroniseerd</string>
+    <string name="settings.muma_sync_error">Synchroniseren van instellingen mislukt: %1$s</string>
+    <string name="settings.muma_user_id_title">Music Management Gebruikers-ID</string>
+    <string name="settings.muma_user_id_summary">Intern gebruikers-ID voor Music Management-synchronisatie</string>
+    <string name="settings.muma_api_key_title">Music Management API-sleutel</string>
+    <string name="settings.muma_api_key_summary">API-sleutel voor Music Management-authenticatie</string>
+    <string name="sync_tiles_muma">Tiles synchroniseren met Music Management</string>
+    <string name="sync_tiles_success">Tiles succesvol gesynchroniseerd</string>
+    <string name="sync_tiles_error">Synchroniseren van tiles mislukt: %1$s</string>
+    <string name="menu.muma_sync">Music Management Sync</string>
+    <string name="muma_sync.logon">Inloggen bij Music Management</string>
+    <string name="muma_sync.load_tiles">Tiles laden van server</string>
+    <string name="muma_sync.write_tiles">Tiles schrijven naar server</string>
+    <string name="muma_sync.load_settings">Instellingen laden van server</string>
+    <string name="muma_sync.write_settings">Instellingen schrijven naar server</string>
+    <string name="muma_sync.logon_success">Succesvol ingelogd bij Music Management</string>
+    <string name="muma_sync.logon_error">Inloggen bij Music Management mislukt: %1$s</string>
 </resources>

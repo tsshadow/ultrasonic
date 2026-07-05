@@ -13,5 +13,6 @@ data class SubsonicClientConfiguration(
     val allowSelfSignedCertificate: Boolean = false,
     val forcePlainTextPassword: Boolean = false,
     val debug: Boolean = false,
-    val isRealProtocolVersion: Boolean = false
+    val isRealProtocolVersion: Boolean = false,
+    val mumaUserId: Int? = null
 )

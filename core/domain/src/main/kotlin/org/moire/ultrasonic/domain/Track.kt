@@ -49,7 +49,7 @@ data class Track(
     var userRating: Int? = null,
     var averageRating: Float? = null,
     override var name: String? = null
-) : MusicDirectory.Child(),
+) : MusicDirectoryEntry(),
     Serializable {
     companion object {
         @Suppress("unused")

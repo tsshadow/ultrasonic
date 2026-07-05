@@ -43,7 +43,8 @@ val musicServiceModule = module {
             baseUrl = server.url,
             username = server.userName,
             password = server.password,
-            apiKey = server.apiKey,
+            apiKey = server.apiKey ?: org.moire.ultrasonic.util.Settings.mumaApiKey.takeIf { it.isNotEmpty() },
+            mumaUserId = server.mumaUserId ?: org.moire.ultrasonic.util.Settings.mumaUserId.takeIf { it != -1 },
             minimalProtocolVersion = SubsonicAPIVersions.getClosestKnownClientApiVersion(
                 server.minimumApiVersion
                     ?: Constants.REST_PROTOCOL_VERSION

@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.domain.MusicDirectory
+import org.moire.ultrasonic.domain.MusicDirectoryEntry
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.service.MediaPlayerManager
@@ -40,7 +41,7 @@ class BookmarksFragment : TrackCollectionFragment() {
     override fun getLiveData(
         refresh: Boolean,
         append: Boolean
-    ): LiveData<List<MusicDirectory.Child>> {
+    ): LiveData<List<MusicDirectoryEntry>> {
         listModel.viewModelScope.launch(
             toastingExceptionHandler()
         ) {

@@ -264,6 +264,7 @@ abstract class SelectFragment :
     }
 
     private fun tileInfoFromFilterState(state: FilterState): TileInfo = TileInfo(
+        pageKey = pageKey,
         title = state.title,
         genre = state.genres,
         artists = state.artists,
@@ -314,19 +315,23 @@ abstract class SelectFragment :
         }
     }
 
+
+
     private fun loadTilesFromServer() {
         swipeRefresh?.isRefreshing = true
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 if (!isOffline()) {
                     val mumaTiles = getMusicService().getMumaTiles()
-                    val newTiles = mumaTiles.mapNotNull { it.toTileInfo() }.toMutableList()
-                    if (newTiles.isNotEmpty()) {
+                    val remoteTiles = mumaTiles.mapNotNull { it.toTileInfo() }
+                        .filter { it.pageKey == pageKey }
+                    
+                    if (remoteTiles.isNotEmpty()) {
                         withContext(Dispatchers.Main) {
                             tiles.clear()
-                            tiles.addAll(newTiles)
+                            tiles.addAll(remoteTiles)
                             TileStorage.saveTiles(requireContext(), tiles, pageKey)
-                            tileAdapter.notifyDataSetChanged()
+                            tileAdapter.updateTiles(tiles)
                         }
                     }
                 }

@@ -74,7 +74,6 @@ import org.moire.ultrasonic.service.MusicServiceFactory
 import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.Constants
-import org.moire.ultrasonic.util.InfoDialog
 import org.moire.ultrasonic.util.LocaleHelper
 import org.moire.ultrasonic.util.ServerColor
 import org.moire.ultrasonic.util.Settings
@@ -143,6 +142,8 @@ class NavigationActivity : ScopeActivity() {
 
         // Ensure servers are configured early if none exist
         serverSettingsModel.getServerList()
+
+        checkMumaLogin()
 
         if (BuildConfig.DEBUG && intent.hasExtra("FORCE_LOGIN")) {
             Timber.d("FORCE_LOGIN intent extra found, forcing default server")
@@ -240,6 +241,7 @@ class NavigationActivity : ScopeActivity() {
         rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
             updateNavigationHeaderForServer()
             setMenuForServerCapabilities()
+            checkMumaLogin()
         }
 
         serverRepository.liveServerCount().observe(this) { count ->
@@ -769,5 +771,19 @@ class NavigationActivity : ScopeActivity() {
         playlistsMenuItem?.isVisible = isOnline
         downloadsMenuItem?.isVisible = isOnline
         videoMenuItem?.isVisible = activeServer.videoSupport != false
+    }
+
+    private fun checkMumaLogin() {
+        val activeServer = activeServerProvider.getActiveServer()
+        if (!ActiveServerProvider.isOffline() && (activeServer.apiKey.isNullOrEmpty() ||
+            activeServer.mumaUserId == null || activeServer.mumaUserId == -1)) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    MusicServiceFactory.getMusicService().mumaLogin()
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to auto-fetch MuMa key")
+                }
+            }
+        }
     }
 }

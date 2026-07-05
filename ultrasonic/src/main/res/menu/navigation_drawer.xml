@@ -59,6 +59,11 @@
     <item a:title="@string/menu.common">
         <menu>
             <item
+                a:id="@+id/mumaSyncFragment"
+                a:checkable="true"
+                a:icon="@drawable/ic_menu_chat"
+                a:title="@string/menu.muma_sync" />
+            <item
                 a:id="@+id/settingsFragment"
                 a:checkable="true"
                 a:icon="@drawable/ic_menu_settings"

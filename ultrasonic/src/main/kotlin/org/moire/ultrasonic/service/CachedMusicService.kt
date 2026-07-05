@@ -40,7 +40,7 @@ import org.moire.ultrasonic.domain.Year
 import org.moire.ultrasonic.util.LRUCache
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.TimeLimitedCache
-import org.moire.ultrasonic.util.Util
+
 @Suppress("TooManyFunctions")
 class CachedMusicService(private val musicService: MusicService) :
     MusicService,
@@ -257,6 +257,11 @@ class CachedMusicService(private val musicService: MusicService) :
     override fun getPodcastEpisodes(podcastChannelId: String?): MusicDirectory? = musicService.getPodcastEpisodes(podcastChannelId)
 
     @Throws(Exception::class)
+    override fun mumaLogin() {
+        musicService.mumaLogin()
+    }
+
+    @Throws(Exception::class)
     override fun getPlaylists(refresh: Boolean): List<Playlist> {
         checkSettingsChanged()
         var result = if (refresh) null else cachedPlaylists.get()
@@ -283,15 +288,6 @@ class CachedMusicService(private val musicService: MusicService) :
         musicService.updatePlaylist(id, name, comment, pub)
     }
 
-    @Throws(Exception::class)
-    override fun createDynamicPlaylist(name: String, smartParams: String): String {
-        return musicService.createDynamicPlaylist(name, smartParams)
-    }
-
-    @Throws(Exception::class)
-    override fun updateDynamicPlaylist(id: String, name: String?, smartParams: String?) {
-        musicService.updateDynamicPlaylist(id, name, smartParams)
-    }
 
     @Throws(Exception::class)
     override fun getLyrics(artist: String, title: String): Lyrics? = musicService.getLyrics(artist, title)

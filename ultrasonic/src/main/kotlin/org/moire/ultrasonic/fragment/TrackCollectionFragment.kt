@@ -42,6 +42,7 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
+import org.moire.ultrasonic.domain.MusicDirectoryEntry
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.model.TrackCollectionModel
@@ -72,7 +73,7 @@ import timber.log.Timber
  */
 @Suppress("TooManyFunctions")
 open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
-    MultiListFragment<MusicDirectory.Child>(),
+    MultiListFragment<MusicDirectoryEntry>(),
     FilterableFragment {
 
     private var albumButtons: View? = null
@@ -326,7 +327,7 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
         var hasSubFolders = false
 
         for (item in viewAdapter.getCurrentList()) {
-            if (item is MusicDirectory.Child && item.isDirectory) {
+            if (item is MusicDirectoryEntry && item.isDirectory) {
                 hasSubFolders = true
                 break
             }
@@ -427,7 +428,7 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
         }
     }
 
-    override val defaultObserver: (List<MusicDirectory.Child>) -> Unit = { newItems ->
+    override val defaultObserver: (List<MusicDirectoryEntry>) -> Unit = { newItems ->
         Timber.i("Received list")
         val entryList = newItems.toMutableList()
 
@@ -509,7 +510,7 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
     override fun getLiveData(
         refresh: Boolean,
         append: Boolean
-    ): LiveData<List<MusicDirectory.Child>> {
+    ): LiveData<List<MusicDirectoryEntry>> {
         Timber.i("Starting gathering track collection data...")
         val id = navArgs.id
         val artistId = navArgs.artistId
@@ -688,7 +689,7 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
 
     override fun onContextMenuItemSelected(
         menuItem: MenuItem,
-        item: MusicDirectory.Child
+        item: MusicDirectoryEntry
     ): Boolean {
         val tracks = getClickedSong(item)
 
@@ -700,7 +701,7 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
         )
     }
 
-    private fun getClickedSong(item: MusicDirectory.Child): List<Track> {
+    private fun getClickedSong(item: MusicDirectoryEntry): List<Track> {
         // This can probably be done better
         return viewAdapter.getCurrentList().mapNotNull {
             if (it is Track && (it.id == item.id)) {
@@ -711,7 +712,7 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
         }
     }
 
-    override fun onItemClick(item: MusicDirectory.Child) {
+    override fun onItemClick(item: MusicDirectoryEntry) {
         when {
             item.isDirectory -> {
                 val action = NavigationGraphDirections.toTrackCollection(

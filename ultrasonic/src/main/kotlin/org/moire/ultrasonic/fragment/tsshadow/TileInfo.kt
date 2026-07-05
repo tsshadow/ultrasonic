@@ -56,6 +56,7 @@ val genreIconMap: Map<String, Int> = mapOf(
 
 class TileInfo(
     var id: String? = null,
+    var pageKey: String = "",
     var title: String = "",
     val genre: List<String>? = null,
     val artists: List<String>? = null,
@@ -159,6 +160,7 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
 
 fun TileInfo.toSmartParamsJson(): String {
     val map = mutableMapOf<String, Any?>()
+    map["pageKey"] = pageKey
     map["genre"] = genre?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }
     map["artists"] = artists?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }
     map["year"] = year?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }
@@ -178,10 +180,11 @@ fun TileInfo.toSmartParamsJson(): String {
 fun org.moire.ultrasonic.domain.Playlist.toTileInfo(): TileInfo? {
     if (smartParams.isEmpty()) return null
     return try {
-        Gson().fromJson(smartParams, TileInfo::class.java).apply {
+        val tile = Gson().fromJson(smartParams, TileInfo::class.java).apply {
             this.id = this@toTileInfo.id
             this.title = this@toTileInfo.name
         }
+        tile
     } catch (e: Exception) {
         null
     }
@@ -190,10 +193,11 @@ fun org.moire.ultrasonic.domain.Playlist.toTileInfo(): TileInfo? {
 fun org.moire.ultrasonic.domain.MumaTile.toTileInfo(): TileInfo? {
     if (smartParams.isEmpty()) return null
     return try {
-        Gson().fromJson(smartParams, TileInfo::class.java).apply {
+        val tile = Gson().fromJson(smartParams, TileInfo::class.java).apply {
             this.id = this@toTileInfo.id
             this.title = this@toTileInfo.name
         }
+        tile
     } catch (e: Exception) {
         null
     }

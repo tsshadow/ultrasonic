@@ -37,7 +37,7 @@ fun MusicDirectoryChild.toAlbumEntity(serverId: Int): Album = Album(id, serverId
     populateCommonProps(this, this@toAlbumEntity)
 }
 
-private fun populateCommonProps(entry: MusicDirectory.Child, source: MusicDirectoryChild) {
+private fun populateCommonProps(entry: MusicDirectoryEntry, source: MusicDirectoryChild) {
     entry.parent = source.parent
     entry.isDirectory = source.isDir
     entry.title = source.title
@@ -78,8 +78,8 @@ private fun populateTrackProps(track: Track, source: MusicDirectoryChild) {
     track.averageRating = source.averageRating
 }
 
-fun List<MusicDirectoryChild>.toDomainEntityList(serverId: Int): List<MusicDirectory.Child> {
-    val newList: MutableList<MusicDirectory.Child> = mutableListOf()
+fun List<MusicDirectoryChild>.toDomainEntityList(serverId: Int): List<MusicDirectoryEntry> {
+    val newList: MutableList<MusicDirectoryEntry> = mutableListOf()
 
     forEach {
         if (it.isDir) {

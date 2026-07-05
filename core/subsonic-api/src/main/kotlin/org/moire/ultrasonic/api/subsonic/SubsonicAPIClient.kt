@@ -130,7 +130,11 @@ class SubsonicAPIClient(
     val api: SubsonicAPIDefinition get() = wrappedApi
 
     val mumaApi: MumaAPIClient by lazy {
-        MumaAPIClient(config.baseUrl, baseOkClient)
+        val mumaBaseUrl = when {
+            config.baseUrl.contains("teunschriks.nl") -> "https://muma.teunschriks.nl"
+            else -> "${config.baseUrl.removeSuffix("/")}/muma"
+        }
+        MumaAPIClient(mumaBaseUrl, baseOkClient, config.apiKey, config.debug, okLogger)
     }
 
     private fun OkHttpClient.Builder.addLogging() {

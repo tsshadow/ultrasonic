@@ -68,6 +68,7 @@ class EditServerFragment : Fragment() {
     private var userNameEditText: TextInputLayout? = null
     private var passwordEditText: TextInputLayout? = null
     private var apiKeyEditText: TextInputLayout? = null
+    private var mumaUserIdEditText: TextInputLayout? = null
     private var selfSignedSwitch: SwitchMaterial? = null
     private var plaintextSwitch: SwitchMaterial? = null
     private var jukeboxSwitch: SwitchMaterial? = null
@@ -109,6 +110,7 @@ class EditServerFragment : Fragment() {
         userNameEditText = view.findViewById(R.id.edit_server_username)
         passwordEditText = view.findViewById(R.id.edit_server_password)
         apiKeyEditText = view.findViewById(R.id.edit_server_apikey)
+        mumaUserIdEditText = view.findViewById(R.id.edit_server_muma_userid)
         selfSignedSwitch = view.findViewById(R.id.edit_self_signed)
         plaintextSwitch = view.findViewById(R.id.edit_plaintext)
         jukeboxSwitch = view.findViewById(R.id.edit_jukebox)
@@ -252,6 +254,10 @@ class EditServerFragment : Fragment() {
             ::apiKeyEditText.name,
             apiKeyEditText!!.editText?.text.toString()
         )
+        savedInstanceState.putString(
+            ::mumaUserIdEditText.name,
+            mumaUserIdEditText!!.editText?.text.toString()
+        )
         savedInstanceState.putBoolean(
             ::selfSignedSwitch.name,
             selfSignedSwitch!!.isChecked
@@ -302,6 +308,9 @@ class EditServerFragment : Fragment() {
         apiKeyEditText!!.editText?.setText(
             savedInstanceState.getString(::apiKeyEditText.name)
         )
+        mumaUserIdEditText!!.editText?.setText(
+            savedInstanceState.getString(::mumaUserIdEditText.name)
+        )
         selfSignedSwitch!!.isChecked = savedInstanceState.getBoolean(::selfSignedSwitch.name)
         plaintextSwitch!!.isChecked = savedInstanceState.getBoolean(::plaintextSwitch.name)
         jukeboxSwitch!!.isChecked = savedInstanceState.getBoolean(::jukeboxSwitch.name)
@@ -323,6 +332,7 @@ class EditServerFragment : Fragment() {
         userNameEditText!!.editText?.setText(currentServerSetting!!.userName)
         passwordEditText!!.editText?.setText(currentServerSetting!!.password)
         apiKeyEditText!!.editText?.setText(currentServerSetting!!.apiKey)
+        mumaUserIdEditText!!.editText?.setText(currentServerSetting!!.mumaUserId?.toString() ?: "")
         selfSignedSwitch!!.isChecked = currentServerSetting!!.allowSelfSignedCertificate
         plaintextSwitch!!.isChecked = currentServerSetting!!.forcePlainTextPassword
         jukeboxSwitch!!.isChecked = currentServerSetting!!.jukeboxByDefault
@@ -379,6 +389,8 @@ class EditServerFragment : Fragment() {
             currentServerSetting!!.userName = userNameEditText!!.editText?.text.toString()
             currentServerSetting!!.password = passwordEditText!!.editText?.text.toString()
             currentServerSetting!!.apiKey = apiKeyEditText!!.editText?.text.toString()
+            currentServerSetting!!.mumaUserId =
+                mumaUserIdEditText!!.editText?.text.toString().toIntOrNull()
             currentServerSetting!!.allowSelfSignedCertificate = selfSignedSwitch!!.isChecked
             currentServerSetting!!.forcePlainTextPassword = plaintextSwitch!!.isChecked
             currentServerSetting!!.jukeboxByDefault = jukeboxSwitch!!.isChecked
@@ -403,6 +415,8 @@ class EditServerFragment : Fragment() {
             currentServerSetting!!.userName != userNameEditText!!.editText?.text.toString() ||
             currentServerSetting!!.password != passwordEditText!!.editText?.text.toString() ||
             currentServerSetting!!.apiKey != apiKeyEditText!!.editText?.text.toString() ||
+            currentServerSetting!!.mumaUserId !=
+            mumaUserIdEditText!!.editText?.text.toString().toIntOrNull() ||
             currentServerSetting!!.allowSelfSignedCertificate != selfSignedSwitch!!.isChecked ||
             currentServerSetting!!.forcePlainTextPassword != plaintextSwitch!!.isChecked ||
             currentServerSetting!!.jukeboxByDefault != jukeboxSwitch!!.isChecked
@@ -437,6 +451,14 @@ class EditServerFragment : Fragment() {
 
                 flow.collect {
                     model.storeFeatureSupport(testSetting, it)
+                    if (it.type == EditServerModel.Companion.ServerFeature.MUMA && it.supported) {
+                        currentServerSetting!!.apiKey = it.apiKey
+                        currentServerSetting!!.mumaUserId = it.userId
+                        withContext(Dispatchers.Main) {
+                            apiKeyEditText!!.editText?.setText(it.apiKey)
+                            mumaUserIdEditText!!.editText?.setText(it.userId?.toString())
+                        }
+                    }
                     dialog.setMessage(getProgress(testSetting))
                     Timber.w("${it.type} support: ${it.supported}")
                 }
@@ -469,7 +491,8 @@ class EditServerFragment : Fragment() {
             serverSetting.shareSupport,
             serverSetting.podcastSupport,
             serverSetting.videoSupport,
-            serverSetting.jukeboxSupport
+            serverSetting.jukeboxSupport,
+            if (serverSetting.apiKey != null) true else null
         ).any { x -> x == false }
 
         var progressString = String.format(
@@ -480,13 +503,15 @@ class EditServerFragment : Fragment() {
                     |%s - ${resources.getString(R.string.button_bar_podcasts)}
                     |%s - ${resources.getString(R.string.main_videos)}
                     |%s - ${resources.getString(R.string.jukebox)}
+                    |%s - MuMa
             """.trimMargin(),
             boolToMark(serverSetting.chatSupport),
             boolToMark(serverSetting.bookmarkSupport),
             boolToMark(serverSetting.shareSupport),
             boolToMark(serverSetting.podcastSupport),
             boolToMark(serverSetting.videoSupport),
-            boolToMark(serverSetting.jukeboxSupport)
+            boolToMark(serverSetting.jukeboxSupport),
+            boolToMark(if (serverSetting.apiKey != null) true else null)
         )
         if (isAnyDisabled) {
             progressString += "\n\n" + resources.getString(R.string.server_editor_disabled_feature)

@@ -40,10 +40,11 @@ data class ServerSetting(
     @ColumnInfo(name = "shareSupport") var shareSupport: Boolean? = null,
     @ColumnInfo(name = "podcastSupport") var podcastSupport: Boolean? = null,
     @ColumnInfo(name = "jukeboxSupport") var jukeboxSupport: Boolean? = null,
-    @ColumnInfo(name = "videoSupport") var videoSupport: Boolean? = null
+    @ColumnInfo(name = "videoSupport") var videoSupport: Boolean? = null,
+    @ColumnInfo(name = "mumaUserId") var mumaUserId: Int? = null
 ) {
 
     constructor() : this (
-        0, 0, "", "", null, "", "", null, false, false, false, null, null
+        0, 0, "", "", null, "", "", null, false, false, false, null, null, null, null, null, null, null, null, null
     )
 }

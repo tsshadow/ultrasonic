@@ -3,10 +3,11 @@ package org.moire.ultrasonic.adapters
 import java.util.HashSet
 import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.domain.MusicDirectory
+import org.moire.ultrasonic.domain.MusicDirectoryEntry
 import org.moire.ultrasonic.util.Settings.shouldUseFolderForArtistName
 import org.moire.ultrasonic.util.Util.getGrandparent
 
-class AlbumHeader(var entries: List<MusicDirectory.Child>, var name: String?) : Identifiable {
+class AlbumHeader(var entries: List<MusicDirectoryEntry>, var name: String?) : Identifiable {
     var isAllVideo: Boolean
         private set
 
@@ -32,7 +33,7 @@ class AlbumHeader(var entries: List<MusicDirectory.Child>, var name: String?) : 
     val years: Set<Int>
         get() = _years
 
-    private fun processGrandParents(entry: MusicDirectory.Child) {
+    private fun processGrandParents(entry: MusicDirectoryEntry) {
         val grandParent = getGrandparent(entry.path)
         if (grandParent != null) {
             _grandParents.add(grandParent)
@@ -40,7 +41,7 @@ class AlbumHeader(var entries: List<MusicDirectory.Child>, var name: String?) : 
     }
 
     @Suppress("NestedBlockDepth")
-    private fun processEntries(list: List<MusicDirectory.Child>) {
+    private fun processEntries(list: List<MusicDirectoryEntry>) {
         entries = list
         childCount = entries.size
         for (entry in entries) {

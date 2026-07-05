@@ -88,4 +88,10 @@ class TileAdapter(
         TileStorage.saveTiles(context, tiles, pageKey)
         notifyItemInserted(tiles.size - 1)
     }
+
+    fun updateTiles(newTiles: List<TileInfo>) {
+        tiles.clear()
+        tiles.addAll(newTiles)
+        notifyDataSetChanged()
+    }
 }

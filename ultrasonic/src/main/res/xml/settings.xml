@@ -344,16 +344,7 @@
             a:key="@string/setting_key.muma_api_key"
             a:title="@string/settings.muma_api_key_title"
             a:summary="@string/settings.muma_api_key_summary"
-            app:iconSpaceReserved="false"/>
-        <Preference
-            a:key="@string/setting_key.save_to_muma"
-            a:title="@string/settings.save_to_muma_title"
-            a:summary="@string/settings.save_to_muma_summary"
-            app:iconSpaceReserved="false"/>
-        <Preference
-            a:key="@string/setting_key.load_from_muma"
-            a:title="@string/settings.load_from_muma_title"
-            a:summary="@string/settings.load_from_muma_summary"
+            a:inputType="textPassword"
             app:iconSpaceReserved="false"/>
     </PreferenceCategory>
 

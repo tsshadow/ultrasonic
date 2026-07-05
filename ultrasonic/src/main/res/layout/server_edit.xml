@@ -106,9 +106,10 @@
             a:id="@+id/edit_server_apikey"
             a:layout_width="match_parent"
             a:layout_height="wrap_content"
-            a:layout_marginBottom="21dp"
+            a:layout_marginBottom="0dp"
             a:hint="@string/settings.server_apikey"
-            app:layout_constraintBottom_toTopOf="@id/edit_advanced_header"
+            app:endIconMode="password_toggle"
+            app:layout_constraintBottom_toTopOf="@id/edit_server_muma_userid"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/edit_server_password">
@@ -116,8 +117,27 @@
             <com.google.android.material.textfield.TextInputEditText
                 a:layout_width="match_parent"
                 a:layout_height="wrap_content"
-                a:inputType="text"
+                a:inputType="textPassword"
                 />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            a:id="@+id/edit_server_muma_userid"
+            a:layout_width="match_parent"
+            a:layout_height="wrap_content"
+            a:layout_marginBottom="21dp"
+            a:hint="@string/settings.muma_user_id_title"
+            app:layout_constraintBottom_toTopOf="@id/edit_advanced_header"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edit_server_apikey">
+
+            <com.google.android.material.textfield.TextInputEditText
+                a:layout_width="match_parent"
+                a:layout_height="wrap_content"
+                a:inputType="number"
+                a:maxLines="1" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -131,7 +151,7 @@
             a:text="@string/server_editor.advanced"
             app:layout_constraintBottom_toTopOf="@id/edit_server_color_text"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_server_apikey" />
+            app:layout_constraintTop_toBottomOf="@id/edit_server_muma_userid" />
 
 
         <ImageView

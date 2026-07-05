@@ -2,6 +2,7 @@
 
 ### Don't remove subsonic api serializers/entities
 -keep class org.moire.ultrasonic.api.subsonic.** { *; }
+-keep class org.moire.ultrasonic.api.muma.** { *; }
 
 ## Don't remove the domain models
 -keep class org.moire.ultrasonic.domain.** { *; }

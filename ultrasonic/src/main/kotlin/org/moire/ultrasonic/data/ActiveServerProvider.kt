@@ -186,6 +186,34 @@ class ActiveServerProvider(private val repository: ServerSettingDao) : Coroutine
         }
     }
 
+    fun setMumaSettings(apiKey: String, userId: Int) {
+        launch {
+            if (cachedServer != null) {
+                cachedServer!!.apiKey = apiKey
+                // Only update MuMa ID if it's not set yet
+                if (cachedServer!!.mumaUserId == null || cachedServer!!.mumaUserId == -1) {
+                    cachedServer!!.mumaUserId = userId
+                }
+                repository.update(cachedServer!!)
+            }
+            // Sync globally as well since the user said they are the same for all servers
+            org.moire.ultrasonic.util.Settings.mumaApiKey = apiKey
+            // Only update MuMa ID if it's not set yet
+            if (org.moire.ultrasonic.util.Settings.mumaUserId == -1) {
+                org.moire.ultrasonic.util.Settings.mumaUserId = userId
+            }
+        }
+    }
+
+    fun update(serverSetting: ServerSetting) {
+        launch {
+            repository.update(serverSetting)
+            if (cachedServer?.id == serverSetting.id) {
+                cachedServer = serverSetting
+            }
+        }
+    }
+
     /**
      * Invalidates the Active Server Setting cache
      * This should be called when the Active Server or one of its properties changes

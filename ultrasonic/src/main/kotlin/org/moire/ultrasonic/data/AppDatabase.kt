@@ -20,7 +20,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  */
 @Database(
     entities = [ServerSetting::class],
-    version = 7,
+    version = 9,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -302,5 +302,33 @@ val MIGRATION_6_5: Migration = object : Migration(6, 5) {
 val MIGRATION_6_7: Migration = object : Migration(6, 7) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE ServerSetting ADD COLUMN apiKey TEXT")
+    }
+}
+
+val MIGRATION_7_8: Migration = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE ServerSetting ADD COLUMN mumaUserId INTEGER")
+    }
+}
+
+val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        val cursor = db.query("PRAGMA table_info(ServerSetting)")
+        var oldColumnName: String? = null
+        while (cursor.moveToNext()) {
+            val nameIndex = cursor.getColumnIndex("name")
+            if (nameIndex != -1) {
+                val name = cursor.getString(nameIndex)
+                if (name == "muamaUserId" || name == "musicManagementUserId") {
+                    oldColumnName = name
+                    break
+                }
+            }
+        }
+        cursor.close()
+
+        if (oldColumnName != null) {
+            db.execSQL("ALTER TABLE ServerSetting RENAME COLUMN $oldColumnName TO mumaUserId")
+        }
     }
 }

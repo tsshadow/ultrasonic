@@ -325,11 +325,6 @@ class OfflineMusicService :
     @Throws(Exception::class)
     override fun updatePlaylist(id: String, name: String?, comment: String?, pub: Boolean): Unit = throw OfflineException("Updating playlist not available in offline mode")
 
-    @Throws(Exception::class)
-    override fun createDynamicPlaylist(name: String, smartParams: String): String = throw OfflineException("Creating dynamic playlist not available in offline mode")
-
-    @Throws(Exception::class)
-    override fun updateDynamicPlaylist(id: String, name: String?, smartParams: String?): Unit = throw OfflineException("Updating dynamic playlist not available in offline mode")
 
     @Throws(Exception::class)
     override fun getLyrics(artist: String, title: String): Lyrics? = throw OfflineException("Lyrics not available in offline mode")
@@ -647,6 +642,10 @@ class OfflineMusicService :
 
     @Throws(OfflineException::class)
     override fun getPodcastEpisodes(podcastChannelId: String?): MusicDirectory? = throw OfflineException("getPodcastEpisodes isn't available in offline mode")
+
+    override fun mumaLogin() {
+        // No-op
+    }
 
     override fun getMumaTiles(): List<MumaTile> {
         return emptyList()

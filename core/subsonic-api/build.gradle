@@ -1,11 +1,9 @@
-plugins {
-    alias libs.plugins.ksp
-}
-
 apply from: bootstrap.kotlinModule
 
 dependencies {
     api libs.retrofit
+    api libs.gson
+    api libs.gsonConverter
     api libs.jacksonConverter
     api libs.koinCore
 

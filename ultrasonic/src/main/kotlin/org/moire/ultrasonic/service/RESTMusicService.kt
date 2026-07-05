@@ -16,7 +16,6 @@ import org.moire.ultrasonic.api.subsonic.SubsonicAPIClient
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.api.subsonic.models.JukeboxAction
-import org.moire.ultrasonic.api.subsonic.response.GetPlaylistResponse
 import org.moire.ultrasonic.api.subsonic.throwOnFailure
 import org.moire.ultrasonic.api.subsonic.toStreamResponse
 import org.moire.ultrasonic.data.ActiveServerProvider
@@ -50,6 +49,7 @@ import org.moire.ultrasonic.domain.toDomainEntityList
 import org.moire.ultrasonic.domain.toIndexList
 import org.moire.ultrasonic.domain.toMusicDirectoryDomainEntity
 import org.moire.ultrasonic.domain.toTrackEntity
+import org.moire.ultrasonic.api.muma.MumaTile as MumaApiTile
 import org.moire.ultrasonic.api.muma.LoginRequest
 import org.moire.ultrasonic.util.FileUtil
 import org.moire.ultrasonic.util.Settings
@@ -274,7 +274,7 @@ open class RESTMusicService(
             pSongIds.add(id1)
         }
 
-        API.createPlaylist(id, name, null, pSongIds.toList()).execute().throwOnFailure()
+        API.createPlaylist(id, name, pSongIds.toList()).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
@@ -284,20 +284,8 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun updatePlaylist(id: String, name: String?, comment: String?, pub: Boolean) {
-        API.updatePlaylist(id, name, comment, pub, null, null, null)
+        API.updatePlaylist(id, name, comment, pub, null, null)
             .execute().throwOnFailure()
-    }
-
-    @Throws(Exception::class)
-    override fun createDynamicPlaylist(name: String, smartParams: String): String {
-        val response = API.createDynamicPlaylist(name, smartParams).execute().throwOnFailure()
-        val getPlaylistResponse = response.body() as? GetPlaylistResponse
-        return getPlaylistResponse?.playlist?.id ?: ""
-    }
-
-    @Throws(Exception::class)
-    override fun updateDynamicPlaylist(id: String, name: String?, smartParams: String?) {
-        API.updateDynamicPlaylist(id, name, smartParams).execute().throwOnFailure()
     }
 
     @Throws(Exception::class)
@@ -769,63 +757,76 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
-    private fun ensureMumaLogin() {
-        if (Settings.mumaApiKey.isNotEmpty()) {
-            subsonicAPIClient.mumaApi.setApiKey(Settings.mumaApiKey)
+    override fun mumaLogin() {
+        ensureMumaLogin(force = true)
+    }
+
+    @Throws(Exception::class)
+    private fun ensureMumaLogin(force: Boolean = false) {
+        val activeServer = activeServerProvider.getActiveServer()
+        if (!force && !activeServer.apiKey.isNullOrEmpty() &&
+            activeServer.mumaUserId != null && activeServer.mumaUserId != -1
+        ) {
+            subsonicAPIClient.mumaApi.setApiKey(activeServer.apiKey!!)
             return
         }
 
-        val activeServer = activeServerProvider.getActiveServer()
         if (activeServer.userName.isEmpty() || activeServer.password.isEmpty()) {
             return
         }
 
-        Timber.i("Muma API key missing, attempting login with Subsonic credentials")
+        Timber.i("MuMa API key missing or logon forced, attempting login with Subsonic credentials")
         val req = LoginRequest(activeServer.userName, activeServer.password)
         val response = subsonicAPIClient.mumaApi.api.login(req).execute()
 
         if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-                Settings.mumaApiKey = body.api_key
-                Settings.mumaUserId = body.id
+                activeServerProvider.setMumaSettings(body.api_key, body.id)
                 subsonicAPIClient.mumaApi.setApiKey(body.api_key)
-                Timber.i("Muma login successful, API key: ${body.api_key}")
+                Timber.i("MuMa login successful")
             }
         } else {
-            Timber.e("Muma login failed: ${response.code()}")
-            // Fallback for release version if login fails but user expects it to work
-            if (Settings.mumaApiKey.isEmpty()) {
-                // If we really can't get it, we could set a default or just fail
-                // The user said: "wil je die instantieren op api key"
-                // This might mean literally the string "api_key" if it's a fixed value for some reason?
-                // But "Api key kunnen we ook wel ophalen met username + pass" suggests dynamic is preferred.
-            }
+            Timber.e("MuMa login failed: ${response.code()}")
+            throw IOException("MuMa login failed: ${response.code()}")
         }
     }
 
     @Throws(Exception::class)
     override fun getMumaTiles(): List<MumaTile> {
         ensureMumaLogin()
-        val response = subsonicAPIClient.mumaApi.api.getTiles().execute()
-        if (!response.isSuccessful) throw IOException("Failed to get muma tiles: ${response.code()}")
-        return response.body()?.map { MumaTile(it.id, it.name, it.smartParams) } ?: emptyList()
+        val activeServer = activeServerProvider.getActiveServer()
+        val userId = activeServer.mumaUserId ?: Settings.mumaUserId
+        if (userId == -1) throw IOException("User ID not set")
+
+        val response = subsonicAPIClient.mumaApi.api.getTiles(userId).execute()
+        if (!response.isSuccessful) throw IOException("Failed to get MuMa tiles: ${response.code()}")
+        return response.body()?.map { MumaTile(it.id?.toString(), it.name, it.smartParams) } ?: emptyList()
     }
 
     @Throws(Exception::class)
     override fun saveMumaTile(tile: MumaTile): String {
         ensureMumaLogin()
-        val apiTile = org.moire.ultrasonic.api.muma.MumaTile(tile.id, tile.name, tile.smartParams)
-        val response = subsonicAPIClient.mumaApi.api.saveTile(apiTile).execute()
-        if (!response.isSuccessful) throw IOException("Failed to save muma tile: ${response.code()}")
+        val activeServer = activeServerProvider.getActiveServer()
+        val userId = activeServer.mumaUserId ?: Settings.mumaUserId
+        if (userId == -1) throw IOException("User ID not set")
+
+        val apiTile = MumaApiTile(tile.id?.toIntOrNull(), tile.name, tile.smartParams)
+        val response = subsonicAPIClient.mumaApi.api.saveTile(userId, apiTile).execute()
+        if (!response.isSuccessful) throw IOException("Failed to save MuMa tile: ${response.code()}")
         return response.body()?.id ?: throw IOException("Empty response from server")
     }
 
     @Throws(Exception::class)
     override fun deleteMumaTile(id: String) {
         ensureMumaLogin()
-        val response = subsonicAPIClient.mumaApi.api.deleteTile(id).execute()
-        if (!response.isSuccessful) throw IOException("Failed to delete muma tile: ${response.code()}")
+        val activeServer = activeServerProvider.getActiveServer()
+        val userId = activeServer.mumaUserId ?: Settings.mumaUserId
+        if (userId == -1) throw IOException("User ID not set")
+
+        val playlistId = id.toIntOrNull() ?: throw IOException("Invalid tile ID: $id")
+        val response = subsonicAPIClient.mumaApi.api.deleteTile(userId, playlistId).execute()
+        if (!response.isSuccessful) throw IOException("Failed to delete MuMa tile: ${response.code()}")
     }
 
     @Throws(Exception::class)

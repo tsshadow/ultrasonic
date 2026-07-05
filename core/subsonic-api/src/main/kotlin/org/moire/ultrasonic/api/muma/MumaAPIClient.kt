@@ -1,16 +1,18 @@
 package org.moire.ultrasonic.api.muma
 
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.databind.DeserializationFeature
+import retrofit2.converter.gson.GsonConverterFactory
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 
 class MumaAPIClient(
     baseUrl: String,
     okHttpClient: OkHttpClient,
-    private var apiKey: String? = null
+    private var apiKey: String? = null,
+    debug: Boolean = false,
+    okLogger: HttpLoggingInterceptor.Logger = HttpLoggingInterceptor.Logger.DEFAULT
 ) {
     private val mumaOkHttpClient = okHttpClient.newBuilder()
         .addInterceptor { chain ->
@@ -24,12 +26,19 @@ class MumaAPIClient(
             }
             chain.proceed(newRequest)
         }
+        .apply {
+            if (debug) {
+                val loggingInterceptor = HttpLoggingInterceptor(okLogger)
+                loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
+                addInterceptor(loggingInterceptor)
+            }
+        }
         .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("${baseUrl.removeSuffix("/")}/muma/")
+        .baseUrl(if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/")
         .client(mumaOkHttpClient)
-        .addConverterFactory(JacksonConverterFactory.create(jacksonMapper))
+        .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
 
     val api: MumaAPIDefinition = retrofit.create(MumaAPIDefinition::class.java)
@@ -39,8 +48,8 @@ class MumaAPIClient(
     }
 
     companion object {
-        private val jacksonMapper: ObjectMapper = ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .registerModule(KotlinModule.Builder().build())
+        private val gson: Gson = GsonBuilder()
+            .setLenient()
+            .create()
     }
 }

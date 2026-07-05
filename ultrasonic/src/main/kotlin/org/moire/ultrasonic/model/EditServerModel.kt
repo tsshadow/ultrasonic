@@ -59,7 +59,13 @@ class EditServerModel(val app: Application) :
      */
     private fun SubsonicResponse.falseOnFailure(): Boolean = (this.status === SubsonicResponse.Status.OK)
 
-    private fun requestFlow(type: ServerFeature, api: SubsonicAPIDefinition, userName: String) = flow {
+    private fun requestFlow(
+        type: ServerFeature,
+        api: SubsonicAPIDefinition,
+        userName: String,
+        password: String,
+        client: SubsonicAPIClient
+    ) = flow {
         when (type) {
             ServerFeature.CHAT -> emit(
                 serverFunctionAvailable(type, api::getChatMessagesSuspend)
@@ -83,6 +89,27 @@ class EditServerModel(val app: Application) :
             ServerFeature.VIDEO -> emit(
                 serverFunctionAvailable(type, api::getVideosSuspend)
             )
+            ServerFeature.MUMA -> emit(
+                try {
+                    val req = org.moire.ultrasonic.api.muma.LoginRequest(
+                        userName,
+                        password
+                    )
+                    val response = client.mumaApi.api.login(req).execute()
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body != null) {
+                            FeatureSupport(type, true, body.api_key, body.id)
+                        } else {
+                            FeatureSupport(type, false)
+                        }
+                    } else {
+                        FeatureSupport(type, false)
+                    }
+                } catch (_: Exception) {
+                    FeatureSupport(type, false)
+                }
+            )
         }
     }
 
@@ -93,7 +120,13 @@ class EditServerModel(val app: Application) :
         // Get all possible feature values, turn them into a flow,
         // and execute each request concurrently
         return (ServerFeature.values()).asFlow().flatMapMerge {
-            requestFlow(it, client.api, currentServerSetting.userName)
+            requestFlow(
+                it,
+                client.api,
+                currentServerSetting.userName,
+                currentServerSetting.password,
+                client
+            )
         }
     }
 
@@ -134,6 +167,12 @@ class EditServerModel(val app: Application) :
             ServerFeature.PODCAST -> settings.podcastSupport = it.supported
             ServerFeature.JUKEBOX -> settings.jukeboxSupport = it.supported
             ServerFeature.VIDEO -> settings.videoSupport = it.supported
+            ServerFeature.MUMA -> {
+                if (it.supported) {
+                    settings.apiKey = it.apiKey
+                    settings.mumaUserId = it.userId
+                }
+            }
         }
     }
 
@@ -144,9 +183,15 @@ class EditServerModel(val app: Application) :
             SHARE("share"),
             PODCAST("podcast"),
             JUKEBOX("jukebox"),
-            VIDEO("video")
+            VIDEO("video"),
+            MUMA("muma")
         }
 
-        data class FeatureSupport(val type: ServerFeature, val supported: Boolean)
+        data class FeatureSupport(
+            val type: ServerFeature,
+            val supported: Boolean,
+            val apiKey: String? = null,
+            val userId: Int? = null
+        )
     }
 }

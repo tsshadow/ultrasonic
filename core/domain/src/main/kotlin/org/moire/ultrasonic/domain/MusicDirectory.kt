@@ -54,3 +54,5 @@ class MusicDirectory : ArrayList<MusicDirectory.Child>() {
         abstract var isVideo: Boolean
     }
 }
+
+typealias MusicDirectoryEntry = MusicDirectory.Child
