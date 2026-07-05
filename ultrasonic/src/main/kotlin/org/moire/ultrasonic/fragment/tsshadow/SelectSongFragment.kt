@@ -18,7 +18,7 @@ import timber.log.Timber
  */
 class SelectSongFragment : SelectFragment(), FilterableFragment {
     override var pageKey = "song"
-    override var defaultLength = ""
+    override var defaultLength = if (Settings.isSetsMode) "long" else "short"
     override var filterModalType = FilterModalType.SONG
 
     override var viewCapabilities: ViewCapabilities = ViewCapabilities(
@@ -35,12 +35,12 @@ class SelectSongFragment : SelectFragment(), FilterableFragment {
 
         if (isSets) {
             pageKey = "liveset"
-            defaultLength = ""
+            defaultLength = "long"
             filterModalType = FilterModalType.LIVESET
             setTitle(this, R.string.main_livesets_title)
         } else {
             pageKey = "song"
-            defaultLength = ""
+            defaultLength = "short"
             filterModalType = FilterModalType.SONG
             setTitle(this, R.string.main_songs_title)
         }
@@ -58,7 +58,7 @@ class SelectSongFragment : SelectFragment(), FilterableFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (Settings.isSetsMode) {
             pageKey = "liveset"
-            defaultLength = ""
+            defaultLength = "long"
             filterModalType = FilterModalType.LIVESET
         }
         super.onViewCreated(view, savedInstanceState)

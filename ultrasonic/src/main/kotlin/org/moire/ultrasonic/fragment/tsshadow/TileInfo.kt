@@ -135,16 +135,19 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
             filters.add(if (it.size == 1) Filter("FESTIVAL", it[0]) else Filter("FESTIVAL", it))
         }
 
-    filters.add(Filter("LENGTH", tile.length))
+    val effectiveLength = tile.length.takeIf { it.isNotBlank() }
+        ?: if (org.moire.ultrasonic.util.Settings.isSetsMode) "long" else "short"
 
-    val filtersJson = Gson().toJson(filters)
+    filters.add(Filter("LENGTH", effectiveLength))
+
+    val filtersJson = Gson().toJson(filters.sanitized())
 
     return NavigationGraphDirections.toTrackCollection(
         songs = tile.title,
         filters = filtersJson,
         size = tile.size,
         offset = tile.offset,
-        length = tile.length,
+        length = effectiveLength,
         ratingMin = tile.ratingMin,
         ratingMax = tile.ratingMax,
         sortMethod = tile.sortMethod,
@@ -156,20 +159,20 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
 
 fun TileInfo.toSmartParamsJson(): String {
     val map = mutableMapOf<String, Any?>()
-    map["genre"] = genre
-    map["artists"] = artists
-    map["year"] = year
+    map["genre"] = genre?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }
+    map["artists"] = artists?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }
+    map["year"] = year?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }
     map["size"] = size
     map["sortMethod"] = sortMethod
     map["ratingMin"] = ratingMin
     map["ratingMax"] = ratingMax
     map["minDuration"] = minDuration
     map["maxDuration"] = maxDuration
-    map["festival"] = festival
-    map["festivalLineup"] = festivalLineup
+    map["festival"] = festival?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }
+    map["festivalLineup"] = festivalLineup?.takeIf { it.isNotBlank() }
     map["favorite"] = favorite
-    map["length"] = length
-    return Gson().toJson(map)
+    map["length"] = length.takeIf { it.isNotBlank() }
+    return Gson().toJson(map.filterValues { it != null })
 }
 
 fun org.moire.ultrasonic.domain.Playlist.toTileInfo(): TileInfo? {

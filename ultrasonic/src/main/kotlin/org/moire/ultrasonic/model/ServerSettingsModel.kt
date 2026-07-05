@@ -16,6 +16,7 @@ import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.OFFLINE_DB_ID
 import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.data.ServerSettingDao
+import org.moire.ultrasonic.service.RxBus
 import org.moire.ultrasonic.util.Settings
 import timber.log.Timber
 import com.fasterxml.jackson.core.type.TypeReference
@@ -147,12 +148,44 @@ class ServerSettingsModel(
      * Parses the DEFAULT_SERVERS_JSON from BuildConfig and adds them to the database.
      * Also adds the demo server.
      */
+    /**
+     * Forces the first server from BuildConfig as the active server.
+     * Only works in debug builds.
+     */
+    fun forceDefaultServer() {
+        if (!BuildConfig.DEBUG) return
+        viewModelScope.launch(Dispatchers.IO) {
+            addConfiguredServers()
+            try {
+                val mapper = ObjectMapper().configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false)
+                val typeRef = object : TypeReference<List<Map<String, Any>>>() {}
+                val defaultServers: List<Map<String, Any>> = mapper.readValue(BuildConfig.DEFAULT_SERVERS_JSON, typeRef)
+
+                if (defaultServers.isNotEmpty()) {
+                    val defaultName = defaultServers[0]["name"] as String
+                    val defaultUrl = defaultServers[0]["url"] as String
+                    val server = repository.findByNameAndUrl(defaultName, defaultUrl)
+                    if (server != null) {
+                        Settings.activeServer = server.id
+                        activeServerProvider.invalidateCache()
+                        Timber.d("Forced active server to ${server.name} (id: ${server.id})")
+                        // Post event to notify UI
+                        RxBus.activeServerChangedPublisher.onNext(server)
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to force default server")
+            }
+        }
+    }
+
     private suspend fun addConfiguredServers() {
         val mapper = ObjectMapper()
             .configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false)
         try {
             val typeRef = object : TypeReference<List<Map<String, Any>>>() {}
             val servers: List<Map<String, Any>> = mapper.readValue(BuildConfig.DEFAULT_SERVERS_JSON, typeRef)
+            var firstAddedServerId = -1
             servers.forEach { serverMap ->
                 val name = serverMap["name"] as String
                 val url = serverMap["url"] as String
@@ -165,6 +198,7 @@ class ServerSettingsModel(
                         repository.update(existingServer)
                         Timber.d("Updated apiKey for server: $name")
                     }
+                    if (firstAddedServerId == -1) firstAddedServerId = existingServer.id
                 } else {
                     val server = ServerSetting(
                         index = (repository.count() ?: 0) + 1,
@@ -184,8 +218,16 @@ class ServerSettingsModel(
                         podcastSupport = false
                     )
                     repository.insert(server)
+                    val addedServer = repository.findByNameAndUrl(name, url)
+                    if (firstAddedServerId == -1) firstAddedServerId = addedServer?.id ?: -1
                     Timber.d("Added configured server: $name")
                 }
+            }
+
+            if (BuildConfig.DEBUG && Settings.activeServer == -1 && firstAddedServerId != -1) {
+                Settings.activeServer = firstAddedServerId
+                activeServerProvider.invalidateCache()
+                Timber.d("Automatically set active server to id: $firstAddedServerId")
             }
         } catch (e: Exception) {
             Timber.e(e, "Failed to parse default servers JSON")

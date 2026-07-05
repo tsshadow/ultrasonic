@@ -165,15 +165,18 @@ abstract class SelectFragment :
                         if (filterState.festival.isNotEmpty()) {
                             add(Filter("FESTIVAL", filterState.festival))
                         }
-                        add(Filter("LENGTH", defaultLength))
+                        val safeLength = defaultLength.takeIf { it.isNotBlank() }
+                            ?: if (org.moire.ultrasonic.util.Settings.isSetsMode) "long" else "short"
+                        add(Filter("LENGTH", safeLength))
                     }
 
                     val navAction = NavigationGraphDirections.toTrackCollection(
                         songs = "?",
-                        filters = Gson().toJson(filters),
+                        filters = Gson().toJson(filters.sanitized()),
                         size = filterState.count,
                         offset = 0,
-                        length = defaultLength,
+                        length = defaultLength.takeIf { it.isNotBlank() }
+                            ?: if (org.moire.ultrasonic.util.Settings.isSetsMode) "long" else "short",
                         ratingMin = filterState.ratingMin,
                         ratingMax = filterState.ratingMax,
                         sortMethod = filterState.sortMethod,
@@ -257,7 +260,8 @@ abstract class SelectFragment :
         label = state.label,
         festival = state.festival,
         sortMethod = state.sortMethod,
-        length = defaultLength,
+        length = defaultLength.takeIf { it.isNotBlank() }
+            ?: if (org.moire.ultrasonic.util.Settings.isSetsMode) "long" else "short",
         ratingMin = state.ratingMin,
         ratingMax = state.ratingMax,
         minDuration = state.minDuration,

@@ -144,6 +144,11 @@ class NavigationActivity : ScopeActivity() {
         // Ensure servers are configured early if none exist
         serverSettingsModel.getServerList()
 
+        if (BuildConfig.DEBUG && intent.hasExtra("FORCE_LOGIN")) {
+            Timber.d("FORCE_LOGIN intent extra found, forcing default server")
+            serverSettingsModel.forceDefaultServer()
+        }
+
         super.onCreate(savedInstanceState)
 
         volumeControlStream = AudioManager.STREAM_MUSIC

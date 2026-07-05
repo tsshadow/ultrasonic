@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ultrasonic" type="AndroidRunConfigurationType" factoryName="Android App">
+  <configuration default="false" name="debug-and-login" type="AndroidRunConfigurationType" factoryName="Android App">
     <module name="ultrasonic.ultrasonic" />
-    <option name="ANDROID_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
+    <option name="SELECTED_BUILD_VARIANT" value="debug" />
     <option name="DEPLOY" value="true" />
     <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
     <option name="DEPLOY_AS_INSTANT" value="false" />
@@ -10,16 +10,15 @@
     <option name="ALL_USERS" value="false" />
     <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
     <option name="ALLOW_ASSUME_VERIFIED" value="false" />
-    <option name="CLEAR_APP_STORAGE" value="true" />
+    <option name="CLEAR_APP_STORAGE" value="false" />
     <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
-    <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+    <option name="ACTIVITY_EXTRA_FLAGS" value="--ez FORCE_LOGIN true" />
     <option name="MODE" value="default_activity" />
-    <option name="RESTORE_ENABLED" value="false" />
-    <option name="RESTORE_FILE" value="" />
-    <option name="RESTORE_FRESH_INSTALL_ONLY" value="false" />
     <option name="CLEAR_LOGCAT" value="false" />
     <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
     <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+    <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+    <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
     <option name="DEBUGGER_TYPE" value="Auto" />
     <Auto>
       <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />

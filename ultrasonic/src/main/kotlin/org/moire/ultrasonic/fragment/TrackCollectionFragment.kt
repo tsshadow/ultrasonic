@@ -610,7 +610,7 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
                 // Gebruik filtersJson als het er is, anders stel Filters handmatig samen
                 val filters: Filters =
                     arguments?.getString("filters")?.takeIf { it.isNotEmpty() }?.let {
-                        Gson().fromJson(it, Filters::class.java)
+                        Gson().fromJson(it, Filters::class.java).sanitized()
                     } ?: Filters().apply {
                         year?.takeIf { it != "All" && it.isNotBlank() }?.let {
                             add(Filter("YEAR", it))

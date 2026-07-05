@@ -52,11 +52,11 @@ class Filters {
     fun getAll(): List<Filter> = filterItems.toList()
 
     fun sanitized(): Filters = Filters().apply {
-        for (filter in this) {
-            if (filter.value is String && filter.value.isNotBlank()) {
-                add(filter)
-            } else if (filter.value is Collection<*> && filter.value.isNotEmpty()) {
-                add(filter)
+        for (filter in this@Filters) {
+            when (val value = filter.value) {
+                is String -> if (value.isNotBlank()) add(filter)
+                is Collection<*> -> if (value.isNotEmpty()) add(filter)
+                else -> add(filter)
             }
         }
     }
