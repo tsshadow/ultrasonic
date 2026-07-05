@@ -62,6 +62,7 @@ import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.data.MumaClient
 import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.data.ServerSettingDao
 import org.moire.ultrasonic.model.ServerSettingsModel
@@ -120,6 +121,7 @@ class NavigationActivity : ScopeActivity() {
     private val mediaPlayerManager: MediaPlayerManager by inject()
     private val activeServerProvider: ActiveServerProvider by inject()
     private val serverRepository: ServerSettingDao by inject()
+    private val mumaClient: MumaClient by inject()
 
     private var currentFragmentId: Int = 0
     private var cachedServerCount: Int = 0
@@ -594,6 +596,17 @@ class NavigationActivity : ScopeActivity() {
                                 userName = username
                                 this.password = password
                             }
+
+                            // Fetch API key if available
+                            try {
+                                val loginResponse = mumaClient.login(stableServer.url, username, password)
+                                if (loginResponse != null) {
+                                    stableServer.apiKey = loginResponse.api_key
+                                    Timber.i("Fetched API key for LMS (stable)")
+                                }
+                            } catch (e: Exception) {
+                                Timber.w(e, "Could not fetch API key from MuMa for stable")
+                            }
                             servers.add(stableServer)
 
                             if (BuildConfig.DEBUG) {
@@ -602,6 +615,16 @@ class NavigationActivity : ScopeActivity() {
                                     url = "http://lms-alpha.teunschriks.nl"
                                     userName = username
                                     this.password = password
+                                }
+                                // Try fetching API key for Alpha as well
+                                try {
+                                    val loginResponse = mumaClient.login(alphaServer.url, username, password)
+                                    if (loginResponse != null) {
+                                        alphaServer.apiKey = loginResponse.api_key
+                                        Timber.i("Fetched API key for LMS (Alpha)")
+                                    }
+                                } catch (e: Exception) {
+                                    Timber.w(e, "Could not fetch API key from MuMa for alpha")
                                 }
                                 servers.add(alphaServer)
                             }

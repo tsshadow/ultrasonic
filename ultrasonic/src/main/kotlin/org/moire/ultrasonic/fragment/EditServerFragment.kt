@@ -34,10 +34,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.data.ActiveServerProvider
+import org.moire.ultrasonic.data.MumaClient
 import org.moire.ultrasonic.data.ServerSetting
 import org.moire.ultrasonic.model.EditServerModel
 import org.moire.ultrasonic.model.ServerSettingsModel
@@ -58,6 +60,7 @@ class EditServerFragment : Fragment() {
 
     private val serverSettingsModel: ServerSettingsModel by viewModel()
     private val activeServerProvider: ActiveServerProvider by inject()
+    private val mumaClient: MumaClient by inject()
 
     private var currentServerSetting: ServerSetting? = null
 
@@ -421,6 +424,30 @@ class EditServerFragment : Fragment() {
 
         val testJob = lifecycleScope.launch {
             try {
+                // Try fetching API key if it's an LMS server and key is empty
+                if (currentServerSetting!!.apiKey.isNullOrEmpty() &&
+                    currentServerSetting!!.url.contains("lms")
+                ) {
+                    try {
+                        val loginResponse = withContext(Dispatchers.IO) {
+                            mumaClient.login(
+                                currentServerSetting!!.url,
+                                currentServerSetting!!.userName,
+                                currentServerSetting!!.password
+                            )
+                        }
+                        if (loginResponse != null) {
+                            currentServerSetting!!.apiKey = loginResponse.api_key
+                            withContext(Dispatchers.Main) {
+                                apiKeyEditText!!.editText?.setText(loginResponse.api_key)
+                            }
+                            Timber.i("Automatically fetched API key for LMS server")
+                        }
+                    } catch (e: Exception) {
+                        Timber.w(e, "Could not fetch API key from MuMa")
+                    }
+                }
+
                 val flow = model.queryFeatureSupport(currentServerSetting!!).flowOn(Dispatchers.IO)
 
                 flow.collect {

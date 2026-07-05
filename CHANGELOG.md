@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.2] - 2026-07-05
+
+### Changed
+- Version bump.
+
+## [6.3.1] - 2026-07-05
+
+### Added
+- **API Key Automation**: Automatically fetches Subsonic API keys for LMS servers during setup and connection testing.
+
 ## [6.3.0] - 2026-07-05
 
 ### Added
