@@ -414,6 +414,8 @@
     <string name="settings.debug.log_keep">Keep files</string>
     <string name="settings.debug.log_delete">Delete files</string>
     <string name="settings.debug.log_deleted">Deleted log files.</string>
+    <string name="settings.debug.share_log">Share debug log</string>
+    <string name="settings.debug.view_log">View debug log</string>
     <string name="notification.downloading_title">Downloading media in the background…</string>
     <string name="notification.permission_required">Notifications are required for media playback. You can grant the permission anytime in the Android settings.</string>
     <string name="server_selector.label">Configured servers</string>
@@ -553,4 +555,6 @@
     <string name="welcome_login_info">What is your login information?</string>
     <string name="welcome_username">Name</string>
     <string name="welcome_password">Password</string>
+    <string name="welcome_fields_required">Username and password are required</string>
+    <string name="welcome_connection_failed">Could not connect to LMS. Please check your credentials.</string>
 </resources>

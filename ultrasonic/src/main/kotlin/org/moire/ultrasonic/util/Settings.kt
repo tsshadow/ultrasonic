@@ -12,6 +12,7 @@ import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import java.util.regex.Pattern
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.app.UApp
 
 /**
@@ -190,7 +191,7 @@ object Settings {
     var showNowPlayingDetails
         by BooleanSetting(getKey(R.string.setting_key_show_now_playing_details), false)
 
-    var scrobbleEnabled by BooleanSetting(getKey(R.string.setting_key_scrobble), false)
+    var scrobbleEnabled by BooleanSetting(getKey(R.string.setting_key_scrobble), true)
 
     // Normally you don't need to use these Settings directly,
     // use ActiveServerProvider.isID3Enabled() instead
@@ -265,14 +266,17 @@ object Settings {
         }
 
     @JvmStatic
-    var debugLogToFile by BooleanSetting(getKey(R.string.setting_key_debug_log_to_file), false)
+    var debugLogToFile by BooleanSetting(
+        getKey(R.string.setting_key_debug_log_to_file),
+        BuildConfig.DEBUG
+    )
 
     @JvmStatic
     val overrideLanguage by StringSetting(getKey(R.string.setting_key_override_language), "")
 
     var useFiveStarRating by BooleanSetting(
         getKey(R.string.setting_key_use_five_star_rating),
-        false
+        true
     )
 
     var useHwOffload by BooleanSetting(getKey(R.string.setting_key_hardware_offload), false)

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import android.content.res.ColorStateList
 import com.google.gson.Gson
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,6 +28,8 @@ import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
 import org.moire.ultrasonic.domain.Tag
 import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
+import org.moire.ultrasonic.service.RxBus
+import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Util.applyTheme
 import org.moire.ultrasonic.util.toastingExceptionHandler
@@ -47,6 +50,7 @@ abstract class SelectFragment :
     override var swipeRefresh: SwipeRefreshLayout? = null
 
     private lateinit var toggleFiltersButton: ImageButton
+    private var rxBusSubscription = CompositeDisposable()
 
     private var tiles = mutableListOf<TileInfo>()
     private var lastEditedTilePosition: Int? = null
@@ -74,11 +78,36 @@ abstract class SelectFragment :
 
         swipeRefresh?.setOnRefreshListener { load(true) }
 
-        loadTilesOrDefaults()
-        populateTiles()
-        setTitle()
-        updateBrandColors()
-        load(false)
+        // Subscribe to server changes to reload tiles
+        rxBusSubscription += RxBus.activeServerChangedObservable.subscribe {
+            Timber.d("Active server changed, reloading tiles for $pageKey")
+            loadTilesOrDefaults()
+            populateTiles()
+            loadTilesFromServer()
+            load(false)
+        }
+
+        val isFirstRun = org.moire.ultrasonic.app.UApp.instance?.isFirstRun ?: false
+        val activeServerId = org.moire.ultrasonic.util.Settings.activeServer
+
+        // If it's the first run and no server is active yet, don't load defaults yet.
+        // We wait for the welcome dialog to finish and trigger activeServerChangedObservable.
+        if (isFirstRun && activeServerId <= 0) {
+            Timber.d("First run and no server active, waiting for configuration...")
+            setTitle()
+            updateBrandColors()
+        } else {
+            loadTilesOrDefaults()
+            populateTiles()
+            setTitle()
+            updateBrandColors()
+            load(false)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        rxBusSubscription.clear()
     }
 
     /**

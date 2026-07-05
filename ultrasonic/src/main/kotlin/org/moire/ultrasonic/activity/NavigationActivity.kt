@@ -22,6 +22,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -552,61 +554,117 @@ class NavigationActivity : ScopeActivity() {
             val view = LayoutInflater.from(this).inflate(R.layout.dialog_welcome, null)
             val usernameField = view.findViewById<TextInputEditText>(R.id.welcome_username)
             val passwordField = view.findViewById<TextInputEditText>(R.id.welcome_password)
+            val progressBar = view.findViewById<ProgressBar>(R.id.welcome_progress)
+            val errorText = view.findViewById<TextView>(R.id.welcome_error)
 
-            MaterialAlertDialogBuilder(this)
+            val dialog = MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.welcome_title)
                 .setView(view)
                 .setCancelable(false)
-                .setPositiveButton(R.string.common_ok) { dialog, _ ->
-                    val username = usernameField.text.toString()
-                    val password = passwordField.text.toString()
+                .setPositiveButton(R.string.common_ok, null)
+                .create()
 
-                    UApp.instance!!.setupDialogDisplayed = true
+            dialog.show()
 
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val servers = mutableListOf<ServerSetting>()
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val username = usernameField.text.toString()
+                val password = passwordField.text.toString()
 
-                        // Always add stable
-                        val stableServer = ServerSetting().apply {
-                            name = "LMS (stable)"
-                            url = "http://lms.teunschriks.nl"
-                            userName = username
-                            this.password = password
-                        }
-                        servers.add(stableServer)
+                if (username.isBlank() || password.isBlank()) {
+                    errorText.text = getString(R.string.welcome_fields_required)
+                    errorText.visibility = View.VISIBLE
+                    return@setOnClickListener
+                }
 
-                        if (BuildConfig.DEBUG) {
-                            val alphaServer = ServerSetting().apply {
-                                name = "LMS (Alpha)"
-                                url = "http://lms-alpha.teunschriks.nl"
+                progressBar.visibility = View.VISIBLE
+                errorText.visibility = View.GONE
+                usernameField.isEnabled = false
+                passwordField.isEnabled = false
+                dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).isEnabled = false
+
+                lifecycleScope.launch {
+                    val result = withContext(Dispatchers.IO) {
+                        try {
+                            val servers = mutableListOf<ServerSetting>()
+
+                            // Always add stable
+                            val stableServer = ServerSetting().apply {
+                                name = "LMS (stable)"
+                                url = "http://lms.teunschriks.nl"
                                 userName = username
                                 this.password = password
                             }
-                            servers.add(alphaServer)
-                        }
+                            servers.add(stableServer)
 
-                        // Save servers
-                        val maxIndex = serverRepository.getMaxIndex() ?: -1
-                        servers.forEachIndexed { i, server ->
-                            server.index = maxIndex + 1 + i
-                        }
-                        serverRepository.insert(*servers.toTypedArray())
-
-                        // Connect to the preferred one (Alpha for debug, Stable for release)
-                        val targetServerName = if (BuildConfig.DEBUG) "LMS (Alpha)" else "LMS (stable)"
-                        val targetServerUrl =
-                            if (BuildConfig.DEBUG) "http://lms-alpha.teunschriks.nl" else "http://lms.teunschriks.nl"
-
-                        val activeServer =
-                            serverRepository.findByNameAndUrl(targetServerName, targetServerUrl)
-                        activeServer?.let {
-                            withContext(Dispatchers.Main) {
-                                activeServerProvider.setActiveServerById(it.id)
+                            if (BuildConfig.DEBUG) {
+                                val alphaServer = ServerSetting().apply {
+                                    name = "LMS (Alpha)"
+                                    url = "http://lms-alpha.teunschriks.nl"
+                                    userName = username
+                                    this.password = password
+                                }
+                                servers.add(alphaServer)
                             }
+
+                            // Save servers
+                            val maxIndex = serverRepository.getMaxIndex() ?: -1
+                            servers.forEachIndexed { i, server ->
+                                server.index = maxIndex + 1 + i
+                            }
+                            serverRepository.insert(*servers.toTypedArray())
+
+                            // Connect to the preferred one (Alpha for debug, Stable for release)
+                            val targetServerName = if (BuildConfig.DEBUG) "LMS (Alpha)" else "LMS (stable)"
+                            val targetServerUrl =
+                                if (BuildConfig.DEBUG) "http://lms-alpha.teunschriks.nl" else "http://lms.teunschriks.nl"
+
+                            val activeServer =
+                                serverRepository.findByNameAndUrl(targetServerName, targetServerUrl)
+
+                            if (activeServer != null) {
+                                withContext(Dispatchers.Main) {
+                                    activeServerProvider.setActiveServerById(activeServer.id)
+                                }
+
+                                // Now test connection
+                                val musicService = MusicServiceFactory.getMusicService()
+                                musicService.ping()
+                                true
+                            } else {
+                                false
+                            }
+                        } catch (e: Exception) {
+                            Timber.e(e, "Connection test failed")
+                            // Clean up on failure so we don't have partial/broken servers
+                            val targetServerName = if (BuildConfig.DEBUG) "LMS (Alpha)" else "LMS (stable)"
+                            val targetServerUrl =
+                                if (BuildConfig.DEBUG) "http://lms-alpha.teunschriks.nl" else "http://lms.teunschriks.nl"
+                            serverRepository.findByNameAndUrl(targetServerName, targetServerUrl)?.let {
+                                serverRepository.delete(it)
+                            }
+                            // Also delete the other one
+                            val otherName = if (BuildConfig.DEBUG) "LMS (stable)" else "LMS (Alpha)"
+                            val otherUrl = if (BuildConfig.DEBUG) "http://lms.teunschriks.nl" else "http://lms-alpha.teunschriks.nl"
+                            serverRepository.findByNameAndUrl(otherName, otherUrl)?.let {
+                                serverRepository.delete(it)
+                            }
+                            false
                         }
                     }
-                    dialog.dismiss()
-                }.show()
+
+                    if (result) {
+                        UApp.instance!!.setupDialogDisplayed = true
+                        dialog.dismiss()
+                    } else {
+                        progressBar.visibility = View.GONE
+                        errorText.text = getString(R.string.welcome_connection_failed)
+                        errorText.visibility = View.VISIBLE
+                        usernameField.isEnabled = true
+                        passwordField.isEnabled = true
+                        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).isEnabled = true
+                    }
+                }
+            }
         }
     }
 

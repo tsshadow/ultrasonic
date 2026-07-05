@@ -61,4 +61,6 @@
     <string name="setting_key.last_synced_version" translatable="false">lastSyncedVersion</string>
     <string name="setting_key.muma_api_key" translatable="false">mumaApiKey</string>
     <string name="setting_key.muma_user_id" translatable="false">mumaUserId</string>
+    <string name="setting_key.share_log" translatable="false">shareLog</string>
+    <string name="setting_key.view_log" translatable="false">viewLog</string>
 </resources>

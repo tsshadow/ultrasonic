@@ -44,5 +44,22 @@
             android:maxLines="1" />
 
     </com.google.android.material.textfield.TextInputLayout>
+    
+    <ProgressBar
+        android:id="@+id/welcome_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/welcome_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="?attr/colorError"
+        android:visibility="gone" />
 
 </LinearLayout>

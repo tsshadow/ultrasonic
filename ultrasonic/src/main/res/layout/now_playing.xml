@@ -82,7 +82,7 @@
             a:contentDescription="@string/buttons.play"
             a:focusable="false"
             app:icon="@drawable/media_pause"
-            app:iconTint="#FFFFFF"
+            app:iconTint="@color/spotify_green"
             app:iconSize="32dp" />
     </LinearLayout>
 </LinearLayout>

@@ -43,6 +43,7 @@ fi
 echo "--- Starting $BUILD_TYPE deployment of $APP_NAME ---"
 
 # 1. API Publish to apk-hoster (Preferred)
+APK_HOSTER_SUCCESS=false
 if [ -n "$APK_HOSTER_URL" ]; then
     echo "--- Uploading to apk-hoster: $APK_HOSTER_URL ---"
     
@@ -59,11 +60,6 @@ if [ -n "$APK_HOSTER_URL" ]; then
         
         echo "Uploading $filename..."
         
-        # Use curl to upload
-        # -F "apk=@$LATEST_APK"
-        # -F "release_notes=$release_notes"
-        # -F "password=$APK_HOSTER_PASSWORD"
-        
         RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$APK_HOSTER_URL/api/add-apk" \
             -H "X-Upload-Password: $APK_HOSTER_PASSWORD" \
             -F "apk=@$LATEST_APK" \
@@ -74,46 +70,58 @@ if [ -n "$APK_HOSTER_URL" ]; then
         
         if [ "$HTTP_CODE" -eq 200 ]; then
             echo "Successfully uploaded to apk-hoster: $BODY"
+            APK_HOSTER_SUCCESS=true
         else
             echo "Error: Upload to apk-hoster failed with status $HTTP_CODE"
             echo "Response: $BODY"
-            # Fallback to SCP if API fails
         fi
     else
         echo "Warning: No APK found in $DIST_DIR to upload via API."
     fi
 fi
 
-# 2. Remote Publish via SCP (Backup/Fallback)
-if [ -n "$PUBLISH_REMOTE_PATH" ]; then
-    echo "--- Syncing to remote server: $PUBLISH_REMOTE_PATH ---"
+# 2. Fallback logic
+if [ "$APK_HOSTER_SUCCESS" = false ]; then
+    echo "--- APK Hoster failed or skipped, falling back to storage locations ---"
     
-    # Check if PUBLISH_REMOTE_PATH is local or remote
-    if [[ "$PUBLISH_REMOTE_PATH" == *":"* ]]; then
-        # Remote path (user@host:path)
-        REMOTE_HOST_ONLY=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f1)
-        REMOTE_PATH_ONLY=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f2-)
+    # Check local path first
+    LOCAL_FALLBACK=""
+    if [ -d "/mnt/teun/ultrasonic-builds" ]; then
+        LOCAL_FALLBACK="/mnt/teun/ultrasonic-builds"
+    elif [ -d "/mnt/teun/ultrasonic_builds" ]; then
+        LOCAL_FALLBACK="/mnt/teun/ultrasonic_builds"
+    fi
+
+    if [ -n "$LOCAL_FALLBACK" ] && [ "$LOCAL_FALLBACK" != "$DIST_DIR" ]; then
+        echo "Falling back to LOCAL storage: $LOCAL_FALLBACK"
+        mkdir -p "$LOCAL_FALLBACK"
+        cp -r "$DIST_DIR/"* "$LOCAL_FALLBACK/"
+        echo "Successfully copied to local storage."
+    elif [ -n "$PUBLISH_REMOTE_PATH" ]; then
+        # Remote fallback
+        echo "Falling back to REMOTE storage: $PUBLISH_REMOTE_PATH"
         
-        echo "Ensuring remote directory exists: $REMOTE_PATH_ONLY"
-        if [ -z "${REMOTE_PASS}" ]; then
-            ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
-            scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
-        elif command -v sshpass >/dev/null 2>&1; then
-            sshpass -p "${REMOTE_PASS}" ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
-            sshpass -p "${REMOTE_PASS}" scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
-        else
-            ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
-            scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+        if [[ "$PUBLISH_REMOTE_PATH" == *":"* ]]; then
+            # Remote path (user@host:path)
+            REMOTE_HOST_ONLY=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f1)
+            REMOTE_PATH_ONLY=$(echo "$PUBLISH_REMOTE_PATH" | cut -d':' -f2-)
+            
+            echo "Ensuring remote directory exists: $REMOTE_PATH_ONLY"
+            if [ -z "${REMOTE_PASS}" ]; then
+                ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
+                scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+            elif command -v sshpass >/dev/null 2>&1; then
+                sshpass -p "${REMOTE_PASS}" ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
+                sshpass -p "${REMOTE_PASS}" scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+            else
+                ssh -o StrictHostKeyChecking=no "$REMOTE_HOST_ONLY" "mkdir -p $REMOTE_PATH_ONLY"
+                scp -o StrictHostKeyChecking=no "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
+            fi
+            echo "Successfully synced to remote storage."
         fi
     else
-        # Local path
-        if [ "$PUBLISH_REMOTE_PATH" != "$DIST_DIR" ]; then
-            echo "Copying to local path: $PUBLISH_REMOTE_PATH"
-            mkdir -p "$PUBLISH_REMOTE_PATH"
-            cp -r "$DIST_DIR/"* "$PUBLISH_REMOTE_PATH/"
-        else
-            echo "Note: PUBLISH_REMOTE_PATH matches DIST_DIR, skipping local copy."
-        fi
+        echo "Error: Both APK Hoster and fallbacks failed/unavailable."
+        exit 1
     fi
 fi
 

@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.0] - 2026-07-05
+
+### Added
+- **Welcome Dialog**: New users are now greeted with a setup wizard to enter login credentials.
+- **Auto-Server Discovery**: Automatically configures Alpha and Stable LMS servers based on build type.
+- **Connection Validation**: Real-time server ping during setup to ensure correct credentials.
+- **Dynamic Playlists (Tiles)**: Support for server-side dynamic playlists synced with LMS and Music Management.
+- **Debug Features**: Share and view debug logs directly from settings in debug builds.
+- **ListenBrainz**: Scrobbling is now enabled by default.
+
+### Changed
+- **UI Improvements**: Significant visibility improvements to player controls, including a green pause button.
+- **Landscape Player**: Optimized player layout for landscape mode with scrollable controls.
+- **Tile Loading**: Delayed initial tile loading until server connection is established.
+- **Deployment**: Improved APK distribution with robust fallbacks.
+- **Default Settings**: 5-star rating system enabled by default.
+
+## [6.2.0-166] - 2026-07-05
+
+### Changed
+- Version bump.
+
+## [6.2.0-165] - 2026-07-05
+
+### Changed
+- Version bump.
+
+## [6.2.0-164] - 2026-07-05
+
+### Changed
+- Version bump.
+
 ## [6.2.0-163] - 2026-07-05
 
 ### Changed

@@ -198,7 +198,7 @@ class FileLoggerTree :
             }
         }
 
-        private fun getLogFileList(): Array<out File>? {
+        fun getLogFileList(): Array<out File>? {
             val directory = FileUtil.ultrasonicDirectory
             return directory.listFiles { t -> t.name.matches(fileNameRegex) }
         }

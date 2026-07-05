@@ -364,6 +364,8 @@
     <string name="settings.debug.log_keep">Behouden</string>
     <string name="settings.debug.log_delete">Verwijderen</string>
     <string name="settings.debug.log_deleted">De logboeken zijn verwijderd.</string>
+    <string name="settings.debug.share_log">Foutsporendagboek delen</string>
+    <string name="settings.debug.view_log">Foutsporendagboek bekijken</string>
     <string name="notification.downloading_title">Bezig met downloaden van media op de achtergrond…</string>
     <string name="notification.permission_required">Meldingen zijn vereist voor het afspelen van media. Je kunt dit recht te allen tijde verlenen in de Android-instellingen.</string>
     <string name="server_selector.label">Ingestelde servers:</string>
@@ -476,4 +478,6 @@
     <string name="welcome_login_info">Wat zijn je inloggegevens?</string>
     <string name="welcome_username">Naam</string>
     <string name="welcome_password">Wachtwoord</string>
+    <string name="welcome_fields_required">Gebruikersnaam en wachtwoord zijn verplicht</string>
+    <string name="welcome_connection_failed">Kon geen verbinding maken met LMS. Controleer je gegevens.</string>
 </resources>

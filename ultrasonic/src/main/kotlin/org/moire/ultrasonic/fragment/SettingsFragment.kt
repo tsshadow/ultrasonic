@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.provider.SearchRecentSuggestions
 import android.view.View
 import androidx.annotation.StringRes
+import androidx.core.content.FileProvider
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
@@ -25,10 +26,12 @@ import java.io.File
 import kotlin.math.ceil
 import org.koin.core.component.KoinComponent
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.fragment.FragmentTitle.setTitle
 import org.moire.ultrasonic.log.FileLoggerTree
 import org.moire.ultrasonic.log.FileLoggerTree.Companion.deleteLogFiles
+import org.moire.ultrasonic.log.FileLoggerTree.Companion.getLogFileList
 import org.moire.ultrasonic.log.FileLoggerTree.Companion.getLogFileNumber
 import org.moire.ultrasonic.log.FileLoggerTree.Companion.getLogFileSizes
 import org.moire.ultrasonic.log.FileLoggerTree.Companion.plantToTimberForest
@@ -86,6 +89,7 @@ class SettingsFragment :
         customCacheLocation = findPreference(getString(R.string.setting_key_custom_cache_location))
         cacheLocation = findPreference(getString(R.string.setting_key_cache_location))
 
+        setupDebugPreferences()
         setupClearSearchPreference()
         setupCacheLocationPreference()
         setupBluetoothDevicePreferences()
@@ -289,6 +293,73 @@ class SettingsFragment :
             getString(R.string.settings_playback_bluetooth_disabled)
         }
         else -> ""
+    }
+
+    private fun setupDebugPreferences() {
+        val debugCategory = findPreference<androidx.preference.PreferenceCategory>("settings.debug.category")
+        if (!BuildConfig.DEBUG) {
+            debugCategory?.isVisible = false
+        } else {
+            findPreference<Preference>(getString(R.string.setting_key_view_log))?.onPreferenceClickListener =
+                Preference.OnPreferenceClickListener {
+                    viewLog()
+                    true
+                }
+            findPreference<Preference>(getString(R.string.setting_key_share_log))?.onPreferenceClickListener =
+                Preference.OnPreferenceClickListener {
+                    shareLog()
+                    true
+                }
+        }
+    }
+
+    private fun shareLog() {
+        val logFiles = getLogFileList()
+        if (logFiles.isNullOrEmpty()) {
+            toast(R.string.settings_debug_log_deleted)
+            return
+        }
+        logFiles.sortByDescending { it.lastModified() }
+        val latestLog = logFiles[0]
+
+        val uri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.fileprovider",
+            latestLog
+        )
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(intent, getString(R.string.settings_debug_share_log)))
+    }
+
+    private fun viewLog() {
+        val logFiles = getLogFileList()
+        if (logFiles.isNullOrEmpty()) {
+            toast(R.string.settings_debug_log_deleted)
+            return
+        }
+        logFiles.sortByDescending { it.lastModified() }
+        val latestLog = logFiles[0]
+
+        val uri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.fileprovider",
+            latestLog
+        )
+
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "text/plain")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            toast("No app found to view log file")
+        }
     }
 
     private fun setupClearSearchPreference() {

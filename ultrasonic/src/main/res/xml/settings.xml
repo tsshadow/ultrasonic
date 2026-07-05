@@ -305,7 +305,7 @@
         a:title="@string/settings.other_title"
         app:iconSpaceReserved="false">
         <CheckBoxPreference
-            a:defaultValue="false"
+            a:defaultValue="true"
             a:key="@string/setting_key.scrobble"
             a:summary="@string/settings.scrobble_summary"
             a:title="@string/settings.scrobble_title"
@@ -332,6 +332,7 @@
             app:iconSpaceReserved="false"/>
     </PreferenceCategory>
     <PreferenceCategory
+        a:key="settings.debug.category"
         a:title="@string/settings.debug.title"
         app:iconSpaceReserved="false">
         <CheckBoxPreference
@@ -339,6 +340,14 @@
             a:key="@string/setting_key.debug_log_to_file"
             a:title="@string/settings.debug.log_to_file"
             a:summary=""
+            app:iconSpaceReserved="false"/>
+        <Preference
+            a:key="@string/setting_key.view_log"
+            a:title="@string/settings.debug.view_log"
+            app:iconSpaceReserved="false"/>
+        <Preference
+            a:key="@string/setting_key.share_log"
+            a:title="@string/settings.debug.share_log"
             app:iconSpaceReserved="false"/>
     </PreferenceCategory>
 
