@@ -1,8 +1,4 @@
 ## [6.3.2] - 2026-07-05
-### Changed
-- Version bump.
-
-## [6.3.1] - 2026-07-05
 ### Added
 - **API Key Automation**: Automatically fetches Subsonic API keys for LMS servers during setup and connection testing.
 
