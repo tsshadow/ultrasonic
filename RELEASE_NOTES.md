@@ -1,6 +1,6 @@
 ## [6.3.3] - 2026-07-05
 ### Changed
-- Version bump.
+- **LMS API Key**: Replaced dynamic API key fetching with a hardcoded Subsonic API key for LMS servers for simplified setup.
 
 ## [6.3.2] - 2026-07-05
 ### Added
