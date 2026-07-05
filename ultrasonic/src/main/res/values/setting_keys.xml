@@ -63,4 +63,6 @@
     <string name="setting_key.muma_user_id" translatable="false">mumaUserId</string>
     <string name="setting_key.share_log" translatable="false">shareLog</string>
     <string name="setting_key.view_log" translatable="false">viewLog</string>
+    <string name="setting_key.save_to_muma" translatable="false">saveToMuma</string>
+    <string name="setting_key.load_from_muma" translatable="false">loadFromMuma</string>
 </resources>

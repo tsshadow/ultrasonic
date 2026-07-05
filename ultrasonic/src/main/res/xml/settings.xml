@@ -332,7 +332,32 @@
             app:iconSpaceReserved="false"/>
     </PreferenceCategory>
     <PreferenceCategory
-        a:key="settings.debug.category"
+        a:title="@string/settings.muma_sync_title"
+        app:iconSpaceReserved="false">
+        <EditTextPreference
+            a:key="@string/setting_key.muma_user_id"
+            a:title="@string/settings.muma_user_id_title"
+            a:summary="@string/settings.muma_user_id_summary"
+            a:inputType="number"
+            app:iconSpaceReserved="false"/>
+        <EditTextPreference
+            a:key="@string/setting_key.muma_api_key"
+            a:title="@string/settings.muma_api_key_title"
+            a:summary="@string/settings.muma_api_key_summary"
+            app:iconSpaceReserved="false"/>
+        <Preference
+            a:key="@string/setting_key.save_to_muma"
+            a:title="@string/settings.save_to_muma_title"
+            a:summary="@string/settings.save_to_muma_summary"
+            app:iconSpaceReserved="false"/>
+        <Preference
+            a:key="@string/setting_key.load_from_muma"
+            a:title="@string/settings.load_from_muma_title"
+            a:summary="@string/settings.load_from_muma_summary"
+            app:iconSpaceReserved="false"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
         a:title="@string/settings.debug.title"
         app:iconSpaceReserved="false">
         <CheckBoxPreference

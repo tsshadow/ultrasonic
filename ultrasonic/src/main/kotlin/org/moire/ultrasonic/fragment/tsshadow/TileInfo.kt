@@ -186,3 +186,15 @@ fun org.moire.ultrasonic.domain.Playlist.toTileInfo(): TileInfo? {
         null
     }
 }
+
+fun org.moire.ultrasonic.domain.MumaTile.toTileInfo(): TileInfo? {
+    if (smartParams.isEmpty()) return null
+    return try {
+        Gson().fromJson(smartParams, TileInfo::class.java).apply {
+            this.id = this@toTileInfo.id
+            this.title = this@toTileInfo.name
+        }
+    } catch (e: Exception) {
+        null
+    }
+}

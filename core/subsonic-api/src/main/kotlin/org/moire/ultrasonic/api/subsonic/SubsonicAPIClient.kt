@@ -18,6 +18,7 @@ import org.moire.ultrasonic.api.subsonic.interceptors.ProxyPasswordInterceptor
 import org.moire.ultrasonic.api.subsonic.interceptors.RangeHeaderInterceptor
 import org.moire.ultrasonic.api.subsonic.interceptors.VersionInterceptor
 import org.moire.ultrasonic.api.subsonic.response.StreamResponse
+import org.moire.ultrasonic.api.muma.MumaAPIClient
 import retrofit2.Response
 import retrofit2.Retrofit
 
@@ -127,6 +128,10 @@ class SubsonicAPIClient(
     )
 
     val api: SubsonicAPIDefinition get() = wrappedApi
+
+    val mumaApi: MumaAPIClient by lazy {
+        MumaAPIClient(config.baseUrl, okHttpClient)
+    }
 
     private fun OkHttpClient.Builder.addLogging() {
         val loggingInterceptor = HttpLoggingInterceptor(okLogger)

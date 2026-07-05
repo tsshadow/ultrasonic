@@ -191,7 +191,12 @@ abstract class SelectFragment :
                     val tile = tileInfoFromFilterState(filterState)
                     lifecycleScope.launch(Dispatchers.IO) {
                         try {
-                            val id = getMusicService().createDynamicPlaylist(tile.title, tile.toSmartParamsJson())
+                            val id = getMusicService().saveMumaTile(
+                                org.moire.ultrasonic.domain.MumaTile(
+                                    name = tile.title,
+                                    smartParams = tile.toSmartParamsJson()
+                                )
+                            )
                             tile.id = id
                             withContext(Dispatchers.Main) {
                                 tileAdapter.addTile(tile)
@@ -215,7 +220,13 @@ abstract class SelectFragment :
                         lifecycleScope.launch(Dispatchers.IO) {
                             try {
                                 tile.id?.let { id ->
-                                    getMusicService().updateDynamicPlaylist(id, tile.title, tile.toSmartParamsJson())
+                                    getMusicService().saveMumaTile(
+                                        org.moire.ultrasonic.domain.MumaTile(
+                                            id = id,
+                                            name = tile.title,
+                                            smartParams = tile.toSmartParamsJson()
+                                        )
+                                    )
                                 }
                             } catch (e: Exception) {
                                 Timber.e(e, "Failed to update tile on server")
@@ -235,7 +246,7 @@ abstract class SelectFragment :
                         val tileId = tiles[pos].id
                         lifecycleScope.launch(Dispatchers.IO) {
                             try {
-                                tileId?.let { getMusicService().deletePlaylist(it) }
+                                tileId?.let { getMusicService().deleteMumaTile(it) }
                             } catch (e: Exception) {
                                 Timber.e(e, "Failed to delete tile from server")
                             }
@@ -308,8 +319,8 @@ abstract class SelectFragment :
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 if (!isOffline()) {
-                    val playlists = getMusicService().getPlaylists(true)
-                    val newTiles = playlists.mapNotNull { it.toTileInfo() }.toMutableList()
+                    val mumaTiles = getMusicService().getMumaTiles()
+                    val newTiles = mumaTiles.mapNotNull { it.toTileInfo() }.toMutableList()
                     if (newTiles.isNotEmpty()) {
                         withContext(Dispatchers.Main) {
                             tiles.clear()

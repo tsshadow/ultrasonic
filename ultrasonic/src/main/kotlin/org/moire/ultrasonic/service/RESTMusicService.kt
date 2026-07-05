@@ -31,6 +31,7 @@ import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lineup
 import org.moire.ultrasonic.domain.Lyrics
 import org.moire.ultrasonic.domain.Mood
+import org.moire.ultrasonic.domain.MumaTile
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.MusicFolder
 import org.moire.ultrasonic.domain.Playlist
@@ -763,6 +764,41 @@ open class RESTMusicService(
         }
 
         API.updateShare(id, description, expiresValue).execute().throwOnFailure()
+    }
+
+    @Throws(Exception::class)
+    override fun getMumaTiles(): List<MumaTile> {
+        val response = subsonicAPIClient.mumaApi.api.getTiles().execute()
+        if (!response.isSuccessful) throw IOException("Failed to get muma tiles: ${response.code()}")
+        return response.body()?.map { MumaTile(it.id, it.name, it.smartParams) } ?: emptyList()
+    }
+
+    @Throws(Exception::class)
+    override fun saveMumaTile(tile: MumaTile): String {
+        val apiTile = org.moire.ultrasonic.api.muma.MumaTile(tile.id, tile.name, tile.smartParams)
+        val response = subsonicAPIClient.mumaApi.api.saveTile(apiTile).execute()
+        if (!response.isSuccessful) throw IOException("Failed to save muma tile: ${response.code()}")
+        return response.body()?.id ?: throw IOException("Empty response from server")
+    }
+
+    @Throws(Exception::class)
+    override fun deleteMumaTile(id: String) {
+        val response = subsonicAPIClient.mumaApi.api.deleteTile(id).execute()
+        if (!response.isSuccessful) throw IOException("Failed to delete muma tile: ${response.code()}")
+    }
+
+    @Throws(Exception::class)
+    override fun getMumaSettings(userId: Int, appId: String): String? {
+        val response = subsonicAPIClient.mumaApi.api.getSettings(userId, appId).execute()
+        if (!response.isSuccessful) throw IOException("Failed to get settings: ${response.code()}")
+        return response.body()?.settings
+    }
+
+    @Throws(Exception::class)
+    override fun saveMumaSettings(userId: Int, appId: String, settings: String) {
+        val req = org.moire.ultrasonic.api.muma.MumaSettingsRequest(settings)
+        val response = subsonicAPIClient.mumaApi.api.saveSettings(userId, appId, req).execute()
+        if (!response.isSuccessful) throw IOException("Failed to save settings: ${response.code()}")
     }
 
     private val activeServerId: Int

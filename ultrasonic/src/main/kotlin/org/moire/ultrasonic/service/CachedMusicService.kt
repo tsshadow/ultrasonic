@@ -25,6 +25,7 @@ import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lineup
 import org.moire.ultrasonic.domain.Lyrics
 import org.moire.ultrasonic.domain.Mood
+import org.moire.ultrasonic.domain.MumaTile
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.MusicFolder
 import org.moire.ultrasonic.domain.Playlist
@@ -634,6 +635,31 @@ class CachedMusicService(private val musicService: MusicService) :
     @Throws(Exception::class)
     override fun updateShare(id: String, description: String?, expires: Long?) {
         musicService.updateShare(id, description, expires)
+    }
+
+    @Throws(Exception::class)
+    override fun getMumaTiles(): List<MumaTile> {
+        return musicService.getMumaTiles()
+    }
+
+    @Throws(Exception::class)
+    override fun saveMumaTile(tile: MumaTile): String {
+        return musicService.saveMumaTile(tile)
+    }
+
+    @Throws(Exception::class)
+    override fun deleteMumaTile(id: String) {
+        musicService.deleteMumaTile(id)
+    }
+
+    @Throws(Exception::class)
+    override fun getMumaSettings(userId: Int, appId: String): String? {
+        return musicService.getMumaSettings(userId, appId)
+    }
+
+    @Throws(Exception::class)
+    override fun saveMumaSettings(userId: Int, appId: String, settings: String) {
+        musicService.saveMumaSettings(userId, appId, settings)
     }
 
     companion object {

@@ -557,4 +557,15 @@
     <string name="welcome_password">Password</string>
     <string name="welcome_fields_required">Username and password are required</string>
     <string name="welcome_connection_failed">Could not connect to LMS. Please check your credentials.</string>
+    <string name="settings.muma_sync_title">MuMa Cloud Sync</string>
+    <string name="settings.save_to_muma_title">Save settings to MuMa</string>
+    <string name="settings.save_to_muma_summary">Backup your current settings to the MuMa server</string>
+    <string name="settings.load_from_muma_title">Load settings from MuMa</string>
+    <string name="settings.load_from_muma_summary">Restore settings from the MuMa server</string>
+    <string name="settings.muma_sync_success">Settings synchronized successfully</string>
+    <string name="settings.muma_sync_error">Failed to synchronize settings: %1$s</string>
+    <string name="settings.muma_user_id_title">MuMa User ID</string>
+    <string name="settings.muma_user_id_summary">Internal user ID for MuMa synchronization</string>
+    <string name="settings.muma_api_key_title">MuMa API Key</string>
+    <string name="settings.muma_api_key_summary">API Key for MuMa authentication</string>
 </resources>

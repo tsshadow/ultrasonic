@@ -19,6 +19,7 @@ import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lineup
 import org.moire.ultrasonic.domain.Lyrics
 import org.moire.ultrasonic.domain.Mood
+import org.moire.ultrasonic.domain.MumaTile
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.MusicFolder
 import org.moire.ultrasonic.domain.Playlist
@@ -266,4 +267,18 @@ interface MusicService {
 
     @Throws(Exception::class)
     fun getPodcastEpisodes(podcastChannelId: String?): MusicDirectory?
+    @Throws(Exception::class)
+    fun getMumaTiles(): List<MumaTile>
+
+    @Throws(Exception::class)
+    fun saveMumaTile(tile: MumaTile): String
+
+    @Throws(Exception::class)
+    fun deleteMumaTile(id: String)
+
+    @Throws(Exception::class)
+    fun getMumaSettings(userId: Int, appId: String): String?
+
+    @Throws(Exception::class)
+    fun saveMumaSettings(userId: Int, appId: String, settings: String)
 }

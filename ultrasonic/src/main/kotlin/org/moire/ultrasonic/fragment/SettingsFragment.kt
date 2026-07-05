@@ -22,6 +22,12 @@ import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
+import androidx.lifecycle.lifecycleScope
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.ceil
 import org.koin.core.component.KoinComponent
@@ -93,6 +99,7 @@ class SettingsFragment :
         setupClearSearchPreference()
         setupCacheLocationPreference()
         setupBluetoothDevicePreferences()
+        setupMumaSyncPrefs()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -422,6 +429,98 @@ class SettingsFragment :
         DownloadService.clearDownloads()
         Storage.reset()
         Storage.checkForErrorsWithCustomRoot()
+    }
+
+    private fun setupMumaSyncPrefs() {
+        findPreference<Preference>(getString(R.string.setting_key_save_to_muma))?.onPreferenceClickListener =
+            Preference.OnPreferenceClickListener {
+                saveSettingsToMuma()
+                true
+            }
+        findPreference<Preference>(getString(R.string.setting_key_load_from_muma))?.onPreferenceClickListener =
+            Preference.OnPreferenceClickListener {
+                loadSettingsFromMuma()
+                true
+            }
+    }
+
+    private fun saveSettingsToMuma() {
+        val userId = Settings.mumaUserId
+        if (userId == -1) {
+            toast("MuMa User ID not set. Please check your MuMa server settings.")
+            return
+        }
+
+        lifecycleScope.launch {
+            try {
+                val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                val allPrefs = prefs.all
+                val json = Gson().toJson(allPrefs)
+
+                withContext(Dispatchers.IO) {
+                    org.moire.ultrasonic.service.MusicServiceFactory.getMusicService()
+                        .saveMumaSettings(userId, "ultrasonic", json)
+                }
+                toast(R.string.settings_muma_sync_success)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to save settings to MuMa")
+                toast(getString(R.string.settings_muma_sync_error, e.message))
+            }
+        }
+    }
+
+    private fun loadSettingsFromMuma() {
+        val userId = Settings.mumaUserId
+        if (userId == -1) {
+            toast("MuMa User ID not set. Please check your MuMa server settings.")
+            return
+        }
+
+        lifecycleScope.launch {
+            try {
+                val json = withContext(Dispatchers.IO) {
+                    org.moire.ultrasonic.service.MusicServiceFactory.getMusicService()
+                        .getMumaSettings(userId, "ultrasonic")
+                }
+
+                if (json != null) {
+                    val allPrefs = Gson().fromJson(json, Map::class.java)
+                    val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    val editor = prefs.edit()
+
+                    allPrefs.forEach { (key, value) ->
+                        val k = key as String
+                        when (value) {
+                            is Boolean -> editor.putBoolean(k, value)
+                            is Float -> editor.putFloat(k, value)
+                            is Int -> editor.putInt(k, value)
+                            is Long -> editor.putLong(k, value)
+                            is Double -> {
+                                // Gson often parses numbers as Double
+                                if (value == value.toInt().toDouble()) {
+                                    editor.putInt(k, value.toInt())
+                                } else {
+                                    editor.putFloat(k, value.toFloat())
+                                }
+                            }
+                            is String -> editor.putString(k, value)
+                        }
+                    }
+                    editor.apply()
+                    toast(R.string.settings_muma_sync_success)
+
+                    ConfirmationDialog.Builder(requireContext())
+                        .setMessage("Settings restored successfully. Please restart the app to apply all changes.")
+                        .setPositiveButton(R.string.common_ok) { d, _ -> d.dismiss() }
+                        .create().show()
+                } else {
+                    toast("No settings found on MuMa server")
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to load settings from MuMa")
+                toast(getString(R.string.settings_muma_sync_error, e.message))
+            }
+        }
     }
 
     private fun setDebugLogToFile(writeLog: Boolean) {

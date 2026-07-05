@@ -37,6 +37,7 @@ import org.moire.ultrasonic.domain.JukeboxStatus
 import org.moire.ultrasonic.domain.Lineup
 import org.moire.ultrasonic.domain.Lyrics
 import org.moire.ultrasonic.domain.Mood
+import org.moire.ultrasonic.domain.MumaTile
 import org.moire.ultrasonic.domain.MusicDirectory
 import org.moire.ultrasonic.domain.MusicFolder
 import org.moire.ultrasonic.domain.Playlist
@@ -646,6 +647,26 @@ class OfflineMusicService :
 
     @Throws(OfflineException::class)
     override fun getPodcastEpisodes(podcastChannelId: String?): MusicDirectory? = throw OfflineException("getPodcastEpisodes isn't available in offline mode")
+
+    override fun getMumaTiles(): List<MumaTile> {
+        return emptyList()
+    }
+
+    override fun saveMumaTile(tile: MumaTile): String {
+        return ""
+    }
+
+    override fun deleteMumaTile(id: String) {
+        // No-op
+    }
+
+    override fun getMumaSettings(userId: Int, appId: String): String? {
+        return null
+    }
+
+    override fun saveMumaSettings(userId: Int, appId: String, settings: String) {
+        // No-op
+    }
 
     @Throws(OfflineException::class)
     override fun getDownloadInputStream(
