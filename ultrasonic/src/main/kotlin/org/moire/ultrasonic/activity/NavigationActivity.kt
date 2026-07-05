@@ -11,6 +11,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.content.res.Resources
 import android.media.AudioManager
 import android.os.Bundle
@@ -47,6 +48,7 @@ import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
@@ -106,6 +108,7 @@ class NavigationActivity : ScopeActivity() {
     private var selectServerButton: MaterialButton? = null
     private var dropDownButton: ImageView? = null
     private var headerBackgroundImage: ImageView? = null
+    var setsToggle: MaterialSwitch? = null
 
     // We store the last search string in this variable.
     // Seems a bit like a hack, is there a better way?
@@ -260,6 +263,20 @@ class NavigationActivity : ScopeActivity() {
     private val searchMenuProvider: MenuProvider = object : MenuProvider {
         override fun onPrepareMenu(menu: Menu) {
             setupSearchField(menu)
+            val setsToggleItem = menu.findItem(R.id.action_sets_toggle)
+            setsToggle = setsToggleItem?.actionView?.findViewById(R.id.switch_sets)
+
+            setsToggle?.let { toggle ->
+                toggle.setOnCheckedChangeListener(null)
+                toggle.isChecked = Settings.isSetsMode
+                updateSetsToggleColors(toggle, Settings.isSetsMode)
+
+                toggle.setOnCheckedChangeListener { _, isChecked ->
+                    Settings.isSetsMode = isChecked
+                    updateSetsToggleColors(toggle, isChecked)
+                    RxBus.setsModeChangedPublisher.onNext(isChecked)
+                }
+            }
         }
 
         override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
@@ -267,6 +284,27 @@ class NavigationActivity : ScopeActivity() {
         }
 
         override fun onMenuItemSelected(item: MenuItem): Boolean = false
+    }
+
+    private fun updateSetsToggleColors(toggle: MaterialSwitch, isSets: Boolean) {
+        val brandColor = if (isSets) {
+            getColor(R.color.spotify_blue)
+        } else {
+            getColor(R.color.spotify_green)
+        }
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_checked),
+            intArrayOf(-android.R.attr.state_checked)
+        )
+        val thumbColors = intArrayOf(brandColor, Color.WHITE)
+        val trackColors = intArrayOf(brandColor.withAlpha(0x80), Color.DKGRAY)
+
+        toggle.thumbTintList = ColorStateList(states, thumbColors)
+        toggle.trackTintList = ColorStateList(states, trackColors)
+    }
+
+    private fun Int.withAlpha(alpha: Int): Int {
+        return (this and 0x00FFFFFF) or (alpha shl 24)
     }
 
     fun setupSearchField(menu: Menu) {

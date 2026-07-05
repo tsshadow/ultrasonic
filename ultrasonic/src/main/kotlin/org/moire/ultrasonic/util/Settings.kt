@@ -37,12 +37,6 @@ object Settings {
     )
 
     @JvmStatic
-    var isSetsModeTiles by BooleanSetting(
-        "isSetsModeTiles",
-        false
-    )
-
-    @JvmStatic
     var lastSyncedVersion by IntSetting(
         getKey(R.string.setting_key_last_synced_version),
         0

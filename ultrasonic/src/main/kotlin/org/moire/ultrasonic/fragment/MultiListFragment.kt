@@ -32,6 +32,9 @@ import org.moire.ultrasonic.domain.Identifiable
 import org.moire.ultrasonic.model.GenericListModel
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.subsonic.ImageLoaderProvider
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import org.moire.ultrasonic.service.RxBus
+import org.moire.ultrasonic.service.plusAssign
 import org.moire.ultrasonic.util.RefreshableFragment
 import org.moire.ultrasonic.util.Util
 
@@ -50,6 +53,7 @@ abstract class MultiListFragment<T : Identifiable> :
     internal lateinit var viewManager: LinearLayoutManager
     internal lateinit var emptyView: ConstraintLayout
     internal lateinit var emptyTextView: TextView
+    private var rxBusSubscription = CompositeDisposable()
 
     /**
      * The Adapter for the RecyclerView
@@ -146,6 +150,15 @@ abstract class MultiListFragment<T : Identifiable> :
         }
 
         updateBrandColors()
+
+        rxBusSubscription += RxBus.setsModeChangedObservable.subscribe {
+            updateBrandColors()
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        rxBusSubscription.clear()
     }
 
     /**

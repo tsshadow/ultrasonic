@@ -36,10 +36,8 @@ class FilterButtonBar : ConstraintLayout {
     private var layoutTypeChangedListener: ((LayoutType) -> Unit)? = null
     private var layoutType: LayoutType = LayoutType.LIST
     private var viewTypeToggle: Chip? = null
-    private var setsToggle: MaterialSwitch? = null
     private var sortOrderMenu: TextInputLayout? = null
     private var sortOrderOptions: AppCompatAutoCompleteTextView? = null
-    private var setsToggleListener: ((Boolean) -> Unit)? = null
 
     constructor(context: Context) : super(context) {
         setup()
@@ -59,10 +57,6 @@ class FilterButtonBar : ConstraintLayout {
      */
     fun configureWithCapabilities(caps: ViewCapabilities, isSetsChecked: Boolean = Settings.isSetsMode) {
         viewTypeToggle!!.isVisible = caps.supportsGrid
-        setsToggle?.isVisible = caps.supportsSetsToggle
-        if (caps.supportsSetsToggle) {
-            setsToggle?.isChecked = isSetsChecked
-        }
         updateBrandColors(isSetsChecked)
         sortOrderMenu!!.isVisible = caps.supportedSortOrders.isNotEmpty()
 
@@ -106,15 +100,6 @@ class FilterButtonBar : ConstraintLayout {
         orderChangedListener = callback
     }
 
-    /**
-     * This listener is called when the user has toggled the sets mode.
-     * Register a callback from the linked fragment here.
-     *
-     * @param callback
-     */
-    fun setOnSetsToggleListener(callback: (Boolean) -> Unit) {
-        setsToggleListener = callback
-    }
 
     /**
      * Setup the necessary bindings
@@ -123,17 +108,12 @@ class FilterButtonBar : ConstraintLayout {
     fun setup() {
         // Link layout toggle Chip
         viewTypeToggle = findViewById(R.id.chip_view_toggle)
-        setsToggle = findViewById(R.id.switch_sets)
         sortOrderMenu = findViewById(R.id.sort_order_menu)
         sortOrderOptions = findViewById(R.id.sort_order_menu_options)
 
         viewTypeToggle!!.setOnClickListener {
             val newType = setLayoutType()
             layoutTypeChangedListener?.let { it(newType) }
-        }
-
-        setsToggle?.setOnCheckedChangeListener { _, isChecked ->
-            setsToggleListener?.invoke(isChecked)
         }
 
         @SuppressLint("PrivateResource")
@@ -214,9 +194,6 @@ class FilterButtonBar : ConstraintLayout {
         )
         val thumbColors = intArrayOf(brandColor, Color.WHITE)
         val trackColors = intArrayOf(brandColor.withAlpha(0x80), Color.DKGRAY)
-
-        setsToggle?.thumbTintList = ColorStateList(states, thumbColors)
-        setsToggle?.trackTintList = ColorStateList(states, trackColors)
 
         // Update chips if they have green accents
         viewTypeToggle?.chipIconTint = ColorStateList.valueOf(brandColor)

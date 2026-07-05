@@ -134,6 +134,7 @@ class FilterModalFragment : BottomSheetDialogFragment() {
 
         setupAdapters()
         setupListeners()
+        binding.durationContainer.visibility = View.GONE
         applyStateToUI(if (modalType == FilterModalType.SONG) songState else livesetState)
         observeFilterOptions()
 
@@ -180,17 +181,6 @@ class FilterModalFragment : BottomSheetDialogFragment() {
             binding.durationValueText.text = "$minutes min"
         }
 
-        binding.chipSongs.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked && modalType != FilterModalType.SONG) {
-                switchType(FilterModalType.SONG)
-            }
-        }
-        binding.chipSets.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked && modalType != FilterModalType.LIVESET) {
-                switchType(FilterModalType.LIVESET)
-            }
-        }
-
         with(binding) {
             search.setOnClickListener { sendResult("search") }
             save.setOnClickListener { sendResult("save") }
@@ -208,10 +198,8 @@ class FilterModalFragment : BottomSheetDialogFragment() {
     private fun updateDurationLabel() {
         if (modalType == FilterModalType.LIVESET) {
             binding.durationLabel.text = "Min Duration"
-            binding.chipSets.isChecked = true
         } else {
             binding.durationLabel.text = "Max Duration"
-            binding.chipSongs.isChecked = true
         }
         updateBrandColors()
     }
@@ -229,12 +217,6 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         binding.selectResultCountSlider.trackActiveTintList = ColorStateList.valueOf(brandColor)
 
         binding.favoriteButton.imageTintList = ColorStateList.valueOf(brandColor)
-
-        val selectedColor = ColorStateList.valueOf(brandColor)
-        val unselectedColor = ColorStateList.valueOf(requireContext().getColor(R.color.spotify_card))
-
-        binding.chipSongs.chipBackgroundColor = if (modalType == FilterModalType.SONG) selectedColor else unselectedColor
-        binding.chipSets.chipBackgroundColor = if (modalType == FilterModalType.LIVESET) selectedColor else unselectedColor
 
         binding.save.backgroundTintList = ColorStateList.valueOf(brandColor)
         binding.search.backgroundTintList = ColorStateList.valueOf(brandColor)
@@ -382,26 +364,6 @@ class FilterModalFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun switchType(newType: FilterModalType) {
-        if (modalType == FilterModalType.SONG) {
-            songState = collectFilterState()
-        } else {
-            livesetState = collectFilterState()
-        }
-
-        modalType = newType
-        applyStateToUI(if (modalType == FilterModalType.SONG) songState else livesetState)
-
-        updateDurationLabel()
-        redrawAllChips(
-            filterOptionsViewModel.genres.value,
-            filterOptionsViewModel.years.value,
-            filterOptionsViewModel.labels.value,
-            filterOptionsViewModel.lineups.value,
-            filterOptionsViewModel.festivals.value,
-            filterOptionsViewModel.artists.value
-        )
-    }
 
     private fun applyStateToUI(state: FilterState) {
         binding.selectTitle.setText(state.title)
@@ -447,7 +409,6 @@ class FilterModalFragment : BottomSheetDialogFragment() {
     }
 
     private fun collectFilterState(): FilterState {
-        val durationValue = binding.durationSlider.value.toInt()
         return FilterState(
             title = binding.selectTitle.text.toString().trim(),
             genres = selectedGenres,
@@ -457,8 +418,8 @@ class FilterModalFragment : BottomSheetDialogFragment() {
             ratingMin = binding.selectRatingMin.selectedItem as Int,
             ratingMax = binding.selectRatingMax.selectedItem as Int,
             sortMethod = sortOptions[binding.selectSortMethod.selectedItemPosition].second,
-            minDuration = if (modalType == FilterModalType.LIVESET) durationValue else null,
-            maxDuration = if (modalType == FilterModalType.SONG) durationValue else null,
+            minDuration = null,
+            maxDuration = null,
             modalType = modalType,
             label = selectedLabels,
             festival = selectedFestivals,

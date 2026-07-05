@@ -30,21 +30,9 @@
         app:chipIcon="@drawable/ic_baseline_view_list"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sort_order_menu"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.materialswitch.MaterialSwitch
-        a:id="@+id/switch_sets"
-        a:layout_width="wrap_content"
-        a:layout_height="wrap_content"
-        a:layout_marginStart="8dp"
-        a:text="Sets"
-        a:textColor="@color/spotify_text_secondary"
-        a:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/chip_view_toggle"
         app:layout_constraintTop_toTopOf="parent" />
 
 

@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.fragment.FilterableFragment
 import org.moire.ultrasonic.api.subsonic.models.Filter
 import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.data.ActiveServerProvider.Companion.isOffline
@@ -85,6 +86,13 @@ abstract class SelectFragment :
             populateTiles()
             loadTilesFromServer()
             load(false)
+        }
+
+        rxBusSubscription += RxBus.setsModeChangedObservable.subscribe {
+            if (this is FilterableFragment) {
+                this.setOnSetsToggle(it)
+            }
+            updateBrandColors()
         }
 
         val isFirstRun = org.moire.ultrasonic.app.UApp.instance?.isFirstRun ?: false

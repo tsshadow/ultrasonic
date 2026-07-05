@@ -18,7 +18,7 @@ import timber.log.Timber
  */
 class SelectSongFragment : SelectFragment(), FilterableFragment {
     override var pageKey = "song"
-    override var defaultLength = "short"
+    override var defaultLength = ""
     override var filterModalType = FilterModalType.SONG
 
     override var viewCapabilities: ViewCapabilities = ViewCapabilities(
@@ -27,21 +27,20 @@ class SelectSongFragment : SelectFragment(), FilterableFragment {
         supportedSortOrders = emptyList()
     )
 
-    override val isSetsMode: Boolean get() = Settings.isSetsModeTiles
+    override val isSetsMode: Boolean get() = Settings.isSetsMode
 
     override fun setOnSetsToggle(isSets: Boolean) {
         if (isSets && pageKey == "liveset") return
         if (!isSets && pageKey == "song") return
 
-        Settings.isSetsModeTiles = isSets
         if (isSets) {
             pageKey = "liveset"
-            defaultLength = "long"
+            defaultLength = ""
             filterModalType = FilterModalType.LIVESET
             setTitle(this, R.string.main_livesets_title)
         } else {
             pageKey = "song"
-            defaultLength = "short"
+            defaultLength = ""
             filterModalType = FilterModalType.SONG
             setTitle(this, R.string.main_songs_title)
         }
@@ -57,9 +56,9 @@ class SelectSongFragment : SelectFragment(), FilterableFragment {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if (Settings.isSetsModeTiles) {
+        if (Settings.isSetsMode) {
             pageKey = "liveset"
-            defaultLength = "long"
+            defaultLength = ""
             filterModalType = FilterModalType.LIVESET
         }
         super.onViewCreated(view, savedInstanceState)

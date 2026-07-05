@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        a:id="@+id/action_sets_toggle"
+        a:title="Sets"
+        app:actionLayout="@layout/menu_switch"
+        app:showAsAction="always" />
+
+    <item
         a:id="@+id/action_search"
         a:icon="@drawable/ic_menu_search"
         a:title="@string/button_bar.search"

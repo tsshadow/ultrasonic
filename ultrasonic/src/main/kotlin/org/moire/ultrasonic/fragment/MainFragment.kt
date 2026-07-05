@@ -9,17 +9,27 @@ package org.moire.ultrasonic.fragment
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import org.moire.ultrasonic.service.RxBus
+import org.moire.ultrasonic.service.plusAssign
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.lang.ref.SoftReference
 import kotlin.collections.HashMap
 import kotlin.collections.hashMapOf
@@ -50,6 +60,8 @@ class MainFragment :
 
     private lateinit var musicCollectionAdapter: MusicCollectionAdapter
     private lateinit var viewPager: ViewPager2
+
+    private var rxBusSubscription = CompositeDisposable()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -83,9 +95,8 @@ class MainFragment :
             updateSortOrderOnCurrentFragment(it)
         }
 
-        filterButtonBar!!.setOnSetsToggleListener {
+        rxBusSubscription += RxBus.setsModeChangedObservable.subscribe {
             updateSetsToggleOnCurrentFragment(it)
-            updateBrandColors()
         }
 
         // Set layout toggle Chip to correct state
@@ -126,9 +137,16 @@ class MainFragment :
                 } else {
                     musicCollectionAdapter.propagateCapabilitiesMatcher = position
                 }
+                requireActivity().invalidateMenu()
             }
         })
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        rxBusSubscription.clear()
+        binding = null
     }
 
     private fun updateLayoutTypeOnCurrentFragment(it: LayoutType) {
@@ -183,6 +201,11 @@ class MainFragment :
             curFrag.updateBrandColors()
         }
         updateBrandColors()
+        requireActivity().invalidateMenu()
+    }
+
+    private fun Int.withAlpha(alpha: Int): Int {
+        return (this and 0x00FFFFFF) or (alpha shl 24)
     }
 
     private fun findCurrentFragment(): Fragment? = findFragmentAtPosition(childFragmentManager, viewPager.currentItem)
@@ -194,6 +217,8 @@ class MainFragment :
             ?: musicCollectionAdapter.fragmentMap[position]?.get()
     }
 }
+
+private val EMPTY_CAPABILITIES = ViewCapabilities(false, false, emptyList())
 
 private fun FilterButtonBar.configureWithCapabilitiesFromFragment(frag: Fragment?) {
     if (frag is FilterableFragment) {
@@ -263,10 +288,3 @@ class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = Layou
     }
 }
 
-interface FilterableFragment {
-    fun setLayoutType(newType: LayoutType) {}
-    fun setOrderType(newOrder: SortOrder)
-    fun setOnSetsToggle(isSets: Boolean) {}
-    val isSetsMode: Boolean get() = Settings.isSetsMode
-    var viewCapabilities: ViewCapabilities
-}
