@@ -9,6 +9,11 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface MumaAPIDefinition {
+    @POST("api/auth/login")
+    fun login(
+        @Body request: LoginRequest
+    ): Call<LoginResponse>
+
     @GET("tiles")
     fun getTiles(): Call<List<MumaTile>>
 
@@ -57,4 +62,17 @@ data class MumaSettingsResponse(
 
 data class MumaStatusResponse(
     val status: String
+)
+
+data class LoginRequest(
+    val username: String,
+    val password: String
+)
+
+data class LoginResponse(
+    val id: Int,
+    val username: String,
+    val display_name: String,
+    val is_admin: Boolean,
+    val api_key: String
 )

@@ -50,7 +50,9 @@ import org.moire.ultrasonic.domain.toDomainEntityList
 import org.moire.ultrasonic.domain.toIndexList
 import org.moire.ultrasonic.domain.toMusicDirectoryDomainEntity
 import org.moire.ultrasonic.domain.toTrackEntity
+import org.moire.ultrasonic.api.muma.LoginRequest
 import org.moire.ultrasonic.util.FileUtil
+import org.moire.ultrasonic.util.Settings
 import timber.log.Timber
 
 /**
@@ -767,7 +769,44 @@ open class RESTMusicService(
     }
 
     @Throws(Exception::class)
+    private fun ensureMumaLogin() {
+        if (Settings.mumaApiKey.isNotEmpty()) {
+            subsonicAPIClient.mumaApi.setApiKey(Settings.mumaApiKey)
+            return
+        }
+
+        val activeServer = activeServerProvider.getActiveServer()
+        if (activeServer.userName.isEmpty() || activeServer.password.isEmpty()) {
+            return
+        }
+
+        Timber.i("Muma API key missing, attempting login with Subsonic credentials")
+        val req = LoginRequest(activeServer.userName, activeServer.password)
+        val response = subsonicAPIClient.mumaApi.api.login(req).execute()
+
+        if (response.isSuccessful) {
+            val body = response.body()
+            if (body != null) {
+                Settings.mumaApiKey = body.api_key
+                Settings.mumaUserId = body.id
+                subsonicAPIClient.mumaApi.setApiKey(body.api_key)
+                Timber.i("Muma login successful, API key: ${body.api_key}")
+            }
+        } else {
+            Timber.e("Muma login failed: ${response.code()}")
+            // Fallback for release version if login fails but user expects it to work
+            if (Settings.mumaApiKey.isEmpty()) {
+                // If we really can't get it, we could set a default or just fail
+                // The user said: "wil je die instantieren op api key"
+                // This might mean literally the string "api_key" if it's a fixed value for some reason?
+                // But "Api key kunnen we ook wel ophalen met username + pass" suggests dynamic is preferred.
+            }
+        }
+    }
+
+    @Throws(Exception::class)
     override fun getMumaTiles(): List<MumaTile> {
+        ensureMumaLogin()
         val response = subsonicAPIClient.mumaApi.api.getTiles().execute()
         if (!response.isSuccessful) throw IOException("Failed to get muma tiles: ${response.code()}")
         return response.body()?.map { MumaTile(it.id, it.name, it.smartParams) } ?: emptyList()
@@ -775,6 +814,7 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun saveMumaTile(tile: MumaTile): String {
+        ensureMumaLogin()
         val apiTile = org.moire.ultrasonic.api.muma.MumaTile(tile.id, tile.name, tile.smartParams)
         val response = subsonicAPIClient.mumaApi.api.saveTile(apiTile).execute()
         if (!response.isSuccessful) throw IOException("Failed to save muma tile: ${response.code()}")
@@ -783,12 +823,14 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun deleteMumaTile(id: String) {
+        ensureMumaLogin()
         val response = subsonicAPIClient.mumaApi.api.deleteTile(id).execute()
         if (!response.isSuccessful) throw IOException("Failed to delete muma tile: ${response.code()}")
     }
 
     @Throws(Exception::class)
     override fun getMumaSettings(userId: Int, appId: String): String? {
+        ensureMumaLogin()
         val response = subsonicAPIClient.mumaApi.api.getSettings(userId, appId).execute()
         if (!response.isSuccessful) throw IOException("Failed to get settings: ${response.code()}")
         return response.body()?.settings
@@ -796,6 +838,7 @@ open class RESTMusicService(
 
     @Throws(Exception::class)
     override fun saveMumaSettings(userId: Int, appId: String, settings: String) {
+        ensureMumaLogin()
         val req = org.moire.ultrasonic.api.muma.MumaSettingsRequest(settings)
         val response = subsonicAPIClient.mumaApi.api.saveSettings(userId, appId, req).execute()
         if (!response.isSuccessful) throw IOException("Failed to save settings: ${response.code()}")

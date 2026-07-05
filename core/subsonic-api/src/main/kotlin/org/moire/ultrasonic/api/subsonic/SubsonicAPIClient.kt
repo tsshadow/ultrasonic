@@ -130,7 +130,7 @@ class SubsonicAPIClient(
     val api: SubsonicAPIDefinition get() = wrappedApi
 
     val mumaApi: MumaAPIClient by lazy {
-        MumaAPIClient(config.baseUrl, okHttpClient)
+        MumaAPIClient(config.baseUrl, baseOkClient)
     }
 
     private fun OkHttpClient.Builder.addLogging() {
