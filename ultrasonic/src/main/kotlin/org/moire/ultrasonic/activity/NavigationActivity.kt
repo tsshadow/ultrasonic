@@ -98,6 +98,7 @@ class NavigationActivity : ScopeActivity() {
     private var podcastsMenuItem: MenuItem? = null
     private var playlistsMenuItem: MenuItem? = null
     private var downloadsMenuItem: MenuItem? = null
+    private var setsToggleItem: MenuItem? = null
 
     private var nowPlayingView: FragmentContainerView? = null
     private var nowPlayingHidden = false
@@ -191,6 +192,7 @@ class NavigationActivity : ScopeActivity() {
         setupNavigationMenu(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            setsToggleItem?.isVisible = destination.id == R.id.mainFragment
             val dest: String = try {
                 resources.getResourceName(destination.id)
             } catch (_: Resources.NotFoundException) {
@@ -270,7 +272,8 @@ class NavigationActivity : ScopeActivity() {
     private val searchMenuProvider: MenuProvider = object : MenuProvider {
         override fun onPrepareMenu(menu: Menu) {
             setupSearchField(menu)
-            val setsToggleItem = menu.findItem(R.id.action_sets_toggle)
+            setsToggleItem = menu.findItem(R.id.action_sets_toggle)
+            setsToggleItem?.isVisible = currentFragmentId == R.id.mainFragment
             setsToggle = setsToggleItem?.actionView?.findViewById(R.id.switch_sets)
 
             setsToggle?.let { toggle ->
@@ -294,11 +297,7 @@ class NavigationActivity : ScopeActivity() {
     }
 
     private fun updateSetsToggleColors(toggle: MaterialSwitch, isSets: Boolean) {
-        val brandColor = if (isSets) {
-            getColor(R.color.spotify_blue)
-        } else {
-            getColor(R.color.spotify_green)
-        }
+        val brandColor = getColor(R.color.spotify_green)
         val states = arrayOf(
             intArrayOf(android.R.attr.state_checked),
             intArrayOf(-android.R.attr.state_checked)
@@ -364,6 +363,10 @@ class NavigationActivity : ScopeActivity() {
     override fun onResume() {
         Timber.d("onResume called")
         super.onResume()
+
+        lifecycleScope.launch {
+            UpdateChecker.checkForUpdates(this@NavigationActivity)
+        }
 
         Storage.reset()
 

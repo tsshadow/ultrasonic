@@ -54,6 +54,10 @@ class MumaSyncFragment : Fragment() {
             writeTiles()
         }
 
+        view.findViewById<MaterialButton>(R.id.btn_clear_tiles).setOnClickListener {
+            clearTiles()
+        }
+
         view.findViewById<MaterialButton>(R.id.btn_load_settings).setOnClickListener {
             loadSettings()
         }
@@ -126,6 +130,18 @@ class MumaSyncFragment : Fragment() {
             }
             toast(R.string.sync_tiles_success, true, requireContext())
         }
+    }
+
+    private fun clearTiles() {
+        ConfirmationDialog.Builder(requireContext())
+            .setMessage("Are you sure you want to clear all local tiles?")
+            .setPositiveButton(R.string.common_ok) { _, _ ->
+                val prefs = requireContext().getSharedPreferences("TileStorage", android.content.Context.MODE_PRIVATE)
+                prefs.edit().clear().apply()
+                toast("All tiles cleared locally", true, requireContext())
+            }
+            .setNegativeButton(R.string.common_cancel, null)
+            .show()
     }
 
     private fun loadSettings() {
