@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -37,6 +38,7 @@ class AboutFragment : Fragment() {
     private var reportBugButton: Button? = null
     private var updateButton: Button? = null
     private var changelogButton: Button? = null
+    private var viewLogButton: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         applyTheme(this.context)
@@ -55,6 +57,7 @@ class AboutFragment : Fragment() {
         reportBugButton = view.findViewById(R.id.help_report)
         updateButton = view.findViewById(R.id.help_update)
         changelogButton = view.findViewById(R.id.help_changelog)
+        viewLogButton = view.findViewById(R.id.help_view_log)
 
         val versionName = getVersionName(requireContext())
         val title = String.format(
@@ -105,6 +108,10 @@ class AboutFragment : Fragment() {
 
         changelogButton?.setOnClickListener {
             showChangelog(requireContext())
+        }
+
+        viewLogButton?.setOnClickListener {
+            findNavController().navigate(R.id.logViewerFragment)
         }
     }
 }

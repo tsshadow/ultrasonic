@@ -42,6 +42,16 @@
 
 
     <Button
+        a:id="@+id/help_view_log"
+        a:layout_width="match_parent"
+        a:layout_height="wrap_content"
+        a:layout_above="@+id/help_changelog"
+        a:layout_marginLeft="10dp"
+        a:layout_marginRight="10dp"
+        a:text="@string/settings.debug.view_log"
+        />
+
+    <Button
         a:id="@+id/help_changelog"
         a:layout_width="match_parent"
         a:layout_height="wrap_content"

@@ -17,6 +17,7 @@ import android.provider.SearchRecentSuggestions
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.core.content.FileProvider
+import androidx.navigation.fragment.findNavController
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
@@ -345,29 +346,7 @@ class SettingsFragment :
     }
 
     private fun viewLog() {
-        val logFiles = getLogFileList()
-        if (logFiles.isNullOrEmpty()) {
-            toast(R.string.settings_debug_log_deleted)
-            return
-        }
-        logFiles.sortByDescending { it.lastModified() }
-        val latestLog = logFiles[0]
-
-        val uri = FileProvider.getUriForFile(
-            requireContext(),
-            "${requireContext().packageName}.fileprovider",
-            latestLog
-        )
-
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "text/plain")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        try {
-            startActivity(intent)
-        } catch (e: Exception) {
-            toast("No app found to view log file")
-        }
+        findNavController().navigate(R.id.logViewerFragment)
     }
 
     private fun setupClearSearchPreference() {

@@ -333,6 +333,9 @@
         android:id="@+id/aboutFragment"
         android:name="org.moire.ultrasonic.fragment.AboutFragment" />
     <fragment
+        android:id="@+id/logViewerFragment"
+        android:name="org.moire.ultrasonic.fragment.LogViewerFragment" />
+    <fragment
         android:id="@+id/selectSongFragment"
         android:name="org.moire.ultrasonic.fragment.tsshadow.SelectSongFragment"/>
     <fragment
