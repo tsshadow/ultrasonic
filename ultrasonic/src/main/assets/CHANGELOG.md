@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.4.0] - 2026-07-05
+
+### Added
+- **MuMa Cloud Sync**: Backup entire app configuration to the MuMa database.
+- **Settings API**: Integration with the new MuMa User App Settings endpoints.
+- **MumaAPIClient**: Modern networking layer for MuMa interactions.
+- **Sync UI**: Manual backup and restore buttons in Settings.
+
 ## [6.3.3] - 2026-07-05
 
 ### Changed

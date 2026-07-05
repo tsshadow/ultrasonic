@@ -1,3 +1,10 @@
+## [6.4.0] - 2026-07-05
+### Added
+- **MuMa Cloud Sync**: New server-side backup system for app settings. Users can now backup their entire configuration to the MuMa database.
+- **Settings Restore**: Easily restore settings on a new device by entering your MuMa User ID and API Key.
+- **Enhanced API Integration**: Implemented a modern MumaAPIClient with support for secure X-API-Key authentication.
+- **Cloud Management UI**: Dedicated sync controls in the Settings menu for manual backup and restore operations.
+
 ## [6.3.3] - 2026-07-05
 ### Changed
 - **LMS API Key**: Replaced dynamic API key fetching with a hardcoded Subsonic API key for LMS servers for simplified setup.
