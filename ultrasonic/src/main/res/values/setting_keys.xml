@@ -65,4 +65,6 @@
     <string name="setting_key.view_log" translatable="false">viewLog</string>
     <string name="setting_key.save_to_muma" translatable="false">saveToMuma</string>
     <string name="setting_key.load_from_muma" translatable="false">loadFromMuma</string>
+    <string name="setting_key.static_username" translatable="false">staticUserName</string>
+    <string name="setting_key.static_password" translatable="false">staticPassword</string>
 </resources>

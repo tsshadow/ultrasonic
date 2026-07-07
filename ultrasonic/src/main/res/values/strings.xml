@@ -149,7 +149,7 @@
     <string name="main.songs_title">Songs</string>
     <string name="main.livesets_title">Livesets</string>
     <string name="main.videos">Videos</string>
-    <string name="main.welcome_text_demo">To use Ultrasonic with your own music you will need your <b>own server</b>. \n\n➤ The LMS servers (Stable and Alpha) and a demo server have been pre-configured for you. \n\n➤ You can add or change servers in the <b>settings</b>.</string>
+    <string name="main.welcome_text_demo">To use Ultrasonic with your own music you will need your <b>own server</b>. \n\n➤ The LMS servers and a demo server have been pre-configured for you. \n\n➤ You can add or change servers in the <b>settings</b>.</string>
     <string name="main.welcome_title">Welcome to Ultrasonic!</string>
     <string name="main.welcome_cancel">Take me to the settings</string>
     <string name="menu.about">About</string>
@@ -434,6 +434,7 @@
     <string name="server_menu.demo">Demo Server</string>
     <string name="server_menu.lms">LMS</string>
     <string name="server_menu.lmsalpha">LMS Alpha</string>
+    <string name="server_menu.lmsstable">LMS stable</string>
 
     <string name="about.webpage">Visit webpage</string>
     <string name="about.report">Report a bug</string>

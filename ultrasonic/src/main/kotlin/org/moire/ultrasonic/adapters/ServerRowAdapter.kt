@@ -53,10 +53,26 @@ internal class ServerRowAdapter(
     fun setData(data: Array<ServerSetting>) {
         this.data.clear()
 
-        // Show the offline server as well
-        this.data.add(ActiveServerProvider.OFFLINE_DB)
+        val sortedData = data.toMutableList()
+        sortedData.sortBy { it.index }
 
-        this.data.addAll(data)
+        // We want LMS, alpha, offline, others
+        // LMS and alpha have index 0 and 1
+        // Offline has index 2
+        
+        var offlineAdded = false
+        for (server in sortedData) {
+            if (!offlineAdded && server.index > ActiveServerProvider.OFFLINE_DB_INDEX) {
+                this.data.add(ActiveServerProvider.OFFLINE_DB)
+                offlineAdded = true
+            }
+            this.data.add(server)
+        }
+        
+        if (!offlineAdded) {
+            this.data.add(ActiveServerProvider.OFFLINE_DB)
+        }
+
         notifyDataSetChanged()
     }
 
@@ -128,8 +144,6 @@ internal class ServerRowAdapter(
      */
     private fun serverMenuClick(view: View, position: Int) {
         val menu = PopupMenu(context, view)
-        val firstServer = 1
-        val lastServer = count - 1
 
         menu.menu.add(
             Menu.NONE,
@@ -137,31 +151,6 @@ internal class ServerRowAdapter(
             Menu.NONE,
             context.getString(R.string.server_menu_edit)
         )
-
-        menu.menu.add(
-            Menu.NONE,
-            MENU_ID_DELETE,
-            Menu.NONE,
-            context.getString(R.string.server_menu_delete)
-        )
-
-        if (position != firstServer) {
-            menu.menu.add(
-                Menu.NONE,
-                MENU_ID_UP,
-                Menu.NONE,
-                context.getString(R.string.server_menu_move_up)
-            )
-        }
-
-        if (position != lastServer) {
-            menu.menu.add(
-                Menu.NONE,
-                MENU_ID_DOWN,
-                Menu.NONE,
-                context.getString(R.string.server_menu_move_down)
-            )
-        }
 
         menu.show()
 

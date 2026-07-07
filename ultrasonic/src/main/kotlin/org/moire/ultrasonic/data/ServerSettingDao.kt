@@ -39,6 +39,12 @@ interface ServerSettingDao {
     fun loadAllServerSettings(): LiveData<List<ServerSetting>>
 
     /**
+     * Loads all Server Settings from the table
+     */
+    @Query("SELECT * FROM serverSetting")
+    suspend fun getAll(): List<ServerSetting>
+
+    /**
      * Finds a Server Setting by its unique Id
      */
     @Query("SELECT * FROM serverSetting WHERE [id] = :id")

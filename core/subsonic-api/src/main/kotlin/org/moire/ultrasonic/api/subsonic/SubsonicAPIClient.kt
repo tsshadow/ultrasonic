@@ -76,10 +76,6 @@ class SubsonicAPIClient(
                 .addQueryParameter("c", config.clientID)
                 .addQueryParameter("f", "json")
 
-            if (!config.apiKey.isNullOrEmpty()) {
-                newUrlBuilder.addQueryParameter("apiKey", config.apiKey)
-            }
-
             val newUrl = newUrlBuilder.build()
             val newRequestBuilder = originalRequest.newBuilder().url(newUrl)
             if (originalRequest.url.username.isNotEmpty() &&

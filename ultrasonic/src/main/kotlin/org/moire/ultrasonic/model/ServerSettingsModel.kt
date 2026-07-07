@@ -3,11 +3,13 @@ package org.moire.ultrasonic.model
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.runBlocking
 import org.moire.ultrasonic.BuildConfig
 import org.moire.ultrasonic.R
@@ -35,113 +37,77 @@ class ServerSettingsModel(
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /**
-     * Retrieves the list of the configured servers from the database.
-     * This function is asynchronous, uses LiveData to provide the Setting.
-     *
-     * It does not include the Offline "server".
+     * Retrieves the list of the configured servers.
+     * In static mode, this returns the hardcoded list with credentials from Settings.
      */
     fun getServerList(): LiveData<List<ServerSetting>> {
-        // This check should run before returning any result
-        runBlocking {
-            val count = repository.count() ?: 0
-            if (count == 0 || Settings.lastSyncedVersion < BuildConfig.VERSION_CODE) {
-                addConfiguredServers()
-                Settings.lastSyncedVersion = BuildConfig.VERSION_CODE
-            }
-            if (areIndexesMissing()) {
-                reindexSettings()
-            }
+        val liveData = MutableLiveData<List<ServerSetting>>()
+        liveData.postValue(getStaticServersWithCredentials())
+        return liveData
+    }
+
+    fun getStaticServersWithCredentials(): List<ServerSetting> {
+        return STATIC_SERVERS.map { server ->
+            server.copy(
+                userName = Settings.staticUserName,
+                password = Settings.staticPassword
+            )
         }
-        return repository.loadAllServerSettings()
     }
 
     /**
      * Retrieves a single Server Setting by its index
-     * This function is asynchronous, uses LiveData to provide the Setting.
      */
-    fun getServerSetting(index: Int): LiveData<ServerSetting?> = repository.getLiveServerSettingByIndex(index)
-
-    /**
-     * Moves a Setting up in the Server List by decreasing its index
-     */
-    fun moveItemUp(index: Int) {
-        if (index <= 1) return
-
-        viewModelScope.launch {
-            val itemToBeMoved = repository.findByIndex(index)
-            val previousItem = repository.findByIndex(index - 1)
-
-            if (itemToBeMoved != null && previousItem != null) {
-                itemToBeMoved.index = previousItem.index
-                previousItem.index = index
-
-                repository.update(itemToBeMoved, previousItem)
-                activeServerProvider.invalidateCache()
-            }
-        }
+    fun getServerSetting(index: Int): LiveData<ServerSetting?> {
+        val liveData = MutableLiveData<ServerSetting?>()
+        val server = STATIC_SERVERS.find { it.index == index }?.copy(
+            userName = Settings.staticUserName,
+            password = Settings.staticPassword
+        )
+        liveData.postValue(server)
+        return liveData
     }
 
     /**
-     * Moves a Setting down in the Server List by increasing its index
+     * Moves a Setting up in the Server List - Disabled in static mode
      */
-    fun moveItemDown(index: Int) {
-        viewModelScope.launch {
-            if (index < (repository.getMaxIndex() ?: 0)) {
-                val itemToBeMoved = repository.findByIndex(index)
-                val nextItem = repository.findByIndex(index + 1)
+    fun moveItemUp(index: Int) {}
 
-                if (itemToBeMoved != null && nextItem != null) {
-                    itemToBeMoved.index = nextItem.index
-                    nextItem.index = index
+    /**
+     * Moves a Setting down in the Server List - Disabled in static mode
+     */
+    fun moveItemDown(index: Int) {}
 
-                    repository.update(itemToBeMoved, nextItem)
-                    activeServerProvider.invalidateCache()
-                }
-            }
-        }
+    /**
+     * Removes a Setting from the database - Disabled in static mode
+     */
+    fun deleteItemById(id: Int) {}
+
+    private fun isRequiredServer(server: ServerSetting): Boolean {
+        return (server.name == LMS_NAME && server.url == LMS_URL) ||
+            (server.name == LMS_ALPHA_NAME && server.url == LMS_ALPHA_URL)
     }
 
     /**
-     * Removes a Setting from the database
+     * Updates a Setting. In static mode, this updates the global static credentials.
      */
-    fun deleteItemById(id: Int) {
-        if (id == OFFLINE_DB_ID) return
-
-        viewModelScope.launch {
-            val itemToBeDeleted = repository.findById(id)
-            if (itemToBeDeleted != null) {
-                repository.delete(itemToBeDeleted)
-                Timber.d("deleteItem deleted id: $id")
-                reindexSettings()
-                activeServerProvider.invalidateCache()
-            }
-        }
-    }
-
-    /**
-     * Updates a Setting in the database
-     */
-    fun updateItem(serverSetting: ServerSetting?) {
+    suspend fun updateItem(serverSetting: ServerSetting?) {
         if (serverSetting == null) return
 
-        appScope.launch {
-            repository.update(serverSetting)
+        withContext(Dispatchers.IO) {
+            Settings.staticUserName = serverSetting.userName
+            Settings.staticPassword = serverSetting.password
             activeServerProvider.invalidateCache()
-            Timber.d("updateItem updated server setting: $serverSetting")
+            Timber.d("updateItem updated static credentials")
         }
     }
 
     /**
      * Inserts a new Setting into the database
      */
-    fun saveNewItem(serverSetting: ServerSetting?) {
-        if (serverSetting == null) return
-
-        appScope.launch {
-            serverSetting.index = (repository.count() ?: 0) + 1
-            repository.insert(serverSetting)
-            Timber.d("saveNewItem saved server setting: $serverSetting")
-        }
+    suspend fun saveNewItem(serverSetting: ServerSetting?) {
+        // No new items allowed in static mode
+        Timber.w("saveNewItem blocked in static mode")
     }
 
     /**
@@ -153,92 +119,11 @@ class ServerSettingsModel(
      * Only works in debug builds.
      */
     fun forceDefaultServer() {
-        if (!BuildConfig.DEBUG) return
-        viewModelScope.launch(Dispatchers.IO) {
-            addConfiguredServers()
-            try {
-                val mapper = ObjectMapper().configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false)
-                val typeRef = object : TypeReference<List<Map<String, Any>>>() {}
-                val defaultServers: List<Map<String, Any>> = mapper.readValue(BuildConfig.DEFAULT_SERVERS_JSON, typeRef)
-
-                if (defaultServers.isNotEmpty()) {
-                    val defaultName = defaultServers[0]["name"] as String
-                    val defaultUrl = defaultServers[0]["url"] as String
-                    val server = repository.findByNameAndUrl(defaultName, defaultUrl)
-                    if (server != null) {
-                        Settings.activeServer = server.id
-                        activeServerProvider.invalidateCache()
-                        Timber.d("Forced active server to ${server.name} (id: ${server.id})")
-                        // Post event to notify UI
-                        RxBus.activeServerChangedPublisher.onNext(server)
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to force default server")
-            }
-        }
+        // Disabled in static mode
     }
 
     private suspend fun addConfiguredServers() {
-        val mapper = ObjectMapper()
-            .configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false)
-        try {
-            val typeRef = object : TypeReference<List<Map<String, Any>>>() {}
-            val servers: List<Map<String, Any>> = mapper.readValue(BuildConfig.DEFAULT_SERVERS_JSON, typeRef)
-            var firstAddedServerId = -1
-            servers.forEach { serverMap ->
-                val name = serverMap["name"] as String
-                val url = serverMap["url"] as String
-                val existingServer = repository.findByNameAndUrl(name, url)
-
-                if (existingServer != null) {
-                    val newApiKey = serverMap["apiKey"] as? String
-                    if (newApiKey != null && existingServer.apiKey != newApiKey) {
-                        existingServer.apiKey = newApiKey
-                        repository.update(existingServer)
-                        Timber.d("Updated apiKey for server: $name")
-                    }
-                    if (firstAddedServerId == -1) firstAddedServerId = existingServer.id
-                } else {
-                    val server = ServerSetting(
-                        index = (repository.count() ?: 0) + 1,
-                        name = name,
-                        url = url,
-                        userName = serverMap["userName"] as? String ?: "",
-                        password = serverMap["password"] as? String ?: "",
-                        apiKey = serverMap["apiKey"] as? String,
-                        jukeboxByDefault = false,
-                        allowSelfSignedCertificate = true,
-                        forcePlainTextPassword = true,
-                        musicFolderId = null,
-                        minimumApiVersion = "1.13.0",
-                        chatSupport = false,
-                        bookmarkSupport = false,
-                        shareSupport = true,
-                        podcastSupport = false
-                    )
-                    repository.insert(server)
-                    val addedServer = repository.findByNameAndUrl(name, url)
-                    if (firstAddedServerId == -1) firstAddedServerId = addedServer?.id ?: -1
-                    Timber.d("Added configured server: $name")
-                }
-            }
-
-            if (BuildConfig.DEBUG && Settings.activeServer == -1 && firstAddedServerId != -1) {
-                Settings.activeServer = firstAddedServerId
-                activeServerProvider.invalidateCache()
-                Timber.d("Automatically set active server to id: $firstAddedServerId")
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to parse default servers JSON")
-        }
-
-        // Only add demo server if it's missing
-        val demoName = DEMO_SERVER_CONFIG.name
-        val demoUrl = DEMO_SERVER_CONFIG.url
-        if (repository.findByNameAndUrl(demoName, demoUrl) == null) {
-            addDemoServer()
-        }
+        // Disabled in static mode
     }
 
     /**
@@ -246,72 +131,45 @@ class ServerSettingsModel(
      * @return The id of the demo server
      */
     fun addDemoServer(): Int {
-        val demo = DEMO_SERVER_CONFIG.copy()
-
-        runBlocking {
-            demo.index = (repository.count() ?: 0) + 1
-            repository.insert(demo)
-            Timber.d("Added demo server")
-        }
-
-        return demo.index
+        return -1
     }
 
-
-    /**
-     * Checks if there are any missing indexes in the ServerSetting list
-     * For displaying the Server Settings in a ListView, it is mandatory that their indexes
-     * aren't missing. Ideally the indexes are continuous, but some circumstances (e.g.
-     * concurrency or migration errors) may get them out of order.
-     * This would make the List Adapter crash, so it is best to prepare and check the list.
-     */
-    private suspend fun areIndexesMissing(): Boolean {
-        for (i in 1 until getMaximumIndexToCheck() + 1) {
-            if (repository.findByIndex(i) == null) return true
-        }
-        return false
-    }
-
-    /**
-     * This function updates all the Server Settings in the DB so their indexing is continuous.
-     */
-    private suspend fun reindexSettings() {
-        var newIndex = 1
-        for (i in 1 until getMaximumIndexToCheck() + 1) {
-            val setting = repository.findByIndex(i)
-            if (setting != null) {
-                setting.index = newIndex
-                newIndex++
-                repository.update(setting)
-                Timber.d("reindexSettings saved $setting")
-            }
-        }
-    }
-
-    private suspend fun getMaximumIndexToCheck(): Int {
-        val rowsInDatabase = repository.count() ?: 0
-        val indexesInDatabase = repository.getMaxIndex() ?: 0
-        if (rowsInDatabase > indexesInDatabase) return rowsInDatabase
-        return indexesInDatabase
-    }
 
     companion object {
-        private val DEMO_SERVER_CONFIG = ServerSetting(
-            id = 0,
-            index = 0,
-            name = UApp.applicationContext().getString(R.string.server_menu_demo),
-            url = "https://demo.ampache.dev",
-            userName = "ultrasonic_demo",
-            password = "W7DumQ3ZUR89Se3",
-            jukeboxByDefault = false,
-            allowSelfSignedCertificate = false,
-            forcePlainTextPassword = false,
-            musicFolderId = null,
-            minimumApiVersion = "1.13.0",
-            chatSupport = true,
-            bookmarkSupport = true,
-            shareSupport = true,
-            podcastSupport = true
+        const val LMS_NAME = "LMS"
+        const val LMS_URL = "http://lms.teunschriks.nl"
+        const val LMS_ALPHA_NAME = "alpha"
+        const val LMS_ALPHA_URL = "http://lms-alpha.teunschriks.nl"
+
+        val STATIC_SERVERS = listOf(
+            ServerSetting(
+                id = 0,
+                index = 0,
+                name = LMS_NAME,
+                url = LMS_URL,
+                userName = "",
+                password = "",
+                allowSelfSignedCertificate = true,
+                forcePlainTextPassword = true,
+                shareSupport = true,
+                jukeboxByDefault = false,
+                musicFolderId = null,
+                minimumApiVersion = "1.13.0"
+            ),
+            ServerSetting(
+                id = 1,
+                index = 1,
+                name = LMS_ALPHA_NAME,
+                url = LMS_ALPHA_URL,
+                userName = "",
+                password = "",
+                allowSelfSignedCertificate = true,
+                forcePlainTextPassword = true,
+                shareSupport = true,
+                jukeboxByDefault = false,
+                musicFolderId = null,
+                minimumApiVersion = "1.13.0"
+            )
         )
     }
 }

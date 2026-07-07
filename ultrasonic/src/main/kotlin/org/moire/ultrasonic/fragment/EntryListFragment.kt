@@ -11,7 +11,9 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.launch
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.inject
@@ -73,7 +75,9 @@ abstract class EntryListFragment<T : GenericEntry> :
             if (!listModel.isOffline()) {
                 val currentSetting = listModel.activeServer
                 currentSetting.musicFolderId = it.id
-                serverSettingsModel.updateItem(currentSetting)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    serverSettingsModel.updateItem(currentSetting)
+                }
             }
             listModel.refresh(swipeRefresh!!)
         }

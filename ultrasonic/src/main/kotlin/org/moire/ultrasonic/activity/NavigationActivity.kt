@@ -54,6 +54,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -209,12 +210,12 @@ class NavigationActivity : ScopeActivity() {
             }
         }
 
-        // Determine if this is a first run
-        val showWelcomeScreen = UApp.instance!!.isFirstRun
+        // Determine if this is a first run or LMS servers are not configured
+        val showWelcomeScreen = UApp.instance!!.isFirstRun || Settings.staticPassword.isBlank()
 
         // This is a first run with only the demo entry inside the database
         // We set the active server to the demo one and show the welcome dialog
-        if (showWelcomeScreen) {
+        if (showWelcomeScreen && !UApp.instance!!.setupDialogDisplayed) {
             showWelcomeDialog()
         } else if (Util.isVersionUpdate(this)) {
             Util.showChangelog(this, full = false)
@@ -633,74 +634,24 @@ class NavigationActivity : ScopeActivity() {
                 lifecycleScope.launch {
                     val result = withContext(Dispatchers.IO) {
                         try {
-                            val servers = mutableListOf<ServerSetting>()
+                            // Update static credentials
+                            Settings.staticUserName = username
+                            Settings.staticPassword = password
+                            activeServerProvider.invalidateCache()
 
-                            // Always add stable
-                            val stableServer = ServerSetting().apply {
-                                name = "LMS (stable)"
-                                url = "http://lms.teunschriks.nl"
-                                userName = username
-                                this.password = password
+                            // Connect to the preferred one (alpha for debug, LMS for release)
+                            val targetServerId = if (BuildConfig.DEBUG) 1 else 0
+
+                            withContext(Dispatchers.Main) {
+                                activeServerProvider.setActiveServerById(targetServerId)
                             }
 
-                            // Set hardcoded API key for LMS
-                            stableServer.apiKey = "453ecd33-3cb2-4ca4-a531-1677330bbaee"
-                            servers.add(stableServer)
-
-                            if (BuildConfig.DEBUG) {
-                                val alphaServer = ServerSetting().apply {
-                                    name = "LMS (Alpha)"
-                                    url = "http://lms-alpha.teunschriks.nl"
-                                    userName = username
-                                    this.password = password
-                                }
-                                // Set hardcoded API key for LMS Alpha
-                                alphaServer.apiKey = "453ecd33-3cb2-4ca4-a531-1677330bbaee"
-                                servers.add(alphaServer)
-                            }
-
-                            // Save servers
-                            val maxIndex = serverRepository.getMaxIndex() ?: -1
-                            servers.forEachIndexed { i, server ->
-                                server.index = maxIndex + 1 + i
-                            }
-                            serverRepository.insert(*servers.toTypedArray())
-
-                            // Connect to the preferred one (Alpha for debug, Stable for release)
-                            val targetServerName = if (BuildConfig.DEBUG) "LMS (Alpha)" else "LMS (stable)"
-                            val targetServerUrl =
-                                if (BuildConfig.DEBUG) "http://lms-alpha.teunschriks.nl" else "http://lms.teunschriks.nl"
-
-                            val activeServer =
-                                serverRepository.findByNameAndUrl(targetServerName, targetServerUrl)
-
-                            if (activeServer != null) {
-                                withContext(Dispatchers.Main) {
-                                    activeServerProvider.setActiveServerById(activeServer.id)
-                                }
-
-                                // Now test connection
-                                val musicService = MusicServiceFactory.getMusicService()
-                                musicService.ping()
-                                true
-                            } else {
-                                false
-                            }
+                            // Now test connection
+                            val musicService = MusicServiceFactory.getMusicService()
+                            musicService.ping()
+                            true
                         } catch (e: Exception) {
                             Timber.e(e, "Connection test failed")
-                            // Clean up on failure so we don't have partial/broken servers
-                            val targetServerName = if (BuildConfig.DEBUG) "LMS (Alpha)" else "LMS (stable)"
-                            val targetServerUrl =
-                                if (BuildConfig.DEBUG) "http://lms-alpha.teunschriks.nl" else "http://lms.teunschriks.nl"
-                            serverRepository.findByNameAndUrl(targetServerName, targetServerUrl)?.let {
-                                serverRepository.delete(it)
-                            }
-                            // Also delete the other one
-                            val otherName = if (BuildConfig.DEBUG) "LMS (stable)" else "LMS (Alpha)"
-                            val otherUrl = if (BuildConfig.DEBUG) "http://lms.teunschriks.nl" else "http://lms-alpha.teunschriks.nl"
-                            serverRepository.findByNameAndUrl(otherName, otherUrl)?.let {
-                                serverRepository.delete(it)
-                            }
                             false
                         }
                     }
@@ -778,8 +729,8 @@ class NavigationActivity : ScopeActivity() {
 
     private fun checkMumaLogin() {
         val activeServer = activeServerProvider.getActiveServer()
-        if (!ActiveServerProvider.isOffline() && (activeServer.apiKey.isNullOrEmpty() ||
-            activeServer.mumaUserId == null || activeServer.mumaUserId == -1)) {
+        if (!ActiveServerProvider.isOffline() && activeServer.apiKey.isNullOrEmpty() &&
+            (activeServer.mumaUserId == null || activeServer.mumaUserId == -1)) {
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     MusicServiceFactory.getMusicService().mumaLogin()

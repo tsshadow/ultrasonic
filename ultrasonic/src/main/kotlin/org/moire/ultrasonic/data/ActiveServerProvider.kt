@@ -42,19 +42,14 @@ class ActiveServerProvider(private val repository: ServerSettingDao) : Coroutine
         if (serverId > OFFLINE_DB_ID) {
             if (cachedServer != null && cachedServer!!.id == serverId) return cachedServer!!
 
-            // Ideally this is the only call where we block the thread while using the repository
-            runBlocking {
-                withContext(Dispatchers.IO) {
-                    cachedServer = repository.findById(serverId)
-                }
-                Timber.d(
-                    "getActiveServer retrieved from DataBase, id: %s cachedServer: %s",
-                    serverId,
-                    cachedServer
-                )
-            }
+            // Get from static list in ServerSettingsModel
+            cachedServer = org.moire.ultrasonic.model.ServerSettingsModel.STATIC_SERVERS.find { it.id == serverId }?.copy(
+                userName = Settings.staticUserName,
+                password = Settings.staticPassword
+            )
 
             if (cachedServer != null) {
+                Timber.d("getActiveServer retrieved from static list, id: %s", serverId)
                 return cachedServer!!
             }
 
@@ -76,13 +71,7 @@ class ActiveServerProvider(private val repository: ServerSettingDao) : Coroutine
             return OFFLINE_DB_ID
         }
 
-        var id: Int
-
-        runBlocking {
-            id = repository.findByIndex(index)?.id ?: 0
-        }
-
-        return id
+        return org.moire.ultrasonic.model.ServerSettingsModel.STATIC_SERVERS.find { it.index == index }?.id ?: 0
     }
 
     /**
@@ -97,10 +86,8 @@ class ActiveServerProvider(private val repository: ServerSettingDao) : Coroutine
             return
         }
 
-        launch {
-            val serverId = repository.findByIndex(index)?.id ?: 0
-            setActiveServerById(serverId)
-        }
+        val serverId = org.moire.ultrasonic.model.ServerSettingsModel.STATIC_SERVERS.find { it.index == index }?.id ?: 0
+        setActiveServerById(serverId)
     }
 
     /**
@@ -124,8 +111,8 @@ class ActiveServerProvider(private val repository: ServerSettingDao) : Coroutine
         // Use a coroutine to post the server change to the end of the message queue
         launch {
             withContext(Dispatchers.Main) {
-                resetMusicService()
                 Settings.activeServer = serverId
+                resetMusicService()
 
                 RxBus.activeServerChangedPublisher.onNext(getActiveServer(serverId))
                 Timber.i("setActiveServerById done, new id: %s", serverId)
@@ -178,38 +165,25 @@ class ActiveServerProvider(private val repository: ServerSettingDao) : Coroutine
      * Sets the minimum Subsonic API version of the current server.
      */
     fun setMinimumApiVersion(apiVersion: String) {
-        launch {
-            if (cachedServer != null) {
-                cachedServer!!.minimumApiVersion = apiVersion
-                repository.update(cachedServer!!)
-            }
-        }
+        cachedServer?.minimumApiVersion = apiVersion
     }
 
     fun setMumaSettings(apiKey: String, userId: Int) {
-        launch {
-            if (cachedServer != null) {
-                cachedServer!!.apiKey = apiKey
-                // Only update MuMa ID if it's not set yet
-                if (cachedServer!!.mumaUserId == null || cachedServer!!.mumaUserId == -1) {
-                    cachedServer!!.mumaUserId = userId
-                }
-                repository.update(cachedServer!!)
-            }
-            // Sync globally as well since the user said they are the same for all servers
-            org.moire.ultrasonic.util.Settings.mumaApiKey = apiKey
-            // Only update MuMa ID if it's not set yet
-            if (org.moire.ultrasonic.util.Settings.mumaUserId == -1) {
-                org.moire.ultrasonic.util.Settings.mumaUserId = userId
-            }
+        // Sync globally
+        Settings.mumaApiKey = apiKey
+        // Only update MuMa ID if it's not set yet
+        if (Settings.mumaUserId == -1) {
+            Settings.mumaUserId = userId
         }
     }
 
     fun update(serverSetting: ServerSetting) {
-        launch {
-            repository.update(serverSetting)
-            if (cachedServer?.id == serverSetting.id) {
-                cachedServer = serverSetting
+        if (serverSetting.id > OFFLINE_DB_ID) {
+            Settings.staticUserName = serverSetting.userName
+            Settings.staticPassword = serverSetting.password
+            invalidateCache()
+            launch(Dispatchers.Main) {
+                resetMusicService()
             }
         }
     }
@@ -252,7 +226,7 @@ class ActiveServerProvider(private val repository: ServerSettingDao) : Coroutine
     companion object {
         const val METADATA_DB = "$DB_FILENAME-meta-"
         const val OFFLINE_DB_ID = -1
-        const val OFFLINE_DB_INDEX = 0
+        const val OFFLINE_DB_INDEX = 2
 
         val OFFLINE_DB = ServerSetting(
             id = OFFLINE_DB_ID,

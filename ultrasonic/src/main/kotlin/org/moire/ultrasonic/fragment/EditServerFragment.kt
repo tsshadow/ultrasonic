@@ -120,6 +120,19 @@ class EditServerFragment : Fragment() {
         if (navArgs.index != -1) {
             // Editing an existing server
             FragmentTitle.setTitle(this, R.string.server_editor_label)
+
+            // Disable fields for static servers (LMS and alpha)
+            if (navArgs.index == 0 || navArgs.index == 1) {
+                serverNameEditText?.isEnabled = false
+                serverAddressEditText?.isEnabled = false
+                serverColorImageView?.isEnabled = false
+                apiKeyEditText?.isEnabled = false
+                mumaUserIdEditText?.isEnabled = false
+                selfSignedSwitch?.isEnabled = false
+                plaintextSwitch?.isEnabled = false
+                jukeboxSwitch?.isEnabled = false
+            }
+
             val serverSetting = serverSettingsModel.getServerSetting(navArgs.index)
             serverSetting.observe(
                 viewLifecycleOwner
@@ -130,12 +143,14 @@ class EditServerFragment : Fragment() {
                     // Remove the minimum API version so it can be detected again
                     if (currentServerSetting?.minimumApiVersion != null) {
                         currentServerSetting!!.minimumApiVersion = null
-                        serverSettingsModel.updateItem(currentServerSetting)
-                        if (
-                            activeServerProvider.getActiveServer().id ==
-                            currentServerSetting!!.id
-                        ) {
-                            MusicServiceFactory.resetMusicService()
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            serverSettingsModel.updateItem(currentServerSetting)
+                            if (
+                                activeServerProvider.getActiveServer().id ==
+                                currentServerSetting!!.id
+                            ) {
+                                MusicServiceFactory.resetMusicService()
+                            }
                         }
                     }
                 }
@@ -143,15 +158,17 @@ class EditServerFragment : Fragment() {
             saveButton!!.setOnClickListener {
                 if (currentServerSetting != null) {
                     if (getFields()) {
-                        serverSettingsModel.updateItem(currentServerSetting)
-                        // Apply modifications if the current server was modified
-                        if (
-                            activeServerProvider.getActiveServer().id ==
-                            currentServerSetting!!.id
-                        ) {
-                            MusicServiceFactory.resetMusicService()
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            serverSettingsModel.updateItem(currentServerSetting)
+                            // Apply modifications if the current server was modified
+                            if (
+                                activeServerProvider.getActiveServer().id ==
+                                currentServerSetting!!.id
+                            ) {
+                                MusicServiceFactory.resetMusicService()
+                            }
+                            findNavController().navigateUp()
                         }
-                        findNavController().navigateUp()
                     }
                 }
             }
@@ -162,8 +179,10 @@ class EditServerFragment : Fragment() {
             currentServerSetting = ServerSetting()
             saveButton!!.setOnClickListener {
                 if (getFields()) {
-                    serverSettingsModel.saveNewItem(currentServerSetting)
-                    findNavController().navigateUp()
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        serverSettingsModel.saveNewItem(currentServerSetting)
+                        findNavController().navigateUp()
+                    }
                 }
             }
         }
@@ -388,7 +407,7 @@ class EditServerFragment : Fragment() {
             currentServerSetting!!.color = selectedColor ?: currentColor
             currentServerSetting!!.userName = userNameEditText!!.editText?.text.toString()
             currentServerSetting!!.password = passwordEditText!!.editText?.text.toString()
-            currentServerSetting!!.apiKey = apiKeyEditText!!.editText?.text.toString()
+            currentServerSetting!!.apiKey = apiKeyEditText!!.editText?.text.toString().takeIf { it.isNotBlank() }
             currentServerSetting!!.mumaUserId =
                 mumaUserIdEditText!!.editText?.text.toString().toIntOrNull()
             currentServerSetting!!.allowSelfSignedCertificate = selfSignedSwitch!!.isChecked
@@ -403,18 +422,20 @@ class EditServerFragment : Fragment() {
      * Checks whether any value in the fields are changed according to their original values.
      */
     private fun areFieldsChanged(): Boolean {
-        if (currentServerSetting == null || currentServerSetting!!.id == -1) {
+        if (currentServerSetting == null || currentServerSetting!!.id == 0) {
             return serverNameEditText!!.editText?.text!!.isNotBlank() ||
                 serverAddressEditText!!.editText?.text.toString() != "http://" ||
                 userNameEditText!!.editText?.text!!.isNotBlank() ||
-                passwordEditText!!.editText?.text!!.isNotBlank()
+                passwordEditText!!.editText?.text!!.isNotBlank() ||
+                apiKeyEditText!!.editText?.text!!.isNotBlank() ||
+                mumaUserIdEditText!!.editText?.text!!.isNotBlank()
         }
 
         return currentServerSetting!!.name != serverNameEditText!!.editText?.text.toString() ||
             currentServerSetting!!.url != serverAddressEditText!!.editText?.text.toString() ||
             currentServerSetting!!.userName != userNameEditText!!.editText?.text.toString() ||
             currentServerSetting!!.password != passwordEditText!!.editText?.text.toString() ||
-            currentServerSetting!!.apiKey != apiKeyEditText!!.editText?.text.toString() ||
+            (currentServerSetting!!.apiKey ?: "") != apiKeyEditText!!.editText?.text.toString() ||
             currentServerSetting!!.mumaUserId !=
             mumaUserIdEditText!!.editText?.text.toString().toIntOrNull() ||
             currentServerSetting!!.allowSelfSignedCertificate != selfSignedSwitch!!.isChecked ||
@@ -436,27 +457,18 @@ class EditServerFragment : Fragment() {
 
         val testJob = lifecycleScope.launch {
             try {
-                // Set hardcoded API key if it's an LMS server and key is empty
-                if (currentServerSetting!!.apiKey.isNullOrEmpty() &&
-                    currentServerSetting!!.url.contains("lms")
-                ) {
-                    currentServerSetting!!.apiKey = "453ecd33-3cb2-4ca4-a531-1677330bbaee"
-                    withContext(Dispatchers.Main) {
-                        apiKeyEditText!!.editText?.setText("453ecd33-3cb2-4ca4-a531-1677330bbaee")
-                    }
-                    Timber.i("Automatically set hardcoded API key for LMS server")
-                }
-
                 val flow = model.queryFeatureSupport(currentServerSetting!!).flowOn(Dispatchers.IO)
 
                 flow.collect {
                     model.storeFeatureSupport(testSetting, it)
                     if (it.type == EditServerModel.Companion.ServerFeature.MUMA && it.supported) {
-                        currentServerSetting!!.apiKey = it.apiKey
-                        currentServerSetting!!.mumaUserId = it.userId
-                        withContext(Dispatchers.Main) {
-                            apiKeyEditText!!.editText?.setText(it.apiKey)
-                            mumaUserIdEditText!!.editText?.setText(it.userId?.toString())
+                        if (currentServerSetting!!.apiKey.isNullOrBlank()) {
+                            currentServerSetting!!.apiKey = it.apiKey
+                            currentServerSetting!!.mumaUserId = it.userId
+                            withContext(Dispatchers.Main) {
+                                apiKeyEditText!!.editText?.setText(it.apiKey)
+                                mumaUserIdEditText!!.editText?.setText(it.userId?.toString())
+                            }
                         }
                     }
                     dialog.setMessage(getProgress(testSetting))

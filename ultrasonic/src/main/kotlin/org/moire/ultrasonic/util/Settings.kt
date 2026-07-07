@@ -305,6 +305,12 @@ object Settings {
     @JvmStatic
     var mumaUserId by StringIntSetting(getKey(R.string.setting_key_muma_user_id), -1)
 
+    @JvmStatic
+    var staticUserName by StringSetting(getKey(R.string.setting_key_static_username), "")
+
+    @JvmStatic
+    var staticPassword by StringSetting(getKey(R.string.setting_key_static_password), "")
+
     fun hasKey(key: String): Boolean = preferences.contains(key)
 
     private fun getKey(key: Int): String = appContext.getString(key)

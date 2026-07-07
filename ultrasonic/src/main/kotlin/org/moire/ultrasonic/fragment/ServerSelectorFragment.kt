@@ -67,9 +67,7 @@ class ServerSelectorFragment : Fragment() {
         }
 
         val fab = view.findViewById<FloatingActionButton>(R.id.server_add_fab)
-        fab.setOnClickListener {
-            editServerByIndex(-1)
-        }
+        fab.visibility = View.GONE
     }
 
     override fun onResume() {
