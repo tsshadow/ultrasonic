@@ -446,11 +446,11 @@ class MediaLibraryBrowser(
         Timber.d("GetLibrary")
         val mediaItems: MutableList<MediaItem> = ArrayList()
         val presets = listOf(
-            TileInfo("Recent Songs"),
-            TileInfo("Random Songs", sortMethod = "Random"),
-            TileInfo("Recent Livesets", length = "long"),
-            TileInfo("Random Livesets", sortMethod = "Random", length = "long"),
-            TileInfo("Starred Songs", ratingMin = 5)
+            TileInfo(title = "Recent Songs"),
+            TileInfo(title = "Random Songs", sortMethod = "Random"),
+            TileInfo(title = "Recent Livesets", length = "long"),
+            TileInfo(title = "Random Livesets", sortMethod = "Random", length = "long"),
+            TileInfo(title = "Starred Songs", ratingMin = 5)
         )
 
         presets.mapTo(mediaItems) { it.toMediaItem() }
@@ -468,10 +468,10 @@ class MediaLibraryBrowser(
         val mediaItems: MutableList<MediaItem> = ArrayList()
         // Default hardcoded presets
         val presets = listOf(
-            TileInfo("Search"),
-            TileInfo("Recent"),
-            TileInfo("Random", sortMethod = "Random"),
-            TileInfo("Starred", ratingMin = 5)
+            TileInfo(title = "Search"),
+            TileInfo(title = "Recent"),
+            TileInfo(title = "Random", sortMethod = "Random"),
+            TileInfo(title = "Starred", ratingMin = 5)
         )
 
         // Add hardcoded presets
@@ -492,15 +492,15 @@ class MediaLibraryBrowser(
     private fun getLivesetsLibrary(
         context: Context
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.d("getSongsLibrary")
+        Timber.d("getLivesetsLibrary")
 
         val mediaItems: MutableList<MediaItem> = ArrayList()
         // Default hardcoded presets
         val presets = listOf(
-            TileInfo("Search", length = "long"),
-            TileInfo("Recent", length = "long"),
-            TileInfo("Random", sortMethod = "Random", length = "long"),
-            TileInfo("Starred", ratingMin = 5, length = "long")
+            TileInfo(title = "Search", length = "long"),
+            TileInfo(title = "Recent", length = "long"),
+            TileInfo(title = "Random", sortMethod = "Random", length = "long"),
+            TileInfo(title = "Starred", ratingMin = 5, length = "long")
         )
 
         // Add hardcoded presets
