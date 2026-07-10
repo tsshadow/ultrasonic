@@ -128,14 +128,15 @@ class SearchFragment :
         super.onDestroyView()
     }
 
-    private fun search(query: String, autoplay: Boolean) {
+    private fun search(query: String, shouldAutoplay: Boolean) {
         listModel.viewModelScope.launch(
             toastingExceptionHandler()
         ) {
             swipeRefresh?.isRefreshing = true
             val result = listModel.search(query)
             swipeRefresh?.isRefreshing = false
-            if (result != null && autoplay) {
+            if (result != null && shouldAutoplay && !listModel.autoPlayExecuted) {
+                listModel.autoPlayExecuted = true
                 autoplay()
             }
         }

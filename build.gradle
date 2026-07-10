@@ -96,6 +96,17 @@ tasks.register("generateKeystore") {
     }
 }
 
+tasks.register("installGitHooks", Copy) {
+    from new File(rootProject.rootDir, "scripts/pre-commit")
+    into new File(rootProject.rootDir, ".git/hooks")
+    fileMode 0775
+}
+
+// Automatically install git hooks after project evaluation
+afterEvaluate {
+    tasks.named("installGitHooks")
+}
+
 wrapper {
     gradleVersion = libs.versions.gradle.get()
     distributionType = "all"

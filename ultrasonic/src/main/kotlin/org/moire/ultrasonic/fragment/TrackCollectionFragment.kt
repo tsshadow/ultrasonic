@@ -89,9 +89,6 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
     private var shareButtonVisible = false
     private var playAllButton: MenuItem? = null
     private var shareButton: MenuItem? = null
-    private var currentOffset = 0
-    private var isLoading = false
-    private var hasMoreData = true
     private val pageSize get() = navArgs.size.takeIf { it > 0 } ?: Settings.maxSongs
 
     internal val mediaPlayerManager: MediaPlayerManager by inject()
@@ -192,12 +189,18 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
         }
 
         listView!!.addOnScrollListener(scrollListener)
+
+        listModel.title.observe(viewLifecycleOwner) {
+            setTitle(it)
+        }
+        listModel.isLoading.observe(viewLifecycleOwner) {
+            swipeRefresh?.isRefreshing = it
+        }
     }
 
     private fun loadMoreTracks() {
-        if (isLoading || !hasMoreData) return
+        if (listModel.isLoading.value == true || !listModel.hasMoreData) return
 
-        isLoading = true
         getLiveData(append = true)
     }
 
@@ -456,10 +459,6 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
         playAllButton?.isVisible = playAllButtonVisible
         shareButton?.isVisible = shareButtonVisible
 
-        if (entryList.size < pageSize) {
-            hasMoreData = false
-        }
-
         if (songCount > 0 && listModel.showHeader) {
             val intentAlbumName = navArgs.name
             val albumHeader = AlbumHeader(entryList, intentAlbumName)
@@ -470,7 +469,8 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
             viewAdapter.submitList(entryList)
         }
 
-        if (navArgs.autoPlay && songCount > 0) {
+        if (navArgs.autoPlay && songCount > 0 && !listModel.autoPlayExecuted) {
+            listModel.autoPlayExecuted = true
             playAll(navArgs.shuffle, MediaPlayerManager.InsertionMode.CLEAR)
         }
 
@@ -512,175 +512,41 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
         append: Boolean
     ): LiveData<List<MusicDirectoryEntry>> {
         Timber.i("Starting gathering track collection data...")
-        val id = navArgs.id
-        val artistId = navArgs.artistId
-        val isAlbum = navArgs.isAlbum
-        val name = navArgs.name
-        val playlistId = navArgs.playlistId
-        val podcastChannelId = navArgs.podcastChannelId
-        val playlistName = navArgs.playlistName
-        val shareId = navArgs.shareId
-        val shareName = navArgs.shareName
-        val genre = navArgs.genre
-        val artists = navArgs.artists?.filter { it.isNotBlank() } ?: emptyList()
-        val festival = navArgs.festival
-        val label = navArgs.label
-        val songs = navArgs.songs
-        val year = navArgs.year
-        val length = navArgs.length
-        val sortMethod = navArgs.sortMethod
-        val ratingMin = navArgs.ratingMin
-        val festivalLineup = navArgs.festivalLineup
-        val ratingMax = navArgs.ratingMax
-        val minDuration = if (navArgs.minDuration < 0) null else navArgs.minDuration
-        val maxDuration = if (navArgs.maxDuration < 0) null else navArgs.maxDuration
+        val params = TrackCollectionModel.LoadParams(
+            id = navArgs.id,
+            artistId = navArgs.artistId,
+            isAlbum = navArgs.isAlbum,
+            name = navArgs.name,
+            playlistId = navArgs.playlistId,
+            podcastChannelId = navArgs.podcastChannelId,
+            playlistName = navArgs.playlistName,
+            shareId = navArgs.shareId,
+            shareName = navArgs.shareName,
+            genre = navArgs.genre,
+            artists = navArgs.artists?.toList(),
+            festival = navArgs.festival,
+            label = navArgs.label,
+            songs = navArgs.songs,
+            year = navArgs.year,
+            length = navArgs.length,
+            sortMethod = navArgs.sortMethod ?: "",
+            ratingMin = navArgs.ratingMin,
+            festivalLineup = navArgs.festivalLineup,
+            ratingMax = navArgs.ratingMax,
+            minDuration = if (navArgs.minDuration < 0) null else navArgs.minDuration,
+            maxDuration = if (navArgs.maxDuration < 0) null else navArgs.maxDuration,
+            getVideos = navArgs.getVideos,
+            size = if (navArgs.size < 0) Settings.maxSongs else navArgs.size,
+            getRandomTracks = displayRandom(),
+            getStarredTracks = displayStarred(),
+            filtersJson = arguments?.getString("filters"),
+            refresh = navArgs.refresh
+        )
 
-        val getStarredTracks = displayStarred()
-        val getVideos = navArgs.getVideos
-        val getRandomTracks = displayRandom()
-        val size = if (navArgs.size < 0) Settings.maxSongs else navArgs.size
+        listModel.loadData(refresh, append, params)
 
-        val offset = if (append) currentOffset else 0
-        val refresh2 = navArgs.refresh || refresh
-        Timber.i("Lazy loading: size=$size, offset=$offset")
-        if (!append) {
-            currentOffset = 0
-            hasMoreData = true
-        }
-        listModel.viewModelScope.launch(
-            toastingExceptionHandler()
-        ) {
-            swipeRefresh?.isRefreshing = true
-
-            if (playlistId != null) {
-                setTitle(playlistName!!)
-                listModel.getPlaylist(playlistId, playlistName)
-            } else if (podcastChannelId != null) {
-                setTitle(getString(R.string.podcasts_label))
-                listModel.getPodcastEpisodes(podcastChannelId)
-            } else if (shareId != null) {
-                setTitle(shareName)
-                listModel.getShare(shareId)
-            } else if (getStarredTracks) {
-                setTitle(getString(R.string.main_songs_starred))
-                listModel.getStarred()
-            } else if (getVideos) {
-                setTitle(R.string.main_videos)
-                listModel.getVideos(refresh2)
-
-                // getSongsName
-                // Get songs based on filters, for example songs from
-                // [Hardstyle, 2025]
-                // [Uptempo Hardcore, 2021, short]
-            } else if (songs != null) {
-                // No preset title
-                if (songs != "?") {
-                    setTitle(songs)
-                } else {
-                    val title = buildString {
-                        when (sortMethod) {
-                            "AddedDesc" -> append("Recent ")
-                            "Random" -> append("Random ")
-                            "LastWrittenDesc" -> append("Recent Modified ")
-                        }
-                        if (!festival.isNullOrBlank()) append(festival)
-                        if (!label.isNullOrBlank()) append(label)
-                        if (artists.isNotEmpty()) {
-                            if (isNotEmpty()) {
-                                append(" ")
-                            }
-                            append(
-                                if (artists.size == 1) {
-                                    artists.first()
-                                } else {
-                                    getString(R.string.common_artist)
-                                }
-                            )
-                        }
-                        if (!genre.isNullOrBlank() && genre != "All") {
-                            if (isNotEmpty()) append(" ")
-                            append(genre)
-                        }
-                        if (!year.isNullOrBlank() && year != "All") {
-                            append(" ($year)")
-                        }
-                    }
-                    setTitle(title)
-                }
-
-                // Gebruik filtersJson als het er is, anders stel Filters handmatig samen
-                val filters: Filters =
-                    arguments?.getString("filters")?.takeIf { it.isNotEmpty() }?.let {
-                        Gson().fromJson(it, Filters::class.java).sanitized()
-                    } ?: Filters().apply {
-                        year?.takeIf { it != "All" && it.isNotBlank() }?.let {
-                            add(Filter("YEAR", it))
-                        }
-                        genre?.takeIf { it != "All" && it.isNotBlank() }?.let {
-                            add(Filter("GENRE", it))
-                        }
-                        if (artists.isNotEmpty()) {
-                            add(
-                                if (artists.size == 1) {
-                                    Filter("ARTIST", artists.first())
-                                } else {
-                                    Filter("ARTIST", artists)
-                                }
-                            )
-                        }
-                        festival?.takeIf { it != "All" && it.isNotBlank() }?.let {
-                            add(Filter("FESTIVAL", it))
-                        }
-                        label?.takeIf { it != "All" && it.isNotBlank() }?.let {
-                            add(Filter("PUBLISHER", it))
-                        }
-                        length?.takeIf { it.isNotEmpty() }?.let {
-                            add(Filter("LENGTH", it))
-                        }
-                    }
-
-                val effectiveSortMethod = sortMethod?.takeIf { it.isNotEmpty() } ?: "AddedDesc"
-                Timber.d(filters.toString())
-                listModel.getSongs(
-                    filters,
-                    ratingMin,
-                    ratingMax,
-                    size,
-                    offset,
-                    append,
-                    effectiveSortMethod,
-                    festivalLineup,
-                    minDuration,
-                    maxDuration
-                )
-            } else if (id == null || getRandomTracks) {
-                // There seems to be a bug in ViewPager when resuming the Activity that sub-fragments
-                // arguments are empty. If we have no id, just show some random tracks
-                setTitle(R.string.main_songs_random)
-                listModel.getRandom(size, append)
-            } else {
-                setTitle(name)
-
-                if (isAlbum && ActiveServerProvider.shouldUseId3Tags()) {
-                    Timber.d("Loading album with id3 tags $id $artistId")
-                    if (id == "no_album") {
-                        if (artistId != null) {
-                            listModel.getSingles(artistId, refresh2)
-                        }
-                    } else {
-                        listModel.getAlbum(refresh2, id, name)
-                    }
-                } else {
-                    listModel.getMusicDirectory(refresh2, id, name)
-                }
-            }
-            if (append) {
-                currentOffset += pageSize
-            }
-            isLoading = false
-            swipeRefresh?.isRefreshing = false
-        }
-        return listModel.currentList
+        @Suppress("UNCHECKED_CAST")
+        return listModel.currentList as LiveData<List<MusicDirectoryEntry>>
     }
 
     private fun displayStarred() = (sortOrder == SortOrder.STARRED) || navArgs.getStarred

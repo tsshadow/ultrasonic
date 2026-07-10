@@ -19,6 +19,7 @@ import org.moire.ultrasonic.util.Settings
 class SearchListModel(application: Application) : GenericListModel(application) {
 
     var searchResult: MutableLiveData<SearchResult?> = MutableLiveData()
+    var autoPlayExecuted = false
 
     suspend fun search(query: String): SearchResult? {
         val maxArtists = Settings.maxArtists

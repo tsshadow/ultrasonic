@@ -50,3 +50,5 @@ if (isCodeQualityEnabled) {
         }
     }
 }
+
+apply from: "${project.rootDir}/gradle_scripts/jacoco.gradle"

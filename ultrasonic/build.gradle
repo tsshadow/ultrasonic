@@ -34,7 +34,7 @@ android {
 
     defaultConfig {
         applicationId = 'nl.teunschriks.mumamobile'
-        versionCode 192
+        versionCode 194
         versionName "6.4.3"
 
         minSdk = libs.versions.appMinSdk.get().toInteger()
@@ -256,6 +256,8 @@ dependencies {
     testImplementation libs.kluent
     testImplementation libs.mockito
     testImplementation libs.mockitoKotlin
+    testImplementation libs.mockk
+    testImplementation libs.archunit
     testImplementation libs.robolectric
 
     implementation libs.timber

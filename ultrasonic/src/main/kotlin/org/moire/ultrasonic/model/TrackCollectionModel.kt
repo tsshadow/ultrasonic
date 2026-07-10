@@ -10,9 +10,12 @@ package org.moire.ultrasonic.model
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.moire.ultrasonic.R
+import org.moire.ultrasonic.api.subsonic.models.Filter
 import org.moire.ultrasonic.api.subsonic.models.Filters
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.MusicDirectory
@@ -20,6 +23,8 @@ import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.DownloadService
 import org.moire.ultrasonic.service.DownloadState
 import org.moire.ultrasonic.service.MusicServiceFactory
+import org.moire.ultrasonic.util.CommunicationError
+import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import timber.log.Timber
 
@@ -29,7 +34,178 @@ import timber.log.Timber
 class TrackCollectionModel(application: Application) : GenericListModel(application) {
 
     val currentList: MutableLiveData<List<MusicDirectory.Child>> = MutableLiveData()
+    val title: MutableLiveData<String> = MutableLiveData()
+    val isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
     private var loadedUntil: Int = 0
+    var hasMoreData = true
+    var autoPlayExecuted = false
+
+    data class LoadParams(
+        val id: String? = null,
+        val artistId: String? = null,
+        val isAlbum: Boolean = false,
+        val name: String? = null,
+        val playlistId: String? = null,
+        val podcastChannelId: String? = null,
+        val playlistName: String? = null,
+        val shareId: String? = null,
+        val shareName: String? = null,
+        val genre: String? = null,
+        val artists: List<String>? = null,
+        val festival: String? = null,
+        val label: String? = null,
+        val songs: String? = null,
+        val year: String? = null,
+        val length: String? = null,
+        val sortMethod: String = "",
+        val ratingMin: Int = 0,
+        val festivalLineup: String? = null,
+        val ratingMax: Int = 5,
+        val minDuration: Int? = null,
+        val maxDuration: Int? = null,
+        val getVideos: Boolean = false,
+        val size: Int = -1,
+        val getRandomTracks: Boolean = false,
+        val getStarredTracks: Boolean = false,
+        val filtersJson: String? = null,
+        val refresh: Boolean = false
+    )
+
+    @Suppress("LongMethod", "CyclomaticComplexMethod")
+    fun loadData(
+        refresh: Boolean,
+        append: Boolean,
+        params: LoadParams
+    ) {
+        val size = if (params.size < 0) Settings.maxSongs else params.size
+        val offset = if (append) loadedUntil else 0
+        val refresh2 = params.refresh || refresh
+
+        if (!append) {
+            loadedUntil = 0
+            hasMoreData = true
+        }
+
+        isLoading.value = true
+        viewModelScope.launch(CommunicationError.getHandler(context)) {
+            if (params.playlistId != null) {
+                title.postValue(params.playlistName!!)
+                getPlaylist(params.playlistId, params.playlistName)
+            } else if (params.podcastChannelId != null) {
+                title.postValue(context.getString(R.string.podcasts_label))
+                getPodcastEpisodes(params.podcastChannelId)
+            } else if (params.shareId != null) {
+                title.postValue(params.shareName!!)
+                getShare(params.shareId)
+            } else if (params.getStarredTracks) {
+                title.postValue(context.getString(R.string.main_songs_starred))
+                getStarred()
+            } else if (params.getVideos) {
+                title.postValue(context.getString(R.string.main_videos))
+                getVideos(refresh2)
+            } else if (params.songs != null) {
+                if (params.songs != "?") {
+                    title.postValue(params.songs)
+                } else {
+                    val generatedTitle = buildString {
+                        when (params.sortMethod) {
+                            "AddedDesc" -> append("Recent ")
+                            "Random" -> append("Random ")
+                            "LastWrittenDesc" -> append("Recent Modified ")
+                        }
+                        if (!params.festival.isNullOrBlank()) append(params.festival)
+                        if (!params.label.isNullOrBlank()) append(params.label)
+                        if (params.artists != null && params.artists.isNotEmpty()) {
+                            if (isNotEmpty()) append(" ")
+                            append(
+                                if (params.artists.size == 1) {
+                                    params.artists.first()
+                                } else {
+                                    context.getString(R.string.common_artist)
+                                }
+                            )
+                        }
+                        if (!params.genre.isNullOrBlank() && params.genre != "All") {
+                            if (isNotEmpty()) append(" ")
+                            append(params.genre)
+                        }
+                        if (!params.year.isNullOrBlank() && params.year != "All") {
+                            append(" (${params.year})")
+                        }
+                    }
+                    title.postValue(generatedTitle)
+                }
+
+                val filters: Filters = params.filtersJson?.takeIf { it.isNotEmpty() }?.let {
+                    Gson().fromJson(it, Filters::class.java).sanitized()
+                } ?: Filters().apply {
+                    params.year?.takeIf { it != "All" && it.isNotBlank() }?.let {
+                        add(Filter("YEAR", it))
+                    }
+                    params.genre?.takeIf { it != "All" && it.isNotBlank() }?.let {
+                        add(Filter("GENRE", it))
+                    }
+                    params.artists?.forEach { artist ->
+                        if (artist.isNotBlank()) {
+                            add(Filter("ARTIST", artist))
+                        }
+                    }
+                    params.festival?.takeIf { it.isNotBlank() && it != "All" }?.let {
+                        add(Filter("FESTIVAL", it))
+                    }
+                    params.label?.takeIf { it.isNotBlank() && it != "All" }?.let {
+                        add(Filter("PUBLISHER", it))
+                    }
+                    params.length?.takeIf { it.isNotBlank() }?.let {
+                        add(Filter("LENGTH", it))
+                    }
+                }
+                getSongs(
+                    filters,
+                    params.ratingMin,
+                    params.ratingMax,
+                    size,
+                    offset,
+                    append,
+                    params.sortMethod,
+                    params.festivalLineup,
+                    params.minDuration,
+                    params.maxDuration
+                )
+            } else if (params.getRandomTracks) {
+                title.postValue(context.getString(R.string.main_songs_random))
+                getRandom(size, append)
+            } else if (params.id != null) {
+                if (params.name != null) {
+                    title.postValue(params.name)
+                }
+                if (params.isAlbum) {
+                    getAlbum(refresh2, params.id, params.name)
+                } else {
+                    getMusicDirectory(refresh2, params.id, params.name)
+                }
+            } else if (params.artistId != null) {
+                if (params.name != null) {
+                    title.postValue(params.name)
+                }
+                getSingles(params.artistId, refresh2)
+            }
+
+            if (append) {
+                loadedUntil += size
+            } else {
+                loadedUntil = size
+            }
+            
+            // Check if we have more data
+            val currentItems = currentList.value ?: emptyList()
+            if (currentItems.size < size + offset) {
+                hasMoreData = false
+            }
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+        }
+    }
 
     /*
      * Especially when dealing with indexes, this method can return Albums, Entries or a mix of both!

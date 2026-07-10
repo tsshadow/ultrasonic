@@ -63,7 +63,16 @@ Lint:
 
 Unit Tests:
   stage: Check
-  script: ./gradlew ciTest testDebugUnitTest
+  script: ./gradlew ciTest testDebugUnitTest jacocoTestReport
+  artifacts:
+    name: "coverage-report-${CI_COMMIT_REF_NAME}"
+    paths:
+      - "**/build/reports/jacoco/**"
+    reports:
+      junit: "**/build/test-results/**/*.xml"
+      coverage_report:
+        coverage_format: jacoco
+        path: "**/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
   cache:
     # inherit all global cache settings
     <<: *global_cache
