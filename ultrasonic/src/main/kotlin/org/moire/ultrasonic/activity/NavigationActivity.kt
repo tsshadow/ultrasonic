@@ -47,6 +47,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -104,6 +105,7 @@ class NavigationActivity : ScopeActivity() {
     private var nowPlayingView: FragmentContainerView? = null
     private var nowPlayingHidden = false
     private var navigationView: NavigationView? = null
+    private var bottomNavigationView: BottomNavigationView? = null
     private var drawerLayout: DrawerLayout? = null
     private var host: NavHostFragment? = null
     private var selectServerButton: MaterialButton? = null
@@ -158,6 +160,7 @@ class NavigationActivity : ScopeActivity() {
         setContentView(R.layout.navigation_activity)
         nowPlayingView = findViewById(R.id.now_playing_fragment)
         navigationView = findViewById(R.id.nav_view)
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
         drawerLayout = findViewById(R.id.drawer_layout)
 
         setupDrawerLayout(drawerLayout!!)
@@ -191,6 +194,7 @@ class NavigationActivity : ScopeActivity() {
         setupActionBar(navController, appBarConfiguration)
 
         setupNavigationMenu(navController)
+        bottomNavigationView?.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             setsToggleItem?.isVisible = destination.id == R.id.mainFragment
@@ -294,7 +298,9 @@ class NavigationActivity : ScopeActivity() {
             inflater.inflate(R.menu.search_view_menu, menu)
         }
 
-        override fun onMenuItemSelected(item: MenuItem): Boolean = false
+        override fun onMenuItemSelected(item: MenuItem): Boolean {
+            return item.onNavDestinationSelected(host!!.navController)
+        }
     }
 
     private fun updateSetsToggleColors(toggle: MaterialSwitch, isSets: Boolean) {
@@ -605,6 +611,7 @@ class NavigationActivity : ScopeActivity() {
             val passwordField = view.findViewById<TextInputEditText>(R.id.welcome_password)
             val progressBar = view.findViewById<ProgressBar>(R.id.welcome_progress)
             val errorText = view.findViewById<TextView>(R.id.welcome_error)
+            val targetUrlText = view.findViewById<TextView>(R.id.welcome_target_url)
 
             val dialog = MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.welcome_title)
@@ -627,6 +634,15 @@ class NavigationActivity : ScopeActivity() {
 
                 progressBar.visibility = View.VISIBLE
                 errorText.visibility = View.GONE
+
+                // Connect to the preferred one (alpha for debug, LMS for release)
+                val targetServerId = if (BuildConfig.DEBUG) 1 else 0
+                val targetServer = ServerSettingsModel.STATIC_SERVERS.find { it.id == targetServerId }
+                if (targetServer != null) {
+                    targetUrlText.text = getString(R.string.main_setup_server, targetServer.url)
+                    targetUrlText.visibility = View.VISIBLE
+                }
+
                 usernameField.isEnabled = false
                 passwordField.isEnabled = false
                 dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).isEnabled = false

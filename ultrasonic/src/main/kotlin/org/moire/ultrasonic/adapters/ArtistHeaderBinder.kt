@@ -26,7 +26,7 @@ class ArtistHeaderBinder(private val onPlayAll: () -> Unit) : ItemViewBinder<Art
         val title: TextView = view.findViewById(R.id.artist_title)
         val genres: TextView = view.findViewById(R.id.artist_genres)
         val description: TextView = view.findViewById(R.id.artist_description)
-        val playAll: Button = view.findViewById(R.id.artist_play_all)
+        val playAll: View = view.findViewById(R.id.artist_play_all)
     }
 
     data class ArtistHeader(val name: String, val genres: String?, val description: String?) : Identifiable {

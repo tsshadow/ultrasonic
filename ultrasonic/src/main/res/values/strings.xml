@@ -442,6 +442,11 @@
     <string name="about.webpage.url" translatable="false">https://ultrasonic.gitlab.io/</string>
     <string name="about.report.url" translatable="false">https://gitlab.com/ultrasonic/ultrasonic/issues</string>
 
+    <string name="welcome_morning">Good morning</string>
+    <string name="welcome_afternoon">Good afternoon</string>
+    <string name="welcome_evening">Good evening</string>
+    <string name="welcome_night">Good night</string>
+
     <plurals name="n_songs">
         <item quantity="one">%d song</item>
         <item quantity="other">%d songs</item>

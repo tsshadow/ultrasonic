@@ -35,9 +35,19 @@
             a:name="org.moire.ultrasonic.fragment.NowPlayingFragment"
             a:layout_width="match_parent"
             a:layout_height="wrap_content"
-            a:layout_alignParentBottom="true"
+            a:layout_above="@+id/bottom_navigation"
             app:defaultNavHost="true"
             app:navGraph="@navigation/navigation_graph" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            a:id="@+id/bottom_navigation"
+            a:layout_width="match_parent"
+            a:layout_height="wrap_content"
+            a:layout_alignParentBottom="true"
+            a:background="@color/spotify_black"
+            app:itemIconTint="@color/spotify_green"
+            app:itemTextColor="@color/spotify_text_primary"
+            app:menu="@menu/bottom_navigation" />
     </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView

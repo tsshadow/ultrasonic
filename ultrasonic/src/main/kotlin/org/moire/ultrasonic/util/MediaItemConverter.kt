@@ -70,7 +70,7 @@ fun Track.toMediaItem(mediaId: String = id): MediaItem {
     val bitrate = Settings.maxBitRate
     val uri = "$id|$bitrate|$filePath"
 
-    val artworkUri = AlbumArtContentProvider.mapArtworkToContentProviderUri(this)
+    val artworkUri: Uri? = null
 
     val mediaItem = buildMediaItem(
         title = title ?: "",

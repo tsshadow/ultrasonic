@@ -17,49 +17,54 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
-import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.google.android.material.materialswitch.MaterialSwitch
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
-import org.moire.ultrasonic.service.RxBus
-import org.moire.ultrasonic.service.plusAssign
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import java.lang.ref.SoftReference
-import kotlin.collections.HashMap
-import kotlin.collections.hashMapOf
-import kotlin.collections.set
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 import org.koin.androidx.scope.ScopeFragment
+import org.koin.core.component.KoinComponent
 import org.koin.core.component.KoinScopeComponent
+import org.koin.core.component.inject as koinInject
 import org.moire.ultrasonic.NavigationGraphDirections
+import android.widget.TextView
+import java.util.Calendar
 import org.moire.ultrasonic.R
+import org.moire.ultrasonic.adapters.AlbumGridDelegate
+import org.moire.ultrasonic.adapters.ArtistRowBinder
+import org.moire.ultrasonic.adapters.BaseAdapter
+import org.moire.ultrasonic.domain.Album
+import org.moire.ultrasonic.domain.Artist
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
-import org.moire.ultrasonic.data.ActiveServerProvider
-import org.moire.ultrasonic.fragment.tsshadow.SelectFragment
-import org.moire.ultrasonic.fragment.tsshadow.SelectSongFragment
+import org.moire.ultrasonic.domain.ArtistOrIndex
+import org.moire.ultrasonic.domain.Playlist
+import org.moire.ultrasonic.model.AlbumListModel
+import org.moire.ultrasonic.model.ArtistListModel
+import org.moire.ultrasonic.service.MusicServiceFactory.getMusicService
 import org.moire.ultrasonic.util.LayoutType
 import org.moire.ultrasonic.util.Settings
-import org.moire.ultrasonic.view.EMPTY_CAPABILITIES
-import org.moire.ultrasonic.view.FilterButtonBar
-import org.moire.ultrasonic.view.SortOrder
-import org.moire.ultrasonic.view.ViewCapabilities
 import timber.log.Timber
 
 class MainFragment :
     ScopeFragment(),
     KoinScopeComponent {
 
-    private var filterButtonBar: FilterButtonBar? = null
-    private var layoutType: LayoutType = LayoutType.COVER
     private var binding: View? = null
+    private val albumListModel: AlbumListModel by viewModel()
+    private val artistListModel: ArtistListModel by viewModel()
 
-    private lateinit var musicCollectionAdapter: MusicCollectionAdapter
-    private lateinit var viewPager: ViewPager2
+    private lateinit var playlistAdapter: PlaylistHomeAdapter
+    private lateinit var albumAdapter: AlbumHomeAdapter
+    private lateinit var artistAdapter: ArtistHomeAdapter
 
     private var rxBusSubscription = CompositeDisposable()
 
@@ -76,71 +81,90 @@ class MainFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         FragmentTitle.setTitle(this, R.string.music_library_label)
 
-        // Load last layout from settings
-        layoutType = LayoutType.from(Settings.lastViewType)
+        val welcomeTextView: TextView = binding!!.findViewById(R.id.welcome_message)
+        welcomeTextView.text = getWelcomeMessage()
 
-        // Init ViewPager2
-        musicCollectionAdapter = MusicCollectionAdapter(this, layoutType)
-        viewPager = binding!!.findViewById(R.id.pager)
-        viewPager.adapter = musicCollectionAdapter
+        setupPlaylistsRecyclerView(view)
+        setupAlbumsRecyclerView(view)
+        setupArtistsRecyclerView(view)
 
-        filterButtonBar = binding!!.findViewById(R.id.filter_button_bar)
-        musicCollectionAdapter.filterButtonBar = filterButtonBar
+        loadData()
+    }
 
-        filterButtonBar!!.setOnLayoutTypeChangedListener {
-            updateLayoutTypeOnCurrentFragment(it)
+    private fun setupPlaylistsRecyclerView(view: View) {
+        val recyclerView: RecyclerView = view.findViewById(R.id.recent_playlists_recycler)
+        playlistAdapter = PlaylistHomeAdapter { playlist ->
+            val action = NavigationGraphDirections.toTrackCollection(
+                id = playlist.id,
+                playlistId = playlist.id,
+                name = playlist.name,
+                playlistName = playlist.name
+            )
+            findNavController().navigate(action)
         }
+        recyclerView.layoutManager = GridLayoutManager(context, 2)
+        recyclerView.adapter = playlistAdapter
+    }
 
-        filterButtonBar!!.setOnOrderChangedListener {
-            updateSortOrderOnCurrentFragment(it)
+    private fun setupAlbumsRecyclerView(view: View) {
+        val recyclerView: RecyclerView = view.findViewById(R.id.recent_albums_recycler)
+        albumAdapter = AlbumHomeAdapter { album ->
+            val action = NavigationGraphDirections.toTrackCollection(
+                id = album.id,
+                name = album.title,
+                isAlbum = true
+            )
+            findNavController().navigate(action)
         }
+        recyclerView.layoutManager = GridLayoutManager(context, 2)
+        recyclerView.adapter = albumAdapter
 
-        rxBusSubscription += RxBus.setsModeChangedObservable.subscribe {
-            updateSetsToggleOnCurrentFragment(it)
+        albumListModel.list.observe(viewLifecycleOwner) { albums ->
+            albumAdapter.items = albums.take(6)
         }
+    }
 
-        // Set layout toggle Chip to correct state
-        filterButtonBar!!.setLayoutType(layoutType)
+    private fun setupArtistsRecyclerView(view: View) {
+        val recyclerView: RecyclerView = view.findViewById(R.id.recent_artists_recycler)
+        artistAdapter = ArtistHomeAdapter { artist ->
+            val action = NavigationGraphDirections.toArtistDetail(artist.id)
+            findNavController().navigate(action)
+        }
+        recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+        recyclerView.adapter = artistAdapter
 
-        updateBrandColors()
+        artistListModel.list.observe(viewLifecycleOwner) { artists ->
+            // Filter out indexes, only show artists
+            artistAdapter.items = artists.filterIsInstance<Artist>().take(10)
+        }
+    }
 
-        // Listen to changes in the current page (=fragment)
-        val chipGroup: com.google.android.material.chip.ChipGroup = binding!!.findViewById(R.id.main_type_toggle_group)
-        val chipIds = listOf(R.id.chip_songs, R.id.chip_albums, R.id.chip_artists)
-
-        chipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
-            val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
-            val position = chipIds.indexOf(checkedId)
-            if (position != -1 && viewPager.currentItem != position) {
-                viewPager.setCurrentItem(position, true)
+    private fun loadData() {
+        // Load Playlists
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val playlists = getMusicService().getPlaylists(false)
+                withContext(Dispatchers.Main) {
+                    playlistAdapter.items = playlists.take(6)
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to load playlists")
             }
         }
+        // Load Newest Albums
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            albumListModel.getAlbums(AlbumListType.NEWEST, size = 10, refresh = false)
+        }
 
-        viewPager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-
-                Timber.i("On Page changed $position")
-
-                if (position < chipIds.size) {
-                    chipGroup.check(chipIds[position])
-                }
-
-                // This is a bit tricky. We need to configure the FilterButtonBar based on the
-                // fragments capabilities. But this function can be called before the fragment has
-                // been created, and the ViewPager might create the fragments in arbitrary order.
-                // Therefore we store a flag in the Adapter, to signal that the next created
-                // fragment of the given position should propagate its capabilities
-                val frag = findFragmentAtPosition(childFragmentManager, position)
-                if (frag != null) {
-                    filterButtonBar!!.configureWithCapabilitiesFromFragment(frag)
-                } else {
-                    musicCollectionAdapter.propagateCapabilitiesMatcher = position
-                }
-                requireActivity().invalidateMenu()
-            }
-        })
-
+        // Load Artists
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            artistListModel.load(
+                isOffline = org.moire.ultrasonic.data.ActiveServerProvider.isOffline(),
+                useId3Tags = org.moire.ultrasonic.data.ActiveServerProvider.shouldUseId3Tags(),
+                musicService = getMusicService(),
+                refresh = false
+            )
+        }
     }
 
     override fun onDestroyView() {
@@ -149,142 +173,141 @@ class MainFragment :
         binding = null
     }
 
-    private fun updateLayoutTypeOnCurrentFragment(it: LayoutType) {
-        val curFrag = findCurrentFragment()
-
-        if (curFrag is FilterableFragment) {
-            curFrag.setLayoutType(it)
+    private fun getWelcomeMessage(): String {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val resId = when (hour) {
+            in 0..11 -> R.string.welcome_morning
+            in 12..16 -> R.string.welcome_afternoon
+            in 17..20 -> R.string.welcome_evening
+            else -> R.string.welcome_night
         }
-
-        Settings.lastViewType = layoutType.value
-    }
-
-    private fun updateSortOrderOnCurrentFragment(it: SortOrder) {
-        val curFrag = findCurrentFragment()
-
-        if (curFrag is FilterableFragment) {
-            curFrag.setOrderType(it)
-        }
-    }
-
-    private fun updateBrandColors() {
-        val curFrag = findCurrentFragment()
-        val isSets = if (curFrag is FilterableFragment) curFrag.isSetsMode else Settings.isSetsMode
-        val brandColor = if (isSets) {
-            requireContext().getColor(R.color.spotify_blue)
-        } else {
-            requireContext().getColor(R.color.spotify_green)
-        }
-
-        val chipGroup: com.google.android.material.chip.ChipGroup = binding!!.findViewById(R.id.main_type_toggle_group)
-        val chipIds = listOf(R.id.chip_songs, R.id.chip_albums, R.id.chip_artists)
-
-        for (id in chipIds) {
-            val chip = chipGroup.findViewById<com.google.android.material.chip.Chip>(id)
-            chip.chipBackgroundColor = ColorStateList(
-                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(brandColor, requireContext().getColor(R.color.spotify_card))
-            )
-        }
-
-        filterButtonBar?.updateBrandColors(isSets)
-    }
-
-    private fun updateSetsToggleOnCurrentFragment(it: Boolean) {
-        val curFrag = findCurrentFragment()
-        if (curFrag is FilterableFragment) {
-            curFrag.setOnSetsToggle(it)
-        }
-        if (curFrag is MultiListFragment<*>) {
-            curFrag.updateBrandColors()
-        } else if (curFrag is SelectFragment) {
-            curFrag.updateBrandColors()
-        }
-        updateBrandColors()
-        requireActivity().invalidateMenu()
-    }
-
-    private fun Int.withAlpha(alpha: Int): Int {
-        return (this and 0x00FFFFFF) or (alpha shl 24)
-    }
-
-    private fun findCurrentFragment(): Fragment? = findFragmentAtPosition(childFragmentManager, viewPager.currentItem)
-
-    private fun findFragmentAtPosition(fragmentManager: FragmentManager, position: Int): Fragment? {
-        // If a fragment was recently created and never shown the fragment manager might not
-        // hold a reference to it. Fallback on the WeakMap instead.
-        return fragmentManager.findFragmentByTag("f$position")
-            ?: musicCollectionAdapter.fragmentMap[position]?.get()
+        return getString(resId)
     }
 }
 
-private val EMPTY_CAPABILITIES = ViewCapabilities(false, false, emptyList())
+class PlaylistHomeAdapter(
+    private val onItemClick: (Playlist) -> Unit
+) : RecyclerView.Adapter<PlaylistHomeAdapter.ViewHolder>(), KoinComponent {
+    private val imageLoaderProvider: org.moire.ultrasonic.subsonic.ImageLoaderProvider by koinInject()
 
-private fun FilterButtonBar.configureWithCapabilitiesFromFragment(frag: Fragment?) {
-    if (frag is FilterableFragment) {
-        Timber.w("Setting kapas: ${frag.viewCapabilities}")
-        this.configureWithCapabilities(frag.viewCapabilities, frag.isSetsMode)
-    } else {
-        Timber.w("Setting kapas: $EMPTY_CAPABILITIES")
-        this.configureWithCapabilities(EMPTY_CAPABILITIES, Settings.isSetsMode)
+    var items: List<Playlist> = emptyList()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val name: TextView = view.findViewById(R.id.playlist_name)
+        val image: ImageView = view.findViewById(R.id.playlist_image)
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.grid_item_playlist, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = items[position]
+        holder.name.text = item.name
+        holder.itemView.setOnClickListener { onItemClick(item) }
+
+        imageLoaderProvider.executeOn {
+            it.loadImage(
+                holder.image,
+                item.id,
+                item.name,
+                false,
+                0,
+                R.drawable.ic_menu_playlists
+            )
+        }
+    }
+
+    override fun getItemCount() = items.size
 }
 
-@Suppress("MagicNumber")
-class MusicCollectionAdapter(fragment: Fragment, initialType: LayoutType = LayoutType.LIST) : FragmentStateAdapter(fragment) {
+class AlbumHomeAdapter(
+    private val onItemClick: (Album) -> Unit
+) : RecyclerView.Adapter<AlbumHomeAdapter.ViewHolder>(), KoinComponent {
+    private val imageLoaderProvider: org.moire.ultrasonic.subsonic.ImageLoaderProvider by koinInject()
 
-    var filterButtonBar: FilterButtonBar? = null
-    private var layoutType: LayoutType = initialType
+    var items: List<Album> = emptyList()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
-    var propagateCapabilitiesMatcher: Int? = null
-
-    // viewPager.findFragmentAtPosition(childFragmentManager, position) is sometimes delayed..
-    var fragmentMap: HashMap<Int, SoftReference<Fragment>> = hashMapOf()
-
-    override fun getItemCount(): Int {
-        // Hide Genre tab when offline
-        // We merged Songs and Livesets, so we have one less tab
-        return if (ActiveServerProvider.isOffline()) 2 else 3
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val title: TextView = view.findViewById(R.id.album_title)
+        val artist: TextView = view.findViewById(R.id.album_artist)
+        val image: ImageView = view.findViewById(R.id.cover_art)
     }
 
-    override fun createFragment(position: Int): Fragment {
-        Timber.i("Creating new fragment at position: $position")
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.grid_item_album, parent, false)
+        return ViewHolder(view)
+    }
 
-        val action = when (position) {
-            0 -> NavigationGraphDirections.toSongList()
-            1 -> NavigationGraphDirections.toAlbumList(
-                AlbumListType.NEWEST,
-                size = Settings.maxAlbums
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = items[position]
+        holder.title.text = item.title
+        holder.artist.text = item.artist
+        holder.itemView.setOnClickListener { onItemClick(item) }
+
+        imageLoaderProvider.executeOn {
+            it.loadImage(
+                holder.image,
+                item,
+                false,
+                0,
+                R.drawable.unknown_album
             )
-            2 -> NavigationGraphDirections.toArtistList()
-            else -> NavigationGraphDirections.toSongList()
         }
-
-        val fragment = when (position) {
-            0 -> SelectSongFragment()
-            1 -> AlbumListFragment(layoutType)
-            2 -> ArtistListFragment()
-            else -> SelectSongFragment()
-        }
-
-        fragmentMap[position] = SoftReference(fragment)
-        fragment.arguments = action.arguments
-
-        // See comment in onPageSelected
-        if (propagateCapabilitiesMatcher == position) {
-            Timber.w("Setting capacities while creating, $position")
-            propagateCapabilitiesMatcher = null
-            filterButtonBar!!.configureWithCapabilitiesFromFragment(fragment)
-        }
-
-        return fragment
     }
 
-    fun getTitleForFragment(pos: Int, context: Context): String = when (pos) {
-        0 -> context.getString(R.string.main_songs_title)
-        1 -> context.getString(R.string.main_albums_title)
-        2 -> context.getString(R.string.main_artists_title)
-        else -> "Unknown"
+    override fun getItemCount() = items.size
+}
+
+class ArtistHomeAdapter(
+    private val onItemClick: (Artist) -> Unit
+) : RecyclerView.Adapter<ArtistHomeAdapter.ViewHolder>(), KoinComponent {
+    private val imageLoaderProvider: org.moire.ultrasonic.subsonic.ImageLoaderProvider by koinInject()
+
+    var items: List<Artist> = emptyList()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val name: TextView = view.findViewById(R.id.row_artist_name)
+        val image: ImageView = view.findViewById(R.id.cover_art)
+        val section: TextView = view.findViewById(R.id.row_section)
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_artist, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = items[position]
+        holder.name.text = item.name
+        holder.section.visibility = View.GONE
+        holder.itemView.setOnClickListener { onItemClick(item) }
+
+        imageLoaderProvider.executeOn {
+            it.loadImage(
+                view = holder.image,
+                id = item.coverArt,
+                key = org.moire.ultrasonic.util.FileUtil.getArtistArtKey(item.name, false),
+                large = false,
+                size = 0,
+                defaultResourceId = R.drawable.ic_contact_picture
+            )
+        }
+    }
+
+    override fun getItemCount() = items.size
 }
 

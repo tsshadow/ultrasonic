@@ -83,96 +83,6 @@ abstract class MediaLibraryBase protected constructor() {
         internal const val INDEX_RATING_MIN = 6
         internal const val INDEX_RATING_MAX = 7
 
-        // Media item extensions
-        fun MutableList<MediaItem>.addPlayAllItem(mediaId: String) {
-            this.add(
-                R.string.select_album_play_all,
-                mediaId,
-                null,
-                false,
-                icon = R.drawable.media_start
-            )
-        }
-
-        fun MutableList<MediaItem>.add(
-            resId: String,
-            mediaId: String,
-            groupNameId: Int?,
-            isBrowsable: Boolean = true,
-            mediaType: Int = MEDIA_TYPE_FOLDER_MIXED,
-            icon: Int? = null
-        ) {
-            val applicationContext = UApp.applicationContext()
-
-            val mediaItem = buildMediaItem(
-                resId,
-                mediaId,
-                isPlayable = !isBrowsable,
-                isBrowsable = isBrowsable,
-                imageUri = if (icon != null) {
-                    Util.getUriToDrawable(applicationContext, icon)
-                } else {
-                    null
-                },
-                group = if (groupNameId != null) {
-                    applicationContext.getString(groupNameId)
-                } else {
-                    null
-                },
-                mediaType = mediaType
-            )
-
-            this.add(mediaItem)
-        }
-
-        fun MutableList<MediaItem>.add(
-            title: String,
-            mediaId: String,
-            mediaType: Int = MEDIA_TYPE_MIXED,
-            isBrowsable: Boolean = false
-        ) {
-            val mediaItem = buildMediaItem(
-                title,
-                mediaId,
-                isPlayable = false,
-                isBrowsable = isBrowsable,
-                mediaType = mediaType
-            )
-
-            this.add(mediaItem)
-        }
-
-        fun MutableList<MediaItem>.add(
-            resId: Int,
-            mediaId: String,
-            groupNameId: Int?,
-            isBrowsable: Boolean = true,
-            mediaType: Int = MEDIA_TYPE_FOLDER_MIXED,
-            icon: Int? = null
-        ) {
-            val applicationContext = UApp.applicationContext()
-
-            val mediaItem = buildMediaItem(
-                applicationContext.getString(resId),
-                mediaId,
-                isPlayable = !isBrowsable,
-                isBrowsable = isBrowsable,
-                imageUri = if (icon != null) {
-                    Util.getUriToDrawable(applicationContext, icon)
-                } else {
-                    null
-                },
-                group = if (groupNameId != null) {
-                    applicationContext.getString(groupNameId)
-                } else {
-                    null
-                },
-                mediaType = mediaType
-            )
-
-            this.add(mediaItem)
-        }
-
         fun Player.setNextRepeatMode() {
             repeatMode =
                 when (repeatMode) {
@@ -183,6 +93,7 @@ abstract class MediaLibraryBase protected constructor() {
         }
 
         internal const val MEDIA_ROOT_ID = "MEDIA_ROOT_ID"
+        internal const val MEDIA_HOME_ID = "MEDIA_HOME_ID"
         internal const val MEDIA_ALBUM_ID = "MEDIA_ALBUM_ID"
         internal const val MEDIA_ALBUM_PAGE_ID = "MEDIA_ALBUM_PAGE_ID"
         internal const val MEDIA_ALBUM_NEWEST_ID = "MEDIA_ALBUM_NEWEST_ID"
@@ -229,4 +140,57 @@ abstract class MediaLibraryBase protected constructor() {
         // List of available custom SessionCommands
         const val PLAY_COMMAND = "play "
     }
+}
+
+// Media item extensions
+fun MutableList<MediaItem>.addPlayAllItem(mediaId: String) {
+    this.add(
+        R.string.select_album_play_all,
+        mediaId,
+        null,
+        false
+    )
+}
+
+fun MutableList<MediaItem>.add(
+    resId: Int,
+    mediaId: String,
+    groupNameId: Int? = null,
+    isBrowsable: Boolean = true,
+    mediaType: Int = MEDIA_TYPE_FOLDER_MIXED
+) {
+    val context = UApp.applicationContext()
+    add(
+        title = context.getString(resId),
+        mediaId = mediaId,
+        groupNameId = groupNameId,
+        isBrowsable = isBrowsable,
+        mediaType = mediaType
+    )
+}
+
+fun MutableList<MediaItem>.add(
+    title: String,
+    mediaId: String,
+    groupNameId: Int? = null,
+    isBrowsable: Boolean = true,
+    mediaType: Int = MEDIA_TYPE_FOLDER_MIXED
+) {
+    val applicationContext = UApp.applicationContext()
+
+    val mediaItem = buildMediaItem(
+        title,
+        mediaId,
+        isPlayable = !isBrowsable,
+        isBrowsable = isBrowsable,
+        imageUri = null,
+        group = if (groupNameId != null) {
+            applicationContext.getString(groupNameId)
+        } else {
+            null
+        },
+        mediaType = mediaType
+    )
+
+    this.add(mediaItem)
 }

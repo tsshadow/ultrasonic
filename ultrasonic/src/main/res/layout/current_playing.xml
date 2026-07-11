@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     a:layout_width="fill_parent"
     a:layout_height="fill_parent"
@@ -15,17 +16,19 @@
             a:id="@+id/current_playing_album_art_layout"
             a:layout_width="fill_parent"
             a:layout_height="fill_parent"
-            a:gravity="start"
-            a:orientation="vertical" >
+            a:gravity="center"
+            a:padding="32dp">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 a:id="@+id/current_playing_album_art_image"
                 a:layout_width="match_parent"
-                a:layout_height="match_parent"
-                a:scaleType="centerCrop"
-                a:layout_alignParentTop="true"
+                a:layout_height="wrap_content"
+                a:adjustViewBounds="true"
+                a:scaleType="fitCenter"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.MediumComponent"
                 a:layout_centerInParent="true"
-                a:contentDescription="@string/albumArt"/>
+                a:contentDescription="@string/albumArt"
+                a:elevation="12dp" />
 
             <LinearLayout
                 a:id="@+id/album_art_inside"

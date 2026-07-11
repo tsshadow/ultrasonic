@@ -1,65 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:a="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     a:layout_width="match_parent"
     a:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    a:orientation="vertical">
+    a:background="@color/spotify_black"
+    a:fillViewport="true">
 
-    <HorizontalScrollView
+    <LinearLayout
         a:layout_width="match_parent"
         a:layout_height="wrap_content"
-        a:scrollbars="none"
-        a:background="@color/spotify_black">
+        a:orientation="vertical"
+        a:paddingBottom="80dp">
 
-        <com.google.android.material.chip.ChipGroup
-            a:id="@+id/main_type_toggle_group"
-            a:layout_width="wrap_content"
+        <TextView
+            a:id="@+id/welcome_message"
+            a:layout_width="match_parent"
             a:layout_height="wrap_content"
-            a:padding="8dp"
-            app:singleSelection="true"
-            app:selectionRequired="true">
+            a:paddingStart="16dp"
+            a:paddingTop="32dp"
+            a:paddingEnd="16dp"
+            a:paddingBottom="16dp"
+            a:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+            a:textStyle="bold"
+            a:textColor="@color/spotify_text_primary"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.chip.Chip
-                a:id="@+id/chip_songs"
-                style="@style/Widget.Material3.Chip.Filter"
-                a:layout_width="wrap_content"
-                a:layout_height="wrap_content"
-                a:text="@string/main.songs_title"
-                app:chipBackgroundColor="@color/chip_background_selector"
-                app:chipStrokeWidth="0dp"
-                a:textColor="@color/chip_text_selector" />
+        <TextView
+            a:id="@+id/section_playlists_title"
+            a:layout_width="match_parent"
+            a:layout_height="wrap_content"
+            a:paddingStart="16dp"
+            a:paddingTop="16dp"
+            a:paddingEnd="16dp"
+            a:paddingBottom="8dp"
+            a:text="@string/playlist.label"
+            a:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            a:textStyle="bold"
+            a:textColor="@color/spotify_text_primary" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            a:id="@+id/recent_playlists_recycler"
+            a:layout_width="match_parent"
+            a:layout_height="wrap_content"
+            a:nestedScrollingEnabled="false"
+            a:paddingStart="8dp"
+            a:paddingEnd="8dp" />
 
-            <com.google.android.material.chip.Chip
-                a:id="@+id/chip_albums"
-                style="@style/Widget.Material3.Chip.Filter"
-                a:layout_width="wrap_content"
-                a:layout_height="wrap_content"
-                a:text="@string/main.albums_title"
-                app:chipBackgroundColor="@color/chip_background_selector"
-                app:chipStrokeWidth="0dp"
-                a:textColor="@color/chip_text_selector" />
+        <TextView
+            a:id="@+id/section_albums_title"
+            a:layout_width="match_parent"
+            a:layout_height="wrap_content"
+            a:paddingStart="16dp"
+            a:paddingTop="24dp"
+            a:paddingEnd="16dp"
+            a:paddingBottom="8dp"
+            a:text="@string/main.albums_newest"
+            a:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            a:textStyle="bold"
+            a:textColor="@color/spotify_text_primary" />
 
-            <com.google.android.material.chip.Chip
-                a:id="@+id/chip_artists"
-                style="@style/Widget.Material3.Chip.Filter"
-                a:layout_width="wrap_content"
-                a:layout_height="wrap_content"
-                a:text="@string/main.artists_title"
-                app:chipBackgroundColor="@color/chip_background_selector"
-                app:chipStrokeWidth="0dp"
-                a:textColor="@color/chip_text_selector" />
-        </com.google.android.material.chip.ChipGroup>
-    </HorizontalScrollView>
+        <androidx.recyclerview.widget.RecyclerView
+            a:id="@+id/recent_albums_recycler"
+            a:layout_width="match_parent"
+            a:layout_height="wrap_content"
+            a:nestedScrollingEnabled="false"
+            a:paddingStart="8dp"
+            a:paddingEnd="8dp" />
 
-    <org.moire.ultrasonic.view.FilterButtonBar
-        a:id="@+id/filter_button_bar"
-        a:layout_width="match_parent"
-        a:layout_height="wrap_content" />
+        <TextView
+            a:id="@+id/section_artists_title"
+            a:layout_width="match_parent"
+            a:layout_height="wrap_content"
+            a:paddingStart="16dp"
+            a:paddingTop="24dp"
+            a:paddingEnd="16dp"
+            a:paddingBottom="8dp"
+            a:text="@string/main.artists_title"
+            a:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            a:textStyle="bold"
+            a:textColor="@color/spotify_text_primary" />
 
-    <androidx.viewpager2.widget.ViewPager2
-        a:id="@+id/pager"
-        a:layout_width="match_parent"
-        a:layout_height="match_parent" />
+        <androidx.recyclerview.widget.RecyclerView
+            a:id="@+id/recent_artists_recycler"
+            a:layout_width="match_parent"
+            a:layout_height="wrap_content"
+            a:nestedScrollingEnabled="false"
+            a:paddingStart="8dp"
+            a:paddingEnd="8dp" />
 
-</LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

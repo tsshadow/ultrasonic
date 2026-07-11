@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# A git hook script to check and format Kotlin code before committing.
+#
+
+# Get the list of staged Kotlin files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep ".kt$")
+
+if [ -z "$STAGED_FILES" ]; then
+    exit 0
+fi
+
+echo "Running ktlintFormat on staged Kotlin files..."
+
+# Run ktlintFormat via Gradle
+# We use -Pqc to enable ktlint as configured in code_quality.gradle
+./gradlew -Pqc ktlintFormat
+
+# Re-add files that were formatted
+for FILE in $STAGED_FILES; do
+    if [ -f "$FILE" ]; then
+        git add "$FILE"
+    fi
+done
+
+exit 0

@@ -62,9 +62,9 @@
             a:layout_marginEnd="4dp"
             a:indeterminate="true"
             a:visibility="gone"
-            app:indicatorColor="?attr/colorOnSurface"
+            app:indicatorColor="@color/spotify_green"
             app:indicatorSize="20dp"
-            app:trackColor="?attr/colorSurfaceVariant" />
+            app:trackColor="@color/spotify_card" />
     </LinearLayout>
 
     <!-- Artiest + Album + Duur -->

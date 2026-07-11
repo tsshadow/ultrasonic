@@ -19,6 +19,9 @@ import org.moire.ultrasonic.data.MIGRATION_6_5
 import org.moire.ultrasonic.data.MIGRATION_6_7
 import org.moire.ultrasonic.data.MIGRATION_7_8
 import org.moire.ultrasonic.data.MIGRATION_8_9
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.moire.ultrasonic.model.AlbumListModel
+import org.moire.ultrasonic.model.ArtistListModel
 import org.moire.ultrasonic.model.ServerSettingsModel
 import org.moire.ultrasonic.util.Settings
 
@@ -56,4 +59,6 @@ val appPermanentStorage = module {
     single { get<AppDatabase>().serverSettingDao() }
 
     viewModel { ServerSettingsModel(get(), get(), get()) }
+    viewModel { AlbumListModel(get()) }
+    viewModel { ArtistListModel(get()) }
 }

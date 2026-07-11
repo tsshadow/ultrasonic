@@ -1,34 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:background="@color/spotify_black">
 
     <TextView
         android:id="@+id/artist_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceHeadline6" />
+        android:padding="16dp"
+        android:textAppearance="@style/TextAppearance.Material3.HeadlineLarge"
+        android:textStyle="bold"
+        android:textColor="@color/spotify_text_primary" />
 
     <TextView
         android:id="@+id/artist_genres"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="4dp"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:layout_below="@id/artist_title"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textColor="@color/spotify_text_secondary" />
 
     <TextView
         android:id="@+id/artist_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="4dp"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:layout_below="@id/artist_genres"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="24dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+        android:textColor="@color/spotify_text_secondary"
+        android:maxLines="3"
+        android:ellipsize="end" />
 
-    <Button
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/artist_play_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/select_album.play_all"
-        android:layout_marginTop="8dp" />
-</LinearLayout>
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@id/artist_description"
+        android:layout_marginBottom="-28dp"
+        android:layout_marginEnd="16dp"
+        app:backgroundTint="@color/spotify_green"
+        app:srcCompat="@drawable/media_start"
+        app:tint="@android:color/white"
+        app:fabSize="normal" />
+
+</RelativeLayout>

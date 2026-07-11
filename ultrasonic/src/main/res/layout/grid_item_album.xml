@@ -6,7 +6,7 @@
     a:layout_width="match_parent"
     a:layout_height="wrap_content"
     a:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
     app:cardBackgroundColor="@color/spotify_card"
     style="?attr/materialCardViewFilledStyle">

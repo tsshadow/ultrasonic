@@ -183,6 +183,14 @@ class SettingsFragment :
         }
     }
 
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
+        if (preference.key == "server_settings") {
+            findNavController().navigate(R.id.serverSelectorFragment)
+            return true
+        }
+        return super.onPreferenceTreeClick(preference)
+    }
+
     override fun onDisplayPreferenceDialog(preference: Preference) {
         if (preference is TimeSpanPreference) {
             val dialogFragment = TimeSpanPreferenceDialogFragmentCompat()

@@ -30,13 +30,13 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             a:id="@+id/now_playing_image"
-            a:layout_width="56.0dip"
-            a:layout_height="56.0dip"
-            a:layout_marginStart="4dp"
+            a:layout_width="48dip"
+            a:layout_height="48dip"
+            a:layout_marginStart="8dp"
             a:layout_gravity="center_vertical"
             a:focusable="true"
             a:gravity="center"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.SmallComponent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.MediumComponent"
             a:importantForAccessibility="no" />
 
         <LinearLayout

@@ -38,9 +38,9 @@
         a:layout_marginTop="8dp"
         a:layout_marginEnd="10dp"
         a:layout_toEndOf="@+id/row_section"
-        a:scaleType="fitCenter"
+        a:scaleType="centerCrop"
         a:src="@drawable/ic_contact_picture"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.MediumComponent" />
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle" />
 
     <TextView
         a:id="@+id/row_artist_name"

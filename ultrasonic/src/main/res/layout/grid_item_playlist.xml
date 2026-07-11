@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:a="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    a:layout_width="match_parent"
+    a:layout_height="56dp"
+    a:layout_margin="4dp"
+    app:cardBackgroundColor="@color/spotify_card"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        a:layout_width="match_parent"
+        a:layout_height="match_parent"
+        a:orientation="horizontal">
+
+        <ImageView
+            a:id="@+id/playlist_image"
+            a:layout_width="56dp"
+            a:layout_height="56dp"
+            a:scaleType="centerCrop"
+            a:src="@drawable/ic_menu_playlists" />
+
+        <TextView
+            a:id="@+id/playlist_name"
+            a:layout_width="match_parent"
+            a:layout_height="match_parent"
+            a:gravity="center_vertical"
+            a:paddingStart="12dp"
+            a:paddingEnd="12dp"
+            a:ellipsize="end"
+            a:maxLines="2"
+            a:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            a:textColor="@color/spotify_text_primary"
+            a:textStyle="bold" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

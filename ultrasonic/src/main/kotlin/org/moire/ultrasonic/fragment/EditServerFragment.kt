@@ -74,6 +74,7 @@ class EditServerFragment : Fragment() {
     private var jukeboxSwitch: SwitchMaterial? = null
     private var saveButton: Button? = null
     private var testButton: Button? = null
+    private var cancelButton: Button? = null
     private var isInstanceStateSaved: Boolean = false
     private var currentColor: Int = 0
     private var selectedColor: Int? = null
@@ -116,6 +117,7 @@ class EditServerFragment : Fragment() {
         jukeboxSwitch = view.findViewById(R.id.edit_jukebox)
         saveButton = view.findViewById(R.id.edit_save)
         testButton = view.findViewById(R.id.edit_test)
+        cancelButton = view.findViewById(R.id.edit_cancel)
 
         if (navArgs.index != -1) {
             // Editing an existing server
@@ -191,6 +193,10 @@ class EditServerFragment : Fragment() {
             if (getFields()) {
                 testConnection()
             }
+        }
+
+        cancelButton!!.setOnClickListener {
+            finishActivity()
         }
 
         serverColorImageView!!.setOnClickListener {
@@ -451,7 +457,7 @@ class EditServerFragment : Fragment() {
         val testSetting = ServerSetting()
         val builder = InfoDialog.Builder(requireContext())
         builder.setTitle(R.string.supported_server_features)
-        builder.setMessage(getProgress(testSetting))
+        builder.setMessage("${currentServerSetting!!.url}\n\n${getProgress(testSetting)}")
         val dialog: AlertDialog = builder.create()
         dialog.show()
 
@@ -471,7 +477,7 @@ class EditServerFragment : Fragment() {
                             }
                         }
                     }
-                    dialog.setMessage(getProgress(testSetting))
+                    dialog.setMessage("${currentServerSetting!!.url}\n\n${getProgress(testSetting)}")
                     Timber.w("${it.type} support: ${it.supported}")
                 }
 

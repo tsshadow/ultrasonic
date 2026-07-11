@@ -1,0 +1,62 @@
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = libs.versions.jacoco.get()
+}
+
+tasks.withType(Test).configureEach {
+    jacoco {
+        includeNoLocationClasses = true
+        excludes = ['jdk.internal.*']
+    }
+}
+
+project.afterEvaluate {
+    if (project.plugins.hasPlugin('com.android.application') || project.plugins.hasPlugin('com.android.library')) {
+        if (tasks.findByName("jacocoTestReport") == null) {
+            tasks.register("jacocoTestReport", JacocoReport) {
+                dependsOn "testDebugUnitTest"
+
+                reports {
+                    xml.required = true
+                    html.required = true
+                }
+
+                def fileFilter = [
+                        '**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*',
+                        '**/*Test*.*', 'android/**/*.*',
+                        '**/*$ViewInjector*.*', '**/*$ViewBinder*.*', '**/Lambda$*.class',
+                        '**/Lambda.class', '**/*Lambda.class', '**/*Lambda$*.class',
+                        '**/*_MembersInjector.class', '**/Dagger*Component*.*',
+                        '**/*Module_*Factory.class', '**/di/module/*', '**/*_Factory*.*',
+                        '**/*_Provide*Factory*.*', '**/*Extensions*.*',
+                        '**/*$Result.*', '**/*$Result$*.*'
+                ]
+                
+                def debugTree = fileTree(dir: "${project.buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
+                def mainSrc = "${project.projectDir}/src/main/kotlin"
+
+                sourceDirectories.setFrom(files([mainSrc]))
+                classDirectories.setFrom(files([debugTree]))
+                executionData.setFrom(fileTree(dir: project.buildDir, includes: [
+                        'jacoco/testDebugUnitTest.exec', 'outputs/code_coverage/debugAndroidTest/connected/*coverage.ec'
+                ]))
+            }
+        }
+    } else if (project.plugins.hasPlugin('kotlin')) {
+        if (tasks.findByName("jacocoTestReport") == null) {
+            tasks.register("jacocoTestReport", JacocoReport) {
+                dependsOn "test"
+
+                reports {
+                    xml.required = true
+                    html.required = true
+                }
+
+                sourceDirectories.setFrom(files(["src/main/kotlin"]))
+                classDirectories.setFrom(fileTree(dir: "${project.buildDir}/classes/kotlin/main"))
+                executionData.setFrom(fileTree(dir: project.buildDir, includes: ["jacoco/test.exec"]))
+            }
+        }
+    }
+}

@@ -5,6 +5,16 @@
     a:title="@string/common_appname">
 
     <PreferenceCategory
+        a:title="@string/server_selector.label"
+        app:iconSpaceReserved="false">
+        <Preference
+            a:key="server_settings"
+            a:title="@string/server_selector.label"
+            a:icon="@drawable/ic_menu_select_server"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         a:title="@string/settings.appearance_title"
         app:iconSpaceReserved="false">
         <ListPreference

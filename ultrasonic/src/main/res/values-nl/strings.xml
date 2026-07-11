@@ -480,6 +480,11 @@
     <string name="welcome_password">Wachtwoord</string>
     <string name="welcome_fields_required">Gebruikersnaam en wachtwoord zijn verplicht</string>
     <string name="welcome_connection_failed">Kon geen verbinding maken met LMS. Controleer je gegevens.</string>
+
+    <string name="welcome_morning">Goedemorgen</string>
+    <string name="welcome_afternoon">Goedemiddag</string>
+    <string name="welcome_evening">Goedenavond</string>
+    <string name="welcome_night">Goedenacht</string>
     <string name="settings.muma_sync_title">Music Management Cloud Sync</string>
     <string name="settings.save_to_muma_title">Instellingen opslaan naar Music Management</string>
     <string name="settings.save_to_muma_summary">Maak een back-up van je huidige instellingen op de Music Management-server</string>

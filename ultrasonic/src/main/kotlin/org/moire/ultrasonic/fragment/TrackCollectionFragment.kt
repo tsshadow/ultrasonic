@@ -31,6 +31,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.moire.ultrasonic.NavigationGraphDirections
+import android.widget.TextView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.adapters.AlbumHeader
 import org.moire.ultrasonic.adapters.AlbumRowDelegate
@@ -192,7 +194,19 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
 
         listModel.title.observe(viewLifecycleOwner) {
             setTitle(it)
+            view.findViewById<TextView>(R.id.spotify_header_title)?.text = it
         }
+
+        view.findViewById<FloatingActionButton>(R.id.spotify_shuffle_play_button)?.setOnClickListener {
+            playAll(shuffle = true)
+        }
+
+        listModel.currentList.observe(viewLifecycleOwner) { entries ->
+            val count = entries.filterIsInstance<Track>().size
+            val subtitle = resources.getQuantityString(R.plurals.n_songs, count, count)
+            view.findViewById<TextView>(R.id.spotify_header_subtitle)?.text = subtitle
+        }
+
         listModel.isLoading.observe(viewLifecycleOwner) {
             swipeRefresh?.isRefreshing = it
         }

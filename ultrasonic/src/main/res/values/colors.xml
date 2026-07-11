@@ -7,11 +7,11 @@
     <!-- Spotify branding -->
     <color name="spotify_green">#1db954</color>
     <color name="spotify_blue">#2d5afc</color>
-    <color name="spotify_black">#000000</color>
+    <color name="spotify_black">#121212</color>
     <color name="spotify_dark">#000000</color>
-    <color name="spotify_light">#121212</color>
-    <color name="spotify_card">#121212</color>
-    <color name="spotify_hover_light">#282828</color>
+    <color name="spotify_light">#181818</color>
+    <color name="spotify_card">#282828</color>
+    <color name="spotify_hover_light">#3e3e3e</color>
     <color name="spotify_text_primary">#ffffff</color>
     <color name="spotify_text_secondary">#b3b3b3</color>
 </resources>

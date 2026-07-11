@@ -34,6 +34,10 @@ import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.domain.Track
 import org.moire.ultrasonic.service.MusicService
+import org.moire.ultrasonic.util.FileUtil
+import org.moire.ultrasonic.provider.AlbumArtContentProvider
+import org.moire.ultrasonic.util.LayoutType
+import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Settings.maxSongs
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.buildMediaItem
@@ -221,9 +225,6 @@ class MediaLibraryBrowser(
 
         return when (action) {
             MEDIA_ROOT_ID -> getRootItems()
-            MEDIA_LIBRARY_ID -> getLibrary()
-            MEDIA_SONGS_ID -> getSongsLibrary(UApp.applicationContext())
-            MEDIA_LIVESETS_ID -> getLivesetsLibrary(UApp.applicationContext())
             MEDIA_ARTIST_ID -> getArtists()
             MEDIA_ARTIST_SECTION -> {
                 val section = parts.getOrNull(INDEX_ID)
@@ -402,30 +403,19 @@ class MediaLibraryBrowser(
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         mediaItems.add(
-            R.string.music_library_label,
-            MEDIA_LIBRARY_ID,
+            R.string.main_artists_title,
+            MEDIA_ARTIST_ID,
             null,
             isBrowsable = true,
-            mediaType = MEDIA_TYPE_FOLDER_MIXED,
-            icon = R.drawable.ic_library
+            mediaType = MEDIA_TYPE_FOLDER_MIXED
         )
 
         mediaItems.add(
-            "Songs",
-            MEDIA_SONGS_ID,
+            R.string.main_albums_title,
+            MEDIA_ALBUM_ID,
             null,
             isBrowsable = true,
-            mediaType = MEDIA_TYPE_FOLDER_PLAYLISTS,
-            icon = R.drawable.ic_stat_play
-        )
-
-        mediaItems.add(
-            "Livesets",
-            MEDIA_LIVESETS_ID,
-            null,
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_FOLDER_PLAYLISTS,
-            icon = R.drawable.ic_menu_browse
+            mediaType = MEDIA_TYPE_FOLDER_MIXED
         )
 
         mediaItems.add(
@@ -433,85 +423,16 @@ class MediaLibraryBrowser(
             MEDIA_PLAYLIST_ID,
             null,
             isBrowsable = true,
-            mediaType = MEDIA_TYPE_FOLDER_PLAYLISTS,
-            icon = R.drawable.ic_menu_playlists
+            mediaType = MEDIA_TYPE_FOLDER_PLAYLISTS
         )
 
-        return Futures.immediateFuture(
-            LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
+        mediaItems.add(
+            R.string.podcasts_label,
+            MEDIA_PODCAST_ID,
+            null,
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_FOLDER_MIXED
         )
-    }
-
-    private fun getLibrary(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.d("GetLibrary")
-        val mediaItems: MutableList<MediaItem> = ArrayList()
-        val presets = listOf(
-            TileInfo(title = "Recent Songs"),
-            TileInfo(title = "Random Songs", sortMethod = "Random"),
-            TileInfo(title = "Recent Livesets", length = "long"),
-            TileInfo(title = "Random Livesets", sortMethod = "Random", length = "long"),
-            TileInfo(title = "Starred Songs", ratingMin = 5)
-        )
-
-        presets.mapTo(mediaItems) { it.toMediaItem() }
-
-        return Futures.immediateFuture(
-            LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
-        )
-    }
-
-    private fun getSongsLibrary(
-        context: Context
-    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.d("getSongsLibrary")
-
-        val mediaItems: MutableList<MediaItem> = ArrayList()
-        // Default hardcoded presets
-        val presets = listOf(
-            TileInfo(title = "Search"),
-            TileInfo(title = "Recent"),
-            TileInfo(title = "Random", sortMethod = "Random"),
-            TileInfo(title = "Starred", ratingMin = 5)
-        )
-
-        // Add hardcoded presets
-        presets.mapTo(mediaItems) { it.toMediaItem() }
-
-        // Load user-defined tiles from storage and filter favorites
-        val savedFavoriteTiles = TileStorage.loadTiles(context, "song")
-            .filter { it.favorite }
-
-        // Add favorite user-defined tiles
-        savedFavoriteTiles.mapTo(mediaItems) { it.toMediaItem() }
-
-        return Futures.immediateFuture(
-            LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
-        )
-    }
-
-    private fun getLivesetsLibrary(
-        context: Context
-    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-        Timber.d("getLivesetsLibrary")
-
-        val mediaItems: MutableList<MediaItem> = ArrayList()
-        // Default hardcoded presets
-        val presets = listOf(
-            TileInfo(title = "Search", length = "long"),
-            TileInfo(title = "Recent", length = "long"),
-            TileInfo(title = "Random", sortMethod = "Random", length = "long"),
-            TileInfo(title = "Starred", ratingMin = 5, length = "long")
-        )
-
-        // Add hardcoded presets
-        presets.mapTo(mediaItems) { it.toMediaItem() }
-
-        // Load user-defined tiles from storage and filter favorites
-        val savedFavoriteTiles = TileStorage.loadTiles(context, "liveset")
-            .filter { it.favorite }
-
-        // Add favorite user-defined tiles
-        savedFavoriteTiles.mapTo(mediaItems) { it.toMediaItem() }
 
         return Futures.immediateFuture(
             LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
@@ -564,8 +485,8 @@ class MediaLibraryBrowser(
                 } else {
                     artists.map { artist ->
                         mediaItems.add(
-                            artist.name ?: "",
-                            listOf(childMediaId, artist.id, artist.name).joinToString("|")
+                            title = artist.name ?: "",
+                            mediaId = listOf(childMediaId, artist.id, artist.name).joinToString("|")
                         )
                     }
                 }
@@ -594,8 +515,8 @@ class MediaLibraryBrowser(
 
             albums?.map { album ->
                 mediaItems.add(
-                    album.title ?: "",
-                    listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
+                    title = album.title ?: "",
+                    mediaId = listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
                         .joinToString("|")
                 )
             }
@@ -693,8 +614,8 @@ class MediaLibraryBrowser(
 
             albums?.map { album ->
                 mediaItems.add(
-                    album.title ?: "",
-                    listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
+                    title = album.title ?: "",
+                    mediaId = listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
                         .joinToString("|")
                 )
             }
@@ -722,8 +643,8 @@ class MediaLibraryBrowser(
 
             playlists?.map { playlist ->
                 mediaItems.add(
-                    playlist.name,
-                    listOf(MEDIA_PLAYLIST_ITEM, playlist.id, playlist.name)
+                    title = playlist.name,
+                    mediaId = listOf(MEDIA_PLAYLIST_ITEM, playlist.id, playlist.name)
                         .joinToString("|"),
                     mediaType = MEDIA_TYPE_PLAYLIST
                 )
@@ -1053,8 +974,8 @@ class MediaLibraryBrowser(
 
             podcasts?.map { podcast ->
                 mediaItems.add(
-                    podcast.title ?: "",
-                    listOf(MEDIA_PODCAST_ITEM, podcast.id).joinToString("|"),
+                    title = podcast.title ?: "",
+                    mediaId = listOf(MEDIA_PODCAST_ITEM, podcast.id).joinToString("|"),
                     mediaType = MEDIA_TYPE_FOLDER_MIXED
                 )
             }
@@ -1096,11 +1017,16 @@ class MediaLibraryBrowser(
         val genreValue = genre?.takeIf { it.isNotEmpty() }?.joinToString(",") ?: ""
         val yearValue = year?.takeIf { it.isNotEmpty() }?.joinToString(",") ?: ""
 
+        val recentTitle = context.getString(R.string.main_albums_recent)
+        val starredTitle = context.getString(R.string.main_songs_starred)
+        val searchTitle = context.getString(R.string.button_bar_search)
+        val randomTitle = context.getString(R.string.main_albums_random)
+
         val mediaId = when {
-            title.equals("Random", ignoreCase = true) -> "$MEDIA_SONG_RANDOM_ID|$length"
-            title.equals("Recent", ignoreCase = true) -> "$MEDIA_SONG_RECENT|$length"
-            title.equals("Starred", ignoreCase = true) -> "$MEDIA_SONG_STARRED_ID|$length"
-            title.equals("Search", ignoreCase = true) -> "$MEDIA_GET_GENRES|$length"
+            title.equals("Random", ignoreCase = true) || title == randomTitle -> "$MEDIA_SONG_RANDOM_ID|$length"
+            title.equals("Recent", ignoreCase = true) || title == recentTitle -> "$MEDIA_SONG_RECENT|$length"
+            title.equals("Starred", ignoreCase = true) || title == starredTitle -> "$MEDIA_SONG_STARRED_ID|$length"
+            title.equals("Search", ignoreCase = true) || title == searchTitle -> "$MEDIA_GET_GENRES|$length"
             else -> "$MEDIA_GET_SONGS_BY_GENRE|$length|$genreValue|$yearValue|$sortMethod|$festivalLineup|$ratingMin|$ratingMax"
         }
 
@@ -1112,12 +1038,21 @@ class MediaLibraryBrowser(
             }
         )
 
+        val icon = when {
+            title.equals("Random", ignoreCase = true) || title == randomTitle -> R.drawable.ic_menu_refresh
+            title.equals("Recent", ignoreCase = true) || title == recentTitle -> R.drawable.ic_baseline_info
+            title.equals("Starred", ignoreCase = true) || title == starredTitle -> R.drawable.ic_star_full
+            title.equals("Search", ignoreCase = true) || title == searchTitle -> R.drawable.ic_menu_search
+            else -> R.drawable.ic_menu_playlists
+        }
+
         return buildMediaItem(
             title = this.title,
             mediaId = mediaId,
             isPlayable = false,
             isBrowsable = true,
             mediaType = MEDIA_TYPE_PLAYLIST,
+            imageUri = null,
             group = groupName
         )
     }

@@ -24,7 +24,7 @@ import timber.log.Timber
  * Provides ViewModel which contains the list of available Artists
  */
 class ArtistListModel(application: Application) : GenericListModel(application) {
-    private val artists: MutableLiveData<List<ArtistOrIndex>> = MutableLiveData()
+    val list: MutableLiveData<List<ArtistOrIndex>> = MutableLiveData()
 
     /**
      * Retrieves all available Artists in a LiveData
@@ -32,10 +32,10 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
     fun getItems(refresh: Boolean, swipe: SwipeRefreshLayout): LiveData<List<ArtistOrIndex>> {
         // Don't reload the data if navigating back to the view that was active before.
         // This way, we keep the scroll position
-        if (artists.value?.isEmpty() != false || refresh) {
+        if (list.value?.isEmpty() != false || refresh) {
             backgroundLoadFromServer(refresh, swipe)
         }
-        return artists
+        return list
     }
 
     override fun load(
@@ -54,7 +54,7 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
             musicService.getIndexes(musicFolderId, refresh)
         }
 
-        artists.postValue(result.toMutableList().sortedWith(comparator))
+        list.postValue(result.toMutableList().sortedWith(comparator))
     }
 
     fun loadMore(
@@ -79,11 +79,11 @@ class ArtistListModel(application: Application) : GenericListModel(application) 
 
             val sorted = result.sortedWith(comparator)
 
-            val current = artists.value ?: emptyList()
+            val current = list.value ?: emptyList()
             val combined = current + sorted
 
             withContext(Dispatchers.Main) {
-                artists.postValue(combined)
+                list.postValue(combined)
             }
         }
     }

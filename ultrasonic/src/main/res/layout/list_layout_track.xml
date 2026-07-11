@@ -5,6 +5,7 @@
     a:orientation="vertical" >
 
     <include layout="@layout/list_parts_empty_view" />
+    <include layout="@layout/spotify_list_header" />
     <include layout="@layout/list_parts_recycler" />
     <include layout="@layout/track_buttons" />
 
