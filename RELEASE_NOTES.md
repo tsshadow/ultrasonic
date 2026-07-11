@@ -1,3 +1,20 @@
+## [6.5.0] - 2026-07-11
+### Added
+- **Log Viewer**: New diagnostic tool accessible from Settings > About to view and share app logs.
+- **Architecture Tests**: Integrated ArchUnit for maintaining code structure and dependency rules.
+- **Coverage Reporting**: Added JaCoCo integration for automated test coverage analysis.
+- **Welcome Messages**: Dynamic greeting messages based on the time of day.
+
+### Changed
+- **UI Refinement**: Wrapped main layout in a scrollable view for better accessibility on smaller screens.
+- **Track Loading**: Optimized track and album loading with a centralized, state-aware repository pattern.
+- **Server Selection**: Improved UX for server switching and connection validation.
+- **CI/CD**: Enhanced build pipeline with pre-commit hooks and automated documentation updates.
+
+### Fixed
+- **Android Auto**: Reverted to a stable Tile-based interface to resolve navigation and performance issues.
+- **Build Stability**: Fixed various compilation errors and resource conflicts in recent feature branches.
+
 ## [6.4.0] - 2026-07-05
 ### Added
 - **MuMa Cloud Sync**: New server-side backup system for app settings. Users can now backup their entire configuration to the MuMa database.
