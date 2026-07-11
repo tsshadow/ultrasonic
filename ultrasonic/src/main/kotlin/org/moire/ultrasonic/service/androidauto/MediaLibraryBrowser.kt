@@ -10,6 +10,7 @@ package org.moire.ultrasonic.service.androidauto
 import org.moire.ultrasonic.fragment.tsshadow.TileInfo
 import org.moire.ultrasonic.fragment.tsshadow.TileStorage
 import android.content.Context
+import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS
@@ -401,11 +402,13 @@ class MediaLibraryBrowser(
 
     private fun getRootItems(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         val mediaItems: MutableList<MediaItem> = ArrayList()
+        val context = UApp.applicationContext()
+        val packageName = context.packageName
 
         mediaItems.add(
             R.string.main_artists_title,
             MEDIA_ARTIST_ID,
-            null,
+            imageUri = Uri.parse("android.resource://$packageName/${R.drawable.ic_contact_picture}"),
             isBrowsable = true,
             mediaType = MEDIA_TYPE_FOLDER_MIXED
         )
@@ -413,7 +416,7 @@ class MediaLibraryBrowser(
         mediaItems.add(
             R.string.main_albums_title,
             MEDIA_ALBUM_ID,
-            null,
+            imageUri = Uri.parse("android.resource://$packageName/${R.drawable.unknown_album}"),
             isBrowsable = true,
             mediaType = MEDIA_TYPE_FOLDER_MIXED
         )
@@ -421,7 +424,7 @@ class MediaLibraryBrowser(
         mediaItems.add(
             R.string.playlist_label,
             MEDIA_PLAYLIST_ID,
-            null,
+            imageUri = Uri.parse("android.resource://$packageName/${R.drawable.ic_menu_playlists}"),
             isBrowsable = true,
             mediaType = MEDIA_TYPE_FOLDER_PLAYLISTS
         )
@@ -429,7 +432,7 @@ class MediaLibraryBrowser(
         mediaItems.add(
             R.string.podcasts_label,
             MEDIA_PODCAST_ID,
-            null,
+            imageUri = Uri.parse("android.resource://$packageName/${R.drawable.ic_menu_podcasts}"),
             isBrowsable = true,
             mediaType = MEDIA_TYPE_FOLDER_MIXED
         )
@@ -486,7 +489,11 @@ class MediaLibraryBrowser(
                     artists.map { artist ->
                         mediaItems.add(
                             title = artist.name ?: "",
-                            mediaId = listOf(childMediaId, artist.id, artist.name).joinToString("|")
+                            mediaId = listOf(childMediaId, artist.id, artist.name).joinToString("|"),
+                            imageUri = AlbumArtContentProvider.mapArtworkToContentProviderUri(
+                                artist.coverArt,
+                                FileUtil.getArtistArtKey(artist.name, true)
+                            )
                         )
                     }
                 }
@@ -517,7 +524,11 @@ class MediaLibraryBrowser(
                 mediaItems.add(
                     title = album.title ?: "",
                     mediaId = listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
-                        .joinToString("|")
+                        .joinToString("|"),
+                    imageUri = AlbumArtContentProvider.mapArtworkToContentProviderUri(
+                        album.coverArt,
+                        FileUtil.getAlbumArtKey(album, true)
+                    )
                 )
             }
             return@future LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
@@ -616,7 +627,11 @@ class MediaLibraryBrowser(
                 mediaItems.add(
                     title = album.title ?: "",
                     mediaId = listOf(MEDIA_ALBUM_ITEM, album.id, album.name)
-                        .joinToString("|")
+                        .joinToString("|"),
+                    imageUri = AlbumArtContentProvider.mapArtworkToContentProviderUri(
+                        album.coverArt,
+                        FileUtil.getAlbumArtKey(album, true)
+                    )
                 )
             }
 

@@ -44,6 +44,9 @@ import org.moire.ultrasonic.adapters.ArtistRowBinder
 import org.moire.ultrasonic.adapters.BaseAdapter
 import org.moire.ultrasonic.domain.Album
 import org.moire.ultrasonic.domain.Artist
+import org.moire.ultrasonic.fragment.tsshadow.TileInfo
+import org.moire.ultrasonic.fragment.tsshadow.TileStorage
+import org.moire.ultrasonic.fragment.tsshadow.navigateToGenre
 import org.moire.ultrasonic.api.subsonic.models.AlbumListType
 import org.moire.ultrasonic.domain.ArtistOrIndex
 import org.moire.ultrasonic.domain.Playlist
@@ -80,30 +83,55 @@ class MainFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         FragmentTitle.setTitle(this, R.string.music_library_label)
-
-        val welcomeTextView: TextView = binding!!.findViewById(R.id.welcome_message)
-        welcomeTextView.text = getWelcomeMessage()
-
-        setupPlaylistsRecyclerView(view)
-        setupAlbumsRecyclerView(view)
-        setupArtistsRecyclerView(view)
+        updateGridLayoutManager(view)
 
         loadData()
     }
 
+    private fun updateGridLayoutManager(view: View) {
+        val playlistRecyclerView: RecyclerView = view.findViewById(R.id.recent_playlists_recycler)
+        val albumRecyclerView: RecyclerView = view.findViewById(R.id.recent_albums_recycler)
+        
+        val playlistSpanCount = calculateSpanCount(160)
+        val albumSpanCount = calculateSpanCount(160)
+
+        playlistRecyclerView.layoutManager = GridLayoutManager(context, playlistSpanCount)
+        albumRecyclerView.layoutManager = GridLayoutManager(context, albumSpanCount)
+        
+        setupPlaylistsRecyclerView(view)
+        setupAlbumsRecyclerView(view)
+        setupArtistsRecyclerView(view)
+    }
+
+    private fun calculateSpanCount(desiredWidthDp: Int): Int {
+        val displayMetrics = resources.displayMetrics
+        val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
+        return (screenWidthDp / desiredWidthDp).toInt().coerceAtLeast(2)
+    }
+
     private fun setupPlaylistsRecyclerView(view: View) {
         val recyclerView: RecyclerView = view.findViewById(R.id.recent_playlists_recycler)
-        playlistAdapter = PlaylistHomeAdapter { playlist ->
-            val action = NavigationGraphDirections.toTrackCollection(
-                id = playlist.id,
-                playlistId = playlist.id,
-                name = playlist.name,
-                playlistName = playlist.name
-            )
-            findNavController().navigate(action)
+        playlistAdapter = PlaylistHomeAdapter { item ->
+            when (item) {
+                is Playlist -> {
+                    val action = NavigationGraphDirections.toTrackCollection(
+                        id = item.id,
+                        playlistId = item.id,
+                        name = item.name,
+                        playlistName = item.name
+                    )
+                    findNavController().navigate(action)
+                }
+                is TileInfo -> {
+                    findNavController().navigate(navigateToGenre(item))
+                }
+            }
         }
-        recyclerView.layoutManager = GridLayoutManager(context, 2)
         recyclerView.adapter = playlistAdapter
+
+        view.findViewById<View>(R.id.section_playlists_header).setOnClickListener {
+            findNavController().navigate(R.id.toSongList)
+        }
     }
 
     private fun setupAlbumsRecyclerView(view: View) {
@@ -116,11 +144,18 @@ class MainFragment :
             )
             findNavController().navigate(action)
         }
-        recyclerView.layoutManager = GridLayoutManager(context, 2)
         recyclerView.adapter = albumAdapter
 
         albumListModel.list.observe(viewLifecycleOwner) { albums ->
-            albumAdapter.items = albums.take(6)
+            albumAdapter.items = albums.take(calculateSpanCount(160) * 3)
+        }
+
+        view.findViewById<View>(R.id.section_albums_header).setOnClickListener {
+            val action = NavigationGraphDirections.toTrackCollection(
+                albumListType = AlbumListType.NEWEST.name,
+                name = getString(R.string.main_songs_recent)
+            )
+            findNavController().navigate(action)
         }
     }
 
@@ -140,12 +175,19 @@ class MainFragment :
     }
 
     private fun loadData() {
-        // Load Playlists
+        // Load Playlists and Tiles
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val playlists = getMusicService().getPlaylists(false)
+                val songTiles = TileStorage.loadTiles(requireContext(), "song")
+                val livesetTiles = TileStorage.loadTiles(requireContext(), "liveset")
+
+                val combined: List<Any> = (playlists.take(4) + songTiles.take(4) + livesetTiles.take(4))
+                    .shuffled()
+                    .take(8)
+
                 withContext(Dispatchers.Main) {
-                    playlistAdapter.items = playlists.take(6)
+                    playlistAdapter.items = combined
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Failed to load playlists")
@@ -172,25 +214,14 @@ class MainFragment :
         rxBusSubscription.clear()
         binding = null
     }
-
-    private fun getWelcomeMessage(): String {
-        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        val resId = when (hour) {
-            in 0..11 -> R.string.welcome_morning
-            in 12..16 -> R.string.welcome_afternoon
-            in 17..20 -> R.string.welcome_evening
-            else -> R.string.welcome_night
-        }
-        return getString(resId)
-    }
 }
 
 class PlaylistHomeAdapter(
-    private val onItemClick: (Playlist) -> Unit
+    private val onItemClick: (Any) -> Unit
 ) : RecyclerView.Adapter<PlaylistHomeAdapter.ViewHolder>(), KoinComponent {
     private val imageLoaderProvider: org.moire.ultrasonic.subsonic.ImageLoaderProvider by koinInject()
 
-    var items: List<Playlist> = emptyList()
+    var items: List<Any> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -208,18 +239,24 @@ class PlaylistHomeAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        holder.name.text = item.name
         holder.itemView.setOnClickListener { onItemClick(item) }
 
-        imageLoaderProvider.executeOn {
-            it.loadImage(
-                holder.image,
-                item.id,
-                item.name,
-                false,
-                0,
-                R.drawable.ic_menu_playlists
-            )
+        if (item is Playlist) {
+            holder.name.text = item.name
+            imageLoaderProvider.executeOn {
+                it.loadImage(
+                    holder.image,
+                    item.id,
+                    item.name,
+                    true,
+                    0,
+                    R.drawable.ic_menu_playlists
+                )
+            }
+        } else if (item is TileInfo) {
+            holder.name.text = item.title
+            holder.image.setImageResource(R.drawable.ic_menu_playlists)
+            holder.image.setColorFilter(org.moire.ultrasonic.fragment.tsshadow.tileInfoColors[position % org.moire.ultrasonic.fragment.tsshadow.tileInfoColors.size])
         }
     }
 
@@ -258,7 +295,7 @@ class AlbumHomeAdapter(
             it.loadImage(
                 holder.image,
                 item,
-                false,
+                true,
                 0,
                 R.drawable.unknown_album
             )
@@ -300,8 +337,8 @@ class ArtistHomeAdapter(
             it.loadImage(
                 view = holder.image,
                 id = item.coverArt,
-                key = org.moire.ultrasonic.util.FileUtil.getArtistArtKey(item.name, false),
-                large = false,
+                key = org.moire.ultrasonic.util.FileUtil.getArtistArtKey(item.name, true),
+                large = true,
                 size = 0,
                 defaultResourceId = R.drawable.ic_contact_picture
             )

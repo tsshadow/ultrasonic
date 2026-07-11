@@ -12,12 +12,15 @@ import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import org.moire.ultrasonic.R
 
+import org.moire.ultrasonic.domain.Playlist
+import org.moire.ultrasonic.NavigationGraphDirections
+
 interface TileAdapterCallback {
     fun onEditTile(tile: TileInfo, position: Int)
 }
 
 class TileAdapter(
-    val tiles: MutableList<TileInfo>,
+    val items: MutableList<Any>,
     private val context: Context,
     private val navController: NavController,
     private val pageKey: String,
@@ -30,17 +33,32 @@ class TileAdapter(
         private val tileText: TextView = view.findViewById(R.id.tile_text)
         private val subtext: TextView = view.findViewById(R.id.tile_subtext)
 
-        fun bind(tile: TileInfo, index: Int) {
+        fun bind(item: Any, index: Int) {
             setupBackground(index)
-            setupIconAndText(tile)
 
-            itemView.setOnClickListener {
-                navController.navigate(navigateToGenre(tile))
-            }
-
-            itemView.setOnLongClickListener {
-                callback.onEditTile(tile, bindingAdapterPosition)
-                true
+            if (item is TileInfo) {
+                setupIconAndText(item)
+                itemView.setOnClickListener {
+                    navController.navigate(navigateToGenre(item))
+                }
+                itemView.setOnLongClickListener {
+                    callback.onEditTile(item, bindingAdapterPosition)
+                    true
+                }
+            } else if (item is Playlist) {
+                tileIcon.setImageResource(R.drawable.ic_menu_playlists)
+                tileText.text = item.name
+                subtext.text = "Static Playlist"
+                itemView.setOnClickListener {
+                    val action = NavigationGraphDirections.toTrackCollection(
+                        id = item.id,
+                        playlistId = item.id,
+                        name = item.name,
+                        playlistName = item.name
+                    )
+                    navController.navigate(action)
+                }
+                itemView.setOnLongClickListener(null)
             }
         }
 
@@ -78,20 +96,21 @@ class TileAdapter(
     }
 
     override fun onBindViewHolder(holder: TileViewHolder, position: Int) {
-        holder.bind(tiles[position], position)
+        holder.bind(items[position], position)
     }
 
-    override fun getItemCount(): Int = tiles.size
+    override fun getItemCount(): Int = items.size
 
     fun addTile(tile: TileInfo) {
-        tiles.add(tile)
-        TileStorage.saveTiles(context, tiles, pageKey)
-        notifyItemInserted(tiles.size - 1)
+        items.add(tile)
+        val tilesOnly = items.filterIsInstance<TileInfo>().toMutableList()
+        TileStorage.saveTiles(context, tilesOnly, pageKey)
+        notifyItemInserted(items.size - 1)
     }
 
-    fun updateTiles(newTiles: List<TileInfo>) {
-        tiles.clear()
-        tiles.addAll(newTiles)
+    fun updateTiles(newItems: List<Any>) {
+        items.clear()
+        items.addAll(newItems)
         notifyDataSetChanged()
     }
 }

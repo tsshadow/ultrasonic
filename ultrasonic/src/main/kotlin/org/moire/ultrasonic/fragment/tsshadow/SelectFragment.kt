@@ -53,7 +53,7 @@ abstract class SelectFragment :
     private lateinit var toggleFiltersButton: ImageButton
     private var rxBusSubscription = CompositeDisposable()
 
-    private var tiles = mutableListOf<TileInfo>()
+    private var items = mutableListOf<Any>()
     private var lastEditedTilePosition: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -200,14 +200,12 @@ abstract class SelectFragment :
                             tile.id = id
                             withContext(Dispatchers.Main) {
                                 tileAdapter.addTile(tile)
-                                TileStorage.saveTiles(requireContext(), tileAdapter.tiles, pageKey)
                             }
                         } catch (e: Exception) {
                             Timber.e(e, "Failed to save tile to server")
                             // Fallback to local only for now if server fails
                             withContext(Dispatchers.Main) {
                                 tileAdapter.addTile(tile)
-                                TileStorage.saveTiles(requireContext(), tileAdapter.tiles, pageKey)
                             }
                         }
                     }
@@ -216,7 +214,10 @@ abstract class SelectFragment :
                 "update" -> {
                     lastEditedTilePosition?.let { pos ->
                         val tile = tileInfoFromFilterState(filterState)
-                        tile.id = tiles[pos].id
+                        val oldItem = items[pos]
+                        if (oldItem is TileInfo) {
+                            tile.id = oldItem.id
+                        }
                         lifecycleScope.launch(Dispatchers.IO) {
                             try {
                                 tile.id?.let { id ->
@@ -232,9 +233,10 @@ abstract class SelectFragment :
                                 Timber.e(e, "Failed to update tile on server")
                             }
                             withContext(Dispatchers.Main) {
-                                tiles[pos] = tile
+                                items[pos] = tile
                                 tileAdapter.notifyItemChanged(pos)
-                                TileStorage.saveTiles(requireContext(), tiles, pageKey)
+                                val tilesOnly = items.filterIsInstance<TileInfo>().toMutableList()
+                                TileStorage.saveTiles(requireContext(), tilesOnly, pageKey)
                                 lastEditedTilePosition = null
                             }
                         }
@@ -243,7 +245,8 @@ abstract class SelectFragment :
 
                 "delete" -> {
                     lastEditedTilePosition?.let { pos ->
-                        val tileId = tiles[pos].id
+                        val item = items[pos]
+                        val tileId = if (item is TileInfo) item.id else null
                         lifecycleScope.launch(Dispatchers.IO) {
                             try {
                                 tileId?.let { getMusicService().deleteMumaTile(it) }
@@ -251,9 +254,10 @@ abstract class SelectFragment :
                                 Timber.e(e, "Failed to delete tile from server")
                             }
                             withContext(Dispatchers.Main) {
-                                tiles.removeAt(pos)
+                                items.removeAt(pos)
                                 tileAdapter.notifyItemRemoved(pos)
-                                TileStorage.saveTiles(requireContext(), tiles, pageKey)
+                                val tilesOnly = items.filterIsInstance<TileInfo>().toMutableList()
+                                TileStorage.saveTiles(requireContext(), tilesOnly, pageKey)
                                 lastEditedTilePosition = null
                             }
                         }
@@ -321,18 +325,31 @@ abstract class SelectFragment :
         swipeRefresh?.isRefreshing = true
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                val playlists = try {
+                    getMusicService().getPlaylists(false)
+                } catch (e: Exception) {
+                    emptyList()
+                }
+
                 if (!isOffline()) {
                     val mumaTiles = getMusicService().getMumaTiles()
                     val remoteTiles = mumaTiles.mapNotNull { it.toTileInfo() }
                         .filter { it.pageKey == pageKey }
                     
-                    if (remoteTiles.isNotEmpty()) {
-                        withContext(Dispatchers.Main) {
-                            tiles.clear()
-                            tiles.addAll(remoteTiles)
-                            TileStorage.saveTiles(requireContext(), tiles, pageKey)
-                            tileAdapter.updateTiles(tiles)
-                        }
+                    withContext(Dispatchers.Main) {
+                        items.clear()
+                        items.addAll(remoteTiles)
+                        items.addAll(playlists)
+                        val tilesOnly = items.filterIsInstance<TileInfo>().toMutableList()
+                        TileStorage.saveTiles(requireContext(), tilesOnly, pageKey)
+                        tileAdapter.updateTiles(items)
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        items.clear()
+                        items.addAll(items.filterIsInstance<TileInfo>())
+                        items.addAll(playlists)
+                        tileAdapter.updateTiles(items)
                     }
                 }
             } catch (e: Exception) {
@@ -350,7 +367,7 @@ abstract class SelectFragment :
         recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
 
         tileAdapter = TileAdapter(
-            tiles = tiles,
+            items = items,
             context = requireContext(),
             navController = findNavController(),
             pageKey = pageKey,
@@ -362,18 +379,25 @@ abstract class SelectFragment :
     protected open fun loadTilesOrDefaults() {
         try {
             Timber.d("Trying to load tiles for $pageKey")
-            tiles = TileStorage.loadTiles(requireContext(), pageKey).toMutableList()
-            if (tiles.isEmpty()) {
+            val loadedTiles = TileStorage.loadTiles(requireContext(), pageKey).toMutableList()
+            if (loadedTiles.isEmpty()) {
                 Timber.w("No saved tiles found, loading defaults.")
-                tiles = defaultTileSet()
-                TileStorage.saveTiles(requireContext(), tiles, pageKey)
+                items.clear()
+                items.addAll(defaultTileSet())
+                val tilesOnly = items.filterIsInstance<TileInfo>().toMutableList()
+                TileStorage.saveTiles(requireContext(), tilesOnly, pageKey)
+            } else {
+                items.clear()
+                items.addAll(loadedTiles)
             }
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Timber.e(e, "Failed to load saved tiles, falling back to defaults.")
-            tiles = defaultTileSet()
-            TileStorage.saveTiles(requireContext(), tiles, pageKey)
+            items.clear()
+            items.addAll(defaultTileSet())
+            val tilesOnly = items.filterIsInstance<TileInfo>().toMutableList()
+            TileStorage.saveTiles(requireContext(), tilesOnly, pageKey)
         }
-        Timber.d("Loaded tiles: $tiles")
+        Timber.d("Loaded items: $items")
     }
 
     protected open fun defaultTileSet(): MutableList<TileInfo> = mutableListOf()
@@ -457,7 +481,7 @@ abstract class SelectFragment :
     }
 
     companion object {
-        private const val DESIRED_TILE_WIDTH_DP = 132
+        private const val DESIRED_TILE_WIDTH_DP = 110
         private const val MIN_SPAN_COUNT = 2
     }
 }

@@ -32,19 +32,16 @@ class AlbumArtContentProvider :
     companion object {
         fun mapArtworkToContentProviderUri(track: Track?): Uri? {
             if (track?.coverArt.isNullOrBlank()) return null
+            return mapArtworkToContentProviderUri(track.coverArt, FileUtil.getAlbumArtKey(track, true))
+        }
+
+        fun mapArtworkToContentProviderUri(coverArt: String?, cacheKey: String?): Uri? {
+            if (coverArt.isNullOrBlank() || cacheKey.isNullOrBlank()) return null
             val domain = UApp.applicationContext().packageName + ".provider.AlbumArtContentProvider"
             return Uri.Builder()
                 .scheme(ContentResolver.SCHEME_CONTENT)
                 .authority(domain)
-                // currently only large files are cached
-                .path(
-                    String.format(
-                        Locale.ROOT,
-                        "%s|%s",
-                        track!!.coverArt,
-                        FileUtil.getAlbumArtKey(track, true)
-                    )
-                )
+                .path(String.format(Locale.ROOT, "%s|%s", coverArt, cacheKey))
                 .build()
         }
     }

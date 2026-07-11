@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import org.koin.java.KoinJavaComponent.inject
 import org.moire.ultrasonic.R
+import android.net.Uri
 import org.moire.ultrasonic.app.UApp
 import org.moire.ultrasonic.data.ActiveServerProvider
 import org.moire.ultrasonic.util.Util
@@ -157,7 +158,8 @@ fun MutableList<MediaItem>.add(
     mediaId: String,
     groupNameId: Int? = null,
     isBrowsable: Boolean = true,
-    mediaType: Int = MEDIA_TYPE_FOLDER_MIXED
+    mediaType: Int = MEDIA_TYPE_FOLDER_MIXED,
+    imageUri: Uri? = null
 ) {
     val context = UApp.applicationContext()
     add(
@@ -165,7 +167,8 @@ fun MutableList<MediaItem>.add(
         mediaId = mediaId,
         groupNameId = groupNameId,
         isBrowsable = isBrowsable,
-        mediaType = mediaType
+        mediaType = mediaType,
+        imageUri = imageUri
     )
 }
 
@@ -174,7 +177,8 @@ fun MutableList<MediaItem>.add(
     mediaId: String,
     groupNameId: Int? = null,
     isBrowsable: Boolean = true,
-    mediaType: Int = MEDIA_TYPE_FOLDER_MIXED
+    mediaType: Int = MEDIA_TYPE_FOLDER_MIXED,
+    imageUri: Uri? = null
 ) {
     val applicationContext = UApp.applicationContext()
 
@@ -183,7 +187,7 @@ fun MutableList<MediaItem>.add(
         mediaId,
         isPlayable = !isBrowsable,
         isBrowsable = isBrowsable,
-        imageUri = null,
+        imageUri = imageUri,
         group = if (groupNameId != null) {
             applicationContext.getString(groupNameId)
         } else {

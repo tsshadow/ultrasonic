@@ -5,9 +5,9 @@
     a:id="@+id/card"
     a:layout_width="match_parent"
     a:layout_height="wrap_content"
-    a:layout_margin="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
+    a:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="0dp"
     app:cardBackgroundColor="@color/spotify_card"
     style="?attr/materialCardViewFilledStyle">
 
@@ -39,7 +39,7 @@
             a:layout_height="wrap_content"
             a:gravity="center_vertical"
             a:orientation="vertical"
-            a:padding="12dp"
+            a:padding="8dp"
             app:layout_constraintEnd_toEndOf="@+id/cover_art"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cover_art">

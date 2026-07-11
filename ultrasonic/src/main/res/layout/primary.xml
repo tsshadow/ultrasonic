@@ -12,31 +12,36 @@
         a:orientation="vertical"
         a:paddingBottom="80dp">
 
-        <TextView
-            a:id="@+id/welcome_message"
+        <LinearLayout
+            a:id="@+id/section_playlists_header"
             a:layout_width="match_parent"
             a:layout_height="wrap_content"
-            a:paddingStart="16dp"
-            a:paddingTop="32dp"
-            a:paddingEnd="16dp"
-            a:paddingBottom="16dp"
-            a:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
-            a:textStyle="bold"
-            a:textColor="@color/spotify_text_primary"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            a:id="@+id/section_playlists_title"
-            a:layout_width="match_parent"
-            a:layout_height="wrap_content"
+            a:orientation="horizontal"
             a:paddingStart="16dp"
             a:paddingTop="16dp"
             a:paddingEnd="16dp"
             a:paddingBottom="8dp"
-            a:text="@string/playlist.label"
-            a:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-            a:textStyle="bold"
-            a:textColor="@color/spotify_text_primary" />
+            a:background="?attr/selectableItemBackground"
+            a:clickable="true"
+            a:focusable="true">
+
+            <TextView
+                a:id="@+id/section_playlists_title"
+                a:layout_width="0dp"
+                a:layout_height="wrap_content"
+                a:layout_weight="1"
+                a:text="@string/playlist.label"
+                a:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                a:textStyle="bold"
+                a:textColor="@color/spotify_text_primary" />
+
+            <ImageView
+                a:layout_width="wrap_content"
+                a:layout_height="wrap_content"
+                a:layout_gravity="center_vertical"
+                a:src="@drawable/ic_chevron_right"
+                app:tint="@color/spotify_text_secondary" />
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             a:id="@+id/recent_playlists_recycler"
@@ -46,18 +51,36 @@
             a:paddingStart="8dp"
             a:paddingEnd="8dp" />
 
-        <TextView
-            a:id="@+id/section_albums_title"
+        <LinearLayout
+            a:id="@+id/section_albums_header"
             a:layout_width="match_parent"
             a:layout_height="wrap_content"
+            a:orientation="horizontal"
             a:paddingStart="16dp"
             a:paddingTop="24dp"
             a:paddingEnd="16dp"
             a:paddingBottom="8dp"
-            a:text="@string/main.albums_newest"
-            a:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-            a:textStyle="bold"
-            a:textColor="@color/spotify_text_primary" />
+            a:background="?attr/selectableItemBackground"
+            a:clickable="true"
+            a:focusable="true">
+
+            <TextView
+                a:id="@+id/section_albums_title"
+                a:layout_width="0dp"
+                a:layout_height="wrap_content"
+                a:layout_weight="1"
+                a:text="@string/main.albums_newest"
+                a:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                a:textStyle="bold"
+                a:textColor="@color/spotify_text_primary" />
+
+            <ImageView
+                a:layout_width="wrap_content"
+                a:layout_height="wrap_content"
+                a:layout_gravity="center_vertical"
+                a:src="@drawable/ic_chevron_right"
+                app:tint="@color/spotify_text_secondary" />
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             a:id="@+id/recent_albums_recycler"
