@@ -68,6 +68,11 @@
                 android:resource="@xml/searchable"/>
         </activity>
 
+        <activity
+            android:name=".activity.VideoPlaybackActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false" />
+
         <service
             android:name=".service.DownloadService"
             android:label="Ultrasonic Media Player Service"
