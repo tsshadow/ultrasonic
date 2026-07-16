@@ -26,6 +26,7 @@
     <string name="setting_key_auto_switch_offline" translatable="false">autoSwitchOffline</string>
     <string name="setting_key.max_albums" translatable="false">maxAlbums</string>
     <string name="setting_key.max_songs" translatable="false">maxSongs</string>
+    <string name="setting_key.genre_track_limit" translatable="false">genreTrackLimit</string>
     <string name="setting_key.max_artists" translatable="false">maxArtists</string>
     <string name="setting_key.default_albums" translatable="false">defaultAlbums</string>
     <string name="setting_key.default_songs" translatable="false">defaultSongs</string>

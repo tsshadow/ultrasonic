@@ -194,18 +194,8 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
 
         listModel.title.observe(viewLifecycleOwner) {
             setTitle(it)
-            view.findViewById<TextView>(R.id.spotify_header_title)?.text = it
         }
 
-        view.findViewById<FloatingActionButton>(R.id.spotify_shuffle_play_button)?.setOnClickListener {
-            playAll(shuffle = true)
-        }
-
-        listModel.currentList.observe(viewLifecycleOwner) { entries ->
-            val count = entries.filterIsInstance<Track>().size
-            val subtitle = resources.getQuantityString(R.plurals.n_songs, count, count)
-            view.findViewById<TextView>(R.id.spotify_header_subtitle)?.text = subtitle
-        }
 
         listModel.isLoading.observe(viewLifecycleOwner) {
             swipeRefresh?.isRefreshing = it
@@ -553,7 +543,7 @@ open class TrackCollectionFragment(initialOrder: SortOrder? = null) :
             size = if (navArgs.size < 0) Settings.maxSongs else navArgs.size,
             getRandomTracks = displayRandom(),
             getStarredTracks = displayStarred(),
-            filtersJson = arguments?.getString("filters"),
+            filtersJson = navArgs.filters,
             refresh = navArgs.refresh
         )
 

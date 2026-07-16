@@ -10,6 +10,7 @@ import org.moire.ultrasonic.NavigationGraphDirections
 import org.moire.ultrasonic.R
 import org.moire.ultrasonic.api.subsonic.models.Filter
 import org.moire.ultrasonic.api.subsonic.models.Filters
+import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Settings.maxSongs
 
 object TileStorage {
@@ -155,6 +156,24 @@ fun navigateToGenre(tile: TileInfo): NavDirections {
         festivalLineup = tile.festivalLineup,
         minDuration = tile.minDuration ?: -1,
         maxDuration = tile.maxDuration ?: -1
+    )
+}
+
+fun navigateToGenreByName(genreName: String): NavDirections {
+    val filters = Filters()
+    filters.add(Filter("GENRE", genreName))
+
+    val effectiveLength = if (org.moire.ultrasonic.util.Settings.isSetsMode) "long" else "short"
+    filters.add(Filter("LENGTH", effectiveLength))
+
+    val filtersJson = Gson().toJson(filters.sanitized())
+
+    return NavigationGraphDirections.toTrackCollection(
+        songs = genreName,
+        filters = filtersJson,
+        size = Settings.genreTrackLimit,
+        length = effectiveLength,
+        sortMethod = "DateDescAndRelease"
     )
 }
 

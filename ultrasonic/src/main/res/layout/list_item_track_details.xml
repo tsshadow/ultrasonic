@@ -107,6 +107,16 @@
             tools:ignore="HardcodedText" />
 
         <TextView
+            a:id="@+id/song_year"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:layout_marginEnd="6dp"
+            a:textSize="13sp"
+            a:textColor="@color/spotify_text_secondary"
+            a:visibility="gone"
+            tools:text="2023" />
+
+        <TextView
             a:id="@+id/song_duration"
             a:layout_width="wrap_content"
             a:layout_height="wrap_content"

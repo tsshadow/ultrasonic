@@ -305,6 +305,14 @@
             a:key="@string/setting_key.max_songs"
             a:title="@string/settings.max_songs"
             app:iconSpaceReserved="false"/>
+        <ListPreference
+            a:defaultValue="100"
+            a:entries="@array/searchNames"
+            a:entryValues="@array/searchValues"
+            a:key="@string/setting_key.genre_track_limit"
+            a:title="@string/settings.genre_track_limit"
+            a:summary="@string/settings.genre_track_limit_summary"
+            app:iconSpaceReserved="false"/>
         <Preference
             a:key="@string/setting_key.clear_search_history"
             a:persistent="false"

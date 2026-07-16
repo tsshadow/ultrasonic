@@ -109,7 +109,7 @@ class NavigationActivity : ScopeActivity() {
     private var drawerLayout: DrawerLayout? = null
     private var host: NavHostFragment? = null
     private var selectServerButton: MaterialButton? = null
-    private var dropDownButton: ImageView? = null
+    private var dropDownButton: MaterialButton? = null
     private var headerBackgroundImage: ImageView? = null
     var setsToggle: MaterialSwitch? = null
 
@@ -429,7 +429,7 @@ class NavigationActivity : ScopeActivity() {
 
         selectServerButton?.iconTint = ColorStateList.valueOf(foregroundColor)
         selectServerButton?.setTextColor(foregroundColor)
-        dropDownButton?.setColorFilter(foregroundColor)
+        dropDownButton?.iconTint = ColorStateList.valueOf(foregroundColor)
         headerBackgroundImage?.setBackgroundColor(backgroundColor)
 
         // Hide the vector graphic on Android 12 or later
@@ -663,6 +663,7 @@ class NavigationActivity : ScopeActivity() {
                             }
 
                             // Now test connection
+                            MusicServiceFactory.resetMusicService()
                             val musicService = MusicServiceFactory.getMusicService()
                             musicService.ping()
                             true

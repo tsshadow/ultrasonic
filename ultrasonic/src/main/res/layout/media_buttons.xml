@@ -53,7 +53,8 @@
         app:icon="@drawable/media_start"
         app:iconTint="#000000"
         app:iconGravity="textEnd"
-        app:iconSize="32dp" />
+        app:iconSize="32dp"
+        app:backgroundTint="@color/spotify_green" />
 
     <Button
         a:id="@+id/button_pause"
@@ -69,7 +70,8 @@
         app:icon="@drawable/media_pause"
         app:iconTint="#000000"
         app:iconGravity="textEnd"
-        app:iconSize="32dp" />
+        app:iconSize="32dp"
+        app:backgroundTint="@color/spotify_green" />
 
     <Button
         a:id="@+id/button_stop"

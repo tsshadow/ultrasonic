@@ -25,7 +25,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         a:id="@+id/header_select_server"
         style="@style/Widget.Material3.Button.TextButton.Icon"
         a:layout_width="0dp"
@@ -51,7 +51,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:textColor="#FFFFFF" />
 
-    <ImageView
+    <com.google.android.material.button.MaterialButton
         a:id="@+id/edit_server_button"
         style="@style/Widget.Material3.Button.TextButton.Icon"
         a:layout_width="wrap_content"
@@ -59,14 +59,11 @@
         a:layout_marginTop="6dp"
         a:layout_marginBottom="6dp"
         a:contentDescription="@string/server_menu.edit"
-        a:maxHeight="32dp"
-        a:src="@drawable/arrow_drop_down"
-        a:text="@null"
+        app:icon="@drawable/arrow_drop_down"
         app:layout_constraintBottom_toBottomOf="@id/header_select_server"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/header_select_server"
         app:layout_constraintTop_toTopOf="@id/header_select_server"
-        app:strokeColor="@null"
-        app:tint="@color/selected_menu_dark" />
+        app:iconTint="@color/selected_menu_dark" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

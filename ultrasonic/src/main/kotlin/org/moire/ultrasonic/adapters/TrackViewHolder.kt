@@ -64,6 +64,7 @@ class TrackViewHolder(val view: View) :
     private var album: TextView = view.findViewById(R.id.song_album)
     private var title: TextView = view.findViewById(R.id.song_title)
     private var artist: TextView = view.findViewById(R.id.song_artist)
+    private var year: TextView = view.findViewById(R.id.song_year)
     private var duration: TextView = view.findViewById(R.id.song_duration)
     private var statusImage: ImageView = view.findViewById(R.id.song_status_image)
     private var progressIndicator: CircularProgressIndicator =
@@ -89,6 +90,13 @@ class TrackViewHolder(val view: View) :
         duration.text = entryDescription.duration
         album.text = song.album ?: ""
         album.isVisible = true
+
+        if (song.year != null && song.year!! > 0) {
+            year.text = song.year.toString()
+            year.isVisible = true
+        } else {
+            year.isVisible = false
+        }
 
         if (Settings.shouldShowTrackNumber && song.track != null && song.track!! > 0) {
             track.text = entryDescription.trackNumber

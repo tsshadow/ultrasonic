@@ -8,6 +8,14 @@
     <string name="background_task.parse_error">Didn\'t understand the reply. Please check the server address.</string>
     <string name="background_task.ssl_cert_error">HTTPS certificate error: %1$s.</string>
     <string name="background_task.ssl_error">SSL connection exception. Please check server certificate.</string>
+    <string name="main.songs">Songs</string>
+    <string name="main.sets">Sets</string>
+    <string name="main_recently_played">Recently Played</string>
+    <string name="filter.recent">Recent</string>
+    <string name="filter.favorites">Favorites</string>
+    <string name="filter.new">New</string>
+    <string name="filter.genres">Genres</string>
+    <string name="filter.playlists">Playlists</string>
     <string name="button_bar.bookmarks">Bookmarks</string>
     <string name="button_bar.browse">Media Library</string>
     <string name="button_bar.chat">Chat</string>
@@ -123,9 +131,12 @@
     <string name="main.albums_recent">Recently Played</string>
     <string name="main.albums_starred">Starred</string>
     <string name="main.albums_by_year">Chronological</string>
+    <string name="main.albums_released">Recent Released</string>
     <string name="main.albums_title">Albums</string>
     <string name="main.artists_title">Artists</string>
     <string name="main.genres_title">Genres</string>
+    <string name="main.library_title">Library</string>
+    <string name="main.last_played_genres">Last played genres</string>
     <string name="main.moods_title">Moods</string>
     <string name="main.years_title">Years</string>
     <string name="main.title_all_songs">All (songs)</string>
@@ -143,6 +154,7 @@
     <string name="main.songs_random">Random</string>
     <string name="main.songs_random_this_year">Random (2025)</string>
     <string name="main.songs_recent">Recent</string>
+    <string name="main.livesets_recent">Recent Live sets</string>
     <string name="main.songs_recent_added">Recent Added</string>
     <string name="main.songs_recent_modified">Recent Modified</string>
     <string name="main.songs_starred">Starred</string>
@@ -247,6 +259,8 @@
     <string name="settings.hide_media_summary">Hide music files from other apps.</string>
     <string name="settings.hide_media_title">Hide From Other</string>
     <string name="settings.hide_media_toast">Takes effect next time Android scans your phone for music.</string>
+    <string name="settings.genre_track_limit">Genre search limit</string>
+    <string name="settings.genre_track_limit_summary">Maximum number of tracks to fetch when clicking a genre</string>
     <string name="settings.increment_time">Seek Interval</string>
     <string name="settings.invalid_url">Please specify a valid URL.</string>
     <string name="settings.max_albums">Max Albums</string>

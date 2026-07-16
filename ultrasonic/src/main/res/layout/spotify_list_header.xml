@@ -3,42 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     a:layout_width="match_parent"
     a:layout_height="wrap_content"
-    a:padding="16dp">
-
-    <LinearLayout
-        a:layout_width="wrap_content"
-        a:layout_height="wrap_content"
-        a:layout_alignParentStart="true"
-        a:layout_centerVertical="true"
-        a:orientation="vertical">
-
-        <TextView
-            a:id="@+id/spotify_header_title"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
-            a:textStyle="bold"
-            a:textColor="@color/spotify_text_primary" />
-
-        <TextView
-            a:id="@+id/spotify_header_subtitle"
-            a:layout_width="wrap_content"
-            a:layout_height="wrap_content"
-            a:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            a:textColor="@color/spotify_text_secondary" />
-    </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        a:id="@+id/spotify_shuffle_play_button"
-        a:layout_width="wrap_content"
-        a:layout_height="wrap_content"
-        a:layout_alignParentEnd="true"
-        a:layout_centerVertical="true"
-        a:contentDescription="@string/buttons.shuffle"
-        app:backgroundTint="@color/spotify_green"
-        app:fabSize="normal"
-        app:iconSize="28dp"
-        app:srcCompat="@drawable/media_shuffle"
-        app:tint="@android:color/white" />
+    a:padding="0dp">
 
 </RelativeLayout>
