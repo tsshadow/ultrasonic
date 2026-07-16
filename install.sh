@@ -56,7 +56,13 @@ for i in "$@"; do
             exit 0
             ;;
         --app=*)
-            # Only one app, but ignore the flag value
+            DEFAULT_APP="${i#*=}"
+            # Validate app
+            if [[ ! " ${AVAILABLE_APPS[@]} " =~ " ${DEFAULT_APP} " ]]; then
+                echo "Error: Application '$DEFAULT_APP' not found."
+                echo "Available: ${AVAILABLE_APPS[*]}"
+                exit 1
+            fi
             ;;
         debug|release|patch|minor|major|install)
             MODE="$i"
