@@ -108,12 +108,12 @@ class ActiveServerProvider(private val repository: ServerSettingDao) : Coroutine
         // so they can react by e.g. stopping playback on the old server
         RxBus.activeServerChangingPublisher.onNext(oldServerId)
 
+        Settings.activeServer = serverId
+        resetMusicService()
+
         // Use a coroutine to post the server change to the end of the message queue
         launch {
             withContext(Dispatchers.Main) {
-                Settings.activeServer = serverId
-                resetMusicService()
-
                 RxBus.activeServerChangedPublisher.onNext(getActiveServer(serverId))
                 Timber.i("setActiveServerById done, new id: %s", serverId)
             }
