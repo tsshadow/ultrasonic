@@ -24,6 +24,8 @@ import androidx.media3.session.SessionError
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.guava.future
@@ -226,6 +228,11 @@ class MediaLibraryBrowser(
 
         return when (action) {
             MEDIA_ROOT_ID -> getRootItems()
+            MEDIA_LIBRARY_ID -> getLibraryItems()
+            MEDIA_SONGS_ID -> getSongsTabItems()
+            MEDIA_LIVESETS_ID -> getLiveSetsTabItems()
+            MEDIA_LAST_PLAYED_GENRES_SONGS -> getLastPlayedGenres("short")
+            MEDIA_LAST_PLAYED_GENRES_LIVESETS -> getLastPlayedGenres("long")
             MEDIA_ARTIST_ID -> getArtists()
             MEDIA_ARTIST_SECTION -> {
                 val section = parts.getOrNull(INDEX_ID)
@@ -253,6 +260,7 @@ class MediaLibraryBrowser(
             MEDIA_ALBUM_FREQUENT_ID -> getAlbums(AlbumListType.FREQUENT)
             MEDIA_ALBUM_NEWEST_ID -> getAlbums(AlbumListType.NEWEST)
             MEDIA_ALBUM_RECENT_ID -> getAlbums(AlbumListType.RECENT)
+            MEDIA_ALBUM_BY_YEAR_ID -> getAlbums(AlbumListType.BY_YEAR)
             MEDIA_ALBUM_RANDOM_ID -> getAlbums(AlbumListType.RANDOM)
             MEDIA_ALBUM_STARRED_ID -> getAlbums(AlbumListType.STARRED)
             MEDIA_SONG_STARRED_ID -> getStarredSongs()
@@ -267,8 +275,9 @@ class MediaLibraryBrowser(
 
             MEDIA_SONG_RECENT -> {
                 val length = parts.getOrNull(INDEX_LENGTH)
+                val sortMethod = parts.getOrNull(INDEX_NAME)
                 if (length != null) {
-                    getSongs(length = length, sortMethod = "AddedDesc")
+                    getSongs(length = length, sortMethod = sortMethod ?: "AddedDesc")
                 } else {
                     emptyResult("Missing length in $parentId")
                 }
@@ -406,33 +415,33 @@ class MediaLibraryBrowser(
         val packageName = context.packageName
 
         mediaItems.add(
-            R.string.main_artists_title,
-            MEDIA_ARTIST_ID,
-            imageUri = Uri.parse("android.resource://$packageName/${R.drawable.ic_contact_picture}"),
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_FOLDER_MIXED
-        )
-
-        mediaItems.add(
-            R.string.main_albums_title,
-            MEDIA_ALBUM_ID,
-            imageUri = Uri.parse("android.resource://$packageName/${R.drawable.unknown_album}"),
-            isBrowsable = true,
-            mediaType = MEDIA_TYPE_FOLDER_MIXED
-        )
-
-        mediaItems.add(
-            R.string.playlist_label,
-            MEDIA_PLAYLIST_ID,
+            R.string.main_library_title,
+            MEDIA_LIBRARY_ID,
             imageUri = Uri.parse("android.resource://$packageName/${R.drawable.ic_menu_playlists}"),
             isBrowsable = true,
-            mediaType = MEDIA_TYPE_FOLDER_PLAYLISTS
+            mediaType = MEDIA_TYPE_FOLDER_MIXED
         )
 
         mediaItems.add(
-            R.string.podcasts_label,
-            MEDIA_PODCAST_ID,
+            R.string.main_songs_title,
+            MEDIA_SONGS_ID,
+            imageUri = Uri.parse("android.resource://$packageName/${R.drawable.ic_menu_search}"),
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_FOLDER_MIXED
+        )
+
+        mediaItems.add(
+            R.string.main_livesets_title,
+            MEDIA_LIVESETS_ID,
             imageUri = Uri.parse("android.resource://$packageName/${R.drawable.ic_menu_podcasts}"),
+            isBrowsable = true,
+            mediaType = MEDIA_TYPE_FOLDER_MIXED
+        )
+
+        mediaItems.add(
+            R.string.main_songs_starred,
+            MEDIA_SONG_STARRED_ID,
+            imageUri = Uri.parse("android.resource://$packageName/${R.drawable.ic_star_full}"),
             isBrowsable = true,
             mediaType = MEDIA_TYPE_FOLDER_MIXED
         )
@@ -440,6 +449,55 @@ class MediaLibraryBrowser(
         return Futures.immediateFuture(
             LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null)
         )
+    }
+
+    private fun getLibraryItems(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+        mediaItems.add(R.string.main_songs_recent, "$MEDIA_SONG_RECENT|short")
+        mediaItems.add(R.string.main_livesets_recent, "$MEDIA_SONG_RECENT|long")
+        mediaItems.add(R.string.playlist_label, MEDIA_PLAYLIST_ID)
+        mediaItems.add(R.string.main_artists_title, MEDIA_ARTIST_ID)
+        mediaItems.add(R.string.main_albums_title, MEDIA_ALBUM_ID)
+        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
+    }
+
+    private fun getSongsTabItems(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+        mediaItems.add(R.string.button_bar_search, "$MEDIA_GET_GENRES|short")
+        mediaItems.add(R.string.main_songs_recent_added, "$MEDIA_SONG_RECENT|short|AddedDesc")
+        mediaItems.add(R.string.main_albums_released, "$MEDIA_SONG_RECENT|short|DateDescAndRelease")
+        mediaItems.add(R.string.main_last_played_genres, MEDIA_LAST_PLAYED_GENRES_SONGS)
+        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
+    }
+
+    private fun getLiveSetsTabItems(): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+        mediaItems.add(R.string.button_bar_search, "$MEDIA_GET_GENRES|long")
+        mediaItems.add(R.string.main_songs_recent_added, "$MEDIA_SONG_RECENT|long|AddedDesc")
+        mediaItems.add(R.string.main_albums_released, "$MEDIA_SONG_RECENT|long|DateDescAndRelease")
+        mediaItems.add(R.string.main_last_played_genres, MEDIA_LAST_PLAYED_GENRES_LIVESETS)
+        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
+    }
+
+    private fun getLastPlayedGenres(length: String): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+        val mediaItems: MutableList<MediaItem> = ArrayList()
+        val genresJson = if (length == "long") Settings.lastPlayedLiveGenres else Settings.lastPlayedGenres
+        val type = object : TypeToken<List<String>>() {}.type
+        val genres: List<String> = Gson().fromJson(genresJson, type)
+
+        genres.flatMap { it.split(';', ',', '/') }
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+            .forEach { genre ->
+                mediaItems.add(
+                    genre,
+                    "$MEDIA_GET_SONGS_BY_GENRE|$length|$genre||AddedDesc",
+                    isBrowsable = true,
+                    mediaType = MEDIA_TYPE_PLAYLIST
+                )
+            }
+        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), null))
     }
 
     private fun getArtists(
@@ -652,6 +710,18 @@ class MediaLibraryBrowser(
         val mediaItems: MutableList<MediaItem> = ArrayList()
 
         return mainScope.future {
+            // Add Tiles first
+            val context = UApp.applicationContext()
+            val songTiles = TileStorage.loadTiles(context, "song")
+            val liveTiles = TileStorage.loadTiles(context, "liveset")
+
+            songTiles.forEach { tile ->
+                mediaItems.add(tile.toMediaItem())
+            }
+            liveTiles.forEach { tile ->
+                mediaItems.add(tile.toMediaItem())
+            }
+
             val playlists = serviceScope.future {
                 callWithErrorHandling { musicService.getPlaylists(true) }
             }.await()

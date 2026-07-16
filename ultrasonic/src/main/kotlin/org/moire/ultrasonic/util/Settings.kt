@@ -306,6 +306,33 @@ object Settings {
     var mumaUserId by StringIntSetting(getKey(R.string.setting_key_muma_user_id), -1)
 
     @JvmStatic
+    var lastHomeFilter by IntSetting("last_home_filter", R.id.chip_recent)
+
+    @JvmStatic
+    var genreTrackLimit by IntSetting("genre_track_limit", 100)
+
+    @JvmStatic
+    var lastPlayedGenres by StringSetting("last_played_genres", "[]")
+
+    @JvmStatic
+    var lastPlayedLiveGenres by StringSetting("last_played_live_genres", "[]")
+
+    @JvmStatic
+    var lastPlayedSongs by StringSetting("last_played_songs", "[]")
+
+    @JvmStatic
+    var lastPlayedAlbums by StringSetting("last_played_albums", "[]")
+
+    @JvmStatic
+    var lastPlayedArtists by StringSetting("last_played_artists", "[]")
+
+    @JvmStatic
+    var lastSelectedGenres by StringSetting("last_selected_genres", "[]")
+
+    @JvmStatic
+    var lastSelectedLiveGenres by StringSetting("last_selected_live_genres", "[]")
+
+    @JvmStatic
     var staticUserName by StringSetting(getKey(R.string.setting_key_static_username), "")
 
     @JvmStatic
