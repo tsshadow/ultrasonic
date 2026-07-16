@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Update Checker**: Added `u=guest` and `p=guest` credentials to APK download URL to prevent access errors.
+
 ## [6.5.0] - 2026-07-11
 
 ### Added

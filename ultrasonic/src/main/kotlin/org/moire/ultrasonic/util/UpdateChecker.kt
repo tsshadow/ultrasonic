@@ -124,7 +124,11 @@ object UpdateChecker {
                 .setTitle("New Version Available")
                 .setMessage("A new version of Ultrasonic ($versionName) is available. Would you like to download it now?")
                 .setPositiveButton("Download") { _, _ ->
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(downloadUrl))
+                    val uri = Uri.parse(downloadUrl).buildUpon()
+                        .appendQueryParameter("u", "guest")
+                        .appendQueryParameter("p", "guest")
+                        .build()
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
                     context.startActivity(intent)
                 }
                 .setNegativeButton("Later", null)
