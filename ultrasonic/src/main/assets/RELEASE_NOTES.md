@@ -1,3 +1,7 @@
+## [6.5.2-232] - 2026-07-16
+### Fixed
+- **Update Checker**: Added `u=guest` and `p=guest` credentials to APK download URL to prevent access errors.
+
 ## [6.5.0] - 2026-07-11
 ### Added
 - **Log Viewer**: New diagnostic tool accessible from Settings > About to view and share app logs.
