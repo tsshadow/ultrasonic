@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Gradle**: Updated to 9.6.1.
+- **Dependencies**: Updated all major libraries (Kotlin 2.4.0, AGP 9.2.0, Media3 1.10.1, Room 2.8.4, Retrofit 3.0.0, OkHttp 5.1.0).
+- **Target SDK**: Updated to Android 16 (API 36).
 
 ### Added
 - **Export to Media Device**: New feature to export the current playlist to external USB devices (e.g., Shokz OpenSwim Pro) via SAF. Includes an option to clear the destination folder before exporting.
