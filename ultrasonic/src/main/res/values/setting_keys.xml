@@ -68,4 +68,5 @@
     <string name="setting_key.load_from_muma" translatable="false">loadFromMuma</string>
     <string name="setting_key.static_username" translatable="false">staticUserName</string>
     <string name="setting_key.static_password" translatable="false">staticPassword</string>
+    <string name="setting_key.media_device_export" translatable="false">mediaDeviceExportEnabled</string>
 </resources>

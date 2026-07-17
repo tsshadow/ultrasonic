@@ -14,6 +14,7 @@ import android.graphics.Canvas
 import android.graphics.Color.argb
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -38,6 +39,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ViewFlipper
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -46,6 +48,7 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.HeartRating
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -78,6 +81,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.scope.ScopeFragment
 import org.koin.core.component.KoinScopeComponent
@@ -141,6 +145,12 @@ class PlayerFragment :
     private val mediaPlayerManager: MediaPlayerManager by inject()
     private val shareHandler: ShareHandler by inject()
     private val imageLoaderProvider: ImageLoaderProvider by inject()
+    private val mediaDeviceExporter: MediaDeviceExporter by inject()
+    private val exportToMediaDevicePicker = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+        uri?.let {
+            askClearDeviceAndExport(it)
+        }
+    }
     private var currentSong: Track? = null
     private lateinit var viewManager: LinearLayoutManager
     private var rxBusSubscription: CompositeDisposable = CompositeDisposable()
@@ -473,6 +483,58 @@ class PlayerFragment :
         }
     }
 
+    private fun exportPlaylistToMediaDevice() {
+        if (viewAdapter.getCurrentList().isEmpty()) {
+            toast(R.string.playlist_empty)
+            return
+        }
+        exportToMediaDevicePicker.launch(null)
+    }
+
+    private fun askClearDeviceAndExport(uri: Uri) {
+        ConfirmationDialog.show(
+            requireContext(),
+            R.string.export_clear_dialog_title,
+            R.string.export_clear_dialog_message,
+            R.string.common_ok,
+            R.string.common_cancel
+        ) {
+            startExport(uri, true)
+        }.apply {
+            setNegativeButton(R.string.common_cancel) { _, _ ->
+                startExport(uri, false)
+            }
+        }
+    }
+
+    private fun startExport(uri: Uri, clearFirst: Boolean) {
+        val tracks = viewAdapter.getCurrentList().filterIsInstance<Track>()
+        val progressDialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.download_menu_export_to_media_device)
+            .setMessage(getString(R.string.export_progress, 0, tracks.size, ""))
+            .setCancelable(false)
+            .setNegativeButton(R.string.common_cancel) { _, _ ->
+                // TODO: Handle cancellation if needed
+            }
+            .show()
+
+        lifecycleScope.launch {
+            try {
+                mediaDeviceExporter.export(uri, tracks, clearFirst) { current, total, title ->
+                    withContext(Dispatchers.Main) {
+                        progressDialog.setMessage(getString(R.string.export_progress, current, total, title))
+                    }
+                }
+                toast(R.string.export_success)
+            } catch (e: Exception) {
+                Timber.e(e, "Export failed")
+                toast(getString(R.string.export_failed, e.message ?: "Unknown error"))
+            } finally {
+                progressDialog.dismiss()
+            }
+        }
+    }
+
     private fun toggleShuffle() {
         val isEnabled = mediaPlayerManager.toggleShuffle()
 
@@ -543,6 +605,7 @@ class PlayerFragment :
         val goToArtist = menu.findItem(R.id.menu_show_artist)
         val showMetadata = menu.findItem(R.id.menu_show_metadata)
         val jukeboxOption = menu.findItem(R.id.menu_item_jukebox)
+        val exportMenuItem = menu.findItem(R.id.menu_item_export_to_media_device)
         val equalizerMenuItem = menu.findItem(R.id.menu_item_equalizer)
         val shareMenuItem = menu.findItem(R.id.menu_item_share)
         val shareSongMenuItem = menu.findItem(R.id.menu_item_share_song)
@@ -632,6 +695,8 @@ class PlayerFragment :
                 jukeboxOption.setTitle(R.string.download_menu_jukebox_on)
             }
         }
+
+        exportMenuItem?.isVisible = Settings.mediaDeviceExportEnabled
     }
 
     private fun onCreateContextMenu(view: View, track: Track): PopupMenu {
@@ -753,6 +818,10 @@ class PlayerFragment :
                 if (mediaPlayerManager.playlistSize > 0) {
                     showSavePlaylistDialog()
                 }
+                return true
+            }
+            R.id.menu_item_export_to_media_device -> {
+                exportPlaylistToMediaDevice()
                 return true
             }
             R.id.menu_item_star -> {

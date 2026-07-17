@@ -333,6 +333,12 @@ object Settings {
     var lastSelectedLiveGenres by StringSetting("last_selected_live_genres", "[]")
 
     @JvmStatic
+    var mediaDeviceExportEnabled by BooleanSetting(
+        getKey(R.string.setting_key_media_device_export),
+        false
+    )
+
+    @JvmStatic
     var staticUserName by StringSetting(getKey(R.string.setting_key_static_username), "")
 
     @JvmStatic

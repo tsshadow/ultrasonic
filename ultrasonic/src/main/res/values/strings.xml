@@ -78,6 +78,7 @@
     <string name="download.menu_show_album">Go to Album</string>
     <string name="download.menu_show_metadata">Show metadata</string>
     <string name="download.menu_refresh_track">Refresh Track</string>
+    <string name="download.menu_export_to_media_device">Export to Media Device</string>
     <string name="download.menu_shuffle">Shuffle</string>
     <string name="download.menu_shuffle_on">Shuffle mode enabled</string>
     <string name="download.menu_shuffle_off">Shuffle mode disabled</string>
@@ -107,6 +108,11 @@
     <string name="meta_duration">Duration: %1$s</string>
     <string name="meta_bitrate">Bitrate: %1$s kbps</string>
     <string name="meta_path">Path: %1$s</string>
+    <string name="export.clear_dialog_title">Clear device?</string>
+    <string name="export.clear_dialog_message">Do you want to clear the destination folder before exporting?</string>
+    <string name="export.success">Export successful</string>
+    <string name="export.failed">Export failed: %s</string>
+    <string name="export.progress">Exporting %1$d/%2$d: %3$s</string>
     <string name="language.default">System default</string>
     <string name="language.zh_CN">Chinese (China)</string>
     <string name="language.zh_TW">Chinese (Taiwan)</string>
@@ -571,6 +577,8 @@
     <string name="changelog_title">What\'s New</string>
     <string name="changelog_button">Changelog</string>
     <string name="setting_key_last_seen_version" translatable="false">last_seen_version</string>
+    <string name="setting_media_device_export_title">Enable Media Device Export</string>
+    <string name="setting_media_device_export_summary">Show an option to export the current playlist to a connected media device (USB/OpenSwim Pro)</string>
     <string name="welcome_title">Welcome to Ultrasonic</string>
     <string name="welcome_login_info">What is your login information?</string>
     <string name="welcome_username">Name</string>

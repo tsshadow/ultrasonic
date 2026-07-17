@@ -259,6 +259,12 @@
             a:key="@string/setting_key.directory_cache_time"
             a:title="@string/settings.directory_cache_time"
             app:iconSpaceReserved="false"/>
+        <CheckBoxPreference
+            a:defaultValue="false"
+            a:key="@string/setting_key.media_device_export"
+            a:summary="@string/setting_media_device_export_summary"
+            a:title="@string/setting_media_device_export_title"
+            app:iconSpaceReserved="false"/>
     </PreferenceCategory>
     <PreferenceCategory
         a:title="@string/settings.search_title"

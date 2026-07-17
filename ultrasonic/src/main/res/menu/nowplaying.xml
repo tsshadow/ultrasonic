@@ -49,6 +49,11 @@
         app:showAsAction="ifRoom|withText"
         a:title="@string/download.menu_clear_playlist"/>
     <item
+        a:id="@+id/menu_item_export_to_media_device"
+        a:icon="@drawable/ic_menu_save"
+        app:showAsAction="never"
+        a:title="@string/download.menu_export_to_media_device"/>
+    <item
         a:id="@+id/menu_lyrics"
         a:icon="@drawable/ic_library"
         app:showAsAction="ifRoom|withText"
