@@ -68,9 +68,11 @@ class TrackViewHolder(val view: View) :
     private var duration: TextView = view.findViewById(R.id.song_duration)
     private var statusImage: ImageView = view.findViewById(R.id.song_status_image)
     private var progressIndicator: CircularProgressIndicator =
-        view.findViewById<CircularProgressIndicator?>(R.id.song_status_progress).apply {
-            this.max = 100
-        }
+        view.findViewById(R.id.song_status_progress)
+
+    init {
+        progressIndicator.max = 100
+    }
 
     private var isMaximized = false
     private var cachedStatus = DownloadState.UNKNOWN

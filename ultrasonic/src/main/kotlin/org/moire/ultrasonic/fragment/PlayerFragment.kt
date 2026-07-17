@@ -110,6 +110,7 @@ import org.moire.ultrasonic.subsonic.ShareHandler
 import org.moire.ultrasonic.util.CancellationToken
 import org.moire.ultrasonic.util.CommunicationError
 import org.moire.ultrasonic.util.ConfirmationDialog
+import org.moire.ultrasonic.util.MediaDeviceExporter
 import org.moire.ultrasonic.util.Settings
 import org.moire.ultrasonic.util.Util
 import org.moire.ultrasonic.util.Util.toast
@@ -500,11 +501,9 @@ class PlayerFragment :
             R.string.common_cancel
         ) {
             startExport(uri, true)
-        }.apply {
-            setNegativeButton(R.string.common_cancel) { _, _ ->
-                startExport(uri, false)
-            }
-        }
+        }.setNegativeButton(R.string.common_cancel) { _, _ ->
+            startExport(uri, false)
+        }.show()
     }
 
     private fun startExport(uri: Uri, clearFirst: Boolean) {
@@ -1440,8 +1439,8 @@ class PlayerFragment :
 
     private fun setLayerDrawableColors(drawable: LayerDrawable) {
         drawable.apply {
-            getDrawable(0).setTint(requireContext().themeColor(RM.attr.colorSurface))
-            getDrawable(1).setTint(requireContext().themeColor(RM.attr.colorAccent))
+            getDrawable(0).setTint(requireContext().themeColor(com.google.android.material.R.attr.colorSurface))
+            getDrawable(1).setTint(requireContext().themeColor(android.R.attr.colorPrimary))
         }
     }
 

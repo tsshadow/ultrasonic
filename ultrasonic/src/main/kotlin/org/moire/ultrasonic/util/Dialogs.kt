@@ -103,6 +103,25 @@ class ConfirmationDialog(
 ) : InfoDialog(context, message, activity, finishActivityOnClose) {
     override var builder: MaterialAlertDialogBuilder = Builder(activity ?: context, message)
 
+    companion object {
+        fun show(
+            context: Context,
+            title: Int,
+            message: Int,
+            positiveButton: Int,
+            negativeButton: Int,
+            onPositive: () -> Unit
+        ): MaterialAlertDialogBuilder {
+            val builder = Builder(context)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(positiveButton) { _, _ -> onPositive() }
+                .setNegativeButton(negativeButton) { _, _ -> }
+            builder.show()
+            return builder
+        }
+    }
+
     class Builder(context: Context) : MaterialAlertDialogBuilder(context) {
         constructor(context: Context, message: CharSequence?) : this(context) {
             setMessage(message)
